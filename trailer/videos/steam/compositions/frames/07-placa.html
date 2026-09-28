@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root { position: absolute; inset: 0; overflow: hidden; background: #1c1a3a; }
+        /* O mundo é a câmera: translate + scale num só wrapper (origem no centro). O vídeo nunca é animado direto. */
+        .f-mundo { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+        .f-mundo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+        #f-escuro { position: absolute; inset: 0; background: #1c1a3a; opacity: 0; }
+      </style>
+
+      <div data-hf-id="hf-n7vu" id="root" data-composition-id="placa" data-width="1920" data-height="1080">
+        <div data-hf-id="hf-nhsx" class="f-mundo" id="f-mundo" data-layout-allow-overflow=""><video data-hf-id="hf-ja85" id="f-video" class="clip" src="assets/gameplay/steam-final.mp4" data-start="0" data-duration="5.41" data-media-start="0.5" data-track-index="0" muted playsinline></video></div>
+        <div data-hf-id="hf-tw4v" id="f-escuro"></div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+
+          tl.fromTo("#f-mundo", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "none" }, 0);
+          tl.fromTo("#f-escuro", { opacity: 0 }, { opacity: 0.62, duration: 0.8, ease: "power2.out" }, 0.3);
+          window.__timelines["placa"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

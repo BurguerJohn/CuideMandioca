@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root { position: absolute; inset: 0; overflow: hidden; background: #1c1a3a; }
+        /* O mundo é a câmera: translate + scale num só wrapper (origem no centro). O vídeo nunca é animado direto. */
+        .m-mundo { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+        .m-mundo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+
+      </style>
+
+      <div data-hf-id="hf-r7mb" id="root" data-composition-id="melhorias" data-width="1920" data-height="1080">
+        <div data-hf-id="hf-sezr" class="m-mundo" id="m-mundo" data-layout-allow-overflow=""><video data-hf-id="hf-lpxv" id="m-video" class="clip" src="assets/gameplay/steam-melhorias.mp4" data-start="0" data-duration="9.218" data-media-start="0" data-track-index="0" muted playsinline></video></div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+
+          tl.fromTo("#m-mundo", { scale: 1.12, filter: "blur(18px)" },
+            { scale: 1, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 0);
+          window.__timelines["melhorias"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

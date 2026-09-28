@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root { position: absolute; inset: 0; overflow: hidden; background: #1c1a3a; }
+        /* O mundo é a câmera: translate + scale num só wrapper (origem no centro). O vídeo nunca é animado direto. */
+        .r-mundo { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+        .r-mundo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+
+      </style>
+
+      <div data-hf-id="hf-xsmq" id="root" data-composition-id="regional" data-width="1920" data-height="1080">
+        <div data-hf-id="hf-v5cp" class="r-mundo" id="r-mundo" data-layout-allow-overflow=""><video data-hf-id="hf-gpvc" id="r-video" class="clip" src="assets/gameplay/steam-regional.mp4" data-start="0" data-duration="9.219" data-media-start="0" data-track-index="0" muted playsinline></video></div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+
+          const S = 1.7;
+          const limite = 960 * S - 960;                    // translate máximo sem mostrar a borda do vídeo
+          tl.fromTo("#r-mundo", { scale: S, x: limite, y: 0 }, { x: limite * 0.92, duration: 2.1, ease: "sine.inOut" }, 0);
+          tl.to("#r-mundo", { x: -limite, duration: 3.9, ease: "sine.inOut" }, 2.1);
+          const S2 = 2.2;
+          const fogo = { x: 1435 - 960, y: 647 - 540 };
+          tl.to("#r-mundo", { scale: S2, x: -fogo.x * S2, y: -fogo.y * S2, duration: 0.8, ease: "power3.out" }, 6.1);
+          window.__timelines["regional"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

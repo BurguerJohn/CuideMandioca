@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root { position: absolute; inset: 0; overflow: hidden; background: #1c1a3a; }
+        /* O mundo é a câmera: translate + scale num só wrapper (origem no centro). O vídeo nunca é animado direto. */
+        .e-mundo { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+        .e-mundo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+
+      </style>
+
+      <div data-hf-id="hf-4ejx" id="root" data-composition-id="quermesse" data-width="1920" data-height="1080">
+        <div data-hf-id="hf-hgvb" class="e-mundo" id="e-mundo" data-layout-allow-overflow=""><video data-hf-id="hf-rtrh" id="e-video" class="clip" src="assets/gameplay/steam-quermesse.mp4" data-start="0" data-duration="9.219" data-media-start="0.1" data-track-index="0" muted playsinline></video></div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+
+          // Câmera parada: o selo é a âncora e a festa muda em volta dele.
+          tl.set("#e-mundo", { scale: 1 }, 0);
+          window.__timelines["quermesse"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

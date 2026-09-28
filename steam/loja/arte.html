@@ -1,0 +1,158 @@
+<!doctype html>
+<!-- Arte da loja da Steam: céu de São João, a festa em pixel (escala inteira, sem borrar) e a placa com o título no
+     idioma. gerar.js abre esta página com ?tipo=<asset>&idioma=<pt-BR|en|es> no tamanho exato e fotografa. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "Fredoka"; src: url("pecas/Fredoka.ttf") format("truetype"); font-weight: 300 700; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { position: relative; background: transparent; font-family: "Fredoka", sans-serif; }
+  #ceu { position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 55% at 50% 95%, rgba(255, 138, 18, 0.30), rgba(255, 138, 18, 0) 70%),
+      radial-gradient(ellipse 90% 70% at 50% 40%, rgba(98, 72, 176, 0.55), rgba(28, 26, 58, 0) 75%),
+      linear-gradient(#141230, #1c1a3a 40%, #2c2458 80%, #3a2a5e); }
+  #estrelas { position: absolute; inset: 0; }
+  #festa { position: absolute; image-rendering: pixelated; }
+  #escurece { position: absolute; inset: 0; }
+
+  /* Placa do título: a mesma dos vídeos, montada em 900 x 300 e escalada para cada imagem. */
+  .placa { position: absolute; left: 0; top: 0; width: 900px; height: 300px; transform-origin: 0 0;
+    display: flex; align-items: flex-end; gap: 26px; padding: 0 38px 26px; background: #fff4e4; border: 6px solid #2e1812;
+    box-shadow: 0 0 0 9px #c07a36, 0 0 0 18px #7c421e, 0 0 0 24px #2e1812, 16px 20px 0 24px rgba(18, 9, 6, 0.5); }
+  .bandeiras { position: absolute; left: -6px; right: -6px; top: -6px; height: 54px; display: flex; justify-content: space-around; }
+  .bandeiras::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #2e1812; }
+  .bandeiras i { display: block; width: 44px; height: 50px; margin-top: 4px; clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
+  .bandeiras i:nth-child(6n + 1) { background: #ee2f3c; } .bandeiras i:nth-child(6n + 2) { background: #ffd21e; }
+  .bandeiras i:nth-child(6n + 3) { background: #35a03a; } .bandeiras i:nth-child(6n + 4) { background: #3a6cf0; }
+  .bandeiras i:nth-child(6n + 5) { background: #ff4f9e; } .bandeiras i:nth-child(6n + 6) { background: #ff8a12; }
+  .mascote { position: relative; flex: none; width: 160px; height: 220px; }
+  .mascote .corpo { position: absolute; inset: 0; background: url("pecas/mandioca.png") 0 0 / 2560px 220px no-repeat;
+    image-rendering: pixelated; }
+  .mascote img { position: absolute; width: 120px; height: 45px; left: 20px; top: 25px; image-rendering: pixelated; }
+  .letreiro { flex: 1; min-width: 0; display: flex; flex-direction: column; padding-bottom: 6px; }
+  .letreiro .l1 { font-weight: 700; font-size: 46px; line-height: 1; color: #2e1812; letter-spacing: 0.02em; white-space: nowrap; }
+  .letreiro .l2 { font-weight: 700; font-size: 124px; line-height: 0.95; color: #ee2f3c; letter-spacing: -0.03em; white-space: nowrap;
+    -webkit-text-stroke: 7px #2e1812; paint-order: stroke fill; text-shadow: 0 8px 0 #8a1030; }
+  /* Placa empilhada para as capas verticais: a Mandioca em cima e o título embaixo, em duas linhas centralizadas. */
+  .placa.empilhada { width: 620px; height: 560px; flex-direction: column; align-items: center; justify-content: flex-end;
+    gap: 6px; padding: 64px 30px 30px; }
+  .placa.empilhada .letreiro { flex: none; width: 100%; align-items: center; text-align: center; padding-bottom: 0; }
+  .placa.empilhada .mascote { transform: scale(1.35); transform-origin: 50% 100%; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+<div id="ceu"></div>
+<canvas id="estrelas"></canvas>
+<img id="festa" alt="">
+<div id="escurece"></div>
+<div class="placa" id="placa">
+  <div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="mascote"><div class="corpo"></div><img src="pecas/chapeu-palha.png" alt=""></div>
+  <div class="letreiro"><span class="l1" id="l1"></span><span class="l2" id="l2"></span></div>
+</div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const tipo = q.get('tipo');
+  const idioma = q.get('idioma') || 'en';
+  const W = innerWidth;
+  const H = innerHeight;
+  const TITULO = {
+    'pt-BR': ['CUIDE BEM DA SUA', 'MANDIOCA'],
+    en: ['TAKE GOOD CARE OF YOUR', 'CASSAVA'],
+    es: ['CUIDA BIEN TU', 'MANDIOCA']
+  }[idioma];
+  document.getElementById('l1').textContent = TITULO[0];
+  document.getElementById('l2').textContent = TITULO[1];
+
+  // Cada imagem: onde fica a festa (escala inteira e âncora), a placa (largura e centro) e o que aparece.
+  // fundo: false = PNG transparente (logo da biblioteca). placa: null = sem texto nenhum (hero, fundo da página).
+  const LAYOUT = {
+    // A Steam pede o logo ocupando pelo menos 1/3 da capa, e nenhum texto além dele: a festa usada é a "limpa".
+    header:   { festa: { k: 2, base: 432, cx: 0.5 }, placa: { w: 640, cx: 0.5, top: 22 } },
+    small:    { festa: { k: 1, base: 190, cx: 0.5, sombra: 0.55 }, placa: { w: 410, cx: 0.5, top: 18 } },
+    main:     { festa: { k: 3, base: 716, cx: 0.5 }, placa: { w: 880, cx: 0.5, top: 34 } },
+    vertical: { festa: { k: 3, base: 900, cx: 0.5, foco: 0.45 }, placa: { w: 560, cx: 0.5, top: 34, empilhada: true } },
+    capsula:  { festa: { k: 3, base: 904, cx: 0.5, foco: 0.45 }, placa: { w: 470, cx: 0.5, top: 34, empilhada: true } },
+    hero:     { festa: { k: 5, base: 1250, cx: 0.5 }, placa: null, limpa: true },
+    fundo:    { festa: { k: 3, base: 830, cx: 0.5, sombra: 0.55 }, placa: null, limpa: true },
+    logo:     { festa: null, placa: { w: 1180, cx: 0.5, top: 90 }, fundo: false },
+    icone:    { festa: null, placa: null, icone: true }
+  }[tipo];
+
+  // Estrelinhas de pixel, sempre as mesmas (semente fixa).
+  function estrelas() {
+    const c = document.getElementById('estrelas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    let s = 11;
+    const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const cores = ['#fff4e4', '#fff07a', '#cfe3ff'];
+    const px = Math.max(2, Math.round(Math.min(W, H) / 220));
+    for (let i = 0; i < Math.round(W * H / 5200); i++) {
+      g.fillStyle = cores[Math.floor(r() * cores.length)];
+      g.globalAlpha = 0.45 + r() * 0.55;
+      g.fillRect(Math.floor(r() * W / px) * px, Math.floor(r() * H * 0.7 / px) * px, px, px);
+    }
+  }
+
+  function festa(cfg, arquivo) {
+    const img = document.getElementById('festa');
+    return new Promise(resolve => {
+      img.onload = () => {
+        const w = img.naturalWidth * cfg.k;
+        const h = img.naturalHeight * cfg.k;
+        img.style.width = `${w}px`;
+        img.style.height = `${h}px`;
+        // foco: que ponto da festa (0 = esquerda, 1 = direita) fica em cx; o palco com a Mandioca fica perto de 0,45.
+        img.style.left = `${Math.round(W * cfg.cx - w * (cfg.foco ?? 0.5))}px`;
+        img.style.top = `${Math.round(cfg.base - h)}px`;
+        if (cfg.sombra) document.getElementById('escurece').style.background = `rgba(20, 16, 44, ${cfg.sombra})`;
+        resolve();
+      };
+      img.src = arquivo;
+    });
+  }
+
+  // A placa encolhe o texto até caber (o inglês tem a primeira linha mais comprida).
+  function placa(cfg) {
+    const el = document.getElementById('placa');
+    if (cfg.empilhada) el.classList.add('empilhada');
+    const base = cfg.empilhada ? 620 : 900;
+    for (const [id, min] of [['l1', 20], ['l2', 60]]) {
+      const span = document.getElementById(id);
+      let size = parseFloat(getComputedStyle(span).fontSize);
+      while (span.scrollWidth > span.parentElement.clientWidth && size > min) span.style.fontSize = `${--size}px`;
+    }
+    const k = cfg.w / base;
+    el.style.transform = `scale(${k})`;
+    el.style.left = `${Math.round(W * cfg.cx - cfg.w / 2)}px`;
+    el.style.top = `${cfg.top}px`;
+  }
+
+  async function montar() {
+    await document.fonts.ready;
+    if (LAYOUT.fundo === false) {
+      document.getElementById('ceu').remove();
+      document.getElementById('estrelas').remove();
+    } else estrelas();
+    if (LAYOUT.icone) {
+      // Ícone da comunidade: a Mandioca de chapéu, grande, no céu da festa (sem texto).
+      document.getElementById('placa').remove();
+      const m = document.createElement('div');
+      m.className = 'mascote';
+      m.innerHTML = '<div class="corpo"></div><img src="pecas/chapeu-palha.png" alt="">';
+      m.style.cssText = `position:absolute; left:${(W - 160) / 2}px; top:${H - 214}px; transform-origin: 50% 100%; transform: scale(0.8)`;
+      document.body.appendChild(m);
+    } else if (LAYOUT.placa) placa(LAYOUT.placa);
+    else document.getElementById('placa').remove();
+    // Toda a arte usa a festa sem palavras (placas em branco): só o título do jogo pode aparecer escrito.
+    if (LAYOUT.festa) await festa(LAYOUT.festa, 'fotos/pt-BR/festa-limpa-1x.png');
+    await Promise.all([...document.images].map(img => img.complete ? null : new Promise(r => { img.onload = r; img.onerror = r; })));
+    window.__pronto = true;
+  }
+  montar();
+</script>
+</body>
+</html>

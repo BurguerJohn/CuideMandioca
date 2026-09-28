@@ -1,0 +1,26 @@
+{
+  "name": "cuide-bem-da-sua-mandioca",
+  "version": "3.0.0",
+  "private": true,
+  "main": "desktop/main.js",
+  "productName": "Cuide bem da sua mandioca",
+  "description": "Uma festa junina em pixel art que cresce na sua área de trabalho",
+  "scripts": {
+    "test": "node --test --test-isolation=none tests/*.test.js",
+    "start": "electron .",
+    "start:web": "python -m http.server 8000",
+    "build:win": "node desktop/package-win.js",
+    "build:art": "py -3.12 art/exportar.py",
+    "simulate": "node tools/simulate.js",
+    "steam:config": "node desktop/prepare-steam.js",
+    "steam:icons": "py -3.12 art/conquistas_steam.py",
+    "steam:upload": "node desktop/upload-steam.js"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "44.4.5"
+  },
+  "dependencies": {
+    "steamworks.js": "^0.4.0"
+  }
+}

@@ -1,0 +1,63 @@
+"lang"
+{
+	"brazilian"
+	{
+		"tokens"
+		{
+			"#Festa"	"{#Porte_%porte%}: %convidados% convidados"
+			"#Porte_quintal"	"Arraiá de Quintal"
+			"#Porte_quermesse"	"Quermesse do Bairro"
+			"#Porte_cidade"	"Festa da Cidade"
+			"#Porte_regional"	"São João Regional"
+			"#Porte_maior"	"Maior São João do Mundo"
+		}
+	}
+	"portuguese"
+	{
+		"tokens"
+		{
+			"#Festa"	"{#Porte_%porte%}: %convidados% convidados"
+			"#Porte_quintal"	"Arraiá de Quintal"
+			"#Porte_quermesse"	"Quermesse do Bairro"
+			"#Porte_cidade"	"Festa da Cidade"
+			"#Porte_regional"	"São João Regional"
+			"#Porte_maior"	"Maior São João do Mundo"
+		}
+	}
+	"english"
+	{
+		"tokens"
+		{
+			"#Festa"	"{#Porte_%porte%}: %convidados% guests"
+			"#Porte_quintal"	"Backyard Arraiá"
+			"#Porte_quermesse"	"Neighborhood Fair"
+			"#Porte_cidade"	"Town Festival"
+			"#Porte_regional"	"Regional São João"
+			"#Porte_maior"	"World’s Biggest São João"
+		}
+	}
+	"spanish"
+	{
+		"tokens"
+		{
+			"#Festa"	"{#Porte_%porte%}: %convidados% invitados"
+			"#Porte_quintal"	"Arraiá del Patio"
+			"#Porte_quermesse"	"Kermés del Barrio"
+			"#Porte_cidade"	"Fiesta de la Ciudad"
+			"#Porte_regional"	"San Juan Regional"
+			"#Porte_maior"	"El San Juan Más Grande del Mundo"
+		}
+	}
+	"latam"
+	{
+		"tokens"
+		{
+			"#Festa"	"{#Porte_%porte%}: %convidados% invitados"
+			"#Porte_quintal"	"Arraiá del Patio"
+			"#Porte_quermesse"	"Kermés del Barrio"
+			"#Porte_cidade"	"Fiesta de la Ciudad"
+			"#Porte_regional"	"San Juan Regional"
+			"#Porte_maior"	"El San Juan Más Grande del Mundo"
+		}
+	}
+}

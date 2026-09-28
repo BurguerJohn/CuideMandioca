@@ -1,0 +1,40 @@
+# Dependências e caches
+node_modules/
+.npm-cache/
+.electron-cache/
+__pycache__/
+*.pyc
+
+# Build do jogo e saída do SteamPipe (npm run build:win / npm run steam:upload)
+dist/
+steam-build-output/
+
+# Cópias de segurança locais
+_backup*.zip
+
+# Imagens da loja já renomeadas para enviar ao Steamworks (steam/loja/gerar.js refaz)
+steam/loja/enviar/
+
+# Vídeos: tudo o que os scripts do trailer/ geram de novo (veja trailer/README.md)
+trailer/renders/
+trailer/assets/gameplay/
+trailer/assets/gameplay-*/
+trailer/videos/gerados/
+trailer/videos/*/assets/
+trailer/videos/*/snapshots/
+trailer/videos/*/beats/
+trailer/videos/*/.hyperframes/
+trailer/videos/*/.media/
+
+# Segredos (o .mcp.json do trailer só lê a chave da variável API_KEY_21ST)
+.env
+.env.*
+
+# Sistema e editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.log
+npm-debug.log*

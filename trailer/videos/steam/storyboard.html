@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Trailer da Steam — rascunhos v2</title>
+<style>
+  @font-face { font-family: "Fredoka"; src: url("../../assets/fontes/Fredoka.ttf") format("truetype"); font-weight: 300 700; }
+  :root {
+    --noite: #1c1a3a; --papel: #fff4e4; --ouro: #ffd21e; --tinta: #2e1812; --vermelho: #ee2f3c;
+    --madeira: #7c421e; --madeira-clara: #c07a36; --madeira-escura: #361a0c;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #14122a; color: var(--papel); font-family: "Fredoka", system-ui, sans-serif; padding: 40px 48px 64px; }
+  header.folha { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
+  header.folha h1 { font-size: 34px; font-weight: 700; }
+  header.folha .versao { background: var(--ouro); color: var(--tinta); font-weight: 700; padding: 2px 10px; border-radius: 999px; font-size: 16px; }
+  header.folha .tag { font-family: Consolas, monospace; font-size: 14px; opacity: .75; }
+  p.dek { font-size: 17px; opacity: .85; max-width: 1100px; margin-bottom: 28px; }
+  .ato { margin: 26px 0 12px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--madeira-clara); font-weight: 700;
+    border-bottom: 2px solid #3a2f5e; padding-bottom: 6px; }
+  .grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  figure { margin: 0; }
+  .quadro { position: relative; aspect-ratio: 16 / 9; container-type: inline-size; overflow: hidden; background: var(--noite);
+    border-radius: 6px; box-shadow: 0 0 0 2px #3a2f5e; --u: calc(100cqw / 1920); }
+  .quadro .fundo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+  .quadro .escurece { position: absolute; inset: 0; background: rgba(20, 16, 44, .62); }
+  .provisoria { position: absolute; right: calc(24 * var(--u)); bottom: calc(18 * var(--u)); font-family: Consolas, monospace;
+    font-size: calc(22 * var(--u)); background: rgba(0,0,0,.55); color: #cfc6ff; padding: calc(4 * var(--u)) calc(12 * var(--u)); border-radius: 4px; }
+
+  /* Selo da festa: a espinha do trailer, sempre no mesmo canto */
+  .selo { position: absolute; left: calc(96 * var(--u)); top: calc(72 * var(--u)); background: var(--noite);
+    border: calc(5 * var(--u)) solid var(--tinta); padding: calc(14 * var(--u)) calc(26 * var(--u)) calc(12 * var(--u));
+    box-shadow: 0 0 0 calc(7 * var(--u)) var(--madeira-clara), 0 0 0 calc(13 * var(--u)) var(--madeira), 0 0 0 calc(17 * var(--u)) var(--tinta); }
+  .selo .porte { display: block; font-weight: 700; font-size: calc(30 * var(--u)); letter-spacing: .06em; text-transform: uppercase; color: var(--papel); }
+  .selo .lotacao { display: block; font-family: "Space Mono", Consolas, monospace; font-weight: 700; font-size: calc(46 * var(--u)); color: var(--ouro); line-height: 1.1; }
+
+  /* Legendas: creme com contorno, a palavra-chave em amarelo */
+  .legenda { position: absolute; left: calc(96 * var(--u)); right: calc(96 * var(--u)); top: calc(300 * var(--u)); text-align: center;
+    font-weight: 700; font-size: calc(84 * var(--u)); line-height: 1.05; color: var(--papel); -webkit-text-stroke: calc(14 * var(--u)) var(--noite);
+    paint-order: stroke fill; text-shadow: 0 calc(8 * var(--u)) 0 rgba(18, 9, 6, .55); }
+  .legenda em { font-style: normal; color: var(--ouro); }
+  .legenda.grande { font-size: calc(128 * var(--u)); top: calc(250 * var(--u)); }
+  .pop { position: absolute; font-weight: 700; font-size: calc(40 * var(--u)); color: var(--tinta); background: var(--ouro);
+    border: calc(5 * var(--u)) solid var(--tinta); padding: calc(6 * var(--u)) calc(20 * var(--u)); border-radius: 999px;
+    box-shadow: 0 calc(6 * var(--u)) 0 var(--tinta); transform: rotate(-3deg); }
+  .confete i { position: absolute; width: calc(14 * var(--u)); height: calc(20 * var(--u)); }
+
+  /* Placa do título (a mesma dos vídeos), em unidades do quadro */
+  .placa { position: absolute; width: calc(900 * var(--u)); height: calc(300 * var(--u)); display: flex; align-items: flex-end;
+    gap: calc(26 * var(--u)); padding: 0 calc(38 * var(--u)) calc(26 * var(--u)); background: var(--papel); border: calc(6 * var(--u)) solid var(--tinta);
+    box-shadow: 0 0 0 calc(9 * var(--u)) var(--madeira-clara), 0 0 0 calc(18 * var(--u)) var(--madeira), 0 0 0 calc(24 * var(--u)) var(--tinta),
+      calc(16 * var(--u)) calc(20 * var(--u)) 0 calc(24 * var(--u)) rgba(18, 9, 6, .5); }
+  .placa .bandeiras { position: absolute; left: calc(-6 * var(--u)); right: calc(-6 * var(--u)); top: calc(-6 * var(--u)); height: calc(54 * var(--u));
+    display: flex; justify-content: space-around; border-top: calc(6 * var(--u)) solid var(--tinta); }
+  .placa .bandeiras i { display: block; width: calc(44 * var(--u)); height: calc(50 * var(--u)); clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
+  .bandeiras i:nth-child(6n + 1) { background: #ee2f3c; } .bandeiras i:nth-child(6n + 2) { background: #ffd21e; }
+  .bandeiras i:nth-child(6n + 3) { background: #35a03a; } .bandeiras i:nth-child(6n + 4) { background: #3a6cf0; }
+  .bandeiras i:nth-child(6n + 5) { background: #ff4f9e; } .bandeiras i:nth-child(6n + 6) { background: #ff8a12; }
+  .mascote { position: relative; flex: none; width: calc(160 * var(--u)); height: calc(220 * var(--u)); }
+  .mascote .corpo { position: absolute; inset: 0; background: url("../../assets/sprites/mandioca.png") 0 0 / calc(2560 * var(--u)) calc(220 * var(--u)) no-repeat;
+    image-rendering: pixelated; }
+  .mascote img { position: absolute; left: calc(20 * var(--u)); top: calc(25 * var(--u)); width: calc(120 * var(--u)); height: calc(45 * var(--u)); image-rendering: pixelated; }
+  .letreiro { display: flex; flex-direction: column; padding-bottom: calc(6 * var(--u)); }
+  .letreiro .l1 { font-weight: 700; font-size: calc(46 * var(--u)); line-height: 1; color: var(--tinta); letter-spacing: .02em; }
+  .letreiro .l2 { font-weight: 700; font-size: calc(124 * var(--u)); line-height: .95; color: var(--vermelho); letter-spacing: -.03em;
+    -webkit-text-stroke: calc(7 * var(--u)) var(--tinta); paint-order: stroke fill; text-shadow: 0 calc(8 * var(--u)) 0 #8a1030; }
+  .desejos { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(150 * var(--u)); background: var(--vermelho);
+    color: var(--papel); font-weight: 700; font-size: calc(56 * var(--u)); padding: calc(16 * var(--u)) calc(56 * var(--u)) calc(20 * var(--u));
+    border: calc(6 * var(--u)) solid var(--tinta); border-radius: 999px; box-shadow: 0 calc(10 * var(--u)) 0 var(--tinta); white-space: nowrap; }
+  .desejos b { color: var(--ouro); }
+  .legenda.linha-final { top: auto; bottom: calc(110 * var(--u)); font-size: calc(64 * var(--u)); -webkit-text-stroke-width: calc(12 * var(--u)); }
+
+  figcaption { margin-top: 10px; }
+  .rotulo { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; }
+  .rotulo span:last-child { font-family: Consolas, monospace; font-weight: 400; opacity: .7; font-size: 13px; }
+  .nota { font-size: 14.5px; line-height: 1.4; opacity: .88; margin-top: 4px; }
+  .chip { display: inline-block; margin-top: 7px; font-family: Consolas, monospace; font-size: 12.5px; color: var(--tinta);
+    background: var(--madeira-clara); padding: 2px 9px; border-radius: 999px; }
+
+  /* Mapa de cortes e tokens */
+  .painel { background: #1f1c3d; border-radius: 6px; box-shadow: 0 0 0 2px #3a2f5e; padding: 18px 20px; font-size: 14px; }
+  .painel h3 { font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--madeira-clara); margin-bottom: 12px; }
+  .faixa { display: flex; height: 58px; border-radius: 4px; overflow: hidden; }
+  .faixa div { position: relative; border-right: 3px solid #14122a; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; color: var(--tinta); }
+  .faixa .corte { position: absolute; top: -2px; left: -3px; font-family: Consolas, monospace; font-size: 10px; color: var(--papel); }
+  .regua { display: flex; justify-content: space-between; font-family: Consolas, monospace; font-size: 11px; opacity: .7; margin-top: 4px; }
+  .emenda { margin-top: 12px; font-size: 13.5px; line-height: 1.45; opacity: .9; }
+  .cores { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .cores span { display: flex; flex-direction: column; align-items: center; font-family: Consolas, monospace; font-size: 11px; gap: 4px; }
+  .cores i { width: 44px; height: 30px; border-radius: 4px; box-shadow: 0 0 0 2px #3a2f5e; }
+  .painel ul { padding-left: 18px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<header class="folha">
+  <h1>Cuide bem da sua mandioca — trailer da Steam</h1>
+  <span class="versao">v2</span>
+  <span class="tag">1920×1080 · 30 fps · 58,7 s · 7 cenas · música: Balanço de Pixel (103 BPM) · v2: sem "lista de desejos" na cena 7</span>
+</header>
+<p class="dek">A festa começa sem nenhuma melhoria, flutuando na área de trabalho, e sobe um porte por frase da música até o
+Maior São João do Mundo. O selo no canto é a espinha: nunca sai do lugar, só conta. As imagens marcadas "provisória" são
+fotos do jogo que já existem; na montagem entram as gravações novas em 16:9.</p>
+
+<div class="ato">Ato 1 — o quintal</div>
+<div class="grade">
+  <figure>
+    <div class="quadro" id="frame-01">
+      <img class="fundo" src="../../../steam/loja/fotos/pt-BR/5-mesa.png" alt="">
+      <div class="selo"><span class="porte">Arraiá de Quintal</span><span class="lotacao">👥 1</span></div>
+      <div class="legenda">Uma festa junina que dança<br>na sua <em>área de trabalho</em></div>
+      <span class="provisoria">provisória: a gravação nova usa a festa sem melhorias (1 convidado)</span>
+    </div>
+    <figcaption>
+      <div class="rotulo"><span>01 · O QUINTAL NA ÁREA DE TRABALHO</span><span>frame-01 · 0,0–9,7 s</span></div>
+      <p class="nota"><b>Primeiro se move a câmera, recuando:</b> abre fechado na Mandioca dançando sozinha; em 1,0 s a placa do título
+        cai e balança; no compasso 2 o zoom-out revela a planilha; no compasso 3 a placa vira o selo e a legenda sobe.</p>
+      <span class="chip">entrada: corte · zoom-out-workspace-reveal</span>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="quadro" id="frame-02">
+      <img class="fundo" src="rascunho/e1-169.png" alt="" style="transform: translateY(22%) scale(.92);">
+      <div class="selo"><span class="porte">Arraiá de Quintal</span><span class="lotacao">👥 5</span></div>
+      <span class="pop" style="left: calc(1130 * var(--u)); top: calc(560 * var(--u));">Chapéu de Vaqueiro!</span>
+      <div class="legenda">Cada passo rende <em>Animação</em>.<br>Melhore a dança e <em>vista a Mandioca</em></div>
+      <span class="provisoria">provisória</span>
+    </div>
+    <figcaption>
+      <div class="rotulo"><span>02 · PRIMEIRAS MELHORIAS</span><span>frame-02 · 9,7–18,9 s</span></div>
+      <p class="nota"><b>Primeiro cai o chapéu, no pico da música (12,0 s):</b> a cada compasso uma troca na Mandioca (chapéu, roupa,
+        espiga) com a etiqueta do item pipocando ao lado; o selo fica parado e conta 1 → 9.</p>
+      <span class="chip">entrada: zoom-through · fixed-anchor-cycle</span>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="quadro" id="frame-03">
+      <img class="fundo" src="rascunho/e2-169.png" alt="" style="transform: translateY(22%) scale(.92);">
+      <div class="confete">
+        <i style="left: calc(420 * var(--u)); top: calc(300 * var(--u)); background: #ee2f3c; transform: rotate(20deg);"></i>
+        <i style="left: calc(700 * var(--u)); top: calc(240 * var(--u)); background: #ffd21e; transform: rotate(-30deg);"></i>
+        <i style="left: calc(980 * var(--u)); top: calc(330 * var(--u)); background: #35a03a;"></i>
+        <i style="left: calc(1240 * var(--u)); top: calc(260 * var(--u)); background: #3a6cf0; transform: rotate(45deg);"></i>
+        <i style="left: calc(1500 * var(--u)); top: calc(320 * var(--u)); background: #ff4f9e; transform: rotate(-15deg);"></i>
+      </div>
+      <div class="selo"><span class="porte">Quermesse do Bairro</span><span class="lotacao">👥 10</span></div>
+      <span class="pop" style="left: calc(1180 * var(--u)); top: calc(640 * var(--u));">Milho entrou na turma!</span>
+      <div class="legenda">Cada convidado traz<br><em>algo novo</em> pra festa</div>
+      <span class="provisoria">provisória</span>
+    </div>
+    <figcaption>
+      <div class="rotulo"><span>03 · QUERMESSE DO BAIRRO</span><span>frame-03 · 18,9–28,2 s</span></div>
+      <p class="nota"><b>Primeiro estoura o confete, no corte:</b> o 10º convidado chega e o selo troca de porte; peças de cenário
+        pipocam uma por compasso e a pescaria revela o Milho.</p>
+      <span class="chip">entrada: corte no compasso · fixed-anchor-cycle</span>
+    </figcaption>
+  </figure>
+</div>
+
+<div class="ato">Ato 2 — a festa cresce</div>
+<div class="grade">
+  <figure>
+    <div class="quadro" id="frame-04">
+      <img class="fundo" src="../../../steam/loja/fotos/pt-BR/3-argolas.png" alt="">
+      <div class="selo"><span class="porte">Festa da Cidade</span><span class="lotacao">👥 25</span></div>
+      <span class="pop" style="left: calc(1240 * var(--u)); top: calc(560 * var(--u));">ANIMAÇÃO ×2!</span>
+      <div class="legenda"><em>Argolas da Sorte</em>, pescaria<br>e uma turma inteira</div>
+      <span class="provisoria">provisória</span>
+    </div>
+    <figcaption>
+      <div class="rotulo"><span>04 · FESTA DA CIDADE</span><span>frame-04 · 28,2–37,4 s</span></div>
+      <p class="nota"><b>Primeiro abre a janela das Argolas, no centro:</b> duas argolas encaixam (fichas, depois a estrela ×2) e a
+        Animação dobra; no último compasso, corte para a turma no palco.</p>
+      <span class="chip">entrada: corte · device-surface-showcase</span>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="quadro" id="frame-05">
+      <img class="fundo" src="rascunho/e4-169.png" alt="">
+      <div class="selo"><span class="porte">São João Regional</span><span class="lotacao">👥 50</span></div>
+      <div class="legenda"><em>Forró</em> no palco<br>e <em>fogueira</em> acesa</div>
+      <span class="provisoria">provisória</span>
+    </div>
+    <figcaption>
+      <div class="rotulo"><span>05 · SÃO JOÃO REGIONAL</span><span>frame-05 · 37,4–46,6 s</span></div>
+      <p class="nota"><b>Primeiro a câmera anda para a direita:</b> uma panorâmica só pela festa larga — palco com a turma, roda-gigante —
+        parando na fogueira, que solta a labareda no último compasso.</p>
+      <span class="chip">entrada: corte · camera-journey</span>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="quadro" id="frame-06">
+      <img class="fundo" src="../../../steam/loja/fotos/pt-BR/1-festa.png" alt="">
+      <div class="selo"><span class="porte">Maior São João do Mundo</span><span class="lotacao">👥 101</span></div>
+      <div class="legenda grande">o <em>MAIOR SÃO JOÃO</em><br>DO MUNDO</div>
+      <span class="provisoria">provisória</span>
+    </div>
+    <figcaption>
+      <div class="rotulo"><span>06 · O MAIOR SÃO JOÃO DO MUNDO</span><span>frame-06 · 46,6–53,5 s</span></div>
+      <p class="nota"><b>Primeiro o flash, no tempo forte da emenda:</b> Mandioca de coroa de milho no meio da festa gigante, confete,
+        selo contando até 101; a câmera recua como na cena 1 até a planilha (a mesma festinha, agora enorme).</p>
+      <span class="chip">entrada: flash-through-white · zoom-out-workspace-reveal</span>
+    </figcaption>
+  </figure>
+</div>
+
+<div class="ato">Ato 3 — o nome</div>
+<div class="grade">
+  <figure>
+    <div class="quadro" id="frame-07">
+      <img class="fundo" src="rascunho/e5-169.png" alt="">
+      <div class="escurece"></div>
+      <div class="placa" style="left: calc(510 * var(--u)); top: calc(250 * var(--u));">
+        <div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mascote"><div class="corpo"></div><img src="../../assets/sprites/chapeu-palha.png" alt=""></div>
+        <div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div>
+      </div>
+      <div class="legenda linha-final">Um jogo <em>idle</em> de festa junina<br>para a sua <em>área de trabalho</em></div>
+    </div>
+    <figcaption>
+      <div class="rotulo"><span>07 · PLACA DO TÍTULO</span><span>frame-07 · 53,5–58,7 s</span></div>
+      <p class="nota"><b>Primeiro a festa escurece, depois a placa cai:</b> balança uma vez; no último tempo forte sobe a linha que diz o
+        que o jogo é (vale antes e depois do lançamento); daí em diante nada se mexe enquanto a música fecha.</p>
+      <span class="chip">entrada: crossfade · logo-assemble-lockup</span>
+    </figcaption>
+  </figure>
+
+  <div class="painel">
+    <h3>Mapa de cortes</h3>
+    <div class="faixa">
+      <div style="flex: 9.73; background: #c07a36;">1</div>
+      <div style="flex: 9.22; background: #ffd21e;"><span class="corte">zoom</span>2</div>
+      <div style="flex: 9.22; background: #35a03a;"><span class="corte">corte</span>3</div>
+      <div style="flex: 9.24; background: #3a6cf0;"><span class="corte">corte</span>4</div>
+      <div style="flex: 9.22; background: #ff4f9e;"><span class="corte">corte</span>5</div>
+      <div style="flex: 6.91; background: #ee2f3c;"><span class="corte">flash</span>6</div>
+      <div style="flex: 5.11; background: #fff4e4;"><span class="corte" style="color:#2e1812">fade</span>7</div>
+    </div>
+    <div class="regua"><span>0</span><span>9,7</span><span>18,9</span><span>28,2</span><span>37,4</span><span>46,6</span><span>53,5</span><span>58,7 s</span></div>
+    <p class="emenda">Cada corte cai no início de uma frase da música (4 compassos de 2,305 s). Em 46,6 s a música pula para a última
+      frase (2:37,3 → 2:49,3): a emenda fica escondida no flash da cena 6. Dentro das cenas, as trocas caem nos compassos.</p>
+  </div>
+
+  <div class="painel">
+    <h3>Tokens</h3>
+    <div class="cores">
+      <span><i style="background:#1c1a3a"></i>noite</span><span><i style="background:#fff4e4"></i>papel</span>
+      <span><i style="background:#ffd21e"></i>destaque</span><span><i style="background:#2e1812"></i>tinta</span>
+      <span><i style="background:#7c421e"></i>madeira</span><span><i style="background:#c07a36"></i>madeira clara</span>
+      <span><i style="background:#ee2f3c"></i>vermelho</span>
+    </div>
+    <ul>
+      <li><b>Fredoka 700</b> — legendas 84 px, título 124 px (contorno de 14 px)</li>
+      <li><b>Space Mono 700</b> — números do selo, 46 px, amarelo</li>
+      <li>Pixel art sempre em pixel exato</li>
+      <li>Proibido: interface do jogo desenhada à mão, neon, gradiente de texto, cenas soltas como slides, duplo sentido</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

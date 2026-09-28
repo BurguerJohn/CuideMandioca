@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Fredoka";
+        src: url("assets/fontes/Fredoka.ttf") format("truetype");
+        font-weight: 300 700;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #1c1a3a; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Fredoka", sans-serif;
+        background: radial-gradient(ellipse 90% 40% at 50% 56%, #3a3470 0%, #1c1a3a 62%, #120f26 100%); }
+
+      /* Monitor com a área de trabalho gravada; a "câmera" dá zoom dentro da tela */
+      .monitor { position: absolute; left: 0; top: 760px; width: 1080px; height: 629px; padding: 24px; background: #0e0d1c;
+        border-radius: 24px; box-shadow: 0 34px 70px rgba(0, 0, 0, 0.55), inset 0 0 0 3px #2c2a48; }
+      .tela { position: relative; width: 1032px; height: 581px; overflow: hidden; background: #000; }
+      #tela-video { position: absolute; left: 0; top: 0; width: 1032px; height: 581px; transform-origin: 0 0; }
+      #tela-video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+      .pe { position: absolute; left: 450px; top: 1389px; width: 180px; height: 64px; background: #2c2a48;
+        clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%); }
+      .base { position: absolute; left: 380px; top: 1450px; width: 320px; height: 16px; border-radius: 8px; background: #2c2a48; }
+      #escuro { background: rgba(20, 16, 44, 0.78); }
+
+      /* Placa do título */
+      .placa { position: absolute; top: 196px; left: 90px; width: 900px; height: 300px; transform-origin: 50% 0;
+        display: flex; align-items: flex-end; gap: 26px; padding: 0 38px 26px; background: #fff4e4; border: 6px solid #2e1812;
+        box-shadow: 0 0 0 9px #c07a36, 0 0 0 18px #7c421e, 0 0 0 24px #2e1812, 16px 20px 0 24px rgba(18, 9, 6, 0.5); }
+      .bandeiras { position: absolute; left: -6px; right: -6px; top: -6px; height: 54px; display: flex; justify-content: space-around; }
+      .bandeiras::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #2e1812; }
+      .bandeiras i { display: block; width: 44px; height: 50px; margin-top: 4px; clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
+      .bandeiras i:nth-child(6n + 1) { background: #ee2f3c; } .bandeiras i:nth-child(6n + 2) { background: #ffd21e; }
+      .bandeiras i:nth-child(6n + 3) { background: #35a03a; } .bandeiras i:nth-child(6n + 4) { background: #3a6cf0; }
+      .bandeiras i:nth-child(6n + 5) { background: #ff4f9e; } .bandeiras i:nth-child(6n + 6) { background: #ff8a12; }
+      .mascote { position: relative; flex: none; width: 160px; height: 220px; }
+      .mascote .corpo { position: absolute; inset: 0; background: url("assets/sprites/mandioca.png") 0 0 / 2560px 220px no-repeat; image-rendering: pixelated; }
+      .mascote img { position: absolute; width: 120px; height: 45px; image-rendering: pixelated; left: 20px; top: 25px; }
+      .letreiro { display: flex; flex-direction: column; padding-bottom: 6px; }
+      .letreiro .l1 { font-weight: 700; font-size: 46px; line-height: 1; color: #2e1812; letter-spacing: 0.02em; }
+      .letreiro .l2 { font-weight: 700; font-size: 124px; line-height: 0.95; color: #ee2f3c; letter-spacing: -0.03em;
+        -webkit-text-stroke: 7px #2e1812; paint-order: stroke fill; text-shadow: 0 8px 0 #8a1030; }
+
+      /* Legendas */
+      .bloco { position: absolute; left: 50px; right: 50px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+      .frase { max-width: 980px; text-align: center; font-weight: 700; font-size: 84px; line-height: 1.04; color: #fff4e4;
+        letter-spacing: -0.01em; -webkit-text-stroke: 16px #1c1a3a; paint-order: stroke fill; text-shadow: 0 12px 0 rgba(18, 9, 6, 0.55); }
+      .frase em { font-style: normal; color: #ffd21e; }
+      .selo { font-family: "Space Mono", monospace; font-weight: 700; font-size: 46px; color: #ffd21e; background: #1c1a3a;
+        border: 5px solid #ffd21e; padding: 12px 30px; border-radius: 999px; }
+      .selo.vermelho { color: #fff4e4; background: #b3202c; border-color: #fff4e4; }
+      .fim-tagline { position: absolute; left: 100px; right: 100px; top: 1040px; text-align: center; font-weight: 700; font-size: 60px;
+        line-height: 1.12; color: #fff4e4; -webkit-text-stroke: 12px #1c1a3a; paint-order: stroke fill; }
+      .fim-cta { position: absolute; left: 120px; right: 120px; top: 1270px; text-align: center; font-weight: 700; font-size: 44px;
+        color: #2e1812; background: #ffd21e; border: 6px solid #2e1812; border-radius: 999px; padding: 16px 20px 20px; box-shadow: 0 10px 0 #2e1812; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="mesa" data-start="0" data-duration="15.5" data-width="1080" data-height="1920">
+      <!-- Monitor: a área de trabalho gravada do jogo (1920x1080) -->
+      <div class="monitor">
+        <div class="tela">
+          <div id="tela-video" data-layout-allow-overflow>
+            <video id="desk" src="assets/gameplay/mesa.mp4" data-start="0" data-duration="12" data-media-start="0" data-track-index="0" muted playsinline></video>
+            <video id="desk-fim" src="assets/gameplay/mesa.mp4" data-start="12" data-duration="3.5" data-media-start="8.4" data-track-index="0" muted playsinline></video>
+          </div>
+        </div>
+      </div>
+      <div class="pe"></div>
+      <div class="base"></div>
+      <div id="escuro" class="clip" data-start="12" data-duration="3.5" data-track-index="1"></div>
+
+      <div id="titulo" class="clip" data-start="0" data-duration="15.5" data-track-index="2">
+        <div class="placa" id="placa">
+          <div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="mascote"><div class="corpo" id="corpo"></div><img id="chapeu" src="assets/sprites/chapeu-palha.png" alt="" /></div>
+          <div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div>
+        </div>
+      </div>
+
+      <div id="c1" class="clip" data-start="0.3" data-duration="2.5" data-track-index="3">
+        <div class="bloco" style="top: 545px"><div class="frase" id="c1f">POV: você instalou isso no <em>PC do trabalho</em> 👀</div></div>
+      </div>
+      <div id="c2" class="clip" data-start="3.5" data-duration="1.9" data-track-index="3">
+        <div class="bloco" style="top: 430px"><div class="frase" id="c2f">ela fica <em>DANÇANDO</em> em cima da planilha 💃</div></div>
+      </div>
+      <div id="c3" class="clip" data-start="5.4" data-duration="2.6" data-track-index="3">
+        <div class="bloco" style="top: 430px"><div class="frase" id="c3f">até <em>PENETRA</em> aparece 😂</div></div>
+      </div>
+      <div id="c4" class="clip" data-start="8" data-duration="2.3" data-track-index="3">
+        <div class="bloco" style="top: 430px"><div class="frase" id="c4f">a festa cresce enquanto você <em>“trabalha”</em> 📈</div></div>
+      </div>
+      <div id="c5" class="clip" data-start="10.4" data-duration="1.6" data-track-index="3">
+        <div class="bloco" style="top: 470px"><div class="selo vermelho" id="c5a">PRODUTIVIDADE: 0%</div>
+          <div class="selo" id="c5b">ANIMAÇÃO: 100%</div></div>
+      </div>
+      <div id="fim" class="clip" data-start="12" data-duration="3.5" data-track-index="3">
+        <div class="fim-tagline" id="fimt">o joguinho de festa junina que dança na sua área de trabalho</div>
+        <div class="fim-cta" id="fimc">comenta se você instalaria 👇</div>
+      </div>
+
+      <audio id="w1" src="assets/audio/whoosh.wav" data-start="2.7" data-duration="0.45" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="w2" src="assets/audio/whoosh.wav" data-start="10.1" data-duration="0.45" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="w3" src="assets/audio/whoosh.wav" data-start="11.9" data-duration="0.45" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="d1" src="assets/audio/ding.wav" data-start="3.2" data-duration="0.9" data-track-index="12" data-volume="0.55"></audio>
+      <audio id="d2" src="assets/audio/ding.wav" data-start="9.6" data-duration="0.9" data-track-index="12" data-volume="0.55"></audio>
+      <audio id="p1" src="assets/audio/pop.wav" data-start="5.45" data-duration="0.18" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="p2" src="assets/audio/pop.wav" data-start="8.05" data-duration="0.18" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="p3" src="assets/audio/pop.wav" data-start="10.45" data-duration="0.18" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="m1" src="assets/audio/moeda.wav" data-start="10.75" data-duration="0.4" data-track-index="14" data-volume="0.5"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const DUR = 15.5;
+
+      // Mandioca da placa dançando com os quadros do jogo.
+      const CABECA = [[4, 5], [3, 4], [3, 3], [4, 4], [4, 5], [5, 4], [5, 3], [4, 4]];
+      const ESCALA = 5;
+      const corpo = document.getElementById("corpo");
+      const chapeu = document.getElementById("chapeu");
+      const quadro = { f: 0 };
+      const mostrarQuadro = () => {
+        const f = Math.min(7, Math.floor(quadro.f));
+        corpo.style.backgroundPosition = `${-f * 32 * ESCALA}px 0px`;
+        chapeu.style.left = `${CABECA[f][0] * ESCALA}px`;
+        chapeu.style.top = `${CABECA[f][1] * ESCALA}px`;
+      };
+      tl.fromTo(quadro, { f: 0 }, { f: 8, duration: 1, ease: "none", repeat: Math.max(0, Math.floor(DUR) - 1), onUpdate: mostrarQuadro }, 0);
+      mostrarQuadro();
+
+      tl.fromTo("#placa", { scale: 1.1, rotation: -3, y: -24 }, { scale: 1, rotation: 0, y: 0, duration: 0.6, ease: "back.out(1.7)" }, 0);
+      tl.to("#placa", { scale: 0.5, y: -30, duration: 0.5, ease: "power3.inOut" }, 2.7);
+      tl.to("#placa", { scale: 1.02, y: 360, duration: 0.7, ease: "expo.out" }, 12.05);
+
+      // Câmera dentro da tela: zoom na festa (canto da área de trabalho), depois volta para a mesa inteira.
+      // Centro da festa na tela do monitor: (763, 427); centro da tela: (516, 290).
+      const ZOOM = 2.2;
+      const foco = s => ({ scale: s, x: 516 - 763 * s, y: 290 - 427 * s });
+      tl.fromTo("#tela-video", { scale: 1, x: 0, y: 0 }, { ...foco(ZOOM), duration: 0.9, ease: "power3.inOut" }, 2.7);
+      tl.to("#tela-video", { ...foco(ZOOM * 1.06), duration: 7.1, ease: "none" }, 3.6);
+      tl.to("#tela-video", { scale: 1, x: 0, y: 0, duration: 0.8, ease: "power3.inOut" }, 10.1);
+
+      // Legendas
+      tl.fromTo("#c1f", { scale: 1.35, opacity: 0, filter: "blur(10px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "power4.out" }, 0.3);
+      tl.fromTo("#c2f", { x: -240, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "expo.out" }, 3.5);
+      tl.fromTo("#c3f", { y: 80, rotation: 4, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.5, ease: "circ.out" }, 5.4);
+      tl.fromTo("#c4f", { x: 240, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "expo.out" }, 8);
+      tl.fromTo("#c5a", { scale: 0, opacity: 0, rotation: -6 }, { scale: 1, opacity: 1, rotation: -3, duration: 0.4, ease: "back.out(1.8)" }, 10.4);
+      tl.fromTo("#c5b", { scale: 0, opacity: 0, rotation: 6 }, { scale: 1, opacity: 1, rotation: 3, duration: 0.4, ease: "back.out(1.8)" }, 10.7);
+
+      tl.fromTo("#fimt", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 12.5);
+      tl.fromTo("#fimc", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.8)" }, 13.0);
+      tl.to("#fimc", { scale: 1.05, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 13.5);
+
+      window.__timelines["mesa"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

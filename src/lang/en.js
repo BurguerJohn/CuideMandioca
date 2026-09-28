@@ -1,0 +1,377 @@
+// English. `ui` has the interface texts; `data` replaces the names and texts of src/data.js (same ids).
+(function (root) {
+  const dict = {
+    ui: {
+      'tab.festa': 'Party', 'tab.historico': 'History', 'tab.conquistas': 'Achievements', 'tab.ajustes': 'Settings',
+      'tab.turma': 'Crew', 'tab.pescaria': 'Fishing Pond', 'tab.roles': 'Outings', 'tab.fogueira': 'Bonfire',
+      'tab.correio': 'Love Letters', 'tab.teste': 'Test mode',
+      'dock.melhorias': 'Upgrades', 'dock.chapeu': 'Hats', 'dock.mao': 'In hand', 'dock.tecido': 'Fabrics',
+      'dock.terreiro': 'Grounds', 'dock.lado': 'Booths',
+
+      'num.thousand': '{n}K', 'num.million': '{n}M', 'num.billion': '{n}B', 'num.trillion': '{n}T',
+      'count.of': '{n} of {total}',
+      'level.short': 'lv. {n}', 'level.long': 'level {n}',
+      'quote': '“{text}”',
+
+      'res.cheer': 'Cheer', 'res.tickets': 'Tickets', 'res.wood': 'Firewood',
+      'gain.tickets': { one: '+{n} ticket', other: '+{n} tickets' }, 'gain.cheer': '+{n} Cheer', 'gain.cheerTimes': '+{n} Cheer (×{f})', 'gain.wood': '+{n} firewood',
+      'lock.note': '🔒 Unlocks when the party becomes <b>{tier}</b> ({size} guests). Now: {now}.',
+
+      'hud.nextTitle': 'Every new guest adds a piece to the scenery',
+      'hud.next': 'Next guest brings: <b>{piece}</b>',
+      'hud.shop': 'Shop and upgrades',
+      'hud.panel': 'Panel: party numbers, achievements and settings',
+      'hud.test': 'Test mode: grant resources and skip time',
+      'hud.resize': 'Size: drag to make the game bigger or smaller, click to go back to 100%',
+      'hud.close': 'Close the game', 'hud.closeAgain': 'Click again to close',
+
+      'shop.buyTicket': '+1 ticket', 'shop.close': 'Close the shop', 'shop.hold': 'Hold to buy several',
+      'shop.upgrade': 'Upgrade', 'shop.sideLeft': '◀ Left', 'shop.sideRight': 'Right ▶',
+      'shop.inUse': 'In use', 'shop.use': 'Use', 'shop.place.esquerda': 'Place left', 'shop.place.direita': 'Place right',
+      'shop.onlyOutings': 'Outings only', 'shop.onlyRings': 'Lucky Rings only',
+      'shop.hintUpgrades': 'Hold the button to buy several levels at once.',
+      'shop.hintItems': 'Hover an item to see it at the party. Click to buy and use it.',
+
+      'rings.title': 'Lucky Rings',
+      'rings.howTo': 'Click the booth or press <b>space</b> to drop the ring over a bottle.',
+      'rings.howTo2': 'The ring speeds up with every throw. Thin bottles are easy; wide mouths need a precise drop. {n} rings this round.',
+      'rings.hits': '{hits} of {total} rings landed', 'rings.allTimes': ' · everything ×{mult}',
+      'rings.noPrize': 'You hit the multiplier, but there was no prize to multiply.',
+      'rings.miss': 'None landed. Try again!',
+      'rings.round': { one: 'Round: {icon}{n} ticket', other: 'Round: {icon}{n} tickets' },
+      'rings.dropsTo': 'Drops to {n} in {time}', 'rings.minimum': 'Lowest price',
+      'rings.rules': 'Every round doubles the price of the next one. Every {time} without playing, the price drops by half{pacoca}. ' +
+        'Each round gives {n} rings{booth}. Cheer bottles multiply the Cheer you have (×2 or ×3); ×2 and ×3 bottles multiply everything the round earns. The gift is an item you ' +
+        'can only get here. The better the prize, the wider the bottle mouth, and the more precisely the ring has to land.',
+      'rings.rulesPacoca': ' (Paçoca speeds up the wait)', 'rings.rulesBooth': ' (the Ring Toss Booth gives one extra)',
+      'rings.play': 'Play', 'rings.youHave': 'You have',
+      'rings.canvas': 'Ring toss booth: click to drop the ring',
+
+      'party.guests': 'Guests', 'party.collection': 'Shop collection', 'party.partner': 'Square-dance partner',
+      'party.heat': 'Bonfire heat', 'party.legendary': 'Legendary bonfire',
+      'party.subtitle': { one: '{tier} · {n} guest', other: '{tier} · {n} guests' },
+      'party.tier': 'Festival size',
+      'party.fame': 'Fame for the next guest: {fame} / {need}. All the Cheer the party gathers slowly turns into fame. ' +
+        'Spending doesn’t take fame away.',
+      'party.nextTier': 'With <b>{n}</b> guests the party becomes <b>{tier}</b>: {unlocks}',
+      'party.biggest': 'This is the biggest São João in the world. The party still grows: every guest makes it earn more.',
+      'party.host': 'Host', 'party.name': 'Name',
+      'party.panelHint': 'The buttons on the sign open the shop, the Lucky Rings and every part of the party (crew, fishing, ' +
+        'outings, bonfire, letters). This panel keeps the numbers, achievements and settings.',
+      'party.photo': 'Party photo', 'party.yield': 'How the party earns',
+      'party.perStep': 'Cheer per step', 'party.stepsPerSecond': 'Steps per second', 'party.stamina': 'Stamina',
+      'party.staminaValue': '{n} steps', 'party.rest': 'Rest', 'party.perSecond': 'Average per second',
+      'party.multipliers': 'Multipliers',
+      'party.tip': 'Tip: open the <b>shop</b> (the tag on the sign) and upgrade <b>Wiggle</b> and <b>Rhythm</b>. ' +
+        'The party earns more, and all the Cheer it gathers turns into fame, which brings guests.',
+
+      'scenery.title': 'Scenery', 'scenery.hint': 'Every new guest adds a piece to the party: a landmark or a decoration.',
+      'scenery.landmarks': 'Landmarks', 'scenery.next': 'Next landmark: <b>{name}</b>, at {n} guests.',
+
+      'crew.subtitle': 'Each character has a role. In the right spot, they change the party.',
+      'crew.count': '{n}/{total} in the crew', 'crew.mystery': '{rarity} · shows up at the fishing pond',
+      'crew.away': 'On an outing · {time}', 'crew.working': 'Working: {post}',
+      'crew.needs': 'Needs the {item} on one side', 'crew.opensAt': 'This spot opens when the party becomes {tier}',
+
+      'fish.subtitle': 'Every so often a prize drops into the pond. Fish to call someone to the crew.',
+      'fish.fish': 'Fish!', 'fish.full': 'The pond is full. Fish so the next prize can drop.',
+      'fish.next': 'Next prize in {time}.',
+      'fish.odds': 'Odds by rarity: {odds}. Duplicates level the character up (up to {max}).',
+      'fish.hotDog': ' Hot Dog is fishing: prizes come faster.',
+      'fish.newMember': '{name} joined the crew!', 'fish.again': '{name} again! Up to level {n}.',
+      'fish.maxLevel': { one: 'Already at max level: +{n} ticket.', other: 'Already at max level: +{n} tickets.' },
+      'fish.working': 'Already working at the party.',
+      'fish.postClosed': 'Their spot hasn’t opened yet. Check the Crew.', 'fish.ok': 'Yay!',
+
+      'outing.subtitle': 'Send someone from the crew to fetch firewood. Whoever leaves, leaves their spot empty until they’re back.',
+      'outing.wood': '{n} firewood', 'outing.option': '{name} · {n} firewood', 'outing.send': 'Send',
+      'outing.nobody': 'Nobody’s free. The crew comes from the fishing pond.', 'outing.back': '{name} is back in {time}',
+      'outing.recall': 'Call back', 'outing.returned': '{name} is back!', 'outing.claim': 'Take the firewood',
+      'outing.prize': ' · {chance} chance of {item}', 'outing.info': '{time} · {n} firewood (more with rares){prize}',
+
+      'fire.subtitle': 'Firewood from outings feeds the bonfire. With {n} upgrades it becomes legendary.',
+      'fire.goal': 'On the way to a legendary bonfire', 'fire.legendary': 'The bonfire is legendary: all Cheer is doubled.',
+      'fire.progress': '{n} of {total} upgrades.', 'fire.spark': 'Spark tends the fire: the Flare lasts longer.',
+
+      'mail.title': 'Love Letters', 'mail.subtitle': 'Anonymous little notes from the party. Every letter brings tickets.',
+      'mail.open': 'Open letter', 'mail.full': 'The mailbox is full.', 'mail.next': 'Next letter in {time}.',
+      'mail.opened': 'Letters opened: {n}.', 'mail.ok': 'So sweet',
+
+      'ach.done': 'Done', 'ach.todo': 'To do',
+
+      'settings.size': 'Game size', 'settings.sizeHint': 'Or drag the size button on the party sign (one click goes back to 100%).',
+      'settings.sound': 'Sound', 'settings.soundOn': 'On', 'settings.soundOff': 'Off', 'settings.volume': 'Volume',
+      'settings.soundHint': 'Party sound effects: shopping, ring toss, fishing, new guests and achievements.',
+      'settings.window': 'Window', 'settings.pinned': 'Pinned above windows', 'settings.behind': 'Behind windows',
+      'settings.hide': 'Hide the party', 'settings.quit': 'Quit the game',
+      'settings.sign': 'Resource sign', 'settings.signAlways': 'Always visible', 'settings.signHover': 'Only on mouse over',
+      'settings.signHint': 'Drag the sign by its background to put it anywhere. Dragging the party moves everything. ' +
+        'Clicking outside the game hides the sign; click the party to bring it back.',
+      'settings.signAuto': 'Stick the sign to the party',
+      'settings.language': 'Language', 'settings.languageAuto': 'Automatic ({lang})',
+      'settings.languageSteam': 'On automatic, the game uses the language chosen for it on Steam.',
+      'settings.languageSystem': 'On automatic, the game uses your computer’s language.',
+      'settings.steamOn': 'Signed in as <b>{name}</b>. Achievements go to your account.',
+      'settings.steamOff': 'Steam is off: the game works normally, but achievements stay here.',
+      'settings.numbers': 'Party numbers', 'settings.game': 'Save game',
+      'settings.saveHint': 'The game saves by itself. Export to keep a copy.',
+      'settings.export': 'Export save', 'settings.import': 'Import save', 'settings.restart': 'Start a new party',
+      'settings.credits': 'Take Good Care of Your Cassava. Fredoka font (SIL Open Font License).',
+
+      'stats.playtime': 'Party time', 'stats.steps': 'Steps danced', 'stats.cheerEarned': 'Cheer across the party',
+      'stats.cheerSpent': 'Cheer spent', 'stats.fished': 'Prizes fished', 'stats.outings': 'Outings',
+      'stats.requests': 'Requests fulfilled', 'stats.crashers': 'Crashers chased off', 'stats.ringRounds': 'Lucky Rings rounds',
+      'stats.ringHits': 'Rings landed',
+
+      'history.chartLabel': 'Guests and unlocks over play time',
+      'history.axisGuests': 'guests', 'history.axisTime': 'play time',
+      'history.test': '(test)', 'history.offline': '(while the game was closed)',
+      'history.subtitle': '{time} of partying · {n} events in the diary',
+      'history.kind.porte': 'Festival size', 'history.kind.cenario': 'Scenery', 'history.kind.turma': 'New crew',
+      'history.kind.item': 'Items', 'history.kind.conquista': 'Achievements',
+      'history.hint': 'The line is the party’s guest count; each dot is an unlock at the moment it happened. Hover a dot ' +
+        'to see what it was.',
+      'history.diary': 'Diary', 'history.onlyUnlocks': 'Unlocks only', 'history.all': 'Everything',
+      'history.showing': 'Showing the 300 most recent.',
+      'tierShort.quintal': 'Backyard', 'tierShort.quermesse': 'Fair', 'tierShort.cidade': 'Town',
+      'tierShort.regional': 'Regional', 'tierShort.maior': 'Biggest',
+
+      'log.start': 'The party started', 'log.begin': 'The diary started here (the party already had {n} guests)',
+      'log.guest': 'Guest #{n} arrived', 'log.guestBrought': 'Guest #{n} arrived and brought: {piece}',
+      'log.tier': 'The party became {tier}', 'log.achievement': 'Achievement: {name}',
+      'log.fishedNew': 'Fished {name} for the crew', 'log.fishedAgain': 'Fished {name} again (level {n})',
+      'log.item': 'Got {name}', 'log.level': '{stat}: level {from} → {to}',
+      'log.ticket': { one: 'Traded Cheer for 1 ticket', other: 'Traded Cheer for {n} tickets' },
+      'log.rings': 'Lucky Rings: {hits} of {total} landed', 'log.ringsMult': ', everything ×{mult}',
+      'log.request': 'Fulfilled a guest request', 'log.crasher': 'Chased off a party crasher (+{n} tickets)',
+      'log.letter': 'Opened a love letter (+{n} tickets)', 'log.outing': '{name} came back from an outing with {n} firewood',
+      'log.bonfire': 'Bonfire: {name}, level {n}', 'log.legendary': 'The bonfire became legendary',
+      'log.fishingOpen': 'The fishing pond opened', 'log.debug': 'Test: {note}',
+
+      'debug.subtitle': 'Shortcuts for testing the game. Everything from here is marked as a test in the History.',
+      'debug.plusMinutes': '+{n} min', 'debug.plusHours': { one: '+{n} hour', other: '+{n} hours' },
+      'debug.plusDays': { one: '+{n} day', other: '+{n} days' },
+      'debug.cheerNote': 'What the party earns in the chosen time (now: {rate}/s). Goes straight to the balance, without turning into fame.',
+      'debug.ticketsWood': 'Tickets and firewood', 'debug.nextTier': 'Next festival size',
+      'debug.guestsNote': 'Each guest brings their scenery piece, just like in the normal game.',
+      'debug.timeTitle': 'Time', 'debug.skipMinutes': 'Skip {n} min',
+      'debug.skipHours': { one: 'Skip {n} hour', other: 'Skip {n} hours' },
+      'debug.timeNote': 'The party really runs during that time: it dances, earns, and the clocks (fishing, letters, outings, ' +
+        'requests, Lucky Rings price) move too. It doesn’t buy anything by itself.',
+      'debug.crewBooths': 'Crew and booths', 'debug.atParty': 'At the party',
+      'debug.callRequest': 'Call a request', 'debug.callCrasher': 'Call a crasher', 'debug.cheapRings': 'Lucky Rings at 1 ticket',
+      'debug.animacao': 'Extra Cheer', 'debug.fichas': '+{n} tickets', 'debug.lenha': '+{n} firewood',
+      'debug.convidados': '+{n} guests', 'debug.time': '{n} min of party went by',
+      'debug.prendas': 'Prizes ready', 'debug.cartas': 'Letters ready', 'debug.roles': 'Outings ready',
+      'debug.turma': 'Full crew', 'debug.itens': 'All items', 'debug.pedido': 'A request arrived',
+      'debug.penetra': 'A crasher arrived', 'debug.argolas': 'Lucky Rings at the lowest price',
+
+      'app.title': 'Take Good Care of Your Cassava',
+      'app.canvas': 'Mandioca’s June festival', 'app.shopLabel': 'Shop', 'app.panelLabel': 'Party panel',
+      'app.windowLabel': 'Party window', 'app.tabsLabel': 'Tabs', 'app.closeEsc': 'Close (Esc)',
+      'app.saveFailedHere': 'Couldn’t save the party on this computer.', 'app.saveFailed': 'Couldn’t save the party.',
+      'app.onlyOutings': '{item} only shows up on outings.', 'app.onlyRings': '{item} only comes from the Lucky Rings.',
+      'app.unlocksAt': 'Unlocks when the party becomes {tier}.', 'app.needTickets': 'Not enough tickets: {item} costs {n}.',
+      'app.yours': '{item} is yours!', 'app.needCheer': 'Not enough Cheer.', 'app.levels': '+{n} levels!',
+      'app.browserClose': 'In the browser, just close the tab.',
+      'app.closeAgain': 'Click the X again to close. The party earns half while it’s closed.',
+      'app.debug': 'Test: {note}.', 'app.needTicket': 'Not enough tickets. Trade Cheer for tickets in the shop.',
+      'app.ticket': '+1 ticket.', 'app.outingStart': '{name} went on an outing.', 'app.outingFail': 'Couldn’t send them.',
+      'app.recalled': 'Called back.', 'app.woodGot': '+{n} firewood.', 'app.woodAndItem': '+{n} firewood and {item}!',
+      'app.fireGrew': 'The bonfire grew.', 'app.needWood': 'Not enough firewood.',
+      'app.hidden': 'The party is hidden. Use the tray icon to bring it back.',
+      'app.restartConfirm': 'Start a new party from scratch? Export your save first if you want to keep this one.',
+      'app.requestDone': 'Request fulfilled: +{n} Cheer!', 'app.crasherOut': 'Crasher out! +{n} tickets.',
+      'app.tierUp': 'The party became {tier}! {unlocks}', 'app.achievement': 'Achievement: {name}',
+      'app.fishingOpen': 'The fishing pond opened! A prize is waiting.', 'app.prizeReady': 'A prize dropped into the pond.',
+      'app.letterReady': 'A love letter arrived.', 'app.outingDone': '{name} is back from the outing.', 'app.someone': 'Someone',
+      'app.crasher': 'A party crasher showed up! Click them.', 'app.legendary': 'The bonfire became legendary! Double Cheer.',
+      'app.ringsReset': 'The Lucky Rings are back at the lowest price.',
+      'app.importConfirm': 'Replace the current party with the one in the file?', 'app.imported': 'Party imported.',
+      'app.importFailed': 'Couldn’t import: the file isn’t a valid save for this game.',
+      'app.saveIgnored': 'Save ignored: the file was corrupted or from another version.',
+      'app.welcomeBack': 'The party went on without you!',
+      'app.welcomeBackText': 'In {time} away, the crew earned <b>{n}</b> Cheer.', 'app.welcomeBackOk': 'Let’s dance',
+      'app.firstRun': '<p>Mandioca dances on her own: every step earns <b>Cheer</b>. When she gets tired, she rests and ' +
+        'comes back full of energy.</p><p>The <b>shop</b> button on the sign opens upgrades, hats, booths and more, with an ' +
+        'instant preview. All the Cheer the party gathers turns into fame, and fame brings guests.</p><p class="miudo">Drag ' +
+        'the dance floor to move the party. Hold the handle on the sign to change its size. There’s a letter waiting in the ' +
+        'Love Letters.</p>',
+      'app.firstRunOk': 'To the arraiá!',
+      'app.languageChanged': 'Language changed.',
+
+      'fx.cobra': 'LOOK, A SNAKE!', 'fx.phew': 'PHEW!', 'fx.ember': 'LIVE EMBERS!', 'fx.flare': 'FLARE!',
+      'fx.guests': { one: '+{n} GUEST', other: '+{n} GUESTS' }, 'fx.preview': 'PREVIEW',
+      'fx.gift': 'GIFT!', 'fx.newMember': 'NEW CREW MEMBER!', 'fx.levelUp': 'LEVEL UP!',
+      'fx.ringsMult': 'X{n} THIS ROUND!', 'fx.ringsCheer': 'CHEER X{n}!', 'fx.ringsHit': 'RINGER!', 'fx.ringsClose': 'SO CLOSE!', 'fx.ringsMiss': 'MISSED!',
+      'fx.ringsInsert': 'INSERT A TICKET!',
+      // Placas pintadas nas barracas (fonte de pixel, sem acento).
+      'sign.barraca-pescaria': 'FISHING', 'sign.barraca-beijo': 'KISSES', 'sign.barraca-comidas': 'FOOD',
+      'sign.cadeia': 'JAIL', 'sign.correio': 'LETTERS', 'sign.barraca-argolas': 'RINGS',
+
+      'tray.panel': 'Open panel', 'tray.shop': 'Open shop', 'tray.photo': 'Take a party photo',
+      'tray.pin': 'Pin above windows', 'tray.size': 'Size', 'tray.display': 'Display',
+      'tray.displayItem': 'Display {n} ({w}×{h})', 'tray.hide': 'Hide the party', 'tray.language': 'Language', 'tray.sound': 'Sound',
+      'tray.quit': 'Quit the game',
+      'steam.required': 'Open Steam and start the game from your library.',
+      'steam.requiredTitle': 'Steam isn’t running',
+
+      'presence.party': '{tier}: {n} guests'
+    },
+
+    data: {
+      stats: {
+        rebolado: { name: 'Wiggle', unit: 'per step', desc: 'Cheer earned by each step.' },
+        folego: { name: 'Stamina', unit: 'steps', desc: 'How many steps she lasts before getting tired.' },
+        refresco: { name: 'Refreshment', unit: '× rest', desc: 'The more refreshment, the shorter the rest.' },
+        ritmo: { name: 'Rhythm', unit: 'steps/s', desc: 'Dance speed. The animation speeds up too.' }
+      },
+      tiers: {
+        quintal: { name: 'Backyard Arraiá', unlocks: 'Upgrades, shop, love letters and Lucky Rings.' },
+        quermesse: { name: 'Neighborhood Fair', unlocks: 'Fishing pond, square-dance partner, booths and guest requests.' },
+        cidade: { name: 'Town Festival', unlocks: 'Stage with a forró trio, outings, bonfire and dance floor.' },
+        regional: { name: 'Regional São João', unlocks: 'Square-dance caller, fire keeper, party crashers and Ferris wheel.' },
+        maior: { name: 'World’s Biggest São João', unlocks: 'String lights and fireworks.' }
+      },
+      posts: {
+        par: { name: 'Square-dance partner' }, sanfona: { name: 'Stage accordion' }, zabumba: { name: 'Stage zabumba drum' },
+        triangulo: { name: 'Stage triangle' }, marcador: { name: 'Caller’s crate' }, foguista: { name: 'By the bonfire' },
+        beijo: { name: 'Kissing Booth' }, pescaria: { name: 'Fishing Booth' }, argolas: { name: 'Ring Toss Booth' }
+      },
+      chars: {
+        milho: { name: 'Corn', role: 'Square-dance partner', text: '+{v}% Cheer per step' },
+        cenoura: { name: 'Carrot', role: 'Accordionist', text: '+{v}% Rhythm' },
+        inhame: { name: 'Yam', role: 'Zabumba drummer', text: '+{n} Stamina' },
+        batata: { name: 'Sweet Potato', role: 'Triangle player', text: '+{v}% Refreshment' },
+        pamonha: { name: 'Pamonha', role: 'Square-dance caller', text: '{v}% chance of “Look, a snake!” (step ×3)' },
+        aipim: { name: 'Aipim', role: 'Kissing Booth attendant', text: 'Requests pay +{v}%' },
+        cachorro: { name: 'Hot Dog', role: 'Fisher', text: 'Prizes {v}% faster' },
+        pacoca: { name: 'Paçoca', role: 'Ring Master', text: 'Lucky Rings price drops {v}% faster' },
+        faisca: { name: 'Spark', role: 'Fire Keeper', text: 'Flare lasts +{v}%' }
+      },
+      rarities: ['Common', 'Rare', 'Super Rare', 'Ultra Rare'],
+      categories: {
+        chapeu: { name: 'Hats' }, mao: { name: 'In hand' }, tecido: { name: 'Fabrics' }, terreiro: { name: 'Grounds' },
+        lado: { name: 'Booths and decorations' }
+      },
+      items: {
+        'chapeu-palha': { name: 'Straw Hat', desc: 'A classic. Hides the cassava’s bald spot.' },
+        'palha-furada': { name: 'Holey Straw Hat', desc: 'More holes than a latecomer’s excuse.' },
+        'lenco-chita': { name: 'Chintz Headscarf', desc: 'Flowery and tied up tight.' },
+        'coroa-flores': { name: 'Flower Crown', desc: 'A country bride with no groom (yet).' },
+        vaqueiro: { name: 'Cowboy Hat', desc: 'For lassoing a heart at the fishing pond.' },
+        'tiara-chifrinho': { name: 'Little Horns Headband', desc: 'Country weddings can get complicated.' },
+        cangaceiro: { name: 'Cangaceiro Hat', desc: 'A leather half-moon. Respect on the dance floor.' },
+        'coroa-milho': { name: 'Corn Queen Crown', desc: 'Only for those who know how to shuck an ear.' },
+        'rei-baiao': { name: 'King of Baião Hat', desc: 'Leather, a star and lots of xote.' },
+        'oculos-coracao': { name: 'Heart Glasses', desc: 'To see the party with more love.' },
+        'chapeu-palhaco': { name: 'Clown Hat', desc: 'Straight from the ring toss booth.' },
+        bandeirinha: { name: 'Little Flag', desc: 'For waving at everyone.' },
+        espiga: { name: 'Corn on the Cob', desc: 'Big, golden and full of kernels.' },
+        leque: { name: 'Chintz Fan', desc: 'To fan away the bonfire heat.' },
+        'maca-amor': { name: 'Candy Apple', desc: 'Hard on the outside, sweet on the inside.' },
+        'vara-pescar': { name: 'Fishing Rod', desc: 'Size isn’t everything; patience is.' },
+        triangulo: { name: 'Love Triangle', desc: 'Three corners and zero jealousy.' },
+        'pau-selfie': { name: 'Selfie Stick', desc: 'To capture the party from up high.' },
+        lampiao: { name: 'Oil Lantern', desc: 'Lights up even the darkest fishing pond.' },
+        ursinho: { name: 'Teddy Bear', desc: 'The classic prize for good aim.' },
+        peixinho: { name: 'Goldfish in a Bag', desc: 'Not from the fishing pond. It’s really yours.' },
+        'xadrez-vermelho': { name: 'Red Plaid', desc: 'The official uniform of any arraiá.' },
+        'xadrez-azul': { name: 'Blue Plaid', desc: 'To match the June sky.' },
+        'xadrez-verde': { name: 'Green Plaid', desc: 'The color of fresh corn.' },
+        remendado: { name: 'Proudly Patched', desc: 'Every patch, a square dance.' },
+        chita: { name: 'Floral Chintz', desc: 'Little flowers everywhere.' },
+        'chita-rosa': { name: 'Pink Chintz', desc: 'The Kissing Booth favorite.' },
+        'xadrez-ouro': { name: 'Golden Plaid', desc: 'Shines brighter than the bonfire.' },
+        'terra-batida': { name: 'Packed Dirt', desc: 'Good dust for kicking up in a xote.' },
+        lamacal: { name: 'After-Rain Mud', desc: 'Slippery, but nobody falls.' },
+        gramado: { name: 'Town Square Lawn', desc: 'Nice and green, with little flowers.' },
+        areia: { name: 'Beach Sand', desc: 'São João with your feet in the sand.' },
+        tablado: { name: 'Wooden Floor', desc: 'To hear every foot shuffle.' },
+        'pista-forro': { name: 'Forró Dance Floor', desc: 'A checkered floor and sparkling eyes.' },
+        fardo: { name: 'Hay Bale', desc: 'Bench, stage and hiding spot.' },
+        mastro: { name: 'Flag Pole', desc: 'Colorful ribbons dancing in the wind.' },
+        espantalho: { name: 'Heartthrob Scarecrow', desc: 'Heartthrob pose, heart of straw.' },
+        carroca: { name: 'Decorated Cart', desc: 'Carries the crew and the pamonha.' },
+        'barraca-pescaria': { name: 'Fishing Booth', desc: 'Where Hot Dog casts his rod.', effect: 'Activates the Fisher.' },
+        'barraca-beijo': { name: 'Kissing Booth', desc: 'One ticket per kiss. Cheeks only!',
+          effect: 'Activates the Kissing Booth attendant.' },
+        'barraca-comidas': { name: 'Food Stand', desc: 'Pamonha, canjica and curau.', effect: '+10% Refreshment.' },
+        cadeia: { name: 'Arraiá Jail', desc: 'Party crashers pay bail here.', effect: 'Party crashers give double tickets.' },
+        correio: { name: 'Love Letter Booth', desc: 'Anonymous notes with a double meaning.', effect: 'Letters arrive 30% faster.' },
+        'barraca-argolas': { name: 'Ring Toss Booth', desc: 'Bottles, rings and lots of aim.',
+          effect: '+1 ring per Lucky Rings round and activates the Ring Master.' }
+      },
+      outings: {
+        quintal: { name: 'Gather firewood in the backyard' },
+        roca: { name: 'Fetch corn from the field' },
+        vizinhanca: { name: 'Invite the neighborhood' },
+        penetra: { name: 'Crash the arraiá next door' },
+        maior: { name: 'Visit the World’s Biggest São João' }
+      },
+      bonfire: {
+        labareda: { name: 'Flare', text: 'Every 60 s the bonfire flares up for 8 s: Cheer +{v}%.' },
+        brasa: { name: 'Live Embers', text: 'After resting, 6 s of Cheer +{v}%.' },
+        calor: { name: 'Heat', text: 'Cheer +{v}% all the time.' }
+      },
+      landmarks: {
+        milharal: { name: 'Corn stalk' }, galinha: { name: 'Hen' }, bananeira: { name: 'Banana tree' },
+        gato: { name: 'Sleepy cat' }, mandacaru: { name: 'Mandacaru cactus' }, casinha: { name: 'Mud hut' },
+        pipa: { name: 'Kite in the sky' }, coqueiro: { name: 'Coconut palm' }, bode: { name: 'Goat' },
+        igrejinha: { name: 'Little chapel' }, 'casinha-azul': { name: 'Blue house' }, lua: { name: 'São João moon' },
+        catavento: { name: 'Pinwheel' }, balao: { name: 'Paper lantern' }, estrelas: { name: 'Starry sky' }
+      },
+      cycle: {
+        balaozinho: { name: 'String lantern' }, pintinho: { name: 'Chick' },
+        mandioquinha: { name: 'Baby cassava' }, vagalume: { name: 'Firefly' }
+      },
+      requests: {
+        milho: { text: 'Where’s the boiled corn?' }, pamonha: { text: 'A pamonha, please!' },
+        musica: { text: 'Play a xote!' }, foto: { text: 'Take our picture!' },
+        pipoca: { text: 'Sweet or salty popcorn?' }, coracao: { text: 'Send me a love letter!' }
+      },
+      letters: [
+        'Saw you wiggling by the bonfire. I almost got burned.',
+        'If you were corn, I’d call you popcorn: you made my heart pop.',
+        'I’ve had my eye on your little flag since the party started.',
+        'Meet me at the Kissing Booth. I’ll bring the ticket.',
+        'Your plaid matches mine. Want to be my dance partner?',
+        'Fishing is like love: sometimes all you catch is an old boot.',
+        'You’re the best-peeled cassava on the dance floor.',
+        'I’m no accordion, but I open up and squeeze just for you.',
+        'Anarriê! Come back here, I wasn’t done looking at you.',
+        'Look, a snake! Just kidding. I only wanted your attention.',
+        'I want to be your partner until the very last balancê.',
+        'Your wiggle made the bonfire jealous.',
+        'Give me a piece of paçoca and I’ll tell you a secret.',
+        'Yam is telling everyone you’ve got moves in the square dance.',
+        'You’re no straw hat, but you left me full of holes.',
+        'I saved you a spot on the hay bale.',
+        'A country wedding? I’m in. Corn can be the judge.',
+        'Your candy apple is the hardest one at the party.',
+        'Signed: someone who dances right behind you in the square dance.',
+        'No peeking at who sent this. But it’s the one with the biggest cob.'
+      ],
+      achievements: {
+        'primeiro-passo': { name: 'First step', text: 'Dance the very first step.' },
+        mil: { name: 'A thousand cheers', text: 'Gather 1,000 Cheer across the whole party.' },
+        quermesse: { name: 'Neighborhood Fair', text: 'Reach the Neighborhood Fair.' },
+        cidade: { name: 'Town Festival', text: 'Reach the Town Festival.' },
+        regional: { name: 'Regional São João', text: 'Reach the Regional São João.' },
+        maior: { name: 'World’s Biggest São João', text: 'Reach the biggest of them all.' },
+        'primeira-prenda': { name: 'First prize', text: 'Hook someone at the fishing pond.' },
+        'turma-completa': { name: 'Full crew', text: 'Have the whole crew.' },
+        'primeiro-role': { name: 'First outing', text: 'Come back from an outing with firewood.' },
+        lendaria: { name: 'Legendary bonfire', text: 'Make 30 bonfire upgrades.' },
+        'mira-de-ouro': { name: 'Golden aim', text: 'Land a ring on the gift bottle.' },
+        estiloso: { name: 'Stylish', text: 'Own 15 shop items.' },
+        correio: { name: 'Paper heart', text: 'Open 10 love letters.' },
+        atenciosa: { name: 'Attentive host', text: 'Fulfill 25 requests.' },
+        seguranca: { name: 'Party security', text: 'Chase off 10 party crashers.' },
+        'mao-boa': { name: 'Steady hand', text: 'Land every ring in a round.' }
+      }
+    }
+  };
+  (root.ARRAIA_LANGS || (root.ARRAIA_LANGS = {})).en = dict;
+  if (typeof module === 'object' && module.exports) module.exports = dict;
+})(typeof globalThis !== 'undefined' ? globalThis : this);

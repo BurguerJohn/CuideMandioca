@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #1c1a3a; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #1c1a3a; }
+      /* As cenas preenchem o quadro; a camada de textos fica por cima de todas. */
+      [data-composition-id="steam"] > div[data-composition-src] { position: absolute; inset: 0; }
+      #el-textos { z-index: 10; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Trailer da Steam (plano: STORYBOARD.md). Cada cena ocupa uma frase da música (4 compassos de 2,305 s); a música é o
+      começo de "Balanço de Pixel" (0–46,6 s) emendado no início da última frase (2:37,3–2:49,3).
+    -->
+    <div data-hf-id="hf-p48b" id="root" data-composition-id="steam" data-start="0" data-duration="58.65" data-width="1920" data-height="1080">
+      <div data-hf-id="hf-p84q" id="el-quintal" data-composition-id="quintal" data-composition-src="compositions/frames/01-quintal.html" data-start="0" data-duration="9.729" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div data-hf-id="hf-cy7r" id="el-melhorias" data-composition-id="melhorias" data-composition-src="compositions/frames/02-melhorias.html" data-start="9.729" data-duration="9.218" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div data-hf-id="hf-8nxp" id="el-quermesse" data-composition-id="quermesse" data-composition-src="compositions/frames/03-quermesse.html" data-start="18.947" data-duration="9.219" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div data-hf-id="hf-fhv1" id="el-cidade" data-composition-id="cidade" data-composition-src="compositions/frames/04-cidade.html" data-start="28.166" data-duration="9.241" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div data-hf-id="hf-evds" id="el-regional" data-composition-id="regional" data-composition-src="compositions/frames/05-regional.html" data-start="37.407" data-duration="9.219" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div data-hf-id="hf-72zk" id="el-maior" data-composition-id="maior" data-composition-src="compositions/frames/06-maior.html" data-start="46.626" data-duration="6.914" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <!-- A cena 7 entra 0,3 s antes, por cima, num crossfade com o clímax. -->
+      <div data-hf-id="hf-c00t" id="el-placa" data-composition-id="placa" data-composition-src="compositions/frames/07-placa.html" data-start="53.24" data-duration="5.41" data-track-index="2" data-width="1920" data-height="1080"></div>
+
+      <div data-hf-id="hf-vjht" id="el-textos" data-composition-id="textos" data-composition-src="compositions/textos.html" data-start="0" data-duration="58.65" data-track-index="5" data-width="1920" data-height="1080"></div>
+
+      <!-- Música: o começo e o fim da faixa, emendados no tempo forte de 46,626 s com 60 ms de crossfade. -->
+      <audio data-hf-id="hf-v9s8" id="musica" data-timeline-role="music" src="assets/audio/balanco-de-pixel.mp3" data-start="0" data-duration="46.66" data-media-start="0" data-track-index="10" data-volume="0.9" data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:1},{&quot;t&quot;:46.6,&quot;v&quot;:1},{&quot;t&quot;:46.66,&quot;v&quot;:0}]}]}"></audio>
+      <audio data-hf-id="hf-dein" id="musica-fim" src="assets/audio/balanco-de-pixel.mp3" data-start="46.6" data-duration="12.05" data-media-start="157.243" data-track-index="11" data-volume="0.9" data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0},{&quot;t&quot;:0.06,&quot;v&quot;:1},{&quot;t&quot;:11.6,&quot;v&quot;:1},{&quot;t&quot;:12.05,&quot;v&quot;:0}]}]}"></audio>
+    </div>
+    <script>
+      window.__timelines["steam"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

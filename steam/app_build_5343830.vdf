@@ -1,0 +1,19 @@
+"AppBuild"
+{
+  "AppID" "5343830"
+  "Desc" "Cuide bem da sua mandioca Windows x64"
+  "ContentRoot" "..\dist\CuideBemDaSuaMandioca-win32-x64"
+  "BuildOutput" "..\steam-build-output"
+  "Depots"
+  {
+    "5343831"
+    {
+      "FileMapping"
+      {
+        "LocalPath" "*"
+        "DepotPath" "."
+        "Recursive" "1"
+      }
+    }
+  }
+}

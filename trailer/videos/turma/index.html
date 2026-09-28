@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="pt-BR" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Fredoka";
+        src: url("assets/fontes/Fredoka.ttf") format("truetype");
+        font-weight: 300 700;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #1c1a3a; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #1c1a3a; font-family: "Fredoka", sans-serif; }
+      .cam { position: absolute; inset: 0; transform-origin: 50% 72%; }
+      .cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #escuro { background: rgba(20, 16, 44, 0.8); }
+      #flash { position: absolute; inset: 0; background: #fff4e4; opacity: 0; pointer-events: none; }
+
+      /* Placa do título */
+      .placa { position: absolute; top: 196px; left: 90px; width: 900px; height: 300px; transform-origin: 50% 0;
+        display: flex; align-items: flex-end; gap: 26px; padding: 0 38px 26px; background: #fff4e4; border: 6px solid #2e1812;
+        box-shadow: 0 0 0 9px #c07a36, 0 0 0 18px #7c421e, 0 0 0 24px #2e1812, 16px 20px 0 24px rgba(18, 9, 6, 0.5); }
+      .bandeiras { position: absolute; left: -6px; right: -6px; top: -6px; height: 54px; display: flex; justify-content: space-around; }
+      .bandeiras::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #2e1812; }
+      .bandeiras i { display: block; width: 44px; height: 50px; margin-top: 4px; clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
+      .bandeiras i:nth-child(6n + 1) { background: #ee2f3c; } .bandeiras i:nth-child(6n + 2) { background: #ffd21e; }
+      .bandeiras i:nth-child(6n + 3) { background: #35a03a; } .bandeiras i:nth-child(6n + 4) { background: #3a6cf0; }
+      .bandeiras i:nth-child(6n + 5) { background: #ff4f9e; } .bandeiras i:nth-child(6n + 6) { background: #ff8a12; }
+      .mascote { position: relative; flex: none; width: 160px; height: 220px; }
+      .mascote .corpo { position: absolute; inset: 0; background: url("assets/sprites/mandioca.png") 0 0 / 2560px 220px no-repeat; image-rendering: pixelated; }
+      .mascote img { position: absolute; width: 120px; height: 45px; image-rendering: pixelated; left: 20px; top: 25px; }
+      .letreiro { display: flex; flex-direction: column; padding-bottom: 6px; }
+      .letreiro .l1 { font-weight: 700; font-size: 46px; line-height: 1; color: #2e1812; letter-spacing: 0.02em; }
+      .letreiro .l2 { font-weight: 700; font-size: 124px; line-height: 0.95; color: #ee2f3c; letter-spacing: -0.03em;
+        -webkit-text-stroke: 7px #2e1812; paint-order: stroke fill; text-shadow: 0 8px 0 #8a1030; }
+
+      /* Legendas */
+      .bloco { position: absolute; left: 50px; right: 50px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+      .frase { max-width: 980px; text-align: center; font-weight: 700; font-size: 90px; line-height: 1.04; color: #fff4e4;
+        letter-spacing: -0.01em; -webkit-text-stroke: 16px #1c1a3a; paint-order: stroke fill; text-shadow: 0 12px 0 rgba(18, 9, 6, 0.55); }
+      .frase em { font-style: normal; color: #ffd21e; }
+      .frase.menor { font-size: 52px; -webkit-text-stroke: 12px #1c1a3a; }
+
+      /* Carta da turma (as mesmas cores de raridade do jogo) */
+      .carta { position: absolute; left: 200px; top: 372px; width: 680px; display: flex; flex-direction: column; align-items: center;
+        background: #fff4e4; border: 6px solid #2e1812; border-radius: 22px; padding: 22px 24px 26px;
+        box-shadow: 0 0 0 8px var(--cor), 0 0 0 14px #2e1812, 14px 18px 0 14px rgba(18, 9, 6, 0.5); }
+      .carta .topo { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+      .chip { font-family: "Space Mono", monospace; font-weight: 700; font-size: 32px; padding: 6px 20px; border-radius: 999px;
+        border: 4px solid #2e1812; background: var(--cor); color: var(--tinta); }
+      .num { font-family: "Space Mono", monospace; font-weight: 700; font-size: 30px; color: #7c421e; }
+      .arte { position: relative; width: 100%; height: 286px; margin-top: 16px; border: 4px solid #2e1812; border-radius: 14px;
+        background: var(--fundo); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; overflow: hidden; }
+      .arte::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: rgba(46, 24, 18, 0.14); }
+      .sprite { position: relative; background-repeat: no-repeat; image-rendering: pixelated; }
+      .nome { margin-top: 14px; font-weight: 700; font-size: 84px; line-height: 1; color: #2e1812; white-space: nowrap; }
+      .nome.longo { font-size: 68px; }
+      .posto { margin-top: 6px; font-weight: 600; font-size: 36px; color: #7c421e; }
+      .efeito { margin-top: 16px; font-weight: 700; font-size: 38px; color: #ffd21e; background: #2e1812; border-radius: 999px; padding: 8px 28px 12px; }
+      .r0 { --cor: #e8c49a; --tinta: #2e1812; --fundo: #f3e3cc; }
+      .r1 { --cor: #3a6cf0; --tinta: #fff4e4; --fundo: #b9cfff; }
+      .r2 { --cor: #ff4f9e; --tinta: #1c1a3a; --fundo: #ffc4e4; }
+      .r3 { --cor: #ffd21e; --tinta: #2e1812; --fundo: #fff3a0; }
+      #raios { position: absolute; left: 540px; top: 700px; width: 1500px; height: 1500px; margin: -750px 0 0 -750px; border-radius: 50%;
+        background: repeating-conic-gradient(rgba(255, 210, 30, 0.34) 0deg 9deg, rgba(255, 210, 30, 0) 9deg 22.5deg);
+        -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%); mask-image: radial-gradient(circle, #000 18%, transparent 68%); }
+      #mira { position: absolute; left: 843px; top: 1228px; width: 0; height: 0; }
+      #mira .anel { position: absolute; left: -46px; top: -46px; width: 92px; height: 92px; border: 6px solid #ffd21e; border-radius: 50%;
+        box-shadow: 0 0 0 4px #1c1a3a; }
+      #mira .seta { position: absolute; left: -26px; top: -118px; font-size: 52px; line-height: 1; color: #ffd21e;
+        -webkit-text-stroke: 8px #1c1a3a; paint-order: stroke fill; }
+
+      /* Final */
+      .fila { position: absolute; left: 0; right: 0; top: 650px; height: 132px; display: flex; justify-content: center; align-items: flex-end; gap: 12px; }
+      .fim-cta { position: absolute; left: 150px; right: 150px; top: 1150px; text-align: center; font-weight: 700; font-size: 44px;
+        color: #2e1812; background: #ffd21e; border: 6px solid #2e1812; border-radius: 999px; padding: 16px 20px 20px; box-shadow: 0 10px 0 #2e1812; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="turma" data-start="0" data-duration="20" data-width="1080" data-height="1920">
+      <!-- A festa no fim de jogo, em laço: os cortes caem nas trocas de carta -->
+      <div class="cam" id="cam">
+        <video id="va" src="assets/gameplay/palco.mp4" data-start="0" data-duration="7.4" data-media-start="0" data-track-index="0" muted playsinline></video>
+        <video id="vb" src="assets/gameplay/palco.mp4" data-start="7.4" data-duration="6.4" data-media-start="0.8" data-track-index="0" muted playsinline></video>
+        <video id="vc" src="assets/gameplay/palco.mp4" data-start="13.8" data-duration="6.2" data-media-start="1.2" data-track-index="0" muted playsinline></video>
+        <div id="mira" class="clip" data-start="14.9" data-duration="1.9" data-track-index="1"><div class="anel" id="anel"></div><div class="seta" id="seta">▼</div></div>
+      </div>
+      <div id="raios" class="clip" data-start="14.5" data-duration="2.3" data-track-index="2"></div>
+      <div id="escuro" class="clip" data-start="16.8" data-duration="3.2" data-track-index="2"></div>
+
+      <div id="titulo" class="clip" data-start="0" data-duration="20" data-track-index="3">
+        <div class="placa" id="placa">
+          <div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="mascote"><div class="corpo" id="corpo"></div><img id="chapeu" src="assets/sprites/chapeu-palha.png" alt="" /></div>
+          <div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div>
+        </div>
+      </div>
+
+      <div id="c1" class="clip" data-start="0.3" data-duration="2.3" data-track-index="4">
+        <div class="bloco" style="top: 600px">
+          <div class="frase" id="c1f">conheça a <em>TURMA</em><br />da festa 👇</div>
+          <div class="frase menor" id="c1s">(espera a última 🔥)</div>
+        </div>
+      </div>
+
+      <!-- Cartas: preenchidas pelo script a partir da lista TURMA -->
+      <div id="cartas"></div>
+
+      <div id="fim" class="clip" data-start="16.8" data-duration="3.2" data-track-index="4">
+        <div class="fila" id="fila"></div>
+        <div class="bloco" style="top: 840px"><div class="frase" id="fimf">qual é o seu<br /><em>favorito</em>? 👇</div></div>
+        <div class="fim-cta" id="fimc">segue pra ver a festa crescer 🌽</div>
+      </div>
+      <div id="flash"></div>
+
+      <audio id="w0" src="assets/audio/whoosh.wav" data-start="2.55" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w1" src="assets/audio/whoosh.wav" data-start="3.75" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w2" src="assets/audio/whoosh.wav" data-start="4.95" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w3" src="assets/audio/whoosh.wav" data-start="6.15" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w4" src="assets/audio/whoosh.wav" data-start="7.35" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w5" src="assets/audio/whoosh.wav" data-start="8.85" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w6" src="assets/audio/whoosh.wav" data-start="10.35" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w7" src="assets/audio/whoosh.wav" data-start="11.85" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w8" src="assets/audio/whoosh.wav" data-start="13.75" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="w9" src="assets/audio/whoosh.wav" data-start="16.75" data-duration="0.45" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="d4" src="assets/audio/ding.wav" data-start="7.5" data-duration="0.9" data-track-index="12" data-volume="0.55"></audio>
+      <audio id="d7" src="assets/audio/ding.wav" data-start="12" data-duration="0.9" data-track-index="12" data-volume="0.6"></audio>
+      <audio id="tada" src="assets/audio/tada.wav" data-start="14.5" data-duration="1.1" data-track-index="12" data-volume="0.85"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const DUR = 20;
+
+      // Dados do jogo (src/data.js) e dos sprites extraídos (assets/sprites/sprites.json).
+      const RARIDADE = [["COMUM", "70%"], ["RARA", "22%"], ["SUPER-RARA", "6%"], ["ULTRA-RARA", "2%"]];
+      const TURMA = [
+        { id: "milho", nome: "Milho", r: 0, posto: "Par da quadrilha", efeito: "+ Animação a cada passo", w: 16, h: 22, n: 4, fps: 6, t: 2.6, d: 1.2 },
+        { id: "cenoura", nome: "Cenoura", r: 0, posto: "Sanfona do palco", efeito: "+ Ritmo: dança mais rápido", w: 18, h: 25, n: 6, fps: 8, t: 3.8, d: 1.2 },
+        { id: "inhame", nome: "Inhame", r: 0, posto: "Zabumba do palco", efeito: "+ Fôlego: mais passos", w: 20, h: 26, n: 4, fps: 6, t: 5.0, d: 1.2 },
+        { id: "batata", nome: "Batata‑Doce", r: 0, posto: "Triângulo do palco", efeito: "+ Refresco: descansa rápido", w: 24, h: 25, n: 4, fps: 6, t: 6.2, d: 1.2 },
+        { id: "pamonha", nome: "Pamonha", r: 1, posto: "Marcadora da quadrilha", efeito: "“Olha a cobra!” = passo ×3", w: 30, h: 24, n: 4, fps: 4, t: 7.4, d: 1.5 },
+        { id: "aipim", nome: "Aipim", r: 1, posto: "Barraca do Beijo", efeito: "pedidos pagam mais 💋", w: 16, h: 17, n: 6, fps: 3, t: 8.9, d: 1.5 },
+        { id: "cachorro", nome: "Cachorro‑Quente", r: 1, posto: "Barraca de Pescaria", efeito: "prendas mais rápidas 🎣", w: 20, h: 13, n: 4, fps: 2, t: 10.4, d: 1.5 },
+        { id: "pacoca", nome: "Paçoca", r: 2, posto: "Barraca das Argolas", efeito: "argolas baratas mais rápido", w: 18, h: 24, n: 12, fps: 8, t: 11.9, d: 1.9 },
+        { id: "faisca", nome: "Faísca", r: 3, posto: "Beira da fogueira", efeito: "labareda dura mais 🔥", w: 11, h: 15, n: 6, fps: 9, t: 13.8, d: 3.0 }
+      ];
+      const ALTURA_ARTE = 250;
+      const sprites = [];
+      const criarSprite = (c, k) => {
+        const el = document.createElement("div");
+        el.className = "sprite";
+        el.style.width = `${c.w * k}px`;
+        el.style.height = `${c.h * k}px`;
+        el.style.backgroundImage = `url("assets/sprites/turma-${c.id}.png")`;
+        el.style.backgroundSize = `${c.w * c.n * k}px ${c.h * k}px`;
+        sprites.push({ el, c, k });
+        return el;
+      };
+
+      const cartas = document.getElementById("cartas");
+      TURMA.forEach((c, i) => {
+        const clip = document.createElement("div");
+        clip.id = `k${i}`;
+        clip.className = "clip";
+        clip.dataset.start = c.t;
+        clip.dataset.duration = c.d;
+        clip.dataset.trackIndex = 5;
+        const [raridade, chance] = RARIDADE[c.r];
+        const ultra = c.r === 3;
+        clip.innerHTML = `<div class="carta r${c.r}" id="carta${i}"><div class="topo"><span class="chip">${raridade} · ${chance}</span>
+          <span class="num">${i + 1}/9</span></div><div class="arte" id="arte${i}"></div>
+          <div class="nome${c.nome.length > 11 ? " longo" : ""}" id="nome${i}">${ultra ? "???" : c.nome}</div><div class="posto">${c.posto}</div>
+          <div class="efeito">${c.efeito}</div></div>`;
+        cartas.appendChild(clip);
+        const k = Math.min(Math.floor(ALTURA_ARTE / c.h), Math.floor(480 / c.w));
+        const el = criarSprite(c, k);
+        el.id = `sprite${i}`;
+        clip.querySelector(".arte").appendChild(el);
+      });
+      const fila = document.getElementById("fila");
+      TURMA.forEach(c => fila.appendChild(criarSprite(c, 5)));
+
+      // Um relógio só anima todos os sprites (quadro = tempo × fps do jogo).
+      const relogio = { t: 0 };
+      let nomeUltra = null;
+      const animar = () => {
+        nomeUltra = nomeUltra || document.getElementById(`nome${TURMA.length - 1}`);
+        nomeUltra.textContent = relogio.t >= 14.5 ? TURMA[TURMA.length - 1].nome : "???";
+        for (const s of sprites) {
+          const f = Math.floor(relogio.t * s.c.fps) % s.c.n;
+          s.el.style.backgroundPosition = `${-f * s.c.w * s.k}px 0px`;
+        }
+      };
+      tl.fromTo(relogio, { t: 0 }, { t: DUR, duration: DUR, ease: "none", onUpdate: animar }, 0);
+      animar();
+
+      // Mandioca da placa dançando.
+      const CABECA = [[4, 5], [3, 4], [3, 3], [4, 4], [4, 5], [5, 4], [5, 3], [4, 4]];
+      const corpo = document.getElementById("corpo");
+      const chapeu = document.getElementById("chapeu");
+      const quadro = { f: 0 };
+      const mostrarQuadro = () => {
+        const f = Math.min(7, Math.floor(quadro.f));
+        corpo.style.backgroundPosition = `${-f * 160}px 0px`;
+        chapeu.style.left = `${CABECA[f][0] * 5}px`;
+        chapeu.style.top = `${CABECA[f][1] * 5}px`;
+      };
+      tl.fromTo(quadro, { f: 0 }, { f: 8, duration: 1, ease: "none", repeat: DUR - 1, onUpdate: mostrarQuadro }, 0);
+      mostrarQuadro();
+
+      tl.fromTo("#placa", { scale: 1.1, rotation: -3, y: -24 }, { scale: 1, rotation: 0, y: 0, duration: 0.6, ease: "back.out(1.7)" }, 0);
+      tl.to("#placa", { scale: 0.5, y: -30, duration: 0.45, ease: "power3.inOut" }, 2.45);
+      tl.to("#placa", { scale: 0.85, y: 150, duration: 0.6, ease: "expo.out" }, 16.85);
+
+      tl.fromTo("#cam", { scale: 1 }, { scale: 1.08, duration: DUR, ease: "none" }, 0);
+
+      tl.fromTo("#c1f", { scale: 1.35, opacity: 0, filter: "blur(10px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "power4.out" }, 0.3);
+      tl.fromTo("#c1s", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 1.0);
+
+      // Cada carta entra girando pela direita e sai pela esquerda.
+      TURMA.forEach((c, i) => {
+        tl.fromTo(`#carta${i}`, { x: 760, rotation: 10 }, { x: 0, rotation: 0, duration: 0.38, ease: "back.out(1.4)" }, c.t);
+        tl.fromTo(`#sprite${i}`, { y: 60, scaleY: 0.6 }, { y: 0, scaleY: 1, duration: 0.3, ease: "back.out(2.5)", immediateRender: false }, c.t + 0.18);
+        if (i < TURMA.length - 1) tl.to(`#carta${i}`, { x: -760, rotation: -10, duration: 0.22, ease: "power2.in" }, c.t + c.d - 0.22);
+      });
+
+      // Ultra-rara: primeiro a silhueta, depois o brilho revela a Faísca (ali do lado da fogueira).
+      const ultra = TURMA.length - 1;
+      tl.fromTo(`#sprite${ultra}`, { filter: "brightness(0)" }, { filter: "brightness(1)", duration: 0.2, ease: "none", immediateRender: false }, 14.5);
+      tl.set(`#sprite${ultra}`, { filter: "brightness(0)" }, 13.8);
+      tl.fromTo(`#nome${ultra}`, { scale: 1.6 }, { scale: 1, duration: 0.4, ease: "back.out(2)", immediateRender: false }, 14.5);
+      tl.fromTo(`#carta${ultra}`, { rotation: -2 }, { rotation: 2, duration: 0.07, ease: "none", repeat: 7, yoyo: true, immediateRender: false }, 13.95);
+      tl.to(`#carta${ultra}`, { rotation: 0, duration: 0.1 }, 14.45);
+      tl.fromTo("#flash", { opacity: 0.85 }, { opacity: 0, duration: 0.35, ease: "power2.out", immediateRender: false }, 14.5);
+      tl.fromTo("#raios", { opacity: 0, scale: 0.6, rotation: 0 }, { opacity: 1, scale: 1, rotation: 40, duration: 2.3, ease: "power2.out" }, 14.5);
+      tl.fromTo("#anel", { scale: 1.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 14.9);
+      tl.fromTo("#seta", { y: -14 }, { y: 6, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 5 }, 14.9);
+      tl.to(`#carta${ultra}`, { y: -900, duration: 0.3, ease: "power2.in" }, 16.5);
+
+      // Final: a turma toda dançando em fila.
+      tl.fromTo("#flash", { opacity: 0.5 }, { opacity: 0, duration: 0.22, ease: "power2.out", immediateRender: false }, 16.8);
+      tl.fromTo("#fila .sprite", { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(2)", stagger: 0.05 }, 17.0);
+      tl.fromTo("#fimf", { scale: 1.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "power4.out" }, 17.4);
+      tl.fromTo("#fimc", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.8)" }, 17.9);
+      tl.to("#fimc", { scale: 1.05, duration: 0.45, ease: "sine.inOut", yoyo: true, repeat: 3 }, 18.4);
+
+      window.__timelines["turma"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

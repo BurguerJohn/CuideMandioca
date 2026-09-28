@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cuide bem da sua mandioca</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <div id="festa" class="festa"><canvas id="festa-canvas" aria-label="A festa junina da Mandioca" data-i18n-label="app.canvas"></canvas></div>
+  <div id="placa" class="placa ui" aria-live="polite"></div>
+  <section id="vitrine" class="vitrine ui" hidden aria-label="Vitrine de compras" data-i18n-label="app.shopLabel"></section>
+  <div id="avisos" class="avisos ui" role="status" aria-live="polite"></div>
+  <section id="painel" class="painel ui" hidden aria-label="Painel da festa" data-i18n-label="app.panelLabel">
+    <header class="painel-topo" data-arrastar="painel">
+      <h1 id="painel-titulo">Cuide bem da sua mandioca</h1>
+      <button class="fechar" data-action="fechar" title="Fechar (Esc)" data-i18n-title="app.closeEsc">×</button>
+      <div class="bandeirinhas"></div>
+    </header>
+    <div class="painel-meio">
+      <nav id="painel-abas" class="painel-abas" aria-label="Abas" data-i18n-label="app.tabsLabel"></nav>
+      <div id="painel-corpo" class="painel-corpo"></div>
+    </div>
+  </section>
+  <section id="argolas" class="minijogo ui" hidden aria-label="Argolas da Sorte" data-i18n-label="rings.title">
+    <header class="painel-topo verde" data-arrastar="argolas">
+      <h1 data-i18n="rings.title">Argolas da Sorte</h1>
+      <button class="fechar" data-action="argolas-fechar" title="Fechar (Esc)" data-i18n-title="app.closeEsc">×</button>
+      <div class="bandeirinhas"></div>
+    </header>
+    <div class="minijogo-corpo">
+      <canvas id="argolas-canvas" aria-label="Barraca das argolas: clique para soltar a argola" data-i18n-label="rings.canvas"></canvas>
+      <div id="argolas-info" class="minijogo-info"></div>
+    </div>
+  </section>
+  <section id="tela" class="minijogo tela ui" hidden aria-label="Janela da festa" data-i18n-label="app.windowLabel">
+    <header class="painel-topo azul" data-arrastar="tela">
+      <h1 id="tela-titulo">Correio elegante</h1>
+      <button class="fechar" data-action="tela-fechar" title="Fechar (Esc)" data-i18n-title="app.closeEsc">×</button>
+      <div class="bandeirinhas"></div>
+    </header>
+    <div id="tela-corpo" class="painel-corpo tela-corpo"></div>
+  </section>
+  <div id="janela" class="janela ui" hidden role="dialog"><div id="janela-corpo"></div></div>
+  <input id="importar" type="file" accept="application/json,.json" hidden>
+  <script src="src/lang/pt-BR.js"></script>
+  <script src="src/lang/en.js"></script>
+  <script src="src/lang/es.js"></script>
+  <script src="src/i18n.js"></script>
+  <script src="src/data.js"></script>
+  <script src="src/core.js"></script>
+  <script src="src/festa-sprites.js"></script>
+  <script src="src/festa.js"></script>
+  <script src="src/argolas.js"></script>
+  <script src="src/som.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>

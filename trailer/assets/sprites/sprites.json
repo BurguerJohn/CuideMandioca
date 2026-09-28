@@ -1,0 +1,176 @@
+{
+  "mandioca": {
+    "w": 32,
+    "h": 44,
+    "frames": 16,
+    "fps": 0,
+    "tags": {
+      "danca": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "descanso": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "comemora": [
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  },
+  "turma-milho": {
+    "w": 16,
+    "h": 22,
+    "frames": 4,
+    "fps": 6
+  },
+  "turma-cenoura": {
+    "w": 18,
+    "h": 25,
+    "frames": 6,
+    "fps": 8
+  },
+  "turma-inhame": {
+    "w": 20,
+    "h": 26,
+    "frames": 4,
+    "fps": 6
+  },
+  "turma-batata": {
+    "w": 24,
+    "h": 25,
+    "frames": 4,
+    "fps": 6
+  },
+  "turma-pamonha": {
+    "w": 30,
+    "h": 24,
+    "frames": 4,
+    "fps": 4
+  },
+  "turma-faisca": {
+    "w": 11,
+    "h": 15,
+    "frames": 6,
+    "fps": 9
+  },
+  "turma-pacoca": {
+    "w": 18,
+    "h": 24,
+    "frames": 12,
+    "fps": 8
+  },
+  "turma-aipim": {
+    "w": 16,
+    "h": 17,
+    "frames": 6,
+    "fps": 3
+  },
+  "turma-cachorro": {
+    "w": 20,
+    "h": 13,
+    "frames": 4,
+    "fps": 2
+  },
+  "chapeu-palha": {
+    "w": 24,
+    "h": 9,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-milho": {
+    "w": 14,
+    "h": 20,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-cenoura": {
+    "w": 16,
+    "h": 24,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-inhame": {
+    "w": 19,
+    "h": 24,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-batata": {
+    "w": 20,
+    "h": 24,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-pamonha": {
+    "w": 20,
+    "h": 19,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-faisca": {
+    "w": 11,
+    "h": 12,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-pacoca": {
+    "w": 12,
+    "h": 13,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-aipim": {
+    "w": 16,
+    "h": 24,
+    "frames": 1,
+    "fps": 0
+  },
+  "char-cachorro": {
+    "w": 20,
+    "h": 15,
+    "frames": 1,
+    "fps": 0
+  },
+  "ui-animacao": {
+    "w": 13,
+    "h": 10,
+    "frames": 1,
+    "fps": 0
+  },
+  "ui-fichas": {
+    "w": 14,
+    "h": 8,
+    "frames": 1,
+    "fps": 0
+  },
+  "ui-lotacao": {
+    "w": 14,
+    "h": 9,
+    "frames": 1,
+    "fps": 0
+  },
+  "ui-argolas": {
+    "w": 11,
+    "h": 10,
+    "frames": 1,
+    "fps": 0
+  },
+  "ui-presente": {
+    "w": 10,
+    "h": 9,
+    "frames": 1,
+    "fps": 0
+  }
+}

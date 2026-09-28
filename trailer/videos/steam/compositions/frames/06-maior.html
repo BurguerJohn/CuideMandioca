@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root { position: absolute; inset: 0; overflow: hidden; background: #1c1a3a; }
+        /* O mundo é a câmera: translate + scale num só wrapper (origem no centro). O vídeo nunca é animado direto. */
+        .x-mundo { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+        .x-mundo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+
+      </style>
+
+      <div data-hf-id="hf-kyhp" id="root" data-composition-id="maior" data-width="1920" data-height="1080">
+        <div data-hf-id="hf-e8lt" class="x-mundo" id="x-mundo" data-layout-allow-overflow=""><video data-hf-id="hf-4j8c" id="x-video" class="clip" src="assets/gameplay/steam-maior.mp4" data-start="0" data-duration="6.914" data-media-start="0" data-track-index="0" muted playsinline></video></div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+
+          const S0 = 3;
+          const alvo = { x: 896 - 960, y: 752 - 540 };
+          tl.fromTo("#x-mundo", { scale: S0, x: -alvo.x * S0, y: -alvo.y * S0 },
+            { scale: 1, x: 0, y: 0, duration: 1.6, ease: "expo.out" }, 2.305);
+          window.__timelines["maior"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
