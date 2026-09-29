@@ -769,6 +769,376 @@ def leiloeiro():
     return frames
 
 
+def altofalante():
+    """Alto-falante da quermesse (a "boca de ferro"): corneta de lata virada para a esquerda, com a bobina atrás e a
+    braçadeira que prende no mastro. Dois quadros: parada e tremendo (a boca abre um pixel quando fala)."""
+    frames = []
+    for step in range(2):
+        layer = Layer(11, 9)
+        for x in range(0, 7):
+            half = 3.6 - x * 0.45 + (0.6 if step and x < 2 else 0)
+            top, bottom = round(4 - half), round(4 + half)
+            for y in range(top, bottom + 1):
+                layer.put(x, y, 'S' if y < 4 else 's' if y > 4 else 'w')
+        layer.rect(0, round(4 - 3.6 - (0.6 if step else 0)) + 1, 0, round(4 + 3.6 + (0.6 if step else 0)) - 1, '1')
+        layer.rect(7, 2, 8, 6, 's')
+        layer.rect(7, 2, 8, 2, 'S')
+        layer.rect(9, 3, 10, 5, 'D')
+        layer.put(9, 3, 'l')
+        frames.append(outline(layer.image))
+    return frames
+
+
+def kombi():
+    """Carro da pamonha: a Kombi de duas cores (branca em cima, verde embaixo) com espigas pintadas na lateral, o
+    alto-falante no teto e o farol redondo na frente em V, andando para a direita. Dois quadros (as rodas giram e o
+    carro balança um pixel)."""
+    frames = []
+    for step in range(2):
+        layer = Layer(44, 25)
+        bob = step
+        top = 6 + bob
+        # Carroceria: parte de cima branca com as janelas, parte de baixo verde, faixa amarela no meio.
+        for y in range(top, top + 14):
+            for x in range(1, 42):
+                # Cantos arredondados em cima.
+                if y == top and (x < 3 or x > 39):
+                    continue
+                if y == top + 1 and (x < 2 or x > 40):
+                    continue
+                if y < top + 6:
+                    char = 'X' if x < 40 else 'z'
+                elif y == top + 6:
+                    char = 'A'
+                else:
+                    char = 'G' if x < 38 else 'g'
+                layer.put(x, y, char)
+        # Janelas (azul-claro com reflexo) e a frente em V típica.
+        for wx in (4, 11, 18, 25):
+            layer.rect(wx, top + 2, wx + 5, top + 4, 'b')
+            layer.put(wx + 1, top + 2, 'z')
+        layer.rect(33, top + 2, 38, top + 4, 'b')
+        # Espigas pintadas na lateral: grão amarelo e palha verde.
+        for cx in (7, 17, 27):
+            for gy in range(3):
+                for gx in range(6):
+                    layer.put(cx + gx, top + 8 + gy, 'F' if (gx + gy) % 2 else 'A')
+            layer.rect(cx - 2, top + 8, cx - 1, top + 10, 'v')
+            layer.put(cx - 3, top + 8, 'v')
+            layer.put(cx - 3, top + 10, 'v')
+        # Farol, para-choque e maçaneta.
+        layer.put(41, top + 10, 'F')
+        layer.rect(0, top + 13, 42, top + 13, 's')
+        layer.put(30, top + 7, 's')
+        # Alto-falante no teto, preso num suporte.
+        layer.rect(20, top - 1, 21, top - 1, 's')
+        for x in range(16, 24):
+            half = 0.6 + (x - 16) * 0.3
+            for y in range(round(top - 4 - half), round(top - 4 + half) + 1):
+                layer.put(x, y, 'S' if y < top - 4 else 's')
+        layer.rect(23, top - 5, 24, top - 3, 'M')
+        # Rodas com calota que gira.
+        for wx in (9, 33):
+            for a in range(0, 360, 15):
+                r = math.radians(a)
+                for rad in (2.2, 3.0):
+                    layer.put(wx + rad * math.cos(r), 21 + rad * math.sin(r), 'e')
+            layer.put(wx, 21, 'S')
+            spoke = math.radians(45 * step)
+            layer.put(wx + round(1.4 * math.cos(spoke)), 21 + round(1.4 * math.sin(spoke)), 'S')
+        frames.append(outline(layer.image))
+    return frames
+
+
+def jegue():
+    """Jegue (o do "dono do jegue azul"!): cinza, orelhonas, focinho claro e uma manta azul nas costas, de perfil para a
+    direita. Quadros: andando (duas passadas), parado mexendo a orelha e pastando (cabeça baixa)."""
+    frames = []
+    for pose in ('anda1', 'anda2', 'orelha', 'pasta'):
+        layer = Layer(24, 18)
+        # Corpo.
+        layer.rect(4, 7, 16, 12, 'M')
+        layer.rect(4, 7, 16, 7, 'w')
+        layer.rect(4, 12, 16, 12, 'L')
+        # Manta azul com a franja.
+        layer.rect(7, 6, 13, 10, 'J')
+        layer.rect(7, 6, 13, 6, 'b')
+        for x in range(7, 14, 2):
+            layer.put(x, 11, 'j')
+        # Rabo com o tufo escuro.
+        tail = (2, 8) if pose != 'anda2' else (2, 9)
+        layer.line(4, 8, tail[0], tail[1] + 2, 'L')
+        layer.put(tail[0], tail[1] + 3, 'e')
+        # Pernas: passada alternada andando, juntas parado.
+        legs = {'anda1': (4, 7, 13, 16), 'anda2': (5, 6, 14, 15)}.get(pose, (5, 7, 13, 15))
+        for x in legs:
+            layer.rect(x, 13, x, 16, 'M')
+            layer.put(x, 17, 'e')
+        # Pescoço e cabeça: alta normalmente, baixa pastando.
+        if pose == 'pasta':
+            layer.rect(16, 9, 18, 12, 'M')
+            layer.rect(18, 12, 22, 15, 'M')
+            layer.rect(21, 14, 23, 16, 'w')
+            layer.put(20, 13, 'e')
+            layer.rect(17, 7, 17, 9, 'M')
+            layer.rect(18, 8, 18, 10, 'M')
+            layer.put(23, 17, 'G')
+            layer.put(22, 17, 'g')
+        else:
+            layer.rect(16, 4, 18, 9, 'M')
+            layer.rect(17, 2, 22, 6, 'M')
+            layer.rect(20, 4, 23, 7, 'w')
+            layer.put(19, 3, 'e')
+            layer.put(23, 5, 'L')
+            # Orelhonas (uma mexe no quadro da orelha).
+            layer.rect(16, 0, 16, 2, 'M')
+            if pose == 'orelha':
+                layer.line(17, 2, 15, 0, 'M')
+            else:
+                layer.rect(18, 0, 18, 2, 'M')
+            layer.put(16, 1, 'c')
+        frames.append(outline(layer.image))
+    return frames
+
+
+# Sanfoneiro Andarilho: o cavalheiro da quadrilha de chapéu de couro com a aba virada (estrela dourada na frente),
+# bigode, gibão marrom e a sanfona dourada no peito, abrindo e fechando o fole enquanto anda.
+_SANFONEIRO = animar.edit(sprites.CAVALHEIRO, {(4, 6): 'd', (7, 6): 'd', (5, 1): 'A', (6, 1): 'A'})
+SANFONEIRO = '\n'.join(''.join({'Y': 'l', 'y': 'D', 'o': 'd'}.get(c, c) for c in row) if i < 3 else row
+                       for i, row in enumerate(_SANFONEIRO.strip('\n').split('\n')))
+FOLE = {
+    'fechado': ['aAAa', 'AFFA', 'aAAa', 'AFFA', 'aAAa'],
+    'aberto': ['aAAAAa', 'AFaFaA', 'aAAAAa', 'AFaFaA', 'aAAAAa'],
+}
+
+
+def sanfoneiro():
+    """Quatro quadros: passo com o fole fechado, passo com ele aberto, e o mesmo com o outro pé."""
+    frames = []
+    for foot, fole in (('esquerda', 'fechado'), ('esquerda', 'aberto'), ('direita', 'fechado'), ('direita', 'aberto')):
+        grid = FOLE[fole]
+        x = 4 if fole == 'fechado' else 3
+        frame = animar.person(SANFONEIRO, 'remendado', ('palma', 'palma', 0, foot), sleeve='D',
+                              extra=[(grid, x, 8)])
+        frames.append(frame)
+    return frames
+
+
+# Fotógrafo lambe-lambe: chapéu de feltro cinza, bigode, gravatinha borboleta vermelha e colete xadrez. Anda
+# empurrando o tripé fechado com a câmera de caixote (lente de latão) e, na hora da foto, some debaixo do pano preto.
+_LAMBE = animar.edit(sprites.CAVALHEIRO, {(4, 6): 'd', (7, 6): 'd', (5, 8): 'R', (6, 8): 'R'})
+LAMBE = '\n'.join(''.join({'Y': 'S', 'y': 's', 'o': 's'}.get(c, c) for c in row) if i < 3 else row
+                   for i, row in enumerate(_LAMBE.strip('\n').split('\n')))
+LAMBE_W, LAMBE_H = 30, 22
+CAIXOTE = ['aDDDDDl',
+           'ADDDDDD',
+           'SeDDDDD',
+           'ADDDDDD',
+           'aDDDDDl']
+
+
+def _por_cima(frame, layer):
+    frame.alpha_composite(outline(layer.image).crop((1, 1, LAMBE_W + 1, LAMBE_H + 1)))
+
+
+def fotografo():
+    """Quadros 0-3: andando e empurrando o tripé fechado com a câmera em cima. 4-5: debaixo do pano preto, câmera no
+    tripé aberto, esperando a pose (o pano balança)."""
+    frames = []
+    for foot in ('esquerda', None, 'direita', None):
+        bob = 0 if foot else -1
+        person = animar.person(LAMBE, 'xadrez-azul', ('palma', 'baixo', bob, foot), sleeve='X')
+        frame = Image.new('RGBA', (LAMBE_W, LAMBE_H), (0, 0, 0, 0))
+        props = Layer(LAMBE_W, LAMBE_H)
+        for x0, x1 in ((10, 9), (11, 11), (12, 13)):
+            props.line(x0, 12 + bob, x1, 21, 'D' if x0 != 11 else 'l')
+        props.grid(CAIXOTE, 7, 7 + bob)
+        _por_cima(frame, props)
+        animar.place(frame, person, 13, 2)
+        frames.append(frame)
+    for ripple in range(2):
+        person = animar.person(LAMBE, 'xadrez-azul', ('palma', 'baixo' if ripple else 'aberto', 0, None), sleeve='X')
+        frame = Image.new('RGBA', (LAMBE_W, LAMBE_H), (0, 0, 0, 0))
+        animar.place(frame, person, 13, 2)
+        props = Layer(LAMBE_W, LAMBE_H)
+        for x1 in (5, 9, 13):
+            props.line(9, 12, x1, 21, 'D')
+        props.grid(CAIXOTE, 6, 7)
+        cloth = ['..11111111..', '.1111111111.'] + ['111111111111'] * 5 + ['1.11.111.11.' if ripple else '11.111.11.11']
+        props.grid(cloth, 13, 3)
+        for y in range(5, 10):
+            props.put(16 + ripple, y, '2')
+            props.put(20 + ripple, y, '2')
+        _por_cima(frame, props)
+        frames.append(frame)
+    return frames
+
+
+# Rabo no burro: cavalete de madeira com o papel e o jegue desenhado de perfil (sem rabo) e o X vermelho no lugar
+# dele. O alvo fica em (23, 10) no quadro já contornado (BURRO_ALVO em src/festa.js).
+JEGUE_PAPEL = ['...L.L..............',
+               '...LMLM.............',
+               '...LMLM.............',
+               '..LMMMMM............',
+               '.LMeMMMMLLLLLLLLLL..',
+               'LMMMMMMMMMMMMMMMMMM.',
+               'LLMMM.MMMMMMMMMMMMM.',
+               '.LL...MMMMMMMMMMMMM.',
+               '......MMMMMMMMMMMMM.',
+               '......MMMMMMMMMMMMM.',
+               '......ML.ML...ML.ML.',
+               '......ML.ML...ML.ML.',
+               '......LL.LL...LL.LL.']
+
+
+def burro():
+    layer = Layer(28, 28)
+    layer.line(5, 10, 2, 27, 'D')
+    layer.line(22, 10, 25, 27, 'D')
+    layer.line(14, 12, 14, 27, 'd')
+    layer.rect(3, 22, 24, 22, 'D')
+    layer.rect(1, 1, 26, 19, 'D')
+    layer.rect(2, 2, 25, 18, 'W')
+    layer.grid(JEGUE_PAPEL, 3, 4)
+    for d in (-1, 0, 1):
+        layer.put(22 + d, 9 + d, 'R')
+        layer.put(22 + d, 9 - d, 'R')
+    for px, py in ((2, 2), (25, 2), (2, 18), (25, 18)):
+        layer.put(px, py, 's')
+    return [outline(layer.image)]
+
+
+def carro_de_boi():
+    """Carro de boi: a junta de dois bois brancos de canga (olhando para a direita) puxando o carro de madeira de rodas
+    maciças, com a carga de palha e flores. Quatro quadros: as patas andam e a roda gira."""
+    frames = []
+    for step in range(4):
+        layer = Layer(62, 28)
+        # Carro: a mesa de tábuas, as grades, a carga de palha e o cabeçalho que vai até a canga.
+        layer.rect(2, 13, 29, 16, 'D')
+        layer.rect(2, 13, 29, 13, 'l')
+        for x in range(3, 29, 5):
+            layer.rect(x, 7, x, 12, 'D')
+        layer.rect(2, 7, 29, 7, 'l')
+        for x in range(4, 28):
+            top = 3 + round(1.6 * math.sin(x * 0.55)) + (1 if x in (4, 27) else 0)
+            for y in range(top, 12):
+                layer.put(x, y, 'Y' if (x * 3 + y * 5) % 7 else 'y')
+        for fx_, fy, c in ((9, 4, 'H'), (15, 3, 'A'), (21, 4, 'R'), (25, 5, 'J')):
+            layer.put(fx_, fy, c)
+        layer.line(29, 15, 42, 14, 'd')
+        # Roda maciça com o eixo e os raios desenhados na madeira, girando.
+        cx, cy, r = 15, 20, 6
+        for y in range(cy - r, cy + r + 1):
+            for x in range(cx - r, cx + r + 1):
+                if (x - cx) ** 2 + (y - cy) ** 2 <= r * r + 1:
+                    layer.put(x, y, 'D' if (x - cx) ** 2 + (y - cy) ** 2 < (r - 1) ** 2 else 'd')
+        for k in range(2):
+            angle = step * math.pi / 8 + k * math.pi / 2
+            layer.line(cx - round(math.cos(angle) * (r - 1)), cy - round(math.sin(angle) * (r - 1)),
+                       cx + round(math.cos(angle) * (r - 1)), cy + round(math.sin(angle) * (r - 1)), 'l')
+        layer.rect(cx - 1, cy - 1, cx, cy, 'u')
+        # A junta de bois lado a lado: o de trás (mais escuro) um pouco acima, com a cabeça aparecendo; o da frente inteiro.
+        lift = step % 2
+        for ox, oy, shade, near in ((44, -2, 'w', False), (41, 0, 'W', True)):
+            layer.rect(ox, 12 + oy, ox + 11, 18 + oy, shade)
+            layer.rect(ox, 12 + oy, ox + 11, 12 + oy, 'W' if near else 'w')
+            if near:
+                layer.rect(ox + 3, 14, ox + 5, 16, 'M')
+                layer.rect(ox + 8, 15, ox + 9, 17, 'M')
+            # Cabeça baixa para a frente, focinho escuro, olho e os chifres.
+            layer.rect(ox + 12, 11 + oy, ox + 16, 16 + oy, shade)
+            layer.rect(ox + 16, 14 + oy, ox + 17, 16 + oy, 'L')
+            layer.put(ox + 14, 12 + oy, 'e')
+            for hx, hy in ((ox + 12, 10 + oy), (ox + 11, 9 + oy), (ox + 15, 10 + oy), (ox + 16, 9 + oy)):
+                layer.put(hx, hy, 'x')
+            layer.line(ox - 1, 13 + oy, ox - 2, 17 + oy, 'L')
+            for k, lx in enumerate((ox + 1, ox + 3, ox + 8, ox + 10)):
+                up = lift if (k % 2 == 0) == near else 1 - lift
+                bottom = 25 - up + (oy if not near else 0)
+                layer.rect(lx, 19 + oy, lx, bottom, shade)
+                layer.put(lx, bottom, 'L')
+        # A canga de madeira em cima dos pescoços.
+        layer.rect(51, 8, 60, 9, 'D')
+        layer.rect(51, 8, 60, 8, 'l')
+        frames.append(outline(layer.image))
+    return frames
+
+
+# Papagaio fofoqueiro (papagaio-verdadeiro): verde, testa azul, cara amarela, bico curvo escuro, rabo azul e as patinhas
+# segurando o poste. Três quadros: parado, de bico aberto (falando) e batendo a asa.
+PAPAGAIO = {
+    'parado': ['..JJG...',
+               '.GAAGG..',
+               '.GAeGLL.',
+               'GGGGGGL.',
+               'GGGGGG..',
+               'GGgGGG..',
+               'GGgGGG..',
+               '.GGGG...',
+               '..GJG...',
+               '..GJJ...',
+               '..x.x...'],
+    'fala': ['..JJG...',
+             '.GAAGG..',
+             '.GAeGLL.',
+             'GGGGGG..',
+             'GGGGGGL.',
+             'GGgGGG..',
+             'GGgGGG..',
+             '.GGGG...',
+             '..GJG...',
+             '..GJJ...',
+             '..x.x...'],
+    'asa': ['..JJG...',
+            '.GAAGG..',
+            'gGAeGLL.',
+            'ggGGGGL.',
+            'RgGGGG..',
+            '.GGGGG..',
+            '.GGGGG..',
+            '.GGGG...',
+            '..GJG...',
+            '..GJJ...',
+            '..x.x...'],
+}
+
+
+def papagaio():
+    return [outline(sprite('\n'.join(PAPAGAIO[pose]))) for pose in ('parado', 'fala', 'asa')]
+
+
+def cobra():
+    """Cobra de pano da quadrilha (a do "olha a cobra!"): corpo de meia listrada verde e amarela, olho de botão e a
+    linguinha de feltro, serpenteando em quatro quadros (a onda corre do rabo para a cabeça)."""
+    frames = []
+    body = 17
+    for k in range(4):
+        layer = Layer(25, 8)
+        phase = k * math.pi / 2
+        ys = []
+        for x in range(body):
+            # A onda diminui perto da cabeça, que vai mais firme.
+            amp = 1.3 * (1 - max(0, x - 11) / 8)
+            y = 3 + round(amp * math.sin(x / body * 2 * math.pi * 1.2 - phase))
+            ys.append(y)
+            band = (x + 1) % 4 == 0
+            layer.put(x + 1, y, 'A' if band else 'G')
+            if x >= 3:
+                layer.put(x + 1, y + 1, 'a' if band else 'g')
+        hy = ys[-1]
+        hx = body + 1
+        layer.grid(['.GGG.', 'GGGGG', 'ggggg', '.ggg.'], hx, hy - 1)
+        # Olho de botão: branco com o miolo escuro.
+        for dx, dy, char in ((2, -1, 'X'), (3, -1, 'X'), (2, 0, 'X'), (3, 0, 'e')):
+            layer.put(hx + dx, hy + dy, char)
+        if k % 2 == 0:
+            for dx, dy in ((5, 1), (6, 0), (6, 2)):
+                layer.put(hx + dx, hy + dy, 'R')
+        frames.append(outline(layer.image))
+    return frames
+
+
 def export(add):
     """Registra as folhas do cenário no manifesto, com o tipo de camada de cada peça."""
     sheets = {
@@ -778,6 +1148,6 @@ def export(add):
         'pintinho': (pintinho(), 6), 'gato': (gato(), 1), 'bode': (bode(), 4), 'pipa': (pipa(), 4), 'lua': (lua(), 0),
         'balao': (balao(), 5), 'mandioquinha': (mandioquinha(), 2),
         'carrossel': (carrossel(), 6), 'balao-grande': (balao_grande(), 3), 'boi': (boi(), 6),
-        'balao-ouro': (balao_ouro(), 8), 'pote': (pote(), 0), 'caramelo': (caramelo(), 0), 'pombo': (pombo(), 11), 'trem': (trem(), 0), 'sapo': (sapo(), 0), 'saco': (saco(), 0), 'leiloeiro': (leiloeiro(), 0),
+        'balao-ouro': (balao_ouro(), 8), 'pote': (pote(), 0), 'caramelo': (caramelo(), 0), 'pombo': (pombo(), 11), 'trem': (trem(), 0), 'sapo': (sapo(), 0), 'saco': (saco(), 0), 'altofalante': (altofalante(), 0), 'kombi': (kombi(), 0), 'jegue': (jegue(), 0), 'sanfoneiro': (sanfoneiro(), 0), 'leiloeiro': (leiloeiro(), 0), 'cobra': (cobra(), 0), 'fotografo': (fotografo(), 0), 'burro': (burro(), 0), 'carro-boi': (carro_de_boi(), 0), 'papagaio': (papagaio(), 0),
     }
     return {name: add(f'cenario-{name}', frames, fps=fps) for name, (frames, fps) in sheets.items()}

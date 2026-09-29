@@ -8,8 +8,10 @@
   const SAVE_VERSION = 1;
   const STATS = ['rebolado', 'folego', 'refresco', 'ritmo'];
   const BONFIRE = ['labareda', 'brasa', 'calor'];
-  const SLOTS = ['chapeu', 'mao', 'tecido', 'terreiro', 'esquerda', 'direita'];
+  const SLOTS = ['chapeu', 'mao', 'tecido', 'terreiro', 'esquerda', 'direita', 'varal'];
   const MINUTE = 60000;
+  // Mais que isso sem tique com o jogo aberto (computador dormindo, janela escondida): conta como tempo fora.
+  const WAKE_GAP = MINUTE;
 
   const SCENERY_PLAN = 400;
   // Diário: no máximo tantas entradas; quando passa, somem primeiro os acontecimentos miúdos, nunca os desbloqueios.
@@ -99,6 +101,15 @@
         pote: { active: null, nextAt: 0 },
         saco: { active: null, nextAt: 0 },
         leilao: { active: null, nextAt: 0 },
+        cold: { active: null, nextAt: 0 },
+        visitor: { active: null, nextAt: 0 },
+        fotografo: { active: null, nextAt: 0 },
+        burro: { active: null, nextAt: 0 },
+        fantasia: { judgeAt: 0, nextAt: 0 },
+        cozinha: { pot: null, buff: null },
+        album: [],
+        newsSeen: this.cfg.newsVersion,
+        bornAt: now,
         hints: {},
         bingo: { round: null },
         setsWorn: [],
@@ -111,7 +122,7 @@
         quadrilha: { nextAt: 0 },
         rings: { cost: this.cfg.ringCost, nextAt: 0 },
         stats: { playtime: 0, steps: 0, cheerEarned: 0, cheerSpent: 0, fished: 0,
-          outings: 0, letters: 0, requests: 0, crashers: 0, ringRounds: 0, ringHits: 0, pokes: 0, balloons: 0, rainbows: 0, upgrades: 0, goals: 0, weddings: 0, rice: 0, potes: 0, bingoCards: 0, bingos: 0, contests: 0, contestWins: 0, sacoRaces: 0, sacoWins: 0, leiloes: 0 },
+          outings: 0, letters: 0, requests: 0, crashers: 0, ringRounds: 0, ringHits: 0, pokes: 0, balloons: 0, rainbows: 0, upgrades: 0, goals: 0, weddings: 0, rice: 0, potes: 0, bingoCards: 0, bingos: 0, contests: 0, contestWins: 0, sacoRaces: 0, sacoWins: 0, leiloes: 0, lances: 0, quentao: 0, visitors: 0, cobras: 0, fotos: 0, burros: 0, burroMoscas: 0, fantasias: 0, fantasiaWins: 0, compadres: 0, dishes: 0 },
         achievements: [],
         log: [{ t: 0, type: 'comeco' }],
         runtime: this.freshRuntime(),
@@ -122,7 +133,7 @@
     freshRuntime() {
       return { stamina: this.stats.folego.base, dancing: true, lift: 0, flareWait: this.cfg.flareEvery,
         flareLeft: 0, emberLeft: 0, lastStep: 0, dance: 'forro', danceLeft: this.cfg.danceSteps, frenzyLeft: 0,
-        pokeAt: 0, quadrilhaLeft: 0, callIn: 0, calls: 0, weddingLeft: 0, rice: 0, riceAt: 0 };
+        pokeAt: 0, quadrilhaLeft: 0, callIn: 0, calls: 0, weddingLeft: 0, rice: 0, riceAt: 0, announceAt: 0, cobraLeft: 0, cobraDir: 1 };
     }
 
     load(raw) {
@@ -163,6 +174,29 @@
       // Leilão no meio: o lance guardado volta para o bolso e o próximo leilão continua agendado.
       s.tickets += Math.max(0, Math.floor(finite(raw.leilao?.active?.held)));
       s.leilao = { active: null, nextAt: Math.max(0, finite(raw.leilao?.nextAt)) };
+      s.cold = { active: null, nextAt: Math.max(0, finite(raw.cold?.nextAt)) };
+      s.visitor = { active: null, nextAt: Math.max(0, finite(raw.visitor?.nextAt)) };
+      s.fotografo = { active: null, nextAt: Math.max(0, finite(raw.fotografo?.nextAt)) };
+      s.burro = { active: null, nextAt: Math.max(0, finite(raw.burro?.nextAt)) };
+      s.fantasia = { judgeAt: Math.max(0, finite(raw.fantasia?.judgeAt)), nextAt: Math.max(0, finite(raw.fantasia?.nextAt)) };
+      // Cozinha: só pratos que existem; o prato servido não vale mais que o prato mais longo (relógio adiantado).
+      const recipes = new Set((this.data.recipes || []).map(entry => entry.id));
+      const pot = raw.cozinha?.pot;
+      const served = raw.cozinha?.buff;
+      const longest = Math.max(0, ...(this.data.recipes || []).map(entry => entry.buffMinutes)) * 60000;
+      s.cozinha = {
+        pot: pot && recipes.has(pot.id) ? { id: pot.id, startAt: Math.max(0, finite(pot.startAt)), readyAt: Math.max(0, finite(pot.readyAt)),
+          ready: pot.ready === true } : null,
+        buff: served && recipes.has(served.id) && finite(served.until) > 0
+          ? { id: served.id, until: Math.min(finite(served.until), this.now() + longest) } : null
+      };
+      const stickers = new Set((this.data.album || []).flatMap(page => page.stickers.map(sticker => sticker.id)));
+      s.album = Array.isArray(raw.album) ? [...new Set(raw.album)].filter(id => stickers.has(id)) : [];
+      // Save de antes das novidades: vê a janela delas uma vez.
+      s.newsSeen = Math.max(0, Math.floor(finite(raw.newsSeen, 0)));
+      // Dia em que a festa começou (para o aniversário). Save de antes disso conta a partir de hoje.
+      s.bornAt = finite(raw.bornAt, 0) > 0 ? raw.bornAt : this.now();
+      this.albumBackfill(s);
       s.yearStart = Math.max(0, finite(raw.yearStart));
       s.records = { maior: Number.isFinite(raw.records?.maior) ? raw.records.maior : null, size: Math.max(s.size, Math.floor(finite(raw.records?.size, 1))) };
       s.daily = { day: typeof raw.daily?.day === 'string' ? raw.daily.day : null, streak: clamp(Math.floor(finite(raw.daily?.streak)), 0, 999) };
@@ -178,8 +212,22 @@
       s.runtime = { ...this.freshRuntime(), dancing: true };
       this.state = s;
       s.runtime.stamina = this.maxStamina();
+      this.staggerDue(s);
       this.catchUp(finite(s.lastSeen, this.now()));
       return s;
+    }
+
+    // Voltando depois de muito tempo: o que venceu com o jogo fechado (corrida, leilão, pote, visitantes...) não começa
+    // tudo no mesmo segundo. Entra um de cada vez, em ordem sorteada, com uns 40 s entre eles.
+    staggerDue(s) {
+      const now = this.now();
+      const due = [s.balloon, s.pote, s.saco, s.leilao, s.cold, s.visitor, s.fotografo, s.burro, s.fantasia, s.quadrilha]
+        .filter(clock => clock && clock.nextAt && clock.nextAt <= now);
+      for (let i = due.length - 1; i > 0; i--) {
+        const j = Math.floor(this.rng() * (i + 1));
+        [due[i], due[j]] = [due[j], due[i]];
+      }
+      due.forEach((clock, i) => { clock.nextAt = now + (30 + i * 40) * 1000; });
     }
 
     // Quanto a festa rende com o jogo fechado: 25% (cfg.offlineRate), mais o que o Sopinha acrescenta.
@@ -192,20 +240,101 @@
       if (seconds < 60) return;
       const bunny = this.effect('offline');
       const cheer = this.cheerPerSecond() * seconds * this.offlineRate();
+      const before = this.state.size;
       this.offline = true;
       this.earn(cheer);
       this.offline = false;
-      this.welcome = { seconds, cheer, bunny, capped: away > seconds };
+      this.welcome = { seconds, cheer, bunny, capped: away > seconds, guests: this.state.size - before };
+    }
+
+    // A festa ficou parada com o jogo aberto (o computador dormiu, a janela ficou escondida ou minimizada): o tempo parado
+    // conta como tempo fora, igual a fechar o jogo, e o que venceu nesse meio-tempo entra um de cada vez em vez de tudo no
+    // mesmo segundo. Devolve o resumo (como o `welcome` da abertura) ou null.
+    wake() {
+      if (!this.lastTick || this.now() - this.lastTick < WAKE_GAP) return null;
+      const since = this.lastTick;
+      this.lastTick = this.now();
+      this.staggerDue(this.state);
+      const opening = this.welcome;
+      this.welcome = null;
+      this.catchUp(since);
+      const summary = this.welcome;
+      this.welcome = opening;
+      return summary;
     }
 
     exportState() {
-      this.state.lastSeen = this.now();
+      // Parada há mais de um minuto (computador dormindo): o save guarda quando ela parou de verdade, e ao abrir de novo
+      // esse tempo conta como tempo fora.
+      const stale = this.lastTick && this.now() - this.lastTick >= WAKE_GAP;
+      this.state.lastSeen = stale ? this.lastTick : this.now();
       return copy(this.state);
     }
 
     emit(type, detail = {}) {
       this.events.push({ type, ...detail });
       if (this.events.length > 200) this.events.shift();
+      this.albumCheck('event', type, detail);
+    }
+
+    // Álbum da Festa: as figurinhas que um acontecimento (`event`) ou uma entrada do diário (`record`) dá.
+    albumCheck(kind, type, detail) {
+      const s = this.state;
+      if (!s || !Array.isArray(s.album) || !this.data.album) return;
+      if (!this.albumIndex) {
+        this.albumIndex = { event: {}, record: {} };
+        for (const page of this.data.album) {
+          for (const sticker of page.stickers) {
+            const key = sticker.event ? 'event' : 'record';
+            (this.albumIndex[key][sticker.event || sticker.record] ||= []).push(sticker);
+          }
+        }
+      }
+      for (const sticker of this.albumIndex[kind][type] || []) {
+        if (sticker.tier != null && !(detail.tier >= sticker.tier)) continue;
+        if (sticker.when && Object.entries(sticker.when).some(([key, value]) =>
+          (typeof value === 'number' ? !(detail[key] >= value) : detail[key] !== value))) continue;
+        this.stick(sticker.id);
+      }
+    }
+
+    // Cola uma figurinha nova; se a página fechou, paga a página.
+    stick(id) {
+      const s = this.state;
+      if (s.album.includes(id)) return false;
+      const page = this.data.album.find(entry => entry.stickers.some(sticker => sticker.id === id));
+      if (!page) return false;
+      s.album.push(id);
+      this.emit('sticker', { id, page: page.id });
+      if (this.albumPages() === this.data.album.length) this.unlock('album');
+      if (page.stickers.every(sticker => s.album.includes(sticker.id))) {
+        s.tickets += this.cfg.albumTickets;
+        this.emit('album-page', { id: page.id, tickets: this.cfg.albumTickets, bonus: this.cfg.albumBonus });
+      }
+      return true;
+    }
+
+    albumPages() {
+      const have = new Set(this.state.album || []);
+      return (this.data.album || []).filter(page => page.stickers.every(sticker => have.has(sticker.id))).length;
+    }
+    albumBonus() { return this.cfg.albumBonus * this.albumPages(); }
+
+    // Saves de antes do Álbum: as figurinhas do que os números da festa provam que já aconteceu (sem aviso nem ficha).
+    albumBackfill(s) {
+      const st = s.stats || {};
+      const proof = { ringRounds: 'argolas', fished: 'pescaria', potes: 'pote', sacoRaces: 'saco', leiloes: 'leilao',
+        weddings: 'casamento', bingos: 'bingo', contests: 'concurso', rainbows: 'arco-iris', balloons: 'balao',
+        requests: 'pedido', crashers: 'penetra', outings: 'role', visitors: 'sanfoneiro', cobras: 'cobra', fotos: 'retrato',
+        burroMoscas: 'mosca' };
+      const known = new Set((this.data.album || []).flatMap(page => page.stickers.map(sticker => sticker.id)));
+      const add = id => { if (known.has(id) && !s.album.includes(id)) s.album.push(id); };
+      for (const [stat, id] of Object.entries(proof)) if (st[stat] > 0) add(id);
+      if (Object.values(s.bonfire || {}).some(level => level > 0)) add('fogueira');
+      if ((s.year || 1) > 1 || s.records?.maior != null || s.size >= this.data.tiers[this.data.tiers.length - 1].size) add('fogos');
+      if (Array.isArray(s.setsWorn) && s.setsWorn.length) add('conjunto');
+      if (Array.isArray(s.inventory) && s.inventory.includes('pandeiro')) add('pandeiro');
+      if ((s.daily?.streak || 0) >= 7) add('semana');
     }
 
     // Diário da festa: cada acontecimento com o tempo de jogo (em segundos) em que aconteceu.
@@ -215,6 +344,7 @@
       if (this.offline) entry.offline = true;
       if (this.testing) entry.test = true;
       log.push(entry);
+      this.albumCheck('record', type, detail);
       if (log.length > LOG_CAP) {
         const index = log.findIndex(old => !LOG_KEEP.has(old.type));
         log.splice(index >= 0 ? index : 0, 1);
@@ -300,6 +430,33 @@
         } else if (op === 'saco') {
           this.startSaco(now);
           note = 'Corrida de saco';
+        } else if (op === 'cozinha') {
+          // A panela fica pronta agora (vazia, vai uma pamonha já cozida).
+          s.cozinha.pot = s.cozinha.pot ? { ...s.cozinha.pot, readyAt: now } : { id: 'pamonha', startAt: now, readyAt: now, ready: false };
+          note = 'Panela pronta';
+        } else if (op === 'fantasia') {
+          this.startFantasia(now);
+          s.fantasia.judgeAt = now + 5000;
+          note = 'Concurso de fantasia';
+        } else if (op === 'burro') {
+          this.startBurro(now);
+          note = 'Rabo no burro';
+        } else if (op === 'fotografo') {
+          this.startFotografo(now);
+          note = 'Fotógrafo lambe-lambe';
+        } else if (op === 'sanfoneiro') {
+          this.startVisitor(now);
+          note = 'Sanfoneiro Andarilho';
+        } else if (op === 'cobra') {
+          this.startCobra();
+          note = 'Olha a cobra!';
+        } else if (op === 'frio') {
+          this.startCold(now);
+          note = 'Friozinho';
+        } else if (op === 'aviso') {
+          s.runtime.announceAt = 0;
+          this.emit('announce', { roll: this.rng(), hint: this.announceHint() });
+          note = 'Aviso do alto-falante';
         } else if (op === 'leilao') {
           if (!s.leilao.active) this.startLeilao(now);
           note = 'Leilão de prendas';
@@ -341,7 +498,8 @@
       if (s.request.active) s.request.active.until -= ms;
       if (s.crasher.active) s.crasher.active.until -= ms;
       // Os eventos da festa com relógio de verdade também andam: balão, chuva e arco-íris, quadrilha, quebra-pote e corrida de saco.
-      for (const clock of [s.balloon, s.pote, s.saco, s.leilao, s.quadrilha, s.weather]) clock.nextAt = back(clock.nextAt);
+      for (const clock of [s.balloon, s.pote, s.saco, s.leilao, s.cold, s.visitor, s.fotografo, s.burro, s.fantasia, s.quadrilha, s.weather]) clock.nextAt = back(clock.nextAt);
+      s.fantasia.judgeAt = back(s.fantasia.judgeAt);
       s.weather.thunderAt = back(s.weather.thunderAt);
       for (const live of [s.balloon.active, s.pote.active, s.saco.active, s.weather.rain, s.weather.rainbow]) {
         if (live) { live.born -= ms; live.until -= ms; }
@@ -350,6 +508,13 @@
       if (race) for (const key of ['start', 'at', 'fallUntil']) race[key] = back(race[key]);
       const auction = s.leilao.active;
       if (auction) for (const key of ['born', 'bidAt', 'rivalAt']) auction[key] = back(auction[key]);
+      if (s.cold.active) for (const key of ['born', 'until', 'saleAt']) s.cold.active[key] = back(s.cold.active[key]);
+      if (s.visitor.active) for (const key of ['born', 'until']) s.visitor.active[key] = back(s.visitor.active[key]);
+      if (s.fotografo.active) for (const key of ['born', 'until', 'leaveAt']) s.fotografo.active[key] = back(s.fotografo.active[key]);
+      if (s.burro.active) {
+        for (const key of ['born', 'until']) s.burro.active[key] = back(s.burro.active[key]);
+        if (s.burro.active.pinned) s.burro.active.pinned.at = back(s.burro.active.pinned.at);
+      }
       s.outings.forEach(entry => { entry.endsAt = back(entry.endsAt); });
       for (let left = seconds; left > 0; left -= 1) this.tick(Math.min(1, left));
     }
@@ -499,7 +664,7 @@
       const s = this.state;
       return { steps: s.stats.steps, guests: s.size, levels: s.stats.upgrades, pokes: s.stats.pokes, letters: s.stats.letters,
         fish: s.stats.fished, requests: s.stats.requests, rings: s.stats.ringRounds, outings: s.stats.outings,
-        crashers: s.stats.crashers }[type] || 0;
+        crashers: s.stats.crashers, sacos: s.stats.sacoRaces, potes: s.stats.potes, lances: s.stats.lances, cobras: s.stats.cobras, burros: s.stats.burros, fantasias: s.stats.fantasias, compadres: s.stats.compadres, pratos: s.stats.dishes }[type] || 0;
     }
     goalTarget(type) {
       const tier = this.tierIndex();
@@ -516,13 +681,22 @@
         case 'rings': return 1 + Math.floor(r() * 3);
         case 'outings': return 1 + Math.floor(r() * 2);
         case 'crashers': return 1 + Math.floor(r() * 2) + Math.floor(tier / 3);
+        case 'sacos': return 1 + Math.floor(r() * 2);
+        case 'potes': return 1;
+        case 'lances': return 2 + Math.floor(r() * 3);
+        case 'cobras': return 1;
+        case 'burros': return 1;
+        case 'fantasias': return 1;
+        case 'compadres': return 1;
+        case 'pratos': return 1 + Math.floor(r() * 2);
         default: return 1;
       }
     }
     newGoal(taken = []) {
       const tier = this.tierIndex();
-      const open = this.data.goals.filter(entry => entry.tier <= tier && !taken.includes(entry.id));
-      const pool = open.length ? open : this.data.goals.filter(entry => entry.tier <= tier);
+      const fits = entry => entry.tier <= tier && (!entry.needs || this.isPlaced(entry.needs));
+      const open = this.data.goals.filter(entry => fits(entry) && !taken.includes(entry.id));
+      const pool = open.length ? open : this.data.goals.filter(fits);
       const type = pool[Math.floor(this.rng() * pool.length)].id;
       const target = this.goalTarget(type);
       const tickets = 2 + tier + (target > 1 ? Math.min(3, Math.floor(Math.log2(target) / 2)) : 0);
@@ -539,6 +713,17 @@
       });
     }
     goalProgress(goal) { return Math.max(0, Math.min(goal.target, this.goalCounter(goal.type) - goal.from)); }
+    // Troca uma meta ainda não cumprida por outra de outro tipo (pagando goalSwapCost fichas).
+    swapGoal(index) {
+      const s = this.state;
+      const goal = s.goals[index];
+      if (!goal || this.goalProgress(goal) >= goal.target || s.tickets < this.cfg.goalSwapCost) return null;
+      s.tickets -= this.cfg.goalSwapCost;
+      const others = s.goals.filter((_, i) => i !== index).map(entry => entry.type);
+      s.goals[index] = this.newGoal([...others, goal.type]);
+      return s.goals[index];
+    }
+
     claimGoal(index) {
       const s = this.state;
       const goal = s.goals[index];
@@ -585,7 +770,8 @@
       const b = this.state.bonfire;
       return (1 + this.cfg.sizeBonus * this.state.size) * (1 + this.collection()) * (1 + this.effect('cheer')) *
         (1 + this.cfg.heatPerLevel * b.calor) * (1 + this.cfg.growthBonus * this.growthStage()) *
-        (1 + this.danceBonus()) * (1 + this.setBonus()) * (1 + this.tradition()) * (1 + this.trioBonus()) * (1 + (this.specialDay()?.bonus || 0)) * (this.legendary() ? 2 : 1);
+        (1 + this.danceBonus()) * (1 + this.setBonus()) * (1 + this.albumBonus()) * (1 + this.visitorBonus()) * (1 + this.tradition()) * (1 + this.trioBonus()) * (1 + (this.specialDay()?.bonus || 0)) * (this.legendary() ? 2 : 1) *
+        (1 + this.cookBonus());
     }
     stepValue() { return this.statValue('rebolado') * this.multiplier(); }
     cheerPerSecond() {
@@ -600,6 +786,7 @@
       const s = this.state;
       const r = s.runtime;
       s.stats.playtime += dt;
+      this.lastTick = this.now();
       this.updateTimers(this.now());
       this.updateGoals();
       if (!r.dayAnnounced && this.specialDay()) { r.dayAnnounced = true; this.emit('special-day', { id: this.specialDay().id, bonus: this.specialDay().bonus }); }
@@ -620,14 +807,25 @@
       }
       if (r.quadrilhaLeft > 0) {
         r.quadrilhaLeft -= dt;
-        if ((r.callIn -= dt) <= 0 && r.quadrilhaLeft > 1.5) { r.callIn = this.cfg.callEvery; this.emit('quadrilha-call', { n: r.calls++ }); }
+        if ((r.callIn -= dt) <= 0 && r.quadrilhaLeft > 1.5) {
+          r.callIn = this.cfg.callEvery;
+          const n = r.calls++;
+          this.emit('quadrilha-call', { n });
+          if (n % 8 === 4 && !(r.cobraLeft > 0) && this.rng() < this.cfg.cobraChance) this.startCobra();
+        }
         if (r.quadrilhaLeft <= 0) {
           r.quadrilhaLeft = 0;
           this.emit('quadrilha-end');
           // Quadrilha de concurso: os jurados dão nota. Senão, às vezes tem casamento.
           if (r.contest) { r.contest = false; this.judgeContest(); }
-          else if (this.rng() < this.cfg.weddingChance) this.startWedding();
+          // No dia de Santo Antônio, o casamenteiro, o casamento na roça sai com o dobro da chance.
+          else if (this.rng() < this.cfg.weddingChance * (this.specialDay()?.id === 'antonio' ? 2 : 1)) this.startWedding();
         }
+      }
+      if (r.cobraLeft > 0) {
+        r.cobraLeft -= dt;
+        // Fugiu: "é mentira!".
+        if (r.cobraLeft <= 0) { r.cobraLeft = 0; this.emit('cobra-end'); }
       }
       if (r.weddingLeft > 0) {
         r.weddingLeft -= dt;
@@ -777,7 +975,9 @@
     fishingInterval() { return this.cfg.fishingMinutes * MINUTE * (1 - Math.min(0.6, this.effect('fishing'))); }
     letterInterval() {
       const fast = this.state?.equipped && this.isPlaced('correio') ? 0.7 : 1;
-      return this.cfg.letterMinutes * MINUTE * fast;
+      // A Cocada, cordelista na Barraca de Cordel, faz as cartas chegarem mais depressa (até 60%).
+      const poet = this.state?.crew ? 1 - Math.min(0.6, this.effect('letter')) : 1;
+      return this.cfg.letterMinutes * MINUTE * fast * poet;
     }
     between([low, high]) { return (low + (high - low) * this.rng()) * 1000; }
 
@@ -800,11 +1000,22 @@
           this.emit(clock === s.fishing ? 'prize-ready' : 'letter-ready');
         }
       }
+      // Cozinha: o prato no fogo fica pronto na hora marcada; o servido para de valer quando acaba o tempo.
+      const kitchen = s.cozinha;
+      if (kitchen.pot && !kitchen.pot.ready && now >= kitchen.pot.readyAt) {
+        kitchen.pot.ready = true;
+        this.emit('cook-ready', { id: kitchen.pot.id });
+      }
+      if (kitchen.buff && now >= kitchen.buff.until) {
+        kitchen.buff = null;
+        this.emit('cook-end');
+      }
       if (tier >= 1) {
         const q = s.request;
         if (q.active && now >= q.active.until) q.active = null;
         if (!q.active) {
-          if (!q.nextAt) q.nextAt = now + this.between(this.cfg.requestEvery);
+          // Com a Barraca de Cordel na festa, os pedidos aparecem 30% mais depressa.
+          if (!q.nextAt) q.nextAt = now + this.between(this.cfg.requestEvery) * (this.isPlaced('barraca-cordel') ? 0.7 : 1);
           if (now >= q.nextAt) {
             const kinds = this.data.requests;
             q.active = { kind: kinds[Math.floor(this.rng() * kinds.length)].id, until: now + this.cfg.requestSeconds * 1000,
@@ -830,6 +1041,9 @@
       // Dicas de uma vez só para quem ainda não achou uma parte do jogo.
       if (s.stats.playtime >= 1800) this.hint('music');
       if (s.inventory.length >= 5 && !this.activeSet()) this.hint('sets');
+      if (s.stats.playtime >= 600) this.hint('chao');
+      if (s.stats.playtime >= 7200) this.hint('calmo');
+      if (this.cookOpen()) this.hint('cozinha');
       if (tier >= this.cfg.poteMinTier) {
         const p = s.pote;
         if (p.active && now >= p.active.until) { p.active = null; this.emit('pote-gone'); }
@@ -852,7 +1066,16 @@
         }
         if (!p.active) {
           if (!p.nextAt) p.nextAt = now + this.between(this.cfg.sacoEvery);
-          if (now >= p.nextAt) this.startSaco(now);
+          // Com o cavalete do rabo no burro na beira da pista, a corrida espera ele sair.
+          if (now >= p.nextAt) { if (s.burro?.active) p.nextAt = now + 30000; else this.startSaco(now); }
+        }
+      }
+      if (tier >= 1) {
+        const r = s.runtime;
+        if (!r.announceAt) r.announceAt = now + this.between(this.cfg.announceEvery);
+        else if (now >= r.announceAt) {
+          r.announceAt = now + this.between(this.cfg.announceEvery);
+          this.emit('announce', { roll: this.rng(), hint: this.announceHint() });
         }
       }
       if (tier >= this.cfg.leilaoMinTier) {
@@ -922,11 +1145,70 @@
       } else if (w.rainbow) {
         if (now >= w.rainbow.until) { w.rainbow = null; this.emit('rainbow-gone'); }
       } else if (s.size >= this.cfg.rainMin) {
-        if (!w.nextAt) w.nextAt = now + this.between(this.cfg.rainEvery);
+        // Dia de São Pedro (o santo da chuva): a chuva de São João vem com o dobro da frequência.
+        if (!w.nextAt) w.nextAt = now + this.between(this.cfg.rainEvery) * (this.specialDay()?.id === 'pedro' ? 0.5 : 1);
         if (now >= w.nextAt) {
           w.rain = { born: now, until: now + this.cfg.rainSeconds * 1000 };
           w.nextAt = 0;
           this.emit('rain');
+        }
+      }
+      // Friozinho de São João: de tempos em tempos (fora da chuva) a noite esfria. Com o Barril de Quentão na festa, o frio
+      // vende quentão: uma ficha a cada coldSale segundos enquanto ele durar.
+      if (tier >= this.cfg.coldMinTier) {
+        const c = s.cold;
+        if (c.active) {
+          if (this.quentaoOn() && now >= c.active.saleAt) {
+            c.active.saleAt = now + this.cfg.coldSale * 1000;
+            c.active.sold++;
+            s.tickets += 1;
+            s.stats.quentao++;
+            if (s.stats.quentao >= 20) this.unlock('quentao');
+            this.emit('quentao', { sold: c.active.sold });
+          }
+          if (now >= c.active.until) {
+            const sold = c.active.sold;
+            c.active = null;
+            this.emit('cold-end', { sold });
+          }
+        } else if (!w.rain) {
+          if (!c.nextAt) c.nextAt = now + this.between(this.cfg.coldEvery);
+          if (now >= c.nextAt) this.startCold(now);
+        }
+      }
+      if (tier >= this.cfg.visitorMinTier) {
+        const v = s.visitor;
+        if (v.active && now >= v.active.until) { v.active = null; this.emit('visitor-gone'); }
+        if (!v.active) {
+          if (!v.nextAt) v.nextAt = now + this.between(this.cfg.visitorEvery);
+          // Um visitante de cada vez: com o fotógrafo montado, o Sanfoneiro espera um pouco.
+          if (now >= v.nextAt) { if (s.fotografo?.active) v.nextAt = now + 60000; else this.startVisitor(now); }
+        }
+      }
+      if (tier >= this.cfg.fantasiaMinTier) {
+        const f = s.fantasia;
+        if (f.judgeAt && now >= f.judgeAt) this.judgeFantasia();
+        else if (!f.judgeAt) {
+          if (!f.nextAt) f.nextAt = now + this.between(this.cfg.fantasiaEvery);
+          if (now >= f.nextAt) this.startFantasia(now);
+        }
+      }
+      if (tier >= this.cfg.burroMinTier) {
+        const b = s.burro;
+        if (b.active && now >= b.active.until) { const pinned = !!b.active.pinned; b.active = null; this.emit('burro-gone', { pinned }); }
+        if (!b.active) {
+          if (!b.nextAt) b.nextAt = now + this.between(this.cfg.burroEvery);
+          // Com a corrida de saco na frente da festa, o cavalete espera ela acabar.
+          if (now >= b.nextAt) { if (s.saco.active) b.nextAt = now + 30000; else this.startBurro(now); }
+        }
+      }
+      if (tier >= this.cfg.fotoMinTier) {
+        const f = s.fotografo;
+        if (f.active && now >= f.active.until) { f.active = null; this.emit('fotografo-gone'); }
+        if (!f.active) {
+          if (!f.nextAt) f.nextAt = now + this.between(this.cfg.fotoEvery);
+          // Um visitante de cada vez: com o Sanfoneiro passando, o fotógrafo espera um pouco.
+          if (now >= f.nextAt) { if (s.visitor.active) f.nextAt = now + 60000; else this.startFotografo(now); }
         }
       }
       const rings = s.rings;
@@ -993,7 +1275,8 @@
       const entry = this.state.outings[index];
       if (!entry || entry.char || !this.outingOpen(index) || !this.hasChar(charId) || this.awayOuting(charId) >= 0) return false;
       entry.char = charId;
-      entry.endsAt = this.now() + this.data.outings[index].minutes * MINUTE;
+      // A Carroça Enfeitada num dos lados leva a turma: o rolê volta 15% mais rápido.
+      entry.endsAt = this.now() + this.data.outings[index].minutes * MINUTE * (this.isPlaced('carroca') ? 0.85 : 1);
       entry.announced = false;
       this.emit('outing-start', { index, id: charId });
       return true;
@@ -1059,7 +1342,9 @@
       if (s.mail.ready <= 0) return null;
       s.mail.ready--;
       if (!s.mail.nextAt) s.mail.nextAt = this.now() + this.letterInterval();
-      const tickets = this.cfg.letterTickets + this.tierIndex();
+      // O Espantalho Galã num dos lados: cada carta rende uma ficha a mais.
+      const tickets = this.cfg.letterTickets + this.tierIndex() + (this.isPlaced('espantalho') ? 1 : 0) +
+        (this.specialDay()?.id === 'namorados' ? 1 : 0);
       s.tickets += tickets;
       s.stats.letters++;
       this.record('letter', { tickets });
@@ -1071,7 +1356,8 @@
 
     // Pedidos e penetras
     requestReward() {
-      return this.cheerPerSecond() * this.cfg.requestReward * (1 + this.effect('request'));
+      // O Fogão a Lenha num dos lados: pedido atendido rende +50%.
+      return this.cheerPerSecond() * this.cfg.requestReward * (1 + this.effect('request')) * (this.isPlaced('fogao-lenha') ? 1.5 : 1);
     }
     claimRequest() {
       const q = this.state.request;
@@ -1142,7 +1428,9 @@
         mil: [st.cheerEarned, 1000], crescida: [this.growthStage(), this.cfg.growthAt.length],
         repertorio: [this.learnedDances().length, this.data.dances.length], 'balao-de-sorte': [st.balloons, 10],
         dengosa: [st.pokes, 100], 'arco-iris': [st.rainbows, 5], metodica: [st.goals, 10], madrinha: [st.weddings, 5],
-        bingo: [st.bingos, 3], 'quebra-pote': [st.potes, 5], canguru: [st.sacoWins, 5], 'dou-lhe-tres': [st.leiloes, 3], estilista: [s.setsWorn.length, 5],
+        bingo: [st.bingos, 3], 'quebra-pote': [st.potes, 5], canguru: [st.sacoWins, 5], 'dou-lhe-tres': [st.leiloes, 3], quentao: [st.quentao, 20],
+        'na-mosca': [st.burroMoscas, 3], retratista: [st.fotos, 5], 'pega-cobra': [st.cobras, 5],
+        album: [(s.album || []).length, (this.data.album || []).reduce((n, page) => n + page.stickers.length, 0)], estilista: [s.setsWorn.length, 5],
         'turma-completa': [this.data.chars.filter(c => s.crew[c.id]).length, this.data.chars.length],
         lendaria: [bonfire, this.cfg.legendary], estiloso: [s.inventory.length, 15], correio: [st.letters, 10],
         atenciosa: [st.requests, 25], seguranca: [st.crashers, 10]
@@ -1208,7 +1496,7 @@
       if (!this.canNewYear()) return false;
       const old = this.state;
       const next = this.fresh();
-      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records']) {
+      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'newsSeen', 'bornAt']) {
         next[key] = old[key];
       }
       next.year = (old.year || 1) + 1;
@@ -1328,7 +1616,7 @@
       const s = this.state;
       s.pote.active = null;
       s.pote.nextAt = 0;
-      const amount = Math.max(100, this.cheerPerSecond() * this.cfg.poteCheer);
+      const amount = Math.max(100, this.cheerPerSecond() * this.cfg.poteCheer) * (1 + this.effect('feast'));
       const tickets = 2 + this.tierIndex();
       this.earn(amount);
       s.tickets += tickets;
@@ -1379,7 +1667,7 @@
       // Cruzou a chegada: o lugar é um a mais que os rivais que já tinham chegado.
       const place = 1 + a.rivals.filter(ms => a.start + ms <= now).length;
       const share = [1, 0.4, 0.15][place - 1];
-      const amount = Math.max(place === 1 ? 100 : 20, this.cheerPerSecond() * this.cfg.sacoCheer * share);
+      const amount = Math.max(place === 1 ? 100 : 20, this.cheerPerSecond() * this.cfg.sacoCheer * share) * (1 + this.effect('feast'));
       const tickets = place === 1 ? 2 + this.tierIndex() + (a.falls ? 0 : 1) : place === 2 ? 1 : 0;
       s.saco.active = null;
       s.saco.nextAt = 0;
@@ -1413,6 +1701,264 @@
       this.emit('leilao', { prize, price: base });
     }
 
+    // Sanfoneiro Andarilho: passa tocando pela festa (tudo rende mais) e agradece o cumprimento com fichas.
+    startVisitor(now = this.now()) {
+      const s = this.state;
+      s.visitor.active = { born: now, until: now + this.cfg.visitorSeconds * 1000, greeted: false };
+      s.visitor.nextAt = 0;
+      this.emit('visitor', { bonus: this.cfg.visitorBonus, seconds: this.cfg.visitorSeconds });
+    }
+    visitorBonus() { return this.state.visitor?.active ? this.cfg.visitorBonus : 0; }
+    greetVisitor() {
+      const s = this.state;
+      const v = s.visitor.active;
+      if (!v || v.greeted) return null;
+      v.greeted = true;
+      const tickets = this.cfg.visitorTickets + this.tierIndex();
+      s.tickets += tickets;
+      s.stats.visitors++;
+      this.record('visitor', { tickets });
+      this.emit('visitor-greet', { tickets });
+      return { tickets };
+    }
+
+    // A cobra de pano da quadrilha: atravessa a pista por cobraSeconds, para um lado ou para o outro.
+    startCobra() {
+      const r = this.state.runtime;
+      r.cobraLeft = this.cfg.cobraSeconds;
+      r.cobraDir = this.rng() < 0.5 ? 1 : -1;
+      this.emit('cobra', { dir: r.cobraDir, seconds: this.cfg.cobraSeconds });
+    }
+
+    // Pegou a cobra antes que ela fugisse: Animação e, na primeira vez, a própria Cobra de Pano.
+    catchCobra() {
+      const s = this.state;
+      const r = s.runtime;
+      if (!(r.cobraLeft > 0)) return null;
+      r.cobraLeft = 0;
+      const amount = Math.max(50, this.cheerPerSecond() * this.cfg.cobraCheer) * (1 + this.effect('feast'));
+      this.earn(amount);
+      s.stats.cobras++;
+      if (s.stats.cobras >= 5) this.unlock('pega-cobra');
+      const gift = this.data.items.find(item => item.source === 'cobra' && !this.owned(item.id));
+      if (gift) this.addItem(gift.id);
+      this.record('cobra', { amount, item: gift?.id });
+      this.emit('cobra-caught', { amount, item: gift?.id || null });
+      return { amount, item: gift?.id || null };
+    }
+
+    // Carro de boi (São João Regional em diante): clicar nele enquanto passa rende lenha, no máximo uma vez a cada
+    // cartCooldown s (o carro passa de 3 em 3 minutos ou mais).
+    cartWood() {
+      const s = this.state;
+      const now = this.now();
+      if (this.tierIndex() < 3 || now - (s.runtime.cartAt || 0) < this.cfg.cartCooldown * 1000) return null;
+      s.runtime.cartAt = now;
+      const wood = this.cfg.cartWood + this.tierIndex();
+      s.wood += wood;
+      this.record('carro-boi', { wood });
+      this.emit('cart-wood', { wood });
+      return { wood };
+    }
+
+    // Bandeirinha que o vento soltou do varal: pegar antes de ela cair rende 1 ficha (no máximo a cada flagCooldown s).
+    catchFlag() {
+      const s = this.state;
+      const now = this.now();
+      if (this.tierIndex() < 1 || now - (s.runtime.flagAt || 0) < this.cfg.flagCooldown * 1000) return null;
+      s.runtime.flagAt = now;
+      s.tickets += 1;
+      this.record('bandeirinha', {});
+      this.emit('flag-caught', {});
+      return { tickets: 1 };
+    }
+
+    // Cozinha do Fogão a Lenha: com o fogão num dos lados (do porte cookTier em diante), um prato por vez vai ao fogo
+    // gastando lenha; pronto, é só servir. Com a Canjica no fogão cozinha na metade do tempo.
+    cookOpen() { return this.tierIndex() >= this.cfg.cookTier && this.isPlaced('fogao-lenha'); }
+    recipe(id) { return (this.data.recipes || []).find(entry => entry.id === id) || null; }
+    cookTime(recipe) { return recipe.minutes * 60000 * (this.charActive('canjica') ? 0.5 : 1); }
+    cook(id) {
+      const s = this.state;
+      const recipe = this.recipe(id);
+      if (!recipe || !this.cookOpen() || s.cozinha.pot || s.wood < recipe.wood) return false;
+      s.wood -= recipe.wood;
+      s.cozinha.pot = { id, startAt: this.now(), readyAt: this.now() + this.cookTime(recipe), ready: false };
+      this.emit('cook-start', { id });
+      return true;
+    }
+    // Servir: o prato pronto vale `bonus` a mais em tudo por `buffMinutes` (e troca o que estava valendo).
+    serve() {
+      const s = this.state;
+      const pot = s.cozinha.pot;
+      const recipe = pot && pot.ready && this.recipe(pot.id);
+      if (!recipe) return null;
+      s.cozinha.pot = null;
+      s.cozinha.buff = { id: recipe.id, until: this.now() + recipe.buffMinutes * 60000 };
+      s.stats.dishes++;
+      this.record('cozinha', { id: recipe.id });
+      this.emit('cook-served', { id: recipe.id, bonus: recipe.bonus, minutes: recipe.buffMinutes });
+      return { id: recipe.id, bonus: recipe.bonus, minutes: recipe.buffMinutes };
+    }
+    cookBonus() {
+      const served = this.state.cozinha?.buff;
+      return served && this.now() < served.until ? this.recipe(served.id)?.bonus || 0 : 0;
+    }
+
+    // Compadres de fogueira: o casal recita os versos dos dois lados da fogueira (quando, quem decide é o desenho da festa)
+    // e clicar nele enquanto isso é ser a testemunha: Animação, no máximo uma vez a cada compadreCooldown s.
+    witnessCompadres() {
+      const s = this.state;
+      const now = this.now();
+      if (this.tierIndex() < 1 || now - (s.runtime.compadreAt || 0) < this.cfg.compadreCooldown * 1000) return null;
+      s.runtime.compadreAt = now;
+      const amount = Math.max(40, this.cheerPerSecond() * this.cfg.compadreCheer) * (1 + this.effect('feast'));
+      this.earn(amount);
+      s.stats.compadres++;
+      this.record('compadres', { amount });
+      this.emit('compadres', { amount });
+      return { amount };
+    }
+
+    // Concurso de fantasia: o aviso sai fantasiaPrep s antes (dá para trocar a roupa na loja) e depois os jurados julgam.
+    startFantasia(now = this.now()) {
+      const f = this.state.fantasia;
+      f.judgeAt = now + this.cfg.fantasiaPrep * 1000;
+      f.nextAt = 0;
+      this.emit('fantasia-soon', { seconds: this.cfg.fantasiaPrep });
+    }
+
+    // Nota da roupa: conjunto completo vale muito; peça exclusiva (de leilão, casamento, rolê, Argolas, cobra) vale mais
+    // que peça comprada, e a de fábrica não conta; varal e terreiro trocados dão um toque a mais.
+    fantasiaScore() {
+      const eq = this.state.equipped;
+      const set = this.activeSet();
+      let score = 5 + (set ? 2 + set.bonus * 20 : 0);
+      for (const slot of ['chapeu', 'mao', 'tecido']) {
+        const item = this.items[eq[slot]];
+        if (!item || item.source === 'inicial') continue;
+        score += item.price === 0 ? 0.6 : 0.3;
+      }
+      if (eq.varal && eq.varal !== this.data.equipped.varal) score += 0.2;
+      if (eq.terreiro && eq.terreiro !== this.data.equipped.terreiro) score += 0.2;
+      return Math.min(10, score);
+    }
+
+    judgeFantasia() {
+      const s = this.state;
+      s.fantasia.judgeAt = 0;
+      const base = this.fantasiaScore();
+      const notes = [0, 1, 2].map(() => Math.max(4, Math.min(10, Math.round((base + (this.rng() - 0.5) * 1.2) * 2) / 2)));
+      const average = notes.reduce((a, b) => a + b, 0) / notes.length;
+      const place = average >= this.cfg.fantasiaFirst ? 1 : average >= this.cfg.fantasiaSecond ? 2 : 3;
+      const tickets = [0, 5 + this.tierIndex(), 2 + Math.floor(this.tierIndex() / 2), 1][place];
+      const amount = Math.max(40, this.cheerPerSecond() * [0, 120, 60, 20][place]);
+      s.tickets += tickets;
+      this.earn(amount);
+      s.stats.fantasias++;
+      if (place === 1) s.stats.fantasiaWins++;
+      this.record('fantasia', { place, average, tickets, amount });
+      this.emit('fantasia', { notes, average, place, win: place === 1, tickets, amount });
+      return { notes, average, place, tickets, amount };
+    }
+
+    // Rabo no burro: o cavalete fica burroSeconds s na beira da pista esperando o clique.
+    startBurro(now = this.now()) {
+      const s = this.state;
+      s.burro.active = { born: now, until: now + this.cfg.burroSeconds * 1000, pinned: null };
+      s.burro.nextAt = 0;
+      this.emit('burro', { seconds: this.cfg.burroSeconds });
+    }
+
+    // Onde o rabo está (em pixels, a partir do X) `ms` depois do cavalete chegar: um balanço torto, de olhos vendados.
+    burroOffset(ms) {
+      const t = ms / 1000;
+      const [sx, sy] = this.cfg.burroSwing;
+      const [px, py] = this.cfg.burroPeriods;
+      const x = this.cfg.burroCenter + sx * (0.75 * Math.sin(2 * Math.PI * t / px) + 0.25 * Math.sin(2 * Math.PI * t / 0.61));
+      const y = sy * Math.sin(2 * Math.PI * t / py + 1);
+      return [Math.round(x), Math.round(y)];
+    }
+
+    // O clique prega o rabo onde ele estava. A nota vem da distância até o X.
+    pinBurro() {
+      const s = this.state;
+      const b = s.burro.active;
+      if (!b || b.pinned) return null;
+      const now = this.now();
+      const [dx, dy] = this.burroOffset(now - b.born);
+      const d = Math.hypot(dx, dy);
+      const grade = d <= 2 ? 'mosca' : d <= 5 ? 'perto' : d <= 9 ? 'longe' : 'fora';
+      const cps = this.cheerPerSecond();
+      const share = { mosca: 1, perto: 0.5, longe: 0.2, fora: 0 }[grade];
+      const amount = (grade === 'fora' ? Math.max(20, cps * 5) : Math.max(40, cps * this.cfg.burroCheer * share)) * (1 + this.effect('feast'));
+      const tickets = grade === 'mosca' ? this.cfg.burroTickets + this.tierIndex() : grade === 'perto' ? 1 : 0;
+      this.earn(amount);
+      s.tickets += tickets;
+      s.stats.burros++;
+      if (grade === 'mosca') s.stats.burroMoscas++;
+      if (s.stats.burroMoscas >= 3) this.unlock('na-mosca');
+      b.pinned = { dx, dy, grade, at: now };
+      b.until = now + 4000;
+      this.record('burro', { grade, amount, tickets });
+      this.emit('burro-pin', { grade, amount, tickets, dx, dy });
+      return { grade, amount, tickets, dx, dy };
+    }
+
+    // Fotógrafo lambe-lambe: chega andando (fotoWalk), monta a câmera e espera a pose; depois da foto (ou do tempo),
+    // desmonta e vai embora andando. `leaveAt` é quando ele começa a ir embora.
+    startFotografo(now = this.now()) {
+      const s = this.state;
+      const until = now + this.cfg.fotoSeconds * 1000;
+      s.fotografo.active = { born: now, until, leaveAt: until - this.cfg.fotoWalk * 1000, shot: false };
+      s.fotografo.nextAt = 0;
+      this.emit('fotografo', { seconds: this.cfg.fotoSeconds });
+    }
+
+    // Clique no fotógrafo montado: "xis!", fichas e ele vai embora logo depois.
+    shootFoto() {
+      const s = this.state;
+      const f = s.fotografo.active;
+      const now = this.now();
+      if (!f || f.shot || now < f.born + this.cfg.fotoWalk * 1000 || now >= f.leaveAt) return null;
+      f.shot = true;
+      f.leaveAt = now + 2500;
+      f.until = f.leaveAt + this.cfg.fotoWalk * 1000;
+      const tickets = this.cfg.fotoTickets + this.tierIndex();
+      s.tickets += tickets;
+      s.stats.fotos++;
+      if (s.stats.fotos >= 5) this.unlock('retratista');
+      this.record('foto', { tickets });
+      this.emit('foto', { tickets });
+      return { tickets };
+    }
+
+    // O Barril de Quentão está num dos lados da festa?
+    quentaoOn() {
+      const eq = this.state.equipped;
+      return eq.esquerda === 'barril-quentao' || eq.direita === 'barril-quentao';
+    }
+
+    startCold(now = this.now()) {
+      const s = this.state;
+      s.cold.active = { born: now, until: now + this.cfg.coldSeconds * 1000, saleAt: now + this.cfg.coldSale * 1000, sold: 0 };
+      s.cold.nextAt = 0;
+      this.emit('cold', { quentao: this.quentaoOn() });
+    }
+
+    // Dica do alto-falante, quando tem uma que ajuda: bingo aberto sem cartela, argolas no preço mínimo ou quantos
+    // convidados faltam para o próximo porte.
+    announceHint() {
+      const s = this.state;
+      const hints = [];
+      if (this.bingoOpen() && !(s.bingo.round && !s.bingo.round.result) && s.tickets >= this.bingoCost()) hints.push({ id: 'bingo' });
+      if (this.ringCost() <= this.cfg.ringCost) hints.push({ id: 'rings' });
+      if (s.cozinha.pot?.ready && this.isPlaced('fogao-lenha')) hints.push({ id: 'prato', dish: s.cozinha.pot.id });
+      const next = this.data.tiers[this.tierIndex() + 1];
+      if (next) hints.push({ id: 'size', n: next.size - s.size });
+      return hints.length ? hints[Math.floor(this.rng() * hints.length)] : null;
+    }
+
     // Quanto vale o próximo lance.
     leilaoNext() {
       const a = this.state.leilao.active;
@@ -1428,6 +1974,7 @@
       if (s.tickets < bid) return { active: true, broke: true, bid };
       const now = this.now();
       s.tickets -= bid;
+      s.stats.lances++;
       a.held = bid;
       a.price = bid;
       a.leader = 'voce';
@@ -1497,9 +2044,23 @@
       const hour = Math.floor(this.now() / 3600000);
       if (this.dayCache?.hour !== hour) {
         const date = new Date(this.now());
-        this.dayCache = { hour, day: this.cfg.specialDays.find(entry => entry.month === date.getMonth() + 1 && entry.day === date.getDate()) || null };
+        const month = this.cfg.specialDays.filter(entry => entry.month === date.getMonth() + 1);
+        // Aniversário da festa: todo ano, no dia em que ela começou (depois dos dias de santo, antes do mês inteiro).
+        const born = this.state?.bornAt ? new Date(this.state.bornAt) : null;
+        const years = born ? date.getFullYear() - born.getFullYear() : 0;
+        const birthday = born && years > 0 && born.getMonth() === date.getMonth() && born.getDate() === date.getDate()
+          ? { id: 'aniversario', bonus: this.cfg.birthdayBonus, years } : null;
+        const day = month.find(entry => entry.day === date.getDate()) || birthday || month.find(entry => entry.day == null) || null;
+        this.dayCache = { hour, day };
       }
       return this.dayCache.day;
+    }
+
+    // Contagem para o São João (24 de junho) durante junho, antes do dia: quantos dias faltam, ou null.
+    daysToSaoJoao() {
+      const date = new Date(this.now());
+      if (date.getMonth() !== 5 || date.getDate() >= 24) return null;
+      return 24 - date.getDate();
     }
 
     // Casamento na roça: os noivos e o padre entram na pista e o jogador joga arroz neles (clique). Só da Festa da Cidade

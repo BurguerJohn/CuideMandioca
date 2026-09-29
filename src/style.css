@@ -43,6 +43,22 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 /* Festa */
 .festa { position: absolute; left: 0; bottom: 0; line-height: 0; }
+/* Guia do zoom: enquanto a alça é arrastada, a moldura tracejada do tamanho pedido anda junto com o mouse; a festa pula
+   para o tamanho inteiro mais perto e a moldura pisca a cada pulo. Não pega clique (o que está embaixo continua valendo). */
+.zoom-guia {
+  position: absolute; pointer-events: none; border: 3px dashed #ffd21e; border-radius: 3px;
+  box-shadow: 0 0 0 2px rgba(54, 26, 12, 0.65), inset 0 0 0 2px rgba(54, 26, 12, 0.65); background: rgba(255, 210, 30, 0.07);
+}
+.zoom-guia b {
+  /* No meio da borda de cima: nos cantos costuma estar a placa. */
+  position: absolute; left: 50%; top: 4px; transform: translateX(-50%); padding: 1px 7px; font-size: 14px; line-height: 1.3;
+  color: var(--tinta); background: #ffd21e; border: 2px solid var(--tinta);
+}
+.zoom-guia.pulou { animation: zoom-pulou .32s steps(4); }
+@keyframes zoom-pulou {
+  0% { border-color: #ffffff; background: rgba(255, 255, 255, 0.28); }
+  100% { border-color: #ffd21e; background: rgba(255, 210, 30, 0.07); }
+}
 #festa-canvas { display: block; image-rendering: pixelated; }
 
 /* Moldura de madeira usada na placa, no painel e nas janelas */
@@ -128,6 +144,7 @@ body.jogo-desfocado .placa, body.jogo-desfocado.placa-passar.sobre-festa .placa 
 .painel-corpo { flex: 1; min-width: 0; overflow-y: auto; padding: 6px 16px 18px; user-select: text; }
 
 .aba-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.aba-topo > .selo { white-space: nowrap; flex-shrink: 0; }
 h2 { margin: 0 0 2px; font-size: 26px; }
 h3 { margin: 0 0 4px; font-size: 19px; }
 h4 { margin: 6px 0 2px; font-size: 17px; }
@@ -226,6 +243,7 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 /* Placa: uma fileira com os botões de jogo e outra com painel, tamanho e fechar */
 .placa-barra { margin: 8px -4px -4px; padding-top: 6px; border-top: 3px solid var(--papel3); }
 .barra-jogo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.barra-jogo.cheia { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .barra-sistema { display: flex; align-items: center; gap: 4px; margin-top: 5px; }
 .placa-barra .espaco { flex: 1; }
 .ferramenta {
@@ -418,6 +436,11 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .meta .linha { display: flex; align-items: center; gap: 14px; }
 .meta .linha > div { flex: 1; min-width: 0; }
 .meta .linha .btn { flex: none; }
+.meta .btn.trocar { font-size: 12px; padding: 3px 8px; color: var(--tinta); }
+.meta .botoes { display: flex; gap: 6px; align-items: center; }
+.retrato { display: block; max-width: 100%; height: auto; margin: 8px auto; image-rendering: pixelated; }
+.novidades { margin: 6px auto 0; padding-left: 20px; line-height: 1.45; text-align: left; max-width: 520px; }
+.novidades li { margin-bottom: 4px; }
 .meta.feita { background: #e6f7c0; }
 
 /* Bingo da quermesse: cartela 3x3 de papel, as casas sorteadas ganham um grão de milho; do lado, a última bolinha */
@@ -444,4 +467,16 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .conquista .progresso small { font-size: 11px; font-weight: 700; white-space: nowrap; }
 
 /* Lista do que dá para clicar na festa (Painel > Festa) */
+/* Álbum da Festa: páginas com cinco figurinhas; a que falta é um quadradinho tracejado com "?". */
+.album { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.album .pagina h3 { margin: 0; }
+.album .pagina.feita { box-shadow: inset 0 0 0 2px #35a03a; }
+.figurinhas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+.figurinha { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+.figurinha img, .figurinha .icone { width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; }
+.figurinha span { font-size: 11px; line-height: 1.15; }
+.figurinha.vazia b { display: grid; place-items: center; width: 30px; height: 30px; border: 2px dashed #b08a5a; border-radius: 6px;
+  color: #b08a5a; font-size: 16px; }
+.figurinha.vazia span { opacity: 0.6; }
+
 .cliques { margin: 4px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }

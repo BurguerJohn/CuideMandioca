@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('arraiaDesktop', Object.freeze({
   getSettings: () => ipcRenderer.invoke('desktop:get-settings'),
   updateSettings: partial => ipcRenderer.invoke('desktop:update-settings', partial),
   setInteractive: interactive => ipcRenderer.send('desktop:set-interactive', interactive),
+  // A janela parou de receber o mouse (depois do repouso): o jogo abre uma nova.
+  repair: () => ipcRenderer.send('desktop:repair'),
   setFocusable: focusable => ipcRenderer.send('desktop:set-focusable', focusable),
   focusGame: () => ipcRenderer.send('desktop:focus-game'),
   logError: text => ipcRenderer.send('desktop:log-error', String(text).slice(0, 4000)),

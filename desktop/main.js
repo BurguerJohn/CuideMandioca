@@ -2,7 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, dialog, powerMonitor } = require('electron');
 const { normalizeSettings, mergeSettings, publicSettings, pickDisplay } = require('./window-state');
 const { loadSave, writeSave } = require('./save-store');
 const { createSteam } = require('./steam');
@@ -37,6 +37,10 @@ if (steamOnly && steam.restartIfNeeded()) {
   // A janela está deixando o clique vazar (setIgnoreMouseEvents)? O vigia do cursor conta isso para a festa.
   let ignoring = true;
   let cursorKey = '';
+  // Repouso: o relógio que espera a tela voltar antes de trocar a janela.
+  let wakeTimer = null;
+  // Quanto esperar depois de acordar/desbloquear antes de trocar a janela: o monitor e a área útil voltam primeiro.
+  const WAKE_DELAY = 1500;
 
   // Diário de erros (erros.log na pasta de dados do jogo): o que a página relatou e quando a festa caiu ou travou.
   function logLine(text) {
@@ -206,10 +210,33 @@ if (steamOnly && steam.restartIfNeeded()) {
     replacing = true;
     keepFocusable = false;
     old.once('closed', () => {
-      openWindow();
+      openWindow({ quiet: true });
       replacing = false;
     });
     old.destroy();
+  }
+
+  // Depois do repouso (ou de bloquear e desbloquear a tela), o Windows pode desmontar o que faz a janela transparente
+  // aceitar o clique: o gancho que repassa o mouse e a própria camada da janela. A festa continua na tela, mas todo
+  // clique vaza para o que está atrás. Ao acordar e de novo ao desbloquear a tela (o que o Windows fizer), a festa ganha
+  // uma janela nova, como na troca de idioma: a velha salva ao fechar e a nova carrega o save. Não depende do aviso de
+  // bloqueio: se ele se perdesse, a festa nunca mais trocaria de janela. Dois avisos juntos viram uma troca só.
+  function wakeUp() {
+    clearTimeout(wakeTimer);
+    wakeTimer = setTimeout(() => {
+      if (!alive() || replacing) return;
+      logLine('o computador acordou: janela nova para a festa');
+      place();
+      replaceWindow({ quiet: true });
+    }, WAKE_DELAY);
+  }
+
+  function watchPower() {
+    if (!powerMonitor) return;
+    // Antes de dormir, a festa salva (se a bateria acabar no repouso, não se perde nada).
+    powerMonitor.on('suspend', () => send('salvar'));
+    powerMonitor.on('unlock-screen', wakeUp);
+    powerMonitor.on('resume', wakeUp);
   }
 
   function buildMenu() {
@@ -222,6 +249,7 @@ if (steamOnly && steam.restartIfNeeded()) {
       { label: t('tray.shop'), click: () => { openPanel(); send('vitrine'); } },
       { label: t('rings.title'), click: () => send('argolas') },
       { label: t('tray.photo'), click: () => send('foto') },
+      { label: t('tray.portrait'), click: () => send('retrato') },
       { type: 'separator' },
       { label: t('tray.pin'), type: 'checkbox', checked: settings.pinned,
         click: item => changeAndTell({ pinned: item.checked }) },
@@ -242,6 +270,8 @@ if (steamOnly && steam.restartIfNeeded()) {
         click: item => changeAndTell({ startup: item.checked }) },
       { label: t('tray.perf'), submenu: ['suave', 'normal', 'economia'].map(perf => ({ label: t(`settings.perf.${perf}`),
         type: 'radio', checked: settings.perf === perf, click: () => changeAndTell({ perf }) })) },
+      { label: t('settings.calmOn'), type: 'checkbox', checked: settings.calm === true,
+        click: item => changeAndTell({ calm: item.checked }) },
       { label: t('tray.hide'), type: 'checkbox', checked: settings.hidden,
         click: item => changeAndTell({ hidden: item.checked }) },
       { type: 'separator' },
@@ -258,7 +288,8 @@ if (steamOnly && steam.restartIfNeeded()) {
   }
 
   // A festa: uma janela transparente do tamanho da área útil, que deixa o clique passar fora do jogo.
-  function openWindow() {
+  // `quiet`: janela trocada sozinha (ao acordar, autocura) abre sem pegar o foco de quem está usando outro programa.
+  function openWindow({ quiet = false } = {}) {
     const created = new BrowserWindow({
       ...currentDisplay().workArea,
       show: false,
@@ -289,9 +320,17 @@ if (steamOnly && steam.restartIfNeeded()) {
     created.setAlwaysOnTop(settings.pinned, 'floating');
     created.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     created.webContents.on('will-navigate', event => event.preventDefault());
+    // Janela trocada sozinha abre sem foco, mas a página começa achando que tem (como na abertura normal): depois que
+    // os scripts rodaram (antes disso o aviso se perderia), ela fica sabendo que não.
+    if (quiet) {
+      created.webContents.on('did-finish-load', () => {
+        if (win === created && !created.isFocused()) send({ foco: false });
+      });
+    }
     // Ao abrir, o jogo já vem com foco; clicar fora tira o foco e a placa some até clicar na festa de novo.
     created.once('ready-to-show', () => {
       if (settings.hidden || win !== created) return;
+      if (quiet) { created.showInactive(); return; }
       created.setFocusable(true);
       created.show();
     });
@@ -339,16 +378,18 @@ if (steamOnly && steam.restartIfNeeded()) {
   // mouse para a janela interna antiga do Chromium (setIgnoreMouseEvents com forward). A festa deixa de saber onde está
   // o cursor e os cliques no menu passam direto para o que está atrás. Por isso a troca é de janela: a velha fecha
   // (a página salva ao sair) e só então a nova abre e carrega o save.
-  function replaceWindow() {
+  function replaceWindow(options = {}) {
     if (!alive()) return;
     const old = win;
     replacing = true;
     keepFocusable = false;
     old.once('closed', () => {
-      openWindow();
+      openWindow(options);
       replacing = false;
     });
     old.close();
+    // Página travada não fecha (e a festa nova nunca abriria): depois de 5 s, fecha à força (vale o último save dela).
+    setTimeout(() => { if (!old.isDestroyed()) old.destroy(); }, 5000);
   }
 
   function createWindow() {
@@ -369,7 +410,8 @@ if (steamOnly && steam.restartIfNeeded()) {
     tray.on('click', showGame);
     updateTray();
     screen.on('display-removed', () => { place(); updateTray(); });
-    screen.on('display-added', updateTray);
+    // O monitor voltou (acordando, o Windows às vezes some com ele e traz de novo): a festa volta para a área útil dele.
+    screen.on('display-added', () => { place(); updateTray(); });
     screen.on('display-metrics-changed', place);
   }
 
@@ -418,6 +460,14 @@ if (steamOnly && steam.restartIfNeeded()) {
         win.setIgnoreMouseEvents(!interactive, { forward: true });
       }
     });
+    // A página percebeu que o mouse não chega mais nela (a janela quebrou depois do repouso): janela nova.
+    // Só com a festa fixada sobre as janelas: solta, outra janela pode estar por cima dela (o mouse passa na área da
+    // festa sem chegar nela, e isso não é defeito).
+    ipcMain.on('desktop:repair', event => {
+      if (!isOwnWindow(event) || replacing || !settings.pinned) return;
+      logLine('a festa parou de receber o mouse: janela nova');
+      replaceWindow({ quiet: true });
+    });
     ipcMain.on('desktop:log-error', (event, text) => {
       if (isOwnWindow(event) && typeof text === 'string') logLine(text);
     });
@@ -440,6 +490,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     ipcMain.on('desktop:quit', event => { if (isOwnWindow(event)) app.quit(); });
     createWindow();
     watchCursor();
+    watchPower();
   });
 
   app.on('second-instance', showGame);

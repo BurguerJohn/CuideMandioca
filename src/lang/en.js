@@ -3,10 +3,10 @@
   const dict = {
     ui: {
       'tab.festa': 'Party', 'tab.historico': 'History', 'tab.conquistas': 'Achievements', 'tab.ajustes': 'Settings',
-      'tab.turma': 'Crew', 'tab.pescaria': 'Fishing Pond', 'tab.roles': 'Outings', 'tab.fogueira': 'Bonfire',
+      'tab.turma': 'Crew', 'tab.pescaria': 'Fishing Pond', 'tab.roles': 'Outings', 'tab.cozinha': 'Kitchen', 'tab.fogueira': 'Bonfire',
       'tab.bingo': 'Fair bingo', 'tab.correio': 'Love Letters', 'tab.teste': 'Test mode',
       'dock.conjuntos': 'Sets', 'dock.melhorias': 'Upgrades', 'dock.chapeu': 'Hats', 'dock.mao': 'In hand', 'dock.tecido': 'Fabrics',
-      'dock.terreiro': 'Grounds', 'dock.lado': 'Booths',
+      'dock.terreiro': 'Grounds', 'dock.lado': 'Booths', 'dock.varal': 'Bunting',
 
       'num.thousand': '{n}K', 'num.million': '{n}M', 'num.billion': '{n}B', 'num.trillion': '{n}T',
       'count.of': '{n} of {total}',
@@ -18,7 +18,7 @@
       'lock.note': '🔒 Unlocks when the party becomes <b>{tier}</b> ({size} guests). Now: {now}.',
 
       'hud.frenzy': 'Frenzy ×{mult}', 'hud.frenzyTitle': 'Everything earns more while it lasts', 'hud.year': 'year {n}', 'hud.bingo': 'Bingo {n}/{total}', 'hud.bingoTitle': 'Squares marked on your bingo card', 'hud.wedding': 'Wedding', 'hud.weddingTitle': 'Click the couple to throw rice', 'hud.quadrilha': 'Square dance +{v}%', 'hud.quadrilhaTitle': 'The called square dance earns more while it lasts',
-      'day.antonio': 'Saint Anthony’s Day', 'day.joao': 'Saint John’s Day', 'day.pedro': 'Saint Peter’s Day', 'hud.day': '{name} +{v}%',
+      'day.namorados': 'Brazilian Valentine’s Day', 'day.antonio': 'Saint Anthony’s Day', 'day.joao': 'Saint John’s Day', 'day.pedro': 'Saint Peter’s Day', 'day.julina': 'Festa Julina (July festival)', 'day.aniversario': 'the party\'s birthday', 'hud.day': '{name} +{v}%',
       'hud.nextTitle': 'Every new guest adds a piece to the scenery',
       'hud.next': 'Next guest brings: <b>{piece}</b>',
       'hud.shop': 'Shop and upgrades',
@@ -30,7 +30,7 @@
       'shop.buyTicket': '+1 ticket', 'shop.close': 'Close the shop', 'shop.hold': 'Hold to buy several',
       'shop.upgrade': 'Upgrade', 'shop.drag': 'Drag sideways', 'shop.sideLeft': '◀ Left', 'shop.sideRight': 'Right ▶',
       'shop.inUse': 'In use', 'shop.use': 'Use', 'shop.place.esquerda': 'Place left', 'shop.place.direita': 'Place right',
-      'shop.onlyWedding': 'Weddings only', 'shop.onlyAuction': 'Auction only', 'shop.sets': 'Sets: {list}',
+      'shop.onlyWedding': 'Weddings only', 'shop.onlyAuction': 'Auction only', 'shop.onlySnake': 'Catch the snake', 'shop.sets': 'Sets: {list}',
       'shop.set': 'Set {name} (+{v}%): {pieces}',
       'shop.setMissingOne': '1 missing',
       'shop.setMissing': '{n} missing',
@@ -67,7 +67,7 @@
       'party.host': 'Host', 'party.name': 'Name',
       'party.panelHint': 'The buttons on the sign open the shop, the Lucky Rings and every part of the party (crew, fishing, ' +
         'outings, bonfire, letters). This panel keeps the numbers, achievements and settings.',
-      'party.photo': 'Party photo', 'party.yield': 'How the party earns',
+      'party.photo': 'Party photo', 'party.portrait': 'Portrait', 'party.yield': 'How the party earns',
       'party.perStep': 'Cheer per step', 'party.stepsPerSecond': 'Steps per second', 'party.stamina': 'Stamina',
       'party.staminaValue': '{n} steps', 'party.rest': 'Rest', 'party.perSecond': 'Average per second',
       'party.multipliers': 'Multipliers', 'party.growth': 'Cassava size',
@@ -77,7 +77,7 @@
       'growth.goldenName': 'Legendary Cassava', 'growth.golden': 'Full size, every dance move and a legendary bonfire: she shines.',
       'growth.max': 'Fully grown. Every size earns more per step.',
       'log.grow': 'The Cassava grew: {stage}', 'log.learn': 'New dance move: {name}',
-      'party.set': 'Outfit set', 'party.tradition': 'Tradition', 'party.trio': 'Pé-de-serra trio', 'clicks.title': 'You can click', 'clicks.list': 'Mandioca: a pet (and free steps)|Golden balloon, the rainbow’s pot of gold and the clay pot: prizes|Sack race: the runner with the red stripe hops on each click (in rhythm)|Auctioneer on the stage: one bid per click|The newlyweds at a wedding: rice (more rice, bigger gift)|Guest requests and party crashers|Booths: Rings, Fishing, Post office; the Kissing Booth gives tickets|Bonfire and stage: open the bonfire and the crew|Animals, kids, rising lanterns, the train, Ferris wheel, carousel, chapel, moon and kite: just to see them react',
+      'party.set': 'Outfit set', 'party.tradition': 'Tradition', 'party.trio': 'Pé-de-serra trio', 'clicks.title': 'You can click', 'clicks.list': 'Mandioca: a pet (and free steps)|Golden balloon, the rainbow’s pot of gold and the clay pot: prizes|Sack race: the runner with the red stripe hops on each click (in rhythm)|Pin-the-tail board: click at the right moment|Cloth snake in the square dance: catch it before it gets away|Auctioneer on the stage: one bid per click|The newlyweds at a wedding: rice (more rice, bigger gift)|Wandering Accordionist (rare): say hi for tickets|Street photographer (rare): click for a party portrait|Ox cart (in the back): the driver leaves firewood|Loose flag in the wind: catch it before it lands|Bonfire compadres: click to be the witness|Wood Stove: opens the kitchen (click the ready dish above it to serve)|Guest requests and party crashers|Booths: Rings, Fishing, Post office; the Kissing Booth gives tickets|Bonfire and stage: open the bonfire and the crew|The party ground: throws a snap pop|The Cassava’s dance partner, animals, kids, rising lanterns, the train, the pamonha van, the donkey, Ferris wheel, carousel, chapel, moon and kite: just to see them react',
       'party.dances': 'Dance moves',
       'dances.title': 'Repertoire', 'dances.count': '{n} of {total} moves', 'dances.locked': 'Learned after {n} steps danced',
       'dances.unlockAt': '{n} steps',
@@ -111,7 +111,7 @@
       'outing.recall': 'Call back', 'outing.returned': '{name} is back!', 'outing.claim': 'Take the firewood',
       'outing.prize': ' · {chance} chance of {item}', 'outing.info': '{time} · {n} firewood (more with rares){prize}',
 
-      'fire.subtitle': 'Firewood from outings feeds the bonfire. With {n} upgrades it becomes legendary.',
+      'cook.subtitle': 'One dish at a time on the Wood Stove. Once served, it livens up the party for a while.', 'cook.needStove': 'Place the Wood Stove on one side of the party (shop, decorations tab) to cook.', 'cook.empty': 'The pot is empty. Pick a dish and light the fire!', 'cook.cooking': '{dish} on the fire: ready in {time}.', 'cook.ready': '{dish} is ready!', 'cook.serve': 'Serve', 'cook.cook': 'Cook', 'cook.busy': 'Pot in use', 'cook.info': '+{v}% to everything for {buff} · {time} on the fire', 'cook.active': 'Served: {dish}, +{v}% to everything for {time} more.', 'cook.replace': 'Serving another dish replaces the current one.', 'cook.canjica': 'Canjica is at the stove: everything cooks in half the time.', 'cook.stats': 'Dishes served: {n}', 'fire.subtitle': 'Firewood from outings feeds the bonfire. With {n} upgrades it becomes legendary.',
       'fire.goal': 'On the way to a legendary bonfire', 'fire.legendary': 'The bonfire is legendary: all Cheer is doubled.',
       'fire.progress': '{n} of {total} upgrades.', 'fire.spark': 'Spark tends the fire: the Flare lasts longer.',
 
@@ -120,9 +120,9 @@
       'mail.opened': 'Letters opened: {n}.', 'mail.ok': 'So sweet',
 
       'ach.done': 'Done', 'ach.todo': 'To do',
-      'goals.title': 'Party goals', 'goals.achievements': 'Achievements',
+      'goals.title': 'Party goals', 'goals.achievements': 'Achievements', 'album.title': 'Party Album', 'album.hint': 'Every moment you live sticks a sticker. Full page: +{v}% on everything forever and {n} tickets ({pages} of {total} full).', 'album.missing': 'Not yet',
       'goals.hint': 'Complete a goal and claim it to earn tickets. A new goal takes its place.',
-      'goals.claim': 'Claim', 'goals.reward': '{tickets} tickets', 'goals.wood': '{wood} wood',
+      'goals.claim': 'Claim', 'goals.swap': 'Swap', 'goals.swapTitle': 'Swap for another goal ({n} ticket)', 'goals.reward': '{tickets} tickets', 'goals.wood': '{wood} wood',
       'goal.steps': { one: 'Dance {n} step', other: 'Dance {n} steps' },
       'goal.guests': { one: 'Welcome {n} new guest', other: 'Welcome {n} new guests' },
       'goal.levels': { one: 'Buy {n} upgrade', other: 'Buy {n} upgrades' },
@@ -133,15 +133,18 @@
       'goal.rings': { one: 'Play {n} round of Lucky Rings', other: 'Play {n} rounds of Lucky Rings' },
       'goal.outings': { one: 'Claim {n} outing', other: 'Claim {n} outings' },
       'goal.crashers': { one: 'Throw out {n} crasher', other: 'Throw out {n} crashers' },
+      'goal.sacos': { one: 'Run {n} sack race', other: 'Run {n} sack races' },
+      'goal.potes': { one: 'Smash {n} pot', other: 'Smash {n} pots' },
+      'goal.lances': { one: 'Make {n} bid at the auction', other: 'Make {n} bids at the auction' }, 'goal.cobras': { one: 'Catch {n} cloth snake at the square dance', other: 'Catch {n} cloth snakes at the square dance' }, 'goal.burros': { one: 'Pin the tail on the donkey {n} time', other: 'Pin the tail on the donkey {n} times' }, 'goal.fantasias': { one: 'Take part in {n} costume contest', other: 'Take part in {n} costume contests' }, 'goal.compadres': { one: 'Witness {n} bonfire compadres pact', other: 'Witness {n} bonfire compadres pacts' }, 'goal.pratos': { one: 'Serve {n} Wood Stove dish', other: 'Serve {n} Wood Stove dishes' },
 
       'settings.size': 'Game size', 'settings.sizeHint': 'Or drag the size button on the party sign (one click goes back to 100%).',
       'settings.sound': 'Sound', 'settings.soundOn': 'On', 'settings.soundOff': 'Off', 'settings.volume': 'Volume',
       'settings.perf': 'Performance', 'settings.perf.suave': 'Smooth (60)', 'settings.perf.normal': 'Normal (30)',
       'settings.perf.economia': 'Saver (20)',
       'settings.music': 'Music', 'settings.musicOn': 'On', 'settings.musicOff': 'Off',
-      'settings.musicHint': 'A background forró tune on a loop. It uses the sound volume and stays quiet while the party is hidden.', 'settings.startup': 'Open with Windows', 'settings.startupOn': 'On', 'settings.startupOff': 'Off', 'settings.startupHint': 'The party opens by itself (through Steam) when you sign in to Windows.',
+      'settings.musicHint': 'A forró, a xote, a baião and an arrasta-pé in the background, one after the other. It uses the sound volume and stays quiet while the party is hidden.', 'settings.startup': 'Open with Windows', 'settings.startupOn': 'On', 'settings.startupOff': 'Off', 'settings.startupHint': 'The party opens by itself (through Steam) when you sign in to Windows.',
       'settings.flash': 'Lightning', 'settings.flashOn': 'With flash', 'settings.flashOff': 'No flash',
-      'settings.flashHint': 'In the Saint John rain, lightning lights up the party for a moment. Turn it off if you prefer no flashes.',
+      'settings.flashHint': 'In the Saint John rain, lightning lights up the party for a moment. Turn it off if you prefer no flashes.', 'settings.calm': 'Floating text', 'settings.calmOff': 'All', 'settings.calmOn': 'Less text', 'settings.calmHint': 'Less text hides the step numbers and the crowd chatter (event messages stay). Nice for working with the party on screen.',
       'settings.perfHint': 'How many frames per second the party draws while the game is focused (fewer in the background). Fewer frames use less of your computer.',
       'settings.soundHint': 'Party sound effects: shopping, ring toss, fishing, new guests and achievements.',
       'settings.window': 'Window', 'settings.pinned': 'Pinned above windows', 'settings.behind': 'Behind windows',
@@ -163,7 +166,7 @@
       'stats.playtime': 'Party time', 'stats.steps': 'Steps danced', 'stats.cheerEarned': 'Cheer across the party',
       'stats.cheerSpent': 'Cheer spent', 'stats.fished': 'Prizes fished', 'stats.outings': 'Outings',
       'stats.requests': 'Requests fulfilled', 'stats.crashers': 'Crashers chased off', 'stats.ringRounds': 'Lucky Rings rounds',
-      'stats.ringHits': 'Rings landed', 'stats.pokes': 'Pets given to the Cassava', 'stats.balloons': 'Lucky balloons', 'stats.bingos': 'Bingos', 'stats.contests': 'Square-dance contests (wins)', 'stats.potes': 'Pots smashed', 'stats.sacos': 'Sack races (wins)', 'stats.leiloes': 'Auction prizes won', 'stats.weddings': 'Country weddings', 'stats.rainbows': 'Pots of gold found', 'stats.goals': 'Goals completed',
+      'stats.ringHits': 'Rings landed', 'stats.pokes': 'Pets given to the Cassava', 'stats.balloons': 'Lucky balloons', 'stats.bingos': 'Bingos', 'stats.contests': 'Square-dance contests (wins)', 'stats.potes': 'Pots smashed', 'stats.sacos': 'Sack races (wins)', 'stats.leiloes': 'Auction prizes won', 'stats.quentao': 'Quentão sold in the cold', 'stats.visitors': 'Accordionists greeted', 'stats.cobras': 'Cloth snakes caught', 'stats.fotos': 'Street photographer portraits', 'stats.burros': 'Donkey tails (bullseyes)', 'stats.fantasias': 'Costume contests (wins)', 'stats.compadres': 'Bonfire compadres witnessed', 'stats.dishes': 'Wood Stove dishes served', 'stats.weddings': 'Country weddings', 'stats.rainbows': 'Pots of gold found', 'stats.goals': 'Goals completed',
 
       'history.chartLabel': 'Guests and unlocks over play time',
       'history.axisGuests': 'guests', 'history.axisTime': 'play time',
@@ -194,14 +197,14 @@
       'log.year': 'São João #{n} began (Tradition +{v}%)',
       'log.daily': 'Daily visit: +{n} tickets ({streak} days in a row)',
       'log.contest': 'Square-dance contest: place #{place}, average {avg}, +{tickets} tickets',
-      'log.pote': 'Pot smash: +{n} Cheer and {tickets} tickets', 'log.saco.1': 'Sack race: first place in {s} s! +{n} Cheer and {tickets} tickets', 'log.saco.2': 'Sack race: second place. +{n} Cheer and 1 ticket', 'log.saco.3': 'Sack race: last place. +{n} Cheer', 'log.leilao': 'Won {item} at the auction for {price} tickets', 'log.leilaoCheer': 'Won {n} Cheer at the auction for {price} tickets',
+      'log.pote': 'Pot smash: +{n} Cheer and {tickets} tickets', 'log.saco.1': 'Sack race: first place in {s} s! +{n} Cheer and {tickets} tickets', 'log.saco.2': 'Sack race: second place. +{n} Cheer and 1 ticket', 'log.saco.3': 'Sack race: last place. +{n} Cheer', 'log.leilao': 'Won {item} at the auction for {price} tickets', 'log.visitor': 'Greeted the Wandering Accordionist: +{tickets} tickets', 'log.cobra': 'Caught the square dance cloth snake: +{n} Cheer', 'log.foto': 'Portrait with the street photographer: +{tickets} tickets', 'log.compadres': 'Witnessed the bonfire compadres: +{n} Cheer', 'log.cozinha': 'Served {dish} from the Wood Stove', 'log.flag': 'Caught a flag the wind blew loose: +1 ticket', 'log.cartWood': 'Ox cart: +{n} firewood', 'log.fantasia.1': 'Costume contest: 1st place, +{tickets} tickets', 'log.fantasia.2': 'Costume contest: 2nd place, +{tickets} tickets', 'log.fantasia.3': 'Costume contest: 3rd place, +{tickets} ticket', 'log.burro.mosca': 'Donkey tail on the X: +{n} Cheer and {tickets} tickets', 'log.burro.perto': 'Donkey tail close to the X: +{n} Cheer and 1 ticket', 'log.burro.longe': 'Donkey tail far from the X: +{n} Cheer', 'log.burro.fora': 'Donkey tail off the donkey: +{n} Cheer', 'log.leilaoCheer': 'Won {n} Cheer at the auction for {price} tickets',
       'log.wedding': 'Country wedding: {rice} handfuls of rice, +{n} Cheer and {tickets} tickets',
       'log.rainbow': 'Rainbow pot of gold: +{n} Cheer and {tickets} tickets',
       'log.balloon.frenzy': 'Lucky balloon: frenzy ×{mult} for {s} s', 'log.balloon.cheer': 'Lucky balloon: +{n} Cheer',
       'log.balloon.tickets': 'Lucky balloon: +{n} tickets', 'log.balloon.wood': 'Lucky balloon: +{n} wood',
       'log.fishingOpen': 'The fishing pond opened', 'log.debug': 'Test: {note}',
 
-      'debug.subtitle': 'Shortcuts for testing the game. Everything from here is marked as a test in the History.',
+      'debug.callCook': 'Dish ready', 'debug.subtitle': 'Shortcuts for testing the game. Everything from here is marked as a test in the History.',
       'debug.plusMinutes': '+{n} min', 'debug.plusHours': { one: '+{n} hour', other: '+{n} hours' },
       'debug.plusDays': { one: '+{n} day', other: '+{n} days' },
       'debug.cheerNote': 'What the party earns in the chosen time (now: {rate}/s). Goes straight to the balance, without turning into fame.',
@@ -212,7 +215,7 @@
       'debug.timeNote': 'The party really runs during that time: it dances, earns, and the clocks (fishing, letters, outings, ' +
         'requests, Lucky Rings price) move too. It doesn’t buy anything by itself.',
       'debug.crewBooths': 'Crew and booths', 'debug.atParty': 'At the party',
-      'debug.callBingo': 'Bingo card', 'debug.bingo': 'Bingo card', 'debug.callContest': 'Square-dance contest', 'debug.concurso': 'Square-dance contest', 'debug.callPote': 'Hang the pot', 'debug.pote': 'Pot hung', 'debug.callSaco': 'Sack race', 'debug.saco': 'Sack race', 'debug.callLeilao': 'Prize auction', 'debug.leilao': 'Prize auction', 'debug.callWedding': 'Hold a wedding', 'debug.casamento': 'Country wedding', 'debug.callQuadrilha': 'Call the square dance', 'debug.quadrilha': 'Square dance called', 'debug.doneGoals': 'Complete the goals', 'debug.metas': 'Goals completed', 'debug.callRain': 'Make it rain', 'debug.chuva': 'It started to rain', 'debug.callBalloon': 'Call a golden balloon', 'debug.balao': 'A golden balloon arrived', 'debug.callRequest': 'Call a request', 'debug.callCrasher': 'Call a crasher', 'debug.cheapRings': 'Lucky Rings at 1 ticket',
+      'debug.callBingo': 'Bingo card', 'debug.bingo': 'Bingo card', 'debug.callContest': 'Square-dance contest', 'debug.concurso': 'Square-dance contest', 'debug.callPote': 'Hang the pot', 'debug.pote': 'Pot hung', 'debug.callSaco': 'Sack race', 'debug.saco': 'Sack race', 'debug.callAnnounce': 'Loudspeaker announcement', 'debug.aviso': 'Loudspeaker announcement', 'debug.callCold': 'Cold snap', 'debug.frio': 'Cold snap', 'debug.callVisitor': 'Wandering Accordionist', 'debug.callSnake': 'Watch out, snake', 'debug.callPhotographer': 'Street photographer', 'debug.callBurro': 'Pin the tail', 'debug.callFantasia': 'Costume contest', 'debug.sanfoneiro': 'Wandering Accordionist', 'debug.callLeilao': 'Prize auction', 'debug.leilao': 'Prize auction', 'debug.callWedding': 'Hold a wedding', 'debug.casamento': 'Country wedding', 'debug.callQuadrilha': 'Call the square dance', 'debug.quadrilha': 'Square dance called', 'debug.doneGoals': 'Complete the goals', 'debug.metas': 'Goals completed', 'debug.callRain': 'Make it rain', 'debug.chuva': 'It started to rain', 'debug.callBalloon': 'Call a golden balloon', 'debug.balao': 'A golden balloon arrived', 'debug.callRequest': 'Call a request', 'debug.callCrasher': 'Call a crasher', 'debug.cheapRings': 'Lucky Rings at 1 ticket',
       'debug.animacao': 'Extra Cheer', 'debug.fichas': '+{n} tickets', 'debug.lenha': '+{n} firewood',
       'debug.convidados': '+{n} guests', 'debug.time': '{n} min of party went by',
       'debug.prendas': 'Prizes ready', 'debug.cartas': 'Letters ready', 'debug.roles': 'Outings ready',
@@ -223,7 +226,7 @@
       'app.canvas': 'Mandioca’s June festival', 'app.shopLabel': 'Shop', 'app.panelLabel': 'Party panel',
       'app.windowLabel': 'Party window', 'app.tabsLabel': 'Tabs', 'app.closeEsc': 'Close (Esc)',
       'app.saveFailedHere': 'Couldn’t save the party on this computer.', 'app.saveFailed': 'Couldn’t save the party.',
-      'app.onlyOutings': '{item} only shows up on outings.', 'app.onlyRings': '{item} only comes from the Lucky Rings.', 'app.onlyWedding': '{item} only comes as a wedding gift.', 'app.onlyAuction': '{item} is only sold at the prize auction.',
+      'app.onlyOutings': '{item} only shows up on outings.', 'app.onlyRings': '{item} only comes from the Lucky Rings.', 'app.onlyWedding': '{item} only comes as a wedding gift.', 'app.onlyAuction': '{item} is only sold at the prize auction.', 'app.onlySnake': '{item} only comes from catching the snake that crosses the square dance.', 'app.fotografo': 'The old-time street photographer is here! Click him for a party portrait.', 'app.fotoTitle': 'Party portrait', 'app.fotoTickets': 'The photographer did a great job: +{n} tickets.', 'app.fotoSave': 'Save photo', 'app.fotoOk': 'So pretty!', 'app.burro': 'Pin the tail on the donkey! Click the board to pin it: the closer to the X, the better.', 'app.fantasiaSoon': 'Costume contest in {s} s! Dress up the Cassava: a full set and rare pieces score higher.', 'app.compadres': 'You witnessed the bonfire compadres! +{n} Cheer.', 'app.cookStart': '{dish} on the fire!', 'app.cookReady': '{dish} is ready! Click the dish above the stove to serve it.', 'app.cookServed': '{dish} served: +{v}% to everything for {n} min!', 'app.wake': 'While the party was paused ({time}), it earned +{n} Cheer.', 'app.flag': 'You caught the flag the wind blew loose: +{n} ticket!', 'app.cartWood': 'The ox cart driver left {n} firewood for the bonfire!', 'app.fantasia.1': 'Costume contest: 1st place with an average of {avg}! +{tickets} tickets and {n} Cheer.', 'app.fantasia.2': 'Costume contest: 2nd place with an average of {avg}. +{tickets} tickets and {n} Cheer.', 'app.fantasia.3': 'Costume contest: 3rd place with an average of {avg}. +{tickets} ticket and {n} Cheer. A full set helps!', 'app.burroPin.mosca': 'Bullseye! Right on the X: +{n} Cheer and {tickets} tickets.', 'app.burroPin.perto': 'So close! Right next to the X: +{n} Cheer and 1 ticket.', 'app.burroPin.longe': 'Far from the X, but nice try: +{n} Cheer.', 'app.burroPin.fora': 'You pinned the tail off the donkey! The crowd laughed: +{n} Cheer.', 'app.cobra': 'Watch out, a snake! Click it before it leaves the dance floor.', 'app.cobraCaught': 'You caught the snake! It is made of cloth. +{n} Cheer.', 'app.cobraGift': 'And now it is yours: {name}!',
       'app.unlocksAt': 'Unlocks when the party becomes {tier}.', 'app.needTickets': 'Not enough tickets: {item} costs {n}.',
       'app.yours': '{item} is yours!', 'app.needCheer': 'Not enough Cheer.', 'app.levels': '+{n} levels!',
       'app.browserClose': 'In the browser, just close the tab.',
@@ -260,8 +263,8 @@
       'records.maior': 'Records: World’s Biggest São João in {time} of play; biggest party, {size} guests.',
       'app.record': 'New record! World’s Biggest São João in {time} (before: {before}).',
       'app.pote': 'Pot smash! Click the hanging pot to whack it before it goes away.',
-      'app.poteBreak': 'The pot broke and it rained candy: +{n} Cheer and {tickets} tickets.', 'app.saco': 'Sack race! Click the runner with the red stripe to start and hop. Keep the rhythm: rushed hops end in a tumble.', 'app.sacoEnd.1': 'First place in the sack race ({s} s)! +{n} Cheer and {tickets} tickets.', 'app.sacoEnd.2': 'Second place in the sack race: +{n} Cheer and 1 ticket.', 'app.sacoEnd.3': 'Last in the sack race, but he made it: +{n} Cheer.', 'app.leilao': 'Prize auction on stage: {prize}! Click the auctioneer to bid (starts at {n} tickets). The crowd bids too!', 'app.leilaoPrizeCheer': '{n} Cheer', 'app.leilaoWon': 'You won {prize} for {price} tickets!', 'app.leilaoLost': 'The crowd took {prize} for {price} tickets.', 'app.leilaoBroke': 'Not enough tickets: the next bid is {n}.',
-      'app.hint.music': 'Tip: Settings > Sound has an optional background forró tune (off by default).',
+      'app.poteBreak': 'The pot broke and it rained candy: +{n} Cheer and {tickets} tickets.', 'app.saco': 'Sack race! Click the runner with the red stripe to start and hop. Keep the rhythm: rushed hops end in a tumble.', 'app.sacoEnd.1': 'First place in the sack race ({s} s)! +{n} Cheer and {tickets} tickets.', 'app.sacoEnd.2': 'Second place in the sack race: +{n} Cheer and 1 ticket.', 'app.sacoEnd.3': 'Last in the sack race, but he made it: +{n} Cheer.', 'app.leilao': 'Prize auction on stage: {prize}! Click the auctioneer to bid (starts at {n} tickets). The crowd bids too!', 'app.leilaoPrizeCheer': '{n} Cheer', 'app.leilaoWon': 'You won {prize} for {price} tickets!', 'app.leilaoLost': 'The crowd took {prize} for {price} tickets.', 'app.leilaoBroke': 'Not enough tickets: the next bid is {n}.', 'app.visitor': 'A wandering accordionist is passing through the party! While he plays, everything earns +{v}%. Click him to say hi.', 'app.visitorGreet': 'The accordionist thanks you for the greeting: +{n} tickets.', 'hud.visitorTitle': 'Wandering accordionist playing: click him to say hi.', 'hud.cook': '{dish} +{v}%', 'hud.cookTitle': 'Wood Stove dish: everything earns more while it lasts.', 'hud.foto': 'Photographer!', 'hud.fotoTitle': 'The street photographer is waiting for your pose: click him.', 'hud.burro': 'Donkey tail!', 'hud.burroTitle': 'The pin-the-tail board is at the party: click it.', 'hud.fantasia': 'Costumes!', 'hud.fantasiaTitle': 'A costume contest is coming: change the Cassava\'s outfit in the shop before the judges arrive.', 'hud.countdown': { one: '{n} day to Saint John’s Day!', other: '{n} days to Saint John’s Day!' }, 'hud.visitor': 'Accordionist +{v}%', 'news.title': 'What\'s new at the party!', 'news.1': 'Party Album: 35 stickers of party moments to collect (Panel > Achievements). A full page gives +2% forever.', 'news.2': 'Sack race, pin the tail on the donkey, prize auction, cold snaps with hot quentão, the fair loudspeaker, the square dance cloth snake (catch it!), the street photographer and the rare Wandering Accordionist.', 'news.3': 'Bunting in the shop, the blue-blanket donkey and, at huge parties, the pamonha van.', 'news.4': 'Boi-bumbá, balancez, step on the flower, ciranda and xaxado: 20 dance moves now. And Mandioca makes heart eyes, star eyes and happy eyes.', 'news.5': 'New goals (and you can swap them), helpful decorations, July festivals, open with Windows and three more songs (a xote, a baião and an arrasta-pé).', 'news.6': 'Click the ground to throw a snap pop and the Cassava’s partner for a pet. New pandeiro and flag pole, 60 love letters, Brazilian Valentine’s Day and a Less text option in Settings.', 'news.7': 'Costume contest, Canjica cooking at the Wood Stove, the ribbon dance around the flag pole, white-winged doves in the sky and, at the World’s Biggest São João, a drone show.', 'news.8': 'Wood Stove kitchen: pamonha, curau and pé-de-moleque that liven up the party. Plus the bonfire compadres (click them to be the witness!) and Cocada, the Cordel Booth poet.', 'news.ok': 'Let\'s party!', 'app.goalSwapped': 'New goal: {goal}.', 'app.needTicketsSwap': 'Swapping a goal costs {n} ticket.', 'hud.leilaoTitle': 'Prize auction on stage: click the auctioneer to bid.', 'hud.leilao.open': 'Auction: {n}?', 'hud.leilao.voce': 'Auction: {n} (yours)', 'hud.leilao.plateia': 'Auction: {n} (crowd)', 'hud.sacoTitle': 'Sack race: click the runner with the red stripe, in rhythm.', 'hud.saco': 'Sack race!', 'hud.coldTitle': 'Cold snap: a Quentão Barrel on one side would sell quentão.', 'hud.coldQuentao': 'Cold snap: the Quentão Barrel is selling quentão (tickets).', 'hud.cold': 'Cold snap', 'app.sticker': 'New sticker in the Album (Panel > Achievements): {name}!', 'app.albumPage': 'Album page "{name}" complete: +{v}% forever and {n} tickets!', 'app.cold': 'It got cold! A Quentão Barrel on one side of the party would sell hot quentão in the cold (one ticket per sip).', 'app.coldQuentao': 'It got cold! The Quentão Barrel will sell hot quentão while the cold lasts: one ticket per sip.', 'app.coldEnd': 'The cold is gone. The Quentão Barrel sold {n} sips: +{n} tickets.',
+      'app.hint.music': 'Tip: Settings > Sound has optional background music, a forró, a xote, a baião and an arrasta-pé (off by default).', 'app.hint.cozinha': 'Tip: from the Town Festival on, the Wood Stove cooks! Click it (or the pot button on the sign) to make pamonha, curau and pé-de-moleque with firewood from outings.', 'app.hint.chao': 'Tip: click the party ground to throw a snap pop, and the Cassava’s partner for a pet.', 'app.hint.calmo': 'Tip: too much text on screen? In Settings, Less text hides the step numbers and the crowd chatter.',
       'app.hint.sets': 'Tip: a matching hat, hand item and fabric make an outfit set with a bonus. Check the Sets tab in the shop.',
       'app.wedding': 'Country wedding! Click the couple to throw rice.',
       'app.weddingGift': 'A gift from the couple: {name}!',
@@ -284,7 +287,7 @@
       'app.importFailed': 'Couldn’t import: the file isn’t a valid save for this game.',
       'app.saveIgnored': 'Save ignored: the file was corrupted or from another version.',
       'app.welcomeBack': 'The party went on without you!',
-      'app.welcomeBackText': 'In {time} away, the crew earned <b>{n}</b> Cheer.',
+      'app.welcomeBackText': 'In {time} away, the crew earned <b>{n}</b> Cheer.', 'app.welcomeGuests': { one: 'And <b>{n}</b> new guest arrived!', other: 'And <b>{n}</b> new guests arrived!' },
       'app.welcomeBunny': 'Sopinha looked after the party: +{v}%.',
       'app.welcomeRule': 'While the game is closed, the party earns {v}% of the usual for up to {h} hours.',
       'app.welcomeCapped': 'You were away for more than {h} hours: the party earns {v}% of the usual only for the first {h}, then waits for you.', 'app.welcomeBackOk': 'Let’s dance',
@@ -299,7 +302,7 @@
 
       'fx.cobra': 'LOOK, A SNAKE!', 'fx.phew': 'PHEW!', 'fx.ember': 'LIVE EMBERS!', 'fx.flare': 'FLARE!',
       'fx.guests': { one: '+{n} GUEST', other: '+{n} GUESTS' }, 'fx.preview': 'PREVIEW',
-      'fx.poke.0': 'HEE HEE!', 'fx.poke.1': 'OOPS!', 'fx.poke.2': 'TICKLISH!', 'fx.specialDay': 'HAPPY FESTA JUNINA!', 'fx.frenzy': 'FRENZY!', 'fx.bingo': 'BINGO!', 'fx.bingoNumber': 'NUMBER {n}!', 'fx.bingoCall.1': 'KELLYS EYE!', 'fx.bingoCall.3': 'CUP OF TEA!', 'fx.bingoCall.7': 'LUCKY SEVEN!', 'fx.bingoCall.11': 'LEGS ELEVEN!', 'fx.bingoCall.13': 'SAINT ANTHONY!', 'fx.bingoCall.15': 'YOUNG AND KEEN!', 'fx.bingoCall.18': 'COMING OF AGE!', 'fx.bingoCall.22': 'TWO LITTLE DUCKS!', 'fx.bingoCall.24': 'SAINT JOHN!', 'fx.bingoCall.29': 'SAINT PETER!', 'fx.newYear': 'SEE YOU NEXT YEAR!', 'fx.contestStart': 'SQUARE-DANCE CONTEST!', 'fx.contest.1': 'FIRST PLACE!', 'fx.contest.2': 'SECOND PLACE!', 'fx.contest.3': 'THIRD PLACE!', 'fx.pote': 'SMASH THE POT!', 'fx.poc.0': 'BONK!', 'fx.poc.1': 'WHACK!', 'fx.poc.2': 'THUD!', 'fx.poteBreak': 'IT BROKE!', 'fx.saco': 'SACK RACE!', 'fx.sacoGo': 'GO!', 'fx.sacoYou': 'CLICK!', 'fx.sacoHop.0': 'HOP!', 'fx.sacoHop.1': 'JUMP!', 'fx.sacoHop.2': 'GO GO!', 'fx.sacoFall.0': 'TUMBLE!', 'fx.sacoFall.1': 'EASY!', 'fx.sacoFall.2': 'OOPS!', 'fx.sacoPlace.1': 'FIRST PLACE!', 'fx.sacoPlace.2': 'SECOND!', 'fx.sacoPlace.3': 'LAST ONE!', 'fx.sacoGone': 'THEY GAVE UP!', 'fx.leilao': 'AUCTION!', 'fx.leilaoBid': 'BID {n}!', 'fx.leilaoCall.1': 'GOING ONCE!', 'fx.leilaoCall.2': 'GOING TWICE!', 'fx.leilaoSold': 'SOLD!', 'fx.leilaoSign.voce': 'YOUR BID: {n}', 'fx.leilaoSign.plateia': 'CROWD: {n}', 'fx.leilaoSign.open': 'BID: {n}?', 'fx.wedding': 'COUNTRY WEDDING!', 'fx.vivas.0': 'LONG LIVE THE COUPLE!', 'fx.vivas.1': 'KISS! KISS!', 'fx.vivas.2': 'HOW LOVELY!', 'fx.yes': 'I DO!', 'fx.ciranda': 'RING DANCE!', 'fx.chat.0': 'WHAT A PARTY!', 'fx.chat.1': 'WHERE IS THE CORN CAKE?', 'fx.chat.2': 'WATCH OUT, SNAKE!', 'fx.chat.3': 'THAT ACCORDION!', 'fx.chat.4': 'LONG LIVE SAINT JOHN!', 'fx.chat.5': 'THAT BONFIRE IS HOT!', 'fx.chat.6': 'LET US DANCE!', 'fx.chat.7': 'GET ME A HOT PUNCH!', 'fx.chat.8': 'I LOVE THIS FORRO!', 'fx.chat.9': 'THAT CASSAVA CAN DANCE!', 'fx.chatRain.0': 'LOOK, IT IS RAINING!', 'fx.chatRain.1': 'OH, MY HAT!', 'fx.chatRain.2': 'WHERE IS THE UMBRELLA?', 'fx.set': 'OUTFIT SET!', 'fx.wind': 'WHAT A BREEZE!', 'fx.pigeon': 'COO COO!', 'fx.woof': 'WOOF WOOF!', 'fx.side.beijo': 'MWAH!', 'fx.side.comidas': 'FRESH POPCORN!', 'fx.side.cadeia': 'YOU ARE UNDER ARREST!', 'fx.side.espantalho': 'SHOO, BIRDIE!', 'fx.side.fardo': 'PEEP?', 'fx.side.mastro': 'LONG LIVE SAINT JOHN!', 'fx.side.quentao': 'HOT QUENTAO!', 'fx.side.carroca': 'HERE COMES THE CART!', 'fx.tunnel': 'MAKE THE TUNNEL!', 'fx.chatWedding.0': 'LONG LIVE THE COUPLE!', 'fx.chatWedding.1': 'IS THERE CAKE?', 'fx.chatPote.0': 'SMASH IT! SMASH IT!', 'fx.chatPote.1': 'THERE IS CANDY IN THERE!', 'fx.chatSaco.0': 'HOP, HOP!', 'fx.chatSaco.1': 'WATCH OUT!', 'fx.chatLeilao.0': 'ONE MORE!', 'fx.chatLeilao.1': 'I WANT THAT!', 'fx.chatBingo.0': 'WHERE IS MY NUMBER?', 'fx.chatBingo.1': 'ONE MORE TO GO!', 'fx.sprout': 'HI, EVERYONE!', 'fx.lantern': 'LONG LIVE SAINT JOHN!', 'fx.jail.0': 'LET ME OUT!', 'fx.jail.1': 'I AM INNOCENT!', 'fx.quadrilha': 'SQUARE DANCE!', 'fx.call.0': 'FORWARD!', 'fx.call.1': 'BACK!', 'fx.call.2': 'SWING!',
+      'fx.poke.0': 'HEE HEE!', 'fx.poke.1': 'OOPS!', 'fx.poke.2': 'TICKLISH!', 'fx.specialDay': 'HAPPY FESTA JUNINA!', 'fx.frenzy': 'FRENZY!', 'fx.bingo': 'BINGO!', 'fx.bingoNumber': 'NUMBER {n}!', 'fx.bingoCall.1': 'KELLYS EYE!', 'fx.bingoCall.3': 'CUP OF TEA!', 'fx.bingoCall.7': 'LUCKY SEVEN!', 'fx.bingoCall.11': 'LEGS ELEVEN!', 'fx.bingoCall.13': 'SAINT ANTHONY!', 'fx.bingoCall.15': 'YOUNG AND KEEN!', 'fx.bingoCall.18': 'COMING OF AGE!', 'fx.bingoCall.22': 'TWO LITTLE DUCKS!', 'fx.bingoCall.24': 'SAINT JOHN!', 'fx.bingoCall.29': 'SAINT PETER!', 'fx.newYear': 'SEE YOU NEXT YEAR!', 'fx.contestStart': 'SQUARE-DANCE CONTEST!', 'fx.contest.1': 'FIRST PLACE!', 'fx.contest.2': 'SECOND PLACE!', 'fx.contest.3': 'THIRD PLACE!', 'fx.pote': 'SMASH THE POT!', 'fx.poc.0': 'BONK!', 'fx.poc.1': 'WHACK!', 'fx.poc.2': 'THUD!', 'fx.poteBreak': 'IT BROKE!', 'fx.saco': 'SACK RACE!', 'fx.sacoGo': 'GO!', 'fx.sacoYou': 'CLICK!', 'fx.sacoHop.0': 'HOP!', 'fx.sacoHop.1': 'JUMP!', 'fx.sacoHop.2': 'GO GO!', 'fx.sacoFall.0': 'TUMBLE!', 'fx.sacoFall.1': 'EASY!', 'fx.sacoFall.2': 'OOPS!', 'fx.sacoPlace.1': 'FIRST PLACE!', 'fx.sacoPlace.2': 'SECOND!', 'fx.sacoPlace.3': 'LAST ONE!', 'fx.sacoGone': 'THEY GAVE UP!', 'fx.leilao': 'AUCTION!', 'fx.leilaoBid': 'BID {n}!', 'fx.leilaoCall.1': 'GOING ONCE!', 'fx.leilaoCall.2': 'GOING TWICE!', 'fx.leilaoSold': 'SOLD!', 'fx.leilaoSign.voce': 'YOUR BID: {n}', 'fx.leilaoSign.plateia': 'CROWD: {n}', 'fx.leilaoSign.open': 'BID: {n}?', 'fx.wedding': 'COUNTRY WEDDING!', 'fx.vivas.0': 'LONG LIVE THE COUPLE!', 'fx.vivas.1': 'KISS! KISS!', 'fx.vivas.2': 'HOW LOVELY!', 'fx.yes': 'I DO!', 'fx.ciranda': 'RING DANCE!', 'fx.chat.0': 'WHAT A PARTY!', 'fx.chat.1': 'WHERE IS THE CORN CAKE?', 'fx.chat.2': 'WATCH OUT, SNAKE!', 'fx.chat.3': 'THAT ACCORDION!', 'fx.chat.4': 'LONG LIVE SAINT JOHN!', 'fx.chat.5': 'THAT BONFIRE IS HOT!', 'fx.chat.6': 'LET US DANCE!', 'fx.chat.7': 'GET ME A HOT PUNCH!', 'fx.chat.8': 'I LOVE THIS FORRO!', 'fx.chat.9': 'THAT CASSAVA CAN DANCE!', 'fx.chat.10': 'WHO MADE THIS PAMONHA?', 'fx.chat.11': 'JUST KIDDING, NO SNAKE!', 'fx.chat.12': 'WHERE IS MY LOVE LETTER?', 'fx.chat.13': 'LOOK AT HER MOVES!', 'fx.chat.14': 'SAVE ME A SQUARE DANCE!', 'fx.chat.15': 'WHAT A BONFIRE!', 'fx.chat.16': 'MY FEET ARE ALL DUSTY!', 'fx.chat.17': 'MORE CURAU, PLEASE!', 'fx.chat.18': 'TIME TO SHUFFLE!', 'fx.chat.19': 'THIS CANJICA IS SO GOOD!', 'fx.chat.20': 'WHERE IS THE PHOTOGRAPHER?', 'fx.chat.21': 'I PINNED THE DONKEY TAIL!', 'fx.chat.22': 'PLAY A BAIAO, ACCORDION MAN!', 'fx.chat.23': 'LOOK AT HER BALANCEZ!', 'fx.chatRain.0': 'LOOK, IT IS RAINING!', 'fx.chatRain.1': 'OH, MY HAT!', 'fx.chatRain.2': 'WHERE IS THE UMBRELLA?', 'fx.set': 'OUTFIT SET!', 'fx.wind': 'WHAT A BREEZE!', 'fx.pigeon': 'COO COO!', 'fx.woof': 'WOOF WOOF!', 'fx.side.beijo': 'MWAH!', 'fx.side.comidas': 'FRESH POPCORN!', 'fx.side.cadeia': 'YOU ARE UNDER ARREST!', 'fx.side.espantalho': 'SHOO, BIRDIE!', 'fx.side.fardo': 'PEEP?', 'fx.side.mastro': 'LONG LIVE SAINT JOHN!', 'fx.side.fogao': 'HOT CANJICA!', 'fx.side.quentao': 'HOT QUENTAO!', 'fx.side.carroca': 'HERE COMES THE CART!', 'fx.tunnel': 'MAKE THE TUNNEL!', 'fx.chatWedding.0': 'LONG LIVE THE COUPLE!', 'fx.chatWedding.1': 'IS THERE CAKE?', 'fx.chatPote.0': 'SMASH IT! SMASH IT!', 'fx.chatPote.1': 'THERE IS CANDY IN THERE!', 'fx.chatSaco.0': 'HOP, HOP!', 'fx.chatSaco.1': 'WATCH OUT!', 'fx.alto.0': 'FOUND FALSE TEETH AT FISHING!', 'fx.alto.1': 'LOST A SANDAL? KISSING BOOTH!', 'fx.alto.2': 'BLUE DONKEY OWNER, MOVE IT!', 'fx.alto.3': 'MANDIOCA SENDS YOU A KISS!', 'fx.alto.4': 'HOT QUENTAO AT THE BOOTH!', 'fx.alto.5': 'LOST KID: HIS NAME IS ZEZINHO!', 'fx.alto.6': 'LETTER FOR THE STRAW HAT GUY!', 'fx.alto.7': 'THE MUTT BELONGS TO NOBODY!', 'fx.alto.8': 'FORRO TILL THE SUN COMES UP!', 'fx.alto.9': 'HOLD YOUR HATS, XOTE IS NEXT!', 'fx.alto.prato': 'A DISH IS READY ON THE STOVE!', 'fx.alto.bingo': 'BINGO AT THE FAIR! HURRY!', 'fx.alto.rings': 'RINGS FOR 1 TICKET! HURRY!', 'fx.alto.size': '{n} GUESTS TO THE NEXT SIZE!', 'fx.cold': 'SO COLD!', 'fx.sticker': 'NEW STICKER!', 'fx.visitor': 'ACCORDIONIST IN TOWN!', 'fx.visitorThanks': 'THANK YOU, BOSS!', 'fx.bichos': 'EVEN THE ANIMALS DANCE!', 'fx.oi.0': 'HI!', 'fx.oi.1': 'WELCOME BACK!', 'fx.oi.2': 'MISSED YOU!', 'fx.oi.3': 'THERE YOU ARE!', 'fx.kombi.0': 'PAMONHAS, PAMONHAS!', 'fx.kombi.1': 'PURE SWEET CORN CREAM!', 'fx.kombi.2': 'FRESH HOT PAMONHA!', 'fx.mentira': 'JUST KIDDING!', 'fx.selfie': 'CHEESE!', 'fx.sss': 'SSSS!', 'fx.par.0': 'HI, DARLING!', 'fx.par.1': 'DANCE WITH ME!', 'fx.par.2': 'HEE HEE!', 'fx.par.3': 'ALL YOURS!', 'fx.parCiume': 'WHAT ABOUT ME?', 'fx.meteoros': 'LOOK! A METEOR SHOWER!', 'fx.argolasHit': 'RIGHT ON THE BOTTLE!', 'fx.argolasMiss': 'BETTER LUCK NEXT TIME!', 'fx.solo.0': 'ACCORDION SOLO!', 'fx.solo.1': 'ZABUMBA SOLO!', 'fx.solo.2': 'TRIANGLE SOLO!', 'fx.lanterna': 'PHONE LIGHTS UP!', 'fx.cordel.0': 'THE SERTAO HAS FORRO!', 'fx.cordel.1': 'DANCERS NEVER TIRE!', 'fx.cordel.2': 'CASSAVA ON THE FLOOR!', 'fx.cordel.3': 'THE BONFIRE IS LOVE!', 'fx.cordel.4': 'SAINT JOHN IS HERE!', 'fx.cordel.5': 'CORN IS FROM THE HEART!', 'fx.jegueBurro': 'HEE-HAW! MY COUSIN?', 'fx.flag': 'GOT THE LITTLE FLAG!', 'fx.compadre.0': 'SAINT JOHN SAID IT,', 'fx.compadre.1': 'SAINT PETER AGREED,', 'fx.compadre.2': 'THAT WE BE COMPADRES,', 'fx.compadre.3': 'AS SAINT JOHN DECREED!', 'fx.compadre.fim': 'HOORAY FOR THE COMPADRES!', 'fx.compadre.testemunha': 'WITNESS!', 'fx.cook.ready': 'READY!', 'fx.cook.yum': 'YUMMY!', 'fx.cook.talk.0': 'SMELLS SO GOOD!', 'fx.cook.talk.1': 'STIR, STIR!', 'fx.cook.talk.2': 'ALMOST THERE!', 'fx.chapeu': 'OOPS, MY HAT!', 'fx.asaBranca': 'LOOK, WHITE-WINGED DOVES!', 'fx.drones': 'LOOK, A DRONE SHOW!', 'fx.fitas': 'RIBBON DANCE!', 'fx.estalo.0': 'POP!', 'fx.estalo.1': 'SNAP!', 'fx.estalo.2': 'BANG!', 'fx.fotoCall': 'WATCH THE BIRDIE!', 'fx.burro': 'PIN THE TAIL!', 'fx.fantasia': 'COSTUME CONTEST!', 'fx.burroPin.mosca': 'BULLSEYE!', 'fx.burroPin.perto': 'SO CLOSE!', 'fx.burroPin.longe': 'TOO FAR!', 'fx.burroPin.fora': 'MISSED THE DONKEY!', 'fx.cobraPega': 'GOTCHA! A TOY SNAKE!', 'fx.cobraAi.0': 'AAH!', 'fx.cobraAi.1': 'HELP!', 'fx.cobraAi.2': 'YIKES!', 'fx.brrr': 'BRRR!', 'fx.quentao': 'QUENTAO! +1', 'fx.chatCold.0': 'GIVE ME A QUENTAO!', 'fx.chatCold.1': 'WHERE IS MY COAT?', 'fx.chatLeilao.0': 'ONE MORE!', 'fx.chatLeilao.1': 'I WANT THAT!', 'fx.chatNight.0': 'PAST MIDNIGHT AND NOBODY SLEEPS!', 'fx.chatNight.1': 'DANCING TILL THE SUN COMES UP!', 'fx.chatBingo.0': 'WHERE IS MY NUMBER?', 'fx.chatBingo.1': 'ONE MORE TO GO!', 'fx.sprout': 'HI, EVERYONE!', 'fx.lantern': 'LONG LIVE SAINT JOHN!', 'fx.jail.0': 'LET ME OUT!', 'fx.jail.1': 'I AM INNOCENT!', 'fx.quadrilha': 'SQUARE DANCE!', 'fx.call.0': 'FORWARD!', 'fx.call.1': 'BACK!', 'fx.call.2': 'SWING!',
       'fx.call.3': 'THE COUNTRY PATH!', 'fx.call.4': 'WATCH OUT, SNAKE!', 'fx.call.5': 'WATCH OUT, RAIN!', 'fx.call.6': 'BOW TO YOUR PARTNER!',
       'fx.call.7': 'IT IS SAINT JOHN!', 'fx.rain': 'SAINT JOHN RAIN!', 'fx.rainbow': 'RAINBOW!', 'fx.balloon': 'LUCKY BALLOON!',
       'fx.grew': 'IT GREW!', 'fx.newStep': 'NEW MOVE!', 'fx.gift': 'GIFT!', 'fx.newMember': 'NEW CREW MEMBER!', 'fx.levelUp': 'LEVEL UP!',
@@ -307,9 +310,9 @@
       'fx.ringsInsert': 'INSERT A TICKET!',
       // Placas pintadas nas barracas (fonte de pixel, sem acento).
       'sign.barraca-pescaria': 'FISHING', 'sign.barraca-beijo': 'KISSES', 'sign.barraca-comidas': 'FOOD',
-      'sign.cadeia': 'JAIL', 'sign.correio': 'LETTERS', 'sign.barraca-argolas': 'RINGS',
+      'sign.cadeia': 'JAIL', 'sign.barraca-cordel': 'CORDEL', 'sign.correio': 'LETTERS', 'sign.barraca-argolas': 'RINGS',
 
-      'tray.panel': 'Open panel', 'tray.shop': 'Open shop', 'tray.photo': 'Take a party photo',
+      'tray.panel': 'Open panel', 'tray.shop': 'Open shop', 'tray.photo': 'Take a party photo', 'tray.portrait': 'Take a portrait of the Cassava',
       'tray.pin': 'Pin above windows', 'tray.size': 'Size', 'tray.display': 'Display',
       'tray.displayItem': 'Display {n} ({w}×{h})', 'tray.hide': 'Hide the party', 'tray.language': 'Language', 'tray.music': 'Music', 'tray.perf': 'Performance', 'tray.sound': 'Sound',
       'tray.quit': 'Quit the game',
@@ -329,15 +332,24 @@
       tiers: {
         quintal: { name: 'Backyard Arraiá', unlocks: 'Upgrades, shop, love letters and Lucky Rings.' },
         quermesse: { name: 'Neighborhood Fair', unlocks: 'Fishing pond, square-dance partner, booths, guest requests, called square dances, bingo and sack races.' },
-        cidade: { name: 'Town Festival', unlocks: 'Stage with a forró trio, outings, bonfire, dance floor, pot smashing, country weddings and the prize auction.' },
+        cidade: { name: 'Town Festival', unlocks: 'Stage with a forró trio, outings, bonfire, dance floor, pot smashing, country weddings, the prize auction and Wood Stove cooking.' },
         regional: { name: 'Regional São João', unlocks: 'Square-dance caller, fire keeper, party crashers and Ferris wheel.' },
-        maior: { name: 'World’s Biggest São João', unlocks: 'String lights, fireworks and next year’s São João.' }
+        maior: { name: 'World’s Biggest São João', unlocks: 'String lights, fireworks, a stage LED screen, a drone show and next year’s São João.' }
       },
       posts: {
         par: { name: 'Square-dance partner' }, sanfona: { name: 'Stage accordion' }, zabumba: { name: 'Stage zabumba drum' },
         triangulo: { name: 'Stage triangle' }, marcador: { name: 'Caller’s crate' }, foguista: { name: 'By the bonfire' },
         beijo: { name: 'Kissing Booth' }, pescaria: { name: 'Fishing Booth' }, argolas: { name: 'Ring Toss Booth' },
-        mascote: { name: 'Party grounds' }, comidas: { name: 'Food Booth' }, ambulante: { name: 'Party street vendor' }
+        mascote: { name: 'Party grounds' }, comidas: { name: 'Food Booth' }, ambulante: { name: 'Party street vendor' }, fogao: { name: 'Wood Stove' }, cordel: { name: 'Cordel Booth' }
+      },
+      album: {
+        brincadeiras: { name: 'Games', stickers: { argolas: 'Lucky Rings', pescaria: 'Fishing pond', pote: 'Pot smash', saco: 'Sack race', leilao: 'Auction win' } },
+        tradicoes: { name: 'Traditions', stickers: { quadrilha: 'Called square dance', casamento: 'Country wedding', bingo: 'Bingo!', fogueira: 'Bonfire', concurso: 'Square-dance contest' } },
+        ceu: { name: 'Sky and weather', stickers: { chuva: 'June rain', 'arco-iris': 'Pot of gold', frio: 'Cold snap', balao: 'Lucky balloon', fogos: 'Biggest São João fireworks' } },
+        gente: { name: 'Party people', stickers: { pedido: 'Request granted', penetra: 'Crasher kicked out', pombo: 'Carrier pigeon', alto: 'Loudspeaker', role: 'Back from an outing' } },
+        surpresas: { name: 'Surprises', stickers: { sanfoneiro: 'Wandering Accordionist', trovao: 'Thunder in the rain', frenesi: 'Frenzy', 'dia-santo': 'Party day', conjunto: 'Full outfit set' } },
+        folguedos: { name: 'Folk Fun', stickers: { cobra: 'Watch out, snake!', retrato: 'Street photographer portrait', mosca: 'Donkey tail bullseye', pandeiro: 'Pandeiro in hand', semana: 'A week of party' } },
+        causos: { name: 'Party Tales', stickers: { compadres: 'Bonfire compadres', bandeirinha: 'Flag in the wind', fantasia: 'Winning costume', 'carro-boi': 'Ox cart', lendaria: 'Legendary bonfire' } },
       },
       sets: {
         caipira: { name: 'Country Classic' },
@@ -351,14 +363,14 @@
         noivo: { name: 'Groom' },
         rainha: { name: 'Corn Queen' },
         rei: { name: 'Baião King' }, caipirinha: { name: 'Pigtails' }, arraia: { name: 'Party Lights' },
-        caruaru: { name: 'Caruaru Forró Star' }, arrematador: { name: 'Top Bidder' }
+        caruaru: { name: 'Caruaru Forró Star' }, arrematador: { name: 'Top Bidder' }, luxo: { name: 'Fancy Country' }, 'milho-verde': { name: 'Green Corn' }, 'pe-de-serra': { name: 'Pé-de-Serra Forró' }, passista: { name: 'Frevo Dancer' }, 'roda-de-coco': { name: 'Coco Circle' }, 'olha-a-cobra': { name: 'Watch Out, Snake!' }
       },
       dances: {
         forro: { name: 'Forró' }, xote: { name: 'Xote' }, polichinelo: { name: 'Jumping Jacks' },
         sanfona: { name: 'Air Accordion' }, rebolado: { name: 'Hip Shake' }, baiao: { name: 'Baião' },
         giro: { name: 'Spin' }, moonwalk: { name: 'Moonwalk' }, frevo: { name: 'Frevo' },
-        lambada: { name: 'Lambada' }, macarena: { name: 'Macarena' }, robo: { name: 'Robot' },
-        'arrasta-pe': { name: 'Shuffle' }, coco: { name: 'Coco' }, passinho: { name: 'Passinho' }
+        lambada: { name: 'Lambada' }, macarena: { name: 'Macarena' }, 'boi-bumba': { name: 'Boi-bumbá' }, robo: { name: 'Robot' }, balance: { name: 'Balancez' },
+        'arrasta-pe': { name: 'Shuffle' }, ciranda: { name: 'Ciranda' }, coco: { name: 'Coco' }, passinho: { name: 'Passinho' }, 'pisa-fulo': { name: 'Step on the Flower' }, xaxado: { name: 'Xaxado' }
       },
       chars: {
         milho: { name: 'Corn', role: 'Square-dance partner', text: '+{v}% Cheer per step' },
@@ -372,12 +384,14 @@
         faisca: { name: 'Spark', role: 'Fire Keeper', text: 'Flare lasts +{v}%' },
         sopinha: { name: 'Sopinha', role: 'Party mascot', text: 'While the game is closed, the party earns +{v}%' },
         pipoca: { name: 'Popcorn', role: 'Popcorn Vendor', text: 'Tickets cost {v}% less' },
-        amendoim: { name: 'Peanut', role: 'Street Vendor', text: 'Goals give {v}% more tickets' }
+        amendoim: { name: 'Peanut', role: 'Street Vendor', text: 'Goals give {v}% more tickets' },
+        canjica: { name: 'Canjica', role: 'Cook', text: 'Games (pot, sack race, donkey, snake and compadres) give +{v}% Cheer, and the stove cooks in half the time' },
+        cocada: { name: 'Cocada', role: 'Cordel poet', text: 'Love letters arrive {v}% faster' }
       },
       rarities: ['Common', 'Rare', 'Super Rare', 'Ultra Rare'],
       categories: {
         chapeu: { name: 'Hats' }, mao: { name: 'In hand' }, tecido: { name: 'Fabrics' }, terreiro: { name: 'Grounds' },
-        lado: { name: 'Booths and decorations' }
+        lado: { name: 'Booths and decorations' }, varal: { name: 'Bunting' }
       },
       items: {
         'chapeu-palha': { name: 'Straw Hat', desc: 'A classic. Hides the cassava’s bald spot.' },
@@ -407,10 +421,14 @@
         ursinho: { name: 'Teddy Bear', desc: 'The classic prize for good aim.' },
         peixinho: { name: 'Goldfish in a Bag', desc: 'Not from the fishing pond. It’s really yours.' },
         'sanfona-ouro': { name: 'Golden Accordion', desc: 'Brought back from Caruaru. So good it plays by itself.' },
+        zabumba: { name: 'Campina Zabumba', desc: 'Brought from Parque do Povo, in Campina Grande. Boom, boom-boom.' },
         estrelinha: { name: 'Sparkler', desc: 'Sparks everywhere. Keep it away from the bonfire!' },
         buque: { name: 'Bridal Bouquet', desc: 'Whoever catches it is next.' },
         'frango-assado': { name: 'Roast Chicken', desc: 'Won at the auction, golden and juicy.' },
         'bolo-fuba': { name: 'Cornmeal Cake', desc: 'With fennel. The auctioneer’s grandma’s recipe.' },
+        pandeiro: { name: 'Pandeiro', desc: 'Jingle-jingle-boom: keeps the coco beat.' },
+        sombrinha: { name: 'Frevo Umbrella', desc: 'Tiny and colorful: begs for a frevo step.' },
+        'cobra-de-pano': { name: 'Cloth Snake', desc: 'The one from the square dance. Watch out, snake! Just kidding.' },
         'xadrez-vermelho': { name: 'Red Plaid', desc: 'The official uniform of any arraiá.' },
         'xadrez-azul': { name: 'Blue Plaid', desc: 'To match the June sky.' },
         'xadrez-verde': { name: 'Green Plaid', desc: 'The color of fresh corn.' },
@@ -418,23 +436,32 @@
         chita: { name: 'Floral Chintz', desc: 'Little flowers everywhere.' },
         'chita-rosa': { name: 'Pink Chintz', desc: 'The Kissing Booth favorite.' },
         'xadrez-ouro': { name: 'Golden Plaid', desc: 'Shines brighter than the bonfire.' },
+        'chita-amarela': { name: 'Yellow Chintz', desc: 'Corn-colored, with little flowers.' },
+        'xadrez-roxo': { name: 'Purple Plaid', desc: 'For country folk and city folk alike.' },
+        'varal-colorido': { name: 'Colorful Bunting', desc: 'One flag of every color, as tradition says.' },
+        'varal-azul': { name: 'Blue and White Bunting', desc: 'The June sky, hung on a string.' },
+        'varal-chita': { name: 'Calico Bunting', desc: 'Little fabric flowers swaying in the wind.' },
+        'varal-brasil': { name: 'Green and Yellow Bunting', desc: 'A party in World Cup mood.' },
+        'varal-ouro': { name: 'Golden Bunting', desc: 'For the party that became a tradition.' },
         'terra-batida': { name: 'Packed Dirt', desc: 'Good dust for kicking up in a xote.' },
         lamacal: { name: 'After-Rain Mud', desc: 'Slippery, but nobody falls.' },
         gramado: { name: 'Town Square Lawn', desc: 'Nice and green, with little flowers.' },
         areia: { name: 'Beach Sand', desc: 'São João with your feet in the sand.' },
-        tablado: { name: 'Wooden Floor', desc: 'To hear every foot shuffle.' },
+        sertao: { name: 'Sertão Ground', desc: 'Sun-cracked red earth, with little caatinga flowers.' }, tablado: { name: 'Wooden Floor', desc: 'To hear every foot shuffle.' },
         'pista-forro': { name: 'Forró Dance Floor', desc: 'A checkered floor and sparkling eyes.' },
         fardo: { name: 'Hay Bale', desc: 'Bench, stage and hiding spot.' },
-        mastro: { name: 'Flag Pole', desc: 'Colorful ribbons dancing in the wind.' },
-        espantalho: { name: 'Heartthrob Scarecrow', desc: 'Heartthrob pose, heart of straw.' },
-        'barril-quentao': { name: 'Quentão Barrel', desc: 'Hot quentão to chase away the June chill.' },
-        carroca: { name: 'Decorated Cart', desc: 'Carries the crew and the pamonha.' },
+        mastro: { name: 'Flag Pole', desc: 'Spiral ribbon, a flag on top, an orange and an ear of corn hanging, and ribbons dancing in the wind.' },
+        espantalho: { name: 'Heartthrob Scarecrow', desc: 'Heartthrob pose, heart of straw.', effect: 'Post office heartthrob: every letter gives +1 ticket.' },
+        'fogao-lenha': { name: 'Wood Stove', desc: 'Canjica and pamonha on the fire, the smell all over the party.', effect: 'Guest requests pay +50%. From the Town Festival on, it cooks dishes that liven up the party.' },
+        'barril-quentao': { name: 'Quentão Barrel', desc: 'Hot quentão to chase away the June chill.', effect: 'In a cold snap it sells quentão: 1 ticket every 15 s.' },
+        carroca: { name: 'Decorated Cart', desc: 'Carries the crew and the pamonha.', effect: 'Gives the crew a ride: outings come back 15% faster.' },
         'barraca-pescaria': { name: 'Fishing Booth', desc: 'Where Hot Dog casts his rod.', effect: 'Activates the Fisher.' },
         'barraca-beijo': { name: 'Kissing Booth', desc: 'One ticket per kiss. Cheeks only!',
           effect: 'Activates the Kissing Booth attendant. Click it: one kiss every 5 min gives 1 ticket.' },
         'barraca-comidas': { name: 'Food Stand', desc: 'Pamonha, canjica and curau.', effect: '+10% Refreshment.' },
         cadeia: { name: 'Arraiá Jail', desc: 'Party crashers pay bail here.', effect: 'Party crashers give double tickets.' },
         correio: { name: 'Love Letter Booth', desc: 'Anonymous notes with a double meaning.', effect: 'Letters arrive 30% faster.' },
+        'barraca-cordel': { name: 'Cordel Booth', desc: 'Chapbooks hanging on string, full of rhymes.', effect: 'Guest requests show up more often.' },
         'barraca-argolas': { name: 'Ring Toss Booth', desc: 'Bottles, rings and lots of aim.',
           effect: '+1 ring per Lucky Rings round and activates the Ring Master.' }
       },
@@ -444,7 +471,8 @@
         vizinhanca: { name: 'Invite the neighborhood' },
         penetra: { name: 'Crash the arraiá next door' },
         maior: { name: 'Visit the World’s Biggest São João' },
-        caruaru: { name: 'Road trip to Caruaru' }
+        caruaru: { name: 'Road trip to Caruaru' },
+        campina: { name: 'Road trip to Campina Grande' }
       },
       bonfire: {
         labareda: { name: 'Flare', text: 'Every 60 s the bonfire flares up for 8 s: Cheer +{v}%.' },
@@ -454,8 +482,8 @@
       landmarks: {
         milharal: { name: 'Corn stalk' }, galinha: { name: 'Hen' }, bananeira: { name: 'Banana tree' },
         gato: { name: 'Sleepy cat' }, mandacaru: { name: 'Mandacaru cactus' }, casinha: { name: 'Mud hut' },
-        pipa: { name: 'Kite in the sky' }, coqueiro: { name: 'Coconut palm' }, bode: { name: 'Goat' }, caramelo: { name: 'Caramel mutt' }, trem: { name: 'Joy train' },
-        igrejinha: { name: 'Little chapel' }, 'casinha-azul': { name: 'Blue house' }, lua: { name: 'São João moon' },
+        pipa: { name: 'Kite in the sky' }, coqueiro: { name: 'Coconut palm' }, bode: { name: 'Goat' }, caramelo: { name: 'Caramel mutt' }, trem: { name: 'Joy train' }, kombi: { name: 'Pamonha van' }, jegue: { name: 'Blue-blanket donkey' },
+        igrejinha: { name: 'Little chapel' }, 'casinha-azul': { name: 'Blue house' }, papagaio: { name: 'Gossip parrot' }, lua: { name: 'São João moon' },
         catavento: { name: 'Pinwheel' }, balao: { name: 'Paper lantern' }, estrelas: { name: 'Starry sky' },
         carrossel: { name: 'Carousel' }, 'balao-grande': { name: 'Hot-air balloon' }, boi: { name: 'Bumba-meu-boi' },
         'ilha-quadrilha': { name: 'Floating dance island' }, 'ilha-baloes': { name: 'Floating lantern island' }
@@ -469,7 +497,7 @@
         musica: { text: 'Play a xote!' }, foto: { text: 'Take our picture!' },
         pipoca: { text: 'Sweet or salty popcorn?' }, coracao: { text: 'Send me a love letter!' },
         quentao: { text: 'A hot quentão to warm up!' }, cocada: { text: 'Got any coconut candy?' },
-        bandeirinha: { text: 'That corner needs more flags!' }, danca: { text: 'Teach me that move?' }
+        bandeirinha: { text: 'That corner needs more flags!' }, danca: { text: 'Teach me that move?' }, canjica: { text: 'Any canjica on the stove?' }, fogueira: { text: 'Throw more wood on the bonfire!' }, sanfona: { text: 'Where is the accordion player?' }
       },
       letters: [
         'Saw you wiggling by the bonfire. I almost got burned.',
@@ -506,8 +534,38 @@
         'The wind took my little flag. Will you take my heart?',
         'Saw you doing the robot. Program me to dance by your side?',
         'A line at bingo, a full card in my heart.',
-        'I’m like the lucky balloon: I pass by fast. Catch me!'
+        'I’m like the lucky balloon: I pass by fast. Catch me!',
+        'I ran the sack race just to get to you faster.',
+        'At the auction of my heart, you won it all with the first bid.',
+        'Cold? Let me be your quentão.',
+        'The loudspeaker announced: someone at the party is in love. It was me.',
+        'I stuck your sticker in my album. Page complete.',
+        'If the blue-blanket donkey belongs to someone, I want to belong to you.',
+        'I chased the pamonha van all night just to find you.',
+        'Xaxado, xote or forró: with you I\'ll dance any of them.',
+        'I\'m a first-class fisher: I hooked your gaze.',
+        'I changed all the bunting just to match you.',
+        'My heart is like peanut brittle: hard outside, sweet inside.',
+        'If the bonfire goes out, you and I will warm up the party.',
+        'You are my going, going, gone: sold!',
+        'I fell so many times in the sack race that I fell in love.',
+        'With you, even the June chill feels warm.',
+        'Watch out, a snake! Just kidding. What is true is that I like you.',
+        'If I pinned the tail on the donkey blindfolded, I would land on you.',
+        'The photographer said "watch the birdie", but I only watched you.',
+        'My heart jingles like a pandeiro when you walk by.',
+        'In the square dance balancez, I only swayed for you.',
+        'Play a baião, I want to dance cheek to cheek.',
+        'You are the snap pop of my party: bang, and I jumped.',
+        'I saw a shooting star and wished for you again.',
+        'Just a few days to Saint John’s Day and zero until I like you.',
+        'In the party photo, the prettiest thing in the frame is you.'
       ],
+      recipes: {
+        pamonha: { name: 'Pamonha', desc: 'Grated green corn cooked in its husk and tied up.' },
+        curau: { name: 'Curau', desc: 'Sweet green corn pudding with cinnamon on top.' },
+        'pe-de-moleque': { name: 'Pé-de-moleque', desc: 'Toasted peanuts in raw cane sugar syrup.' }
+      },
       achievements: {
         'primeiro-passo': { name: 'First step', text: 'Dance the very first step.' },
         mil: { name: 'A thousand cheers', text: 'Gather 1,000 Cheer across the whole party.' },
@@ -527,6 +585,11 @@
         'quebra-pote': { name: 'Pot smasher', text: 'Smash 5 pots.' },
         canguru: { name: 'Farm kangaroo', text: 'Win 5 sack races.' },
         'dou-lhe-tres': { name: 'Going, going, gone!', text: 'Win 3 prizes at the auction.' },
+        album: { name: 'Full album', text: 'Stick every sticker in the Party Album.' },
+        quentao: { name: 'Nice and hot', text: 'Sell 20 quentões in cold snaps.' },
+        'na-mosca': { name: 'Bullseye', text: 'Pin the tail right on the X 3 times.' },
+        retratista: { name: 'Portrait on the wall', text: 'Take 5 portraits with the street photographer.' },
+        'pega-cobra': { name: 'Snake catcher', text: 'Catch 5 cloth snakes at the square dance.' },
         estilista: { name: 'Country stylist', text: 'Wear 5 different outfit sets.' },
         metodica: { name: 'By the book', text: 'Complete 10 party goals.' },
         'arco-iris': { name: 'Pot of gold', text: 'Find the pot of gold at the rainbow’s end 5 times.' },

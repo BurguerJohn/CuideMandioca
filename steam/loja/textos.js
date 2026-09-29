@@ -23,9 +23,10 @@ All the Cheer you gather slowly turns into fame, and fame brings guests. Every n
 [list]
 [*][b]Lucky Rings:[/b] a ring toss minigame with multipliers and exclusive prizes. The better the prize, the steadier your hand needs to be.
 [*][b]The crew:[/b] catch characters at the fishing pond, like Corn, Carrot, Yam, Hot Dog and the ultra-rare Spark. Each one has a job that changes the party.
-[*][b]Outings and the bonfire:[/b] send the crew to fetch firewood and feed the bonfire until it becomes legendary.
-[*][b]Shop:[/b] hats, fabrics, dance floors, decorations and booths, with an instant preview on the party. Wear a matching hat, hand item and fabric (Bride, Groom, Corn Queen, Baião King...) to earn an outfit set bonus.
-[*][b]Party events:[/b] lucky golden balloons, June rain with a pot of gold at the rainbow’s end, called square dances, a fair bingo with the caller’s nicknames for the numbers, a clay pot to smash and, in bigger parties, a country wedding where you throw rice at the newlyweds.
+[*][b]Outings and the bonfire:[/b] send the crew to fetch firewood and feed the bonfire until it becomes legendary, or cook pamonha, curau and pé-de-moleque on the Wood Stove.
+[*][b]Shop:[/b] hats, fabrics, dance floors, bunting, decorations and booths, with an instant preview on the party. Wear a matching hat, hand item and fabric (Bride, Groom, Corn Queen, Baião King...) to earn an outfit set bonus.
+[*][b]Party events:[/b] lucky golden balloons, June rain with a pot of gold at the rainbow’s end, called square dances, a fair bingo with the caller’s nicknames for the numbers, a clay pot to smash, sack races, pin the tail on the donkey, a prize auction against the crowd, June cold snaps with hot quentão, the fair loudspeaker, the square dance cloth snake, the street photographer, the ribbon dance and, in bigger parties, a country wedding where you throw rice at the newlyweds and a drone show in the sky.
+[*][b]Party Album:[/b] 35 stickers of party moments to collect. Every full page makes the party earn more, forever.
 [*][b]Next year’s São João:[/b] reached the World’s Biggest São João? Start over in the backyard with your crew and clothes, and earn a permanent Tradition bonus.
 [*][b]Love letters, requests and party crashers:[/b] little surprises that keep the festival lively.
 [*][b]History:[/b] a diary and a chart of everything your party unlocked, and when.
@@ -37,7 +38,8 @@ All the Cheer you gather slowly turns into fame, and fame brings guests. Every n
 [*]Drag it anywhere, resize it, pin it above your windows or hide it in the tray.
 [*]The party keeps earning at 25% speed for up to 12 hours while the game is closed.
 [*]Cheeky double-meaning jokes, in the spirit of the festa junina love letters.
-[*]Optional background forró music, off by default.
+[*]Optional background music (a forró, a xote, a baião and an arrasta-pé), off by default.
+[*]Optionally opens with Windows, through Steam.
 [*]Portuguese, English and Spanish.
 [/list]`
   },
@@ -58,9 +60,10 @@ Toda Animação que a festa junta vira fama aos pouquinhos, e fama traz convidad
 [list]
 [*][b]Argolas da Sorte:[/b] um minijogo de argolas com multiplicadores e prêmios exclusivos. Quanto melhor o prêmio, mais certeira tem que ser a mão.
 [*][b]A turma:[/b] pesque personagens na pescaria, como o Milho, a Cenoura, o Inhame, o Cachorro-Quente e a ultra-rara Faísca. Cada um tem um papel que muda a festa.
-[*][b]Rolês e fogueira:[/b] mande a turma buscar lenha e alimente a fogueira até ela ficar lendária.
-[*][b]Loja:[/b] chapéus, tecidos, terreiros, enfeites e barracas, com prévia na hora, direto na festa. Vista chapéu, item de mão e tecido combinando (Noiva, Noivo, Rainha do Milho, Rei do Baião...) e ganhe o bônus do conjunto.
-[*][b]Eventos da festa:[/b] balões de sorte dourados, chuva de São João com pote de ouro no fim do arco-íris, quadrilha marcada, bingo da quermesse com os apelidos dos números, quebra-pote e, nas festas maiores, um casamento na roça em que você joga arroz nos noivos.
+[*][b]Rolês e fogueira:[/b] mande a turma buscar lenha e alimente a fogueira até ela ficar lendária, ou cozinhe pamonha, curau e pé-de-moleque no Fogão a Lenha.
+[*][b]Loja:[/b] chapéus, tecidos, terreiros, varais de bandeirinhas, enfeites e barracas, com prévia na hora, direto na festa. Vista chapéu, item de mão e tecido combinando (Noiva, Noivo, Rainha do Milho, Rei do Baião...) e ganhe o bônus do conjunto.
+[*][b]Eventos da festa:[/b] balões de sorte dourados, chuva de São João com pote de ouro no fim do arco-íris, quadrilha marcada, bingo da quermesse com os apelidos dos números, quebra-pote, corrida de saco, rabo no burro, leilão de prendas disputado com a plateia, friozinho com quentão, o alto-falante da quermesse, a cobra de pano da quadrilha, o fotógrafo lambe-lambe, a dança das fitas e, nas festas maiores, um casamento na roça em que você joga arroz nos noivos e um show de drones no céu.
+[*][b]Álbum da Festa:[/b] 35 figurinhas dos momentos da festa para colecionar. Cada página completa faz a festa render mais, para sempre.
 [*][b]São João do ano que vem:[/b] chegou ao Maior São João do Mundo? Recomece no quintal com a turma e as roupas e ganhe um bônus de Tradição para sempre.
 [*][b]Correio elegante, pedidos e penetras:[/b] surpresinhas que deixam o arraiá animado.
 [*][b]Histórico:[/b] um diário e um gráfico de tudo o que a sua festa desbloqueou, e quando.
@@ -72,7 +75,8 @@ Toda Animação que a festa junta vira fama aos pouquinhos, e fama traz convidad
 [*]Arraste para onde quiser, mude o tamanho, fixe sobre as janelas ou esconda na bandeja.
 [*]Com o jogo fechado, a festa continua rendendo 25% por até 12 horas.
 [*]Piadas de duplo sentido, no espírito do correio elegante.
-[*]Música de forró de fundo opcional, desligada de fábrica.
+[*]Música de fundo opcional (um forró, um xote, um baião e um arrasta-pé), desligada de fábrica.
+[*]Abre com o Windows se você quiser, pela Steam.
 [*]Português, inglês e espanhol.
 [/list]`
   },
@@ -93,9 +97,10 @@ Toda la Animación que junta la fiesta se vuelve fama poco a poco, y la fama tra
 [list]
 [*][b]Aros de la Suerte:[/b] un minijuego de lanzar aros con multiplicadores y premios exclusivos. Cuanto mejor el premio, más firme tiene que ser tu mano.
 [*][b]La pandilla:[/b] pesca personajes en el estanque, como Maíz, Zanahoria, Ñame, Perrito Caliente y la ultra rara Chispa. Cada uno tiene un papel que cambia la fiesta.
-[*][b]Salidas y hoguera:[/b] manda a la pandilla a buscar leña y alimenta la hoguera hasta que se vuelva legendaria.
-[*][b]Tienda:[/b] sombreros, telas, suelos, adornos y puestos, con vista previa al instante en la fiesta. Viste sombrero, objeto de mano y tela a juego (Novia, Novio, Reina del Maíz, Rey del Baião...) y gana la bonificación del conjunto.
-[*][b]Eventos de la fiesta:[/b] globos de la suerte dorados, lluvia de San Juan con una olla de oro al final del arcoíris, cuadrillas marcadas, un bingo de kermés con los apodos de los números, una olla para romper y, en las fiestas más grandes, una boda campestre en la que tiras arroz a los novios.
+[*][b]Salidas y hoguera:[/b] manda a la pandilla a buscar leña y alimenta la hoguera hasta que se vuelva legendaria, o cocina pamonha, curau y pé-de-moleque en el Fogón de Leña.
+[*][b]Tienda:[/b] sombreros, telas, suelos, banderines, adornos y puestos, con vista previa al instante en la fiesta. Viste sombrero, objeto de mano y tela a juego (Novia, Novio, Reina del Maíz, Rey del Baião...) y gana la bonificación del conjunto.
+[*][b]Eventos de la fiesta:[/b] globos de la suerte dorados, lluvia de San Juan con una olla de oro al final del arcoíris, cuadrillas marcadas, un bingo de kermés con los apodos de los números, una olla para romper, carreras de sacos, la cola del burro, una subasta de premios contra el público, friíto con quentão, el altavoz de la kermés, la culebra de tela de la cuadrilla, el fotógrafo ambulante, la danza de las cintas y, en las fiestas más grandes, una boda campestre en la que tiras arroz a los novios y un show de drones en el cielo.
+[*][b]Álbum de la Fiesta:[/b] 35 estampas de momentos de la fiesta para coleccionar. Cada página completa hace que la fiesta rinda más, para siempre.
 [*][b]El San Juan del año que viene:[/b] ¿llegaste al San Juan más grande del mundo? Vuelve a empezar en el patio con tu pandilla y tu ropa y gana una bonificación de Tradición para siempre.
 [*][b]Correo del amor, pedidos y colados:[/b] pequeñas sorpresas que mantienen viva la fiesta.
 [*][b]Historial:[/b] un diario y un gráfico de todo lo que desbloqueó tu fiesta, y cuándo.
@@ -107,7 +112,8 @@ Toda la Animación que junta la fiesta se vuelve fama poco a poco, y la fama tra
 [*]Arrástrala a donde quieras, cambia su tamaño, fíjala sobre tus ventanas o escóndela en la bandeja.
 [*]Con el juego cerrado, la fiesta sigue rindiendo al 25% de velocidad hasta 12 horas.
 [*]Chistes de doble sentido, al estilo del correo del amor de las festas juninas.
-[*]Música de forró de fondo opcional, desactivada de fábrica.
+[*]Música de fondo opcional (un forró, un xote, un baião y un arrasta-pé), desactivada de fábrica.
+[*]Se abre con Windows si quieres, por Steam.
 [*]Portugués, inglés y español.
 [/list]`
   }

@@ -3,10 +3,10 @@
   const dict = {
     ui: {
       'tab.festa': 'Fiesta', 'tab.historico': 'Historial', 'tab.conquistas': 'Logros', 'tab.ajustes': 'Ajustes',
-      'tab.turma': 'Pandilla', 'tab.pescaria': 'Pesca', 'tab.roles': 'Salidas', 'tab.fogueira': 'Hoguera',
+      'tab.turma': 'Pandilla', 'tab.pescaria': 'Pesca', 'tab.roles': 'Salidas', 'tab.cozinha': 'Cocina', 'tab.fogueira': 'Hoguera',
       'tab.bingo': 'Bingo de la kermés', 'tab.correio': 'Correo del amor', 'tab.teste': 'Modo de prueba',
       'dock.conjuntos': 'Conjuntos', 'dock.melhorias': 'Mejoras', 'dock.chapeu': 'Sombreros', 'dock.mao': 'En la mano', 'dock.tecido': 'Telas',
-      'dock.terreiro': 'Suelos', 'dock.lado': 'Puestos',
+      'dock.terreiro': 'Suelos', 'dock.lado': 'Puestos', 'dock.varal': 'Banderines',
 
       'num.thousand': '{n} mil', 'num.million': '{n} M', 'num.billion': '{n} mil M', 'num.trillion': '{n} B',
       'count.of': '{n} de {total}',
@@ -18,7 +18,7 @@
       'lock.note': '🔒 Se desbloquea cuando la fiesta sea <b>{tier}</b> ({size} invitados). Ahora: {now}.',
 
       'hud.frenzy': 'Frenesí ×{mult}', 'hud.frenzyTitle': 'Todo rinde más mientras dure', 'hud.year': 'año {n}', 'hud.bingo': 'Bingo {n}/{total}', 'hud.bingoTitle': 'Casillas marcadas en tu cartón de bingo', 'hud.wedding': 'Boda', 'hud.weddingTitle': 'Haz clic en los novios para tirar arroz', 'hud.quadrilha': 'Cuadrilla +{v}%', 'hud.quadrilhaTitle': 'La cuadrilla marcada rinde más mientras dure',
-      'day.antonio': 'Día de San Antonio', 'day.joao': 'Día de San Juan', 'day.pedro': 'Día de San Pedro', 'hud.day': '{name} +{v}%',
+      'day.namorados': 'Día de los Enamorados', 'day.antonio': 'Día de San Antonio', 'day.joao': 'Día de San Juan', 'day.pedro': 'Día de San Pedro', 'day.julina': 'Fiesta Julina', 'day.aniversario': 'el cumpleaños de la fiesta', 'hud.day': '{name} +{v}%',
       'hud.nextTitle': 'Cada invitado nuevo pone una pieza en el escenario',
       'hud.next': 'El próximo invitado trae: <b>{piece}</b>',
       'hud.shop': 'Tienda y mejoras',
@@ -30,7 +30,7 @@
       'shop.buyTicket': '+1 ficha', 'shop.close': 'Cerrar la vitrina', 'shop.hold': 'Mantén para comprar varios',
       'shop.upgrade': 'Mejorar', 'shop.drag': 'Arrastra hacia los lados', 'shop.sideLeft': '◀ Izquierdo', 'shop.sideRight': 'Derecho ▶',
       'shop.inUse': 'En uso', 'shop.use': 'Usar', 'shop.place.esquerda': 'Poner a la izquierda', 'shop.place.direita': 'Poner a la derecha',
-      'shop.onlyWedding': 'Solo en bodas', 'shop.onlyAuction': 'Solo en la subasta', 'shop.sets': 'Conjuntos: {list}',
+      'shop.onlyWedding': 'Solo en bodas', 'shop.onlyAuction': 'Solo en la subasta', 'shop.onlySnake': 'Atrapando la culebra', 'shop.sets': 'Conjuntos: {list}',
       'shop.set': 'Conjunto {name} (+{v}%): {pieces}',
       'shop.setMissingOne': 'Falta 1',
       'shop.setMissing': 'Faltan {n}',
@@ -67,7 +67,7 @@
       'party.host': 'Anfitriona', 'party.name': 'Nombre',
       'party.panelHint': 'Los botones del letrero abren la tienda, los Aros y cada parte de la fiesta (pandilla, pesca, ' +
         'salidas, hoguera, correo). Este panel guarda los números, los logros y los ajustes.',
-      'party.photo': 'Foto de la fiesta', 'party.yield': 'Cómo rinde la fiesta',
+      'party.photo': 'Foto de la fiesta', 'party.portrait': 'Retrato', 'party.yield': 'Cómo rinde la fiesta',
       'party.perStep': 'Animación por paso', 'party.stepsPerSecond': 'Pasos por segundo', 'party.stamina': 'Aliento',
       'party.staminaValue': '{n} pasos', 'party.rest': 'Descanso', 'party.perSecond': 'Promedio por segundo',
       'party.multipliers': 'Multiplicadores', 'party.growth': 'Tamaño de la Mandioca',
@@ -77,7 +77,7 @@
       'growth.goldenName': 'Mandioca legendaria', 'growth.golden': 'Tamaño máximo, todos los pasos y la hoguera legendaria: ella brilla.',
       'growth.max': 'Ya tiene el tamaño máximo. Cada tamaño rinde más por paso.',
       'log.grow': 'La Mandioca creció: {stage}', 'log.learn': 'Paso nuevo: {name}',
-      'party.set': 'Conjunto', 'party.tradition': 'Tradición', 'party.trio': 'Trío pie de sierra', 'clicks.title': 'Puedes hacer clic', 'clicks.list': 'Mandioca: un mimo (y pasos gratis)|Globo dorado, la olla de oro del arcoíris y la olla de barro: premios|Carrera de sacos: el corredor de la franja roja salta con cada clic (con ritmo)|Subastador en el escenario: una puja por clic|Los novios en la boda: arroz (más arroz, mejor regalo)|Pedidos y colados|Puestos: Aros, Pesca, Correo; el de Besos da fichas|Hoguera y escenario: abren la hoguera y la pandilla|Animales, niños, faroles que suben, el tren, la noria, el carrusel, la capilla, la luna y la cometa: solo para ver cómo reaccionan',
+      'party.set': 'Conjunto', 'party.tradition': 'Tradición', 'party.trio': 'Trío pie de sierra', 'clicks.title': 'Puedes hacer clic', 'clicks.list': 'Mandioca: un mimo (y pasos gratis)|Globo dorado, la olla de oro del arcoíris y la olla de barro: premios|Carrera de sacos: el corredor de la franja roja salta con cada clic (con ritmo)|Cuadro de la cola del burro: haz clic en el momento justo|Culebra de tela en la cuadrilla: atrápala antes de que se escape|Subastador en el escenario: una puja por clic|Los novios en la boda: arroz (más arroz, mejor regalo)|Acordeonista Andariego (raro): salúdalo y gana fichas|Fotógrafo ambulante (raro): haz clic y gana el retrato de la fiesta|Carreta de bueyes (al fondo): el carretero deja leña|Banderita suelta en el viento: atrápala antes de que caiga|Compadres de hoguera: haz clic y sé el testigo|Fogón de Leña: abre la cocina (haz clic en el plato listo encima para servirlo)|Pedidos y colados|Puestos: Aros, Pesca, Correo; el de Besos da fichas|Hoguera y escenario: abren la hoguera y la pandilla|El suelo de la fiesta: tira un petardito|La pareja de la Mandioca, animales, niños, faroles que suben, el tren, la furgoneta de la pamonha, el burro, la noria, el carrusel, la capilla, la luna y la cometa: solo para ver cómo reaccionan',
       'party.dances': 'Pasos de baile',
       'dances.title': 'Repertorio', 'dances.count': '{n} de {total} pasos', 'dances.locked': 'Lo aprende tras {n} pasos bailados',
       'dances.unlockAt': '{n} pasos',
@@ -111,7 +111,7 @@
       'outing.recall': 'Llamar de vuelta', 'outing.returned': '¡{name} volvió!', 'outing.claim': 'Tomar la leña',
       'outing.prize': ' · {chance} de probabilidad de {item}', 'outing.info': '{time} · {n} de leña (más con raros){prize}',
 
-      'fire.subtitle': 'La leña de las salidas alimenta la hoguera. Con {n} mejoras se vuelve legendaria.',
+      'cook.subtitle': 'Un plato a la vez en el Fogón de Leña. Servido, anima la fiesta por un rato.', 'cook.needStove': 'Pon el Fogón de Leña a un lado de la fiesta (tienda, pestaña de adornos) para cocinar.', 'cook.empty': 'La olla está vacía. ¡Elige un plato y enciende el fuego!', 'cook.cooking': '{dish} al fuego: listo en {time}.', 'cook.ready': '¡{dish} está listo!', 'cook.serve': 'Servir', 'cook.cook': 'Cocinar', 'cook.busy': 'Olla ocupada', 'cook.info': '+{v}% en todo por {buff} · {time} al fuego', 'cook.active': 'Servido: {dish}, +{v}% en todo por {time} más.', 'cook.replace': 'Servir otro plato reemplaza el que está activo.', 'cook.canjica': 'Canjica está en el fogón: todo se cocina en la mitad del tiempo.', 'cook.stats': 'Platos servidos: {n}', 'fire.subtitle': 'La leña de las salidas alimenta la hoguera. Con {n} mejoras se vuelve legendaria.',
       'fire.goal': 'Rumbo a la hoguera legendaria', 'fire.legendary': 'La hoguera es legendaria: toda la Animación se duplica.',
       'fire.progress': '{n} de {total} mejoras.', 'fire.spark': 'Chispa cuida el fuego: la Llamarada dura más.',
 
@@ -120,9 +120,9 @@
       'mail.opened': 'Cartas abiertas: {n}.', 'mail.ok': 'Qué tierno',
 
       'ach.done': 'Hecho', 'ach.todo': 'Pendiente',
-      'goals.title': 'Metas de la fiesta', 'goals.achievements': 'Logros',
+      'goals.title': 'Metas de la fiesta', 'goals.achievements': 'Logros', 'album.title': 'Álbum de la Fiesta', 'album.hint': 'Cada momento vivido pega una estampa. Página completa: +{v}% en todo para siempre y {n} fichas ({pages} de {total} completas).', 'album.missing': 'Todavía no',
       'goals.hint': 'Cumple la meta y cóbrala para ganar fichas. Entra una meta nueva en su lugar.',
-      'goals.claim': 'Cobrar', 'goals.reward': '{tickets} fichas', 'goals.wood': '{wood} de leña',
+      'goals.claim': 'Cobrar', 'goals.swap': 'Cambiar', 'goals.swapTitle': 'Cambiar por otra meta ({n} ficha)', 'goals.reward': '{tickets} fichas', 'goals.wood': '{wood} de leña',
       'goal.steps': { one: 'Bailar {n} paso', other: 'Bailar {n} pasos' },
       'goal.guests': { one: 'Recibir {n} invitado nuevo', other: 'Recibir {n} invitados nuevos' },
       'goal.levels': { one: 'Comprar {n} mejora', other: 'Comprar {n} mejoras' },
@@ -133,15 +133,18 @@
       'goal.rings': { one: 'Jugar {n} ronda de Aros', other: 'Jugar {n} rondas de Aros' },
       'goal.outings': { one: 'Cobrar {n} salida', other: 'Cobrar {n} salidas' },
       'goal.crashers': { one: 'Echar {n} colado', other: 'Echar {n} colados' },
+      'goal.sacos': { one: 'Correr {n} carrera de sacos', other: 'Correr {n} carreras de sacos' },
+      'goal.potes': { one: 'Romper {n} olla', other: 'Romper {n} ollas' },
+      'goal.lances': { one: 'Hacer {n} puja en la subasta', other: 'Hacer {n} pujas en la subasta' }, 'goal.cobras': { one: 'Atrapar {n} culebra de tela en la cuadrilla', other: 'Atrapar {n} culebras de tela en la cuadrilla' }, 'goal.burros': { one: 'Clavar {n} cola del burro', other: 'Clavar {n} colas del burro' }, 'goal.fantasias': { one: 'Participar en {n} concurso de disfraces', other: 'Participar en {n} concursos de disfraces' }, 'goal.compadres': { one: 'Ser testigo de {n} pacto de compadres de hoguera', other: 'Ser testigo de {n} pactos de compadres de hoguera' }, 'goal.pratos': { one: 'Servir {n} plato del Fogón de Leña', other: 'Servir {n} platos del Fogón de Leña' },
 
       'settings.size': 'Tamaño del juego', 'settings.sizeHint': 'O arrastra el botón de tamaño del letrero de la fiesta (un clic vuelve al 100%).',
       'settings.sound': 'Sonido', 'settings.soundOn': 'Activado', 'settings.soundOff': 'Desactivado', 'settings.volume': 'Volumen',
       'settings.perf': 'Rendimiento', 'settings.perf.suave': 'Suave (60)', 'settings.perf.normal': 'Normal (30)',
       'settings.perf.economia': 'Ahorro (20)',
       'settings.music': 'Música', 'settings.musicOn': 'Activada', 'settings.musicOff': 'Desactivada',
-      'settings.musicHint': 'Un forró de fondo, en bucle. Usa el volumen del sonido y se calla con la fiesta oculta.', 'settings.startup': 'Abrir con Windows', 'settings.startupOn': 'Activado', 'settings.startupOff': 'Desactivado', 'settings.startupHint': 'La fiesta se abre sola (por Steam) cuando inicias sesión en Windows.',
+      'settings.musicHint': 'Un forró, un xote, un baião y un arrasta-pé de fondo, uno tras otro. Usa el volumen del sonido y se calla con la fiesta oculta.', 'settings.startup': 'Abrir con Windows', 'settings.startupOn': 'Activado', 'settings.startupOff': 'Desactivado', 'settings.startupHint': 'La fiesta se abre sola (por Steam) cuando inicias sesión en Windows.',
       'settings.flash': 'Relámpagos', 'settings.flashOn': 'Con destello', 'settings.flashOff': 'Sin destello',
-      'settings.flashHint': 'En la lluvia de San Juan, el relámpago ilumina la fiesta por un instante. Desactívalo si prefieres sin destellos.',
+      'settings.flashHint': 'En la lluvia de San Juan, el relámpago ilumina la fiesta por un instante. Desactívalo si prefieres sin destellos.', 'settings.calm': 'Letreros', 'settings.calmOff': 'Todos', 'settings.calmOn': 'Menos letreros', 'settings.calmHint': 'Menos letreros oculta los números de los pasos y la charla del público (los avisos de los eventos siguen). Ideal para trabajar con la fiesta en pantalla.',
       'settings.perfHint': 'Cuántos cuadros por segundo dibuja la fiesta con el juego en foco (menos de fondo). Menos cuadros gastan menos de tu computadora.',
       'settings.soundHint': 'Efectos de la fiesta: compras, aros, pesca, invitados nuevos y logros.',
       'settings.window': 'Ventana', 'settings.pinned': 'Fijada sobre las ventanas', 'settings.behind': 'Detrás de las ventanas',
@@ -163,7 +166,7 @@
       'stats.playtime': 'Tiempo de fiesta', 'stats.steps': 'Pasos bailados', 'stats.cheerEarned': 'Animación de toda la fiesta',
       'stats.cheerSpent': 'Animación gastada', 'stats.fished': 'Premios pescados', 'stats.outings': 'Salidas',
       'stats.requests': 'Pedidos atendidos', 'stats.crashers': 'Colados echados', 'stats.ringRounds': 'Rondas en los Aros',
-      'stats.ringHits': 'Aros encajados', 'stats.pokes': 'Mimos a la Mandioca', 'stats.balloons': 'Globos de la suerte', 'stats.bingos': 'Bingos', 'stats.contests': 'Concursos de cuadrilla (victorias)', 'stats.potes': 'Ollas rotas', 'stats.sacos': 'Carreras de sacos (victorias)', 'stats.leiloes': 'Premios ganados en la subasta', 'stats.weddings': 'Bodas campestres', 'stats.rainbows': 'Ollas de oro halladas', 'stats.goals': 'Metas cumplidas',
+      'stats.ringHits': 'Aros encajados', 'stats.pokes': 'Mimos a la Mandioca', 'stats.balloons': 'Globos de la suerte', 'stats.bingos': 'Bingos', 'stats.contests': 'Concursos de cuadrilla (victorias)', 'stats.potes': 'Ollas rotas', 'stats.sacos': 'Carreras de sacos (victorias)', 'stats.leiloes': 'Premios ganados en la subasta', 'stats.quentao': 'Quentão vendido en el frío', 'stats.visitors': 'Acordeonistas saludados', 'stats.cobras': 'Culebras de tela atrapadas', 'stats.fotos': 'Retratos del fotógrafo ambulante', 'stats.burros': 'Cola del burro (en el blanco)', 'stats.fantasias': 'Concursos de disfraces (victorias)', 'stats.compadres': 'Compadres de hoguera atestiguados', 'stats.dishes': 'Platos servidos del Fogón de Leña', 'stats.weddings': 'Bodas campestres', 'stats.rainbows': 'Ollas de oro halladas', 'stats.goals': 'Metas cumplidas',
 
       'history.chartLabel': 'Invitados y desbloqueos por tiempo de juego',
       'history.axisGuests': 'invitados', 'history.axisTime': 'tiempo de juego',
@@ -194,14 +197,14 @@
       'log.year': 'Empezó el {n}.º San Juan (Tradición +{v}%)',
       'log.daily': 'Visita del día: +{n} fichas ({streak} días seguidos)',
       'log.contest': 'Concurso de cuadrilla: {place}.º lugar, promedio {avg}, +{tickets} fichas',
-      'log.pote': 'Quiebra de la olla: +{n} de Animación y {tickets} fichas', 'log.saco.1': 'Carrera de sacos: ¡primer lugar en {s} s! +{n} de Animación y {tickets} fichas', 'log.saco.2': 'Carrera de sacos: segundo lugar. +{n} de Animación y 1 ficha', 'log.saco.3': 'Carrera de sacos: último lugar. +{n} de Animación', 'log.leilao': 'Ganó {item} en la subasta por {price} fichas', 'log.leilaoCheer': 'Ganó {n} de Animación en la subasta por {price} fichas',
+      'log.pote': 'Quiebra de la olla: +{n} de Animación y {tickets} fichas', 'log.saco.1': 'Carrera de sacos: ¡primer lugar en {s} s! +{n} de Animación y {tickets} fichas', 'log.saco.2': 'Carrera de sacos: segundo lugar. +{n} de Animación y 1 ficha', 'log.saco.3': 'Carrera de sacos: último lugar. +{n} de Animación', 'log.leilao': 'Ganó {item} en la subasta por {price} fichas', 'log.visitor': 'Saludó al Acordeonista Andariego: +{tickets} fichas', 'log.cobra': 'Atrapó la culebra de tela de la cuadrilla: +{n} de Animación', 'log.foto': 'Retrato con el fotógrafo ambulante: +{tickets} fichas', 'log.compadres': 'Fue testigo de los compadres de hoguera: +{n} de Animación', 'log.cozinha': 'Sirvió {dish} del Fogón de Leña', 'log.flag': 'Atrapó una banderita que soltó el viento: +1 ficha', 'log.cartWood': 'Carreta de bueyes: +{n} de leña', 'log.fantasia.1': 'Concurso de disfraces: 1.er lugar, +{tickets} fichas', 'log.fantasia.2': 'Concurso de disfraces: 2.º lugar, +{tickets} fichas', 'log.fantasia.3': 'Concurso de disfraces: 3.er lugar, +{tickets} ficha', 'log.burro.mosca': 'Cola del burro en la X: +{n} de Animación y {tickets} fichas', 'log.burro.perto': 'Cola del burro cerca de la X: +{n} de Animación y 1 ficha', 'log.burro.longe': 'Cola del burro lejos de la X: +{n} de Animación', 'log.burro.fora': 'Cola del burro fuera del burro: +{n} de Animación', 'log.leilaoCheer': 'Ganó {n} de Animación en la subasta por {price} fichas',
       'log.wedding': 'Boda campestre: {rice} puñados de arroz, +{n} de Animación y {tickets} fichas',
       'log.rainbow': 'Olla de oro del arcoíris: +{n} de Animación y {tickets} fichas',
       'log.balloon.frenzy': 'Globo de la suerte: frenesí ×{mult} por {s} s', 'log.balloon.cheer': 'Globo de la suerte: +{n} de Animación',
       'log.balloon.tickets': 'Globo de la suerte: +{n} fichas', 'log.balloon.wood': 'Globo de la suerte: +{n} de leña',
       'log.fishingOpen': 'Se abrió la pesca', 'log.debug': 'Prueba: {note}',
 
-      'debug.subtitle': 'Atajos para probar el juego. Todo lo que sale de aquí queda marcado como prueba en el Historial.',
+      'debug.callCook': 'Plato listo', 'debug.subtitle': 'Atajos para probar el juego. Todo lo que sale de aquí queda marcado como prueba en el Historial.',
       'debug.plusMinutes': '+{n} min', 'debug.plusHours': { one: '+{n} hora', other: '+{n} horas' },
       'debug.plusDays': { one: '+{n} día', other: '+{n} días' },
       'debug.cheerNote': 'Lo que rinde la fiesta en el tiempo elegido (ahora: {rate}/s). Va directo al saldo, sin volverse fama.',
@@ -212,7 +215,7 @@
       'debug.timeNote': 'La fiesta corre de verdad en ese tiempo: baila, rinde, y los relojes (pesca, cartas, salidas, ' +
         'pedidos, precio de los Aros) avanzan también. No compra nada sola.',
       'debug.crewBooths': 'Pandilla y puestos', 'debug.atParty': 'En la fiesta',
-      'debug.callBingo': 'Cartón de bingo', 'debug.bingo': 'Cartón de bingo', 'debug.callContest': 'Concurso de cuadrilla', 'debug.concurso': 'Concurso de cuadrilla', 'debug.callPote': 'Colgar la olla', 'debug.pote': 'Olla colgada', 'debug.callSaco': 'Carrera de sacos', 'debug.saco': 'Carrera de sacos', 'debug.callLeilao': 'Subasta de premios', 'debug.leilao': 'Subasta de premios', 'debug.callWedding': 'Hacer una boda', 'debug.casamento': 'Boda campestre', 'debug.callQuadrilha': 'Marcar la cuadrilla', 'debug.quadrilha': 'Cuadrilla marcada', 'debug.doneGoals': 'Cumplir las metas', 'debug.metas': 'Metas cumplidas', 'debug.callRain': 'Hacer llover', 'debug.chuva': 'Empezó a llover', 'debug.callBalloon': 'Llamar un globo dorado', 'debug.balao': 'Llegó un globo dorado', 'debug.callRequest': 'Llamar un pedido', 'debug.callCrasher': 'Llamar un colado', 'debug.cheapRings': 'Aros a 1 ficha',
+      'debug.callBingo': 'Cartón de bingo', 'debug.bingo': 'Cartón de bingo', 'debug.callContest': 'Concurso de cuadrilla', 'debug.concurso': 'Concurso de cuadrilla', 'debug.callPote': 'Colgar la olla', 'debug.pote': 'Olla colgada', 'debug.callSaco': 'Carrera de sacos', 'debug.saco': 'Carrera de sacos', 'debug.callAnnounce': 'Aviso del altavoz', 'debug.aviso': 'Aviso del altavoz', 'debug.callCold': 'Friíto', 'debug.frio': 'Friíto', 'debug.callVisitor': 'Acordeonista Andariego', 'debug.callSnake': 'Ojo, la culebra', 'debug.callPhotographer': 'Fotógrafo ambulante', 'debug.callBurro': 'Cola del burro', 'debug.callFantasia': 'Concurso de disfraces', 'debug.sanfoneiro': 'Acordeonista Andariego', 'debug.callLeilao': 'Subasta de premios', 'debug.leilao': 'Subasta de premios', 'debug.callWedding': 'Hacer una boda', 'debug.casamento': 'Boda campestre', 'debug.callQuadrilha': 'Marcar la cuadrilla', 'debug.quadrilha': 'Cuadrilla marcada', 'debug.doneGoals': 'Cumplir las metas', 'debug.metas': 'Metas cumplidas', 'debug.callRain': 'Hacer llover', 'debug.chuva': 'Empezó a llover', 'debug.callBalloon': 'Llamar un globo dorado', 'debug.balao': 'Llegó un globo dorado', 'debug.callRequest': 'Llamar un pedido', 'debug.callCrasher': 'Llamar un colado', 'debug.cheapRings': 'Aros a 1 ficha',
       'debug.animacao': 'Animación extra', 'debug.fichas': '+{n} fichas', 'debug.lenha': '+{n} de leña',
       'debug.convidados': '+{n} invitados', 'debug.time': 'Pasaron {n} min de fiesta',
       'debug.prendas': 'Premios listos', 'debug.cartas': 'Cartas listas', 'debug.roles': 'Salidas listas',
@@ -223,7 +226,7 @@
       'app.canvas': 'La fiesta junina de Mandioca', 'app.shopLabel': 'Vitrina de compras', 'app.panelLabel': 'Panel de la fiesta',
       'app.windowLabel': 'Ventana de la fiesta', 'app.tabsLabel': 'Pestañas', 'app.closeEsc': 'Cerrar (Esc)',
       'app.saveFailedHere': 'No pude guardar la fiesta en esta computadora.', 'app.saveFailed': 'No pude guardar la fiesta.',
-      'app.onlyOutings': '{item} solo aparece en las salidas.', 'app.onlyRings': '{item} solo sale en los Aros de la Suerte.', 'app.onlyWedding': '{item} solo llega como regalo de boda.', 'app.onlyAuction': '{item} solo se vende en la subasta de premios.',
+      'app.onlyOutings': '{item} solo aparece en las salidas.', 'app.onlyRings': '{item} solo sale en los Aros de la Suerte.', 'app.onlyWedding': '{item} solo llega como regalo de boda.', 'app.onlyAuction': '{item} solo se vende en la subasta de premios.', 'app.onlySnake': '{item} solo sale atrapando la culebra que cruza la cuadrilla.', 'app.fotografo': '¡Llegó el fotógrafo ambulante! Haz clic en él para el retrato de la fiesta.', 'app.fotoTitle': 'Retrato de la fiesta', 'app.fotoTickets': 'El fotógrafo se lució: +{n} fichas.', 'app.fotoSave': 'Guardar foto', 'app.fotoOk': '¡Qué bonito!', 'app.burro': '¡La cola del burro! Haz clic en el cuadro para clavarla: cuanto más cerca de la X, mejor.', 'app.fantasiaSoon': '¡Concurso de disfraces en {s} s! Viste bien a la Mandioca: un conjunto completo y piezas raras valen más.', 'app.compadres': '¡Fuiste testigo de los compadres de hoguera! +{n} de Animación.', 'app.cookStart': '¡{dish} al fuego!', 'app.cookReady': '¡{dish} listo! Haz clic en el plato sobre el fogón para servirlo.', 'app.cookServed': '¡{dish} servido: +{v}% en todo por {n} min!', 'app.wake': 'Mientras la fiesta estuvo en pausa ({time}), rindió +{n} de Animación.', 'app.flag': '¡Atrapaste la banderita que soltó el viento: +{n} ficha!', 'app.cartWood': '¡El carretero dejó {n} de leña para la hoguera!', 'app.fantasia.1': 'Concurso de disfraces: ¡1.er lugar con promedio {avg}! +{tickets} fichas y {n} de Animación.', 'app.fantasia.2': 'Concurso de disfraces: 2.º lugar con promedio {avg}. +{tickets} fichas y {n} de Animación.', 'app.fantasia.3': 'Concurso de disfraces: 3.er lugar con promedio {avg}. +{tickets} ficha y {n} de Animación. ¡Un conjunto completo ayuda!', 'app.burroPin.mosca': '¡En el blanco! Justo en la X: +{n} de Animación y {tickets} fichas.', 'app.burroPin.perto': '¡Casi! Pegadita a la X: +{n} de Animación y 1 ficha.', 'app.burroPin.longe': 'Lejos de la X, pero bien: +{n} de Animación.', 'app.burroPin.fora': '¡Clavaste la cola fuera del burro! El público se rió: +{n} de Animación.', 'app.cobra': '¡Ojo, la culebra! Haz clic antes de que se escape de la pista.', 'app.cobraCaught': '¡Atrapaste la culebra! Es de tela. +{n} de Animación.', 'app.cobraGift': 'Y ahora es tuya: {name}!',
       'app.unlocksAt': 'Se desbloquea cuando la fiesta sea {tier}.', 'app.needTickets': 'Faltan fichas: {item} cuesta {n}.',
       'app.yours': '¡{item} es tuyo!', 'app.needCheer': 'Falta Animación.', 'app.levels': '¡+{n} niveles!',
       'app.browserClose': 'En el navegador, solo cierra la pestaña.',
@@ -260,8 +263,8 @@
       'records.maior': 'Récords: San Juan Más Grande en {time} de fiesta; la fiesta más llena, {size} invitados.',
       'app.record': '¡Récord! San Juan Más Grande en {time} (antes: {before}).',
       'app.pote': '¡Quiebra la olla! Haz clic en la olla colgada para darle golpes antes de que se vaya.',
-      'app.poteBreak': 'La olla se rompió y llovieron dulces: +{n} de Animación y {tickets} fichas.', 'app.saco': '¡Carrera de sacos! Haz clic en el corredor de la franja roja para largar y saltar. Con ritmo: el salto apurado termina en tropiezo.', 'app.sacoEnd.1': '¡Primer lugar en la carrera de sacos ({s} s)! +{n} de Animación y {tickets} fichas.', 'app.sacoEnd.2': 'Segundo lugar en la carrera de sacos: +{n} de Animación y 1 ficha.', 'app.sacoEnd.3': 'Llegó último en la carrera de sacos, pero llegó: +{n} de Animación.', 'app.leilao': '¡Subasta de premios en el escenario: {prize}! Haz clic en el subastador para pujar (empieza en {n} fichas). ¡El público también puja!', 'app.leilaoPrizeCheer': '{n} de Animación', 'app.leilaoWon': '¡Ganaste {prize} por {price} fichas!', 'app.leilaoLost': 'El público se llevó {prize} por {price} fichas.', 'app.leilaoBroke': 'Faltan fichas: la próxima puja es {n}.',
-      'app.hint.music': 'Consejo: en Ajustes > Sonido hay una música de forró de fondo (desactivada de fábrica).',
+      'app.poteBreak': 'La olla se rompió y llovieron dulces: +{n} de Animación y {tickets} fichas.', 'app.saco': '¡Carrera de sacos! Haz clic en el corredor de la franja roja para largar y saltar. Con ritmo: el salto apurado termina en tropiezo.', 'app.sacoEnd.1': '¡Primer lugar en la carrera de sacos ({s} s)! +{n} de Animación y {tickets} fichas.', 'app.sacoEnd.2': 'Segundo lugar en la carrera de sacos: +{n} de Animación y 1 ficha.', 'app.sacoEnd.3': 'Llegó último en la carrera de sacos, pero llegó: +{n} de Animación.', 'app.leilao': '¡Subasta de premios en el escenario: {prize}! Haz clic en el subastador para pujar (empieza en {n} fichas). ¡El público también puja!', 'app.leilaoPrizeCheer': '{n} de Animación', 'app.leilaoWon': '¡Ganaste {prize} por {price} fichas!', 'app.leilaoLost': 'El público se llevó {prize} por {price} fichas.', 'app.leilaoBroke': 'Faltan fichas: la próxima puja es {n}.', 'app.visitor': '¡Un acordeonista andariego está pasando por la fiesta! Mientras toca, todo rinde +{v}%. Haz clic en él para saludarlo.', 'app.visitorGreet': 'El acordeonista agradece el saludo: +{n} fichas.', 'hud.visitorTitle': 'Acordeonista andariego tocando: haz clic en él para saludarlo.', 'hud.cook': '{dish} +{v}%', 'hud.cookTitle': 'Plato del Fogón de Leña: todo rinde más mientras dura.', 'hud.foto': '¡Fotógrafo!', 'hud.fotoTitle': 'El fotógrafo ambulante espera tu pose: haz clic en él.', 'hud.burro': '¡Cola del burro!', 'hud.burroTitle': 'El cuadro de la cola del burro está en la fiesta: haz clic en él.', 'hud.fantasia': '¡Disfraces!', 'hud.fantasiaTitle': 'Llega un concurso de disfraces: cambia la ropa de la Mandioca en la tienda antes de los jueces.', 'hud.countdown': { one: '¡Falta {n} día para San Juan!', other: '¡Faltan {n} días para San Juan!' }, 'hud.visitor': 'Acordeonista +{v}%', 'news.title': '¡Novedades en la fiesta!', 'news.1': 'Álbum de la Fiesta: 35 estampas de momentos de la fiesta para coleccionar (Panel > Logros). Una página completa da +2% para siempre.', 'news.2': 'Carrera de sacos, la cola del burro, subasta de premios, friíto con quentão, el altavoz de la kermés, la culebra de tela de la cuadrilla (¡atrápala!), el fotógrafo ambulante y el raro Acordeonista Andariego.', 'news.3': 'Banderines en la tienda, el burro de la manta azul y, en las fiestas enormes, la furgoneta de la pamonha.', 'news.4': 'Boi-bumbá, balancé, pisa la flor, ciranda y xaxado: ahora son 20 pasos de baile. Y Mandioca pone ojos de corazón, de estrella y de felicidad.', 'news.5': 'Metas nuevas (y se pueden cambiar), adornos que ayudan, fiestas julinas en julio, abrir con Windows y tres músicas más (un xote, un baião y un arrasta-pé).', 'news.6': 'Haz clic en el suelo para tirar un petardito y en la pareja de la Mandioca para un mimo. Pandero y mástil nuevos, 60 cartitas, Día de los Enamorados y la opción Menos letreros en Ajustes.', 'news.7': 'Concurso de disfraces, Canjica cocinando en el Fogón de Leña, la danza de las cintas en el mástil, palomas ala blanca en el cielo y, en El San Juan Más Grande del Mundo, un show de drones.', 'news.8': 'Cocina del Fogón de Leña: pamonha, curau y pé-de-moleque que animan la fiesta. ¡Y además los compadres de hoguera (haz clic y sé el testigo) y Cocada, la poeta del Puesto de Cordel!', 'news.ok': '¡A la fiesta!', 'app.goalSwapped': 'Meta nueva: {goal}.', 'app.needTicketsSwap': 'Cambiar una meta cuesta {n} ficha.', 'hud.leilaoTitle': 'Subasta en el escenario: haz clic en el subastador para pujar.', 'hud.leilao.open': 'Subasta: {n}?', 'hud.leilao.voce': 'Subasta: {n} (tuya)', 'hud.leilao.plateia': 'Subasta: {n} (público)', 'hud.sacoTitle': 'Carrera de sacos: haz clic en el corredor de la franja roja, con ritmo.', 'hud.saco': '¡Carrera de sacos!', 'hud.coldTitle': 'Friíto: un Barril de Quentão a un lado vendería quentão.', 'hud.coldQuentao': 'Friíto: el Barril de Quentão está vendiendo quentão (fichas).', 'hud.cold': 'Friíto', 'app.sticker': '¡Estampa nueva en el Álbum (Panel > Logros): {name}!', 'app.albumPage': '¡Página "{name}" completa en el Álbum: +{v}% para siempre y {n} fichas!', 'app.cold': '¡Refrescó! Un Barril de Quentão a un lado de la fiesta vendería quentão en el frío (una ficha por trago).', 'app.coldQuentao': '¡Refrescó! El Barril de Quentão venderá quentão mientras dure el frío: una ficha por trago.', 'app.coldEnd': 'Pasó el frío. El Barril de Quentão vendió {n} tragos: +{n} fichas.',
+      'app.hint.music': 'Consejo: en Ajustes > Sonido hay música de fondo, un forró, un xote, un baião y un arrasta-pé (desactivada de fábrica).', 'app.hint.cozinha': 'Consejo: desde la Fiesta de la Ciudad, ¡el Fogón de Leña cocina! Haz clic en él (o en la olla del letrero) para hacer pamonha, curau y pé-de-moleque con la leña de las salidas.', 'app.hint.chao': 'Consejo: haz clic en el suelo de la fiesta para tirar un petardito, y en la pareja de la Mandioca para un mimo.', 'app.hint.calmo': 'Consejo: ¿demasiado texto en pantalla? En Ajustes, Menos letreros oculta los números de los pasos y la charla del público.',
       'app.hint.sets': 'Consejo: un sombrero, un objeto de mano y una tela a juego forman un conjunto con bonificación. Mira la pestaña Conjuntos de la tienda.',
       'app.wedding': '¡Boda campestre! Haz clic en los novios para tirar arroz.',
       'app.weddingGift': '¡Regalo de los novios: {name}!',
@@ -284,7 +287,7 @@
       'app.importFailed': 'No se pudo importar: el archivo no es una partida válida de este juego.',
       'app.saveIgnored': 'Partida ignorada: el archivo estaba dañado o es de otra versión.',
       'app.welcomeBack': '¡La fiesta siguió sin ti!',
-      'app.welcomeBackText': 'En {time} fuera, la pandilla rindió <b>{n}</b> de Animación.',
+      'app.welcomeBackText': 'En {time} fuera, la pandilla rindió <b>{n}</b> de Animación.', 'app.welcomeGuests': { one: '¡Y llegó <b>{n}</b> invitado nuevo!', other: '¡Y llegaron <b>{n}</b> invitados nuevos!' },
       'app.welcomeBunny': 'Sopinha cuidó la fiesta: +{v}%.',
       'app.welcomeRule': 'Con el juego cerrado, la fiesta rinde el {v}% de lo normal hasta {h} horas.',
       'app.welcomeCapped': 'Estuviste fuera más de {h} horas: la fiesta rinde el {v}% de lo normal solo las primeras {h} y luego te espera.', 'app.welcomeBackOk': 'A bailar',
@@ -299,7 +302,7 @@
 
       'fx.cobra': 'OJO, LA CULEBRA!', 'fx.phew': 'UF!', 'fx.ember': 'BRASA VIVA!', 'fx.flare': 'LLAMARADA!',
       'fx.guests': { one: '+{n} INVITADO', other: '+{n} INVITADOS' }, 'fx.preview': 'VISTA PREVIA',
-      'fx.poke.0': 'JIJI!', 'fx.poke.1': 'EPA!', 'fx.poke.2': 'COSQUILLAS!', 'fx.specialDay': 'FELIZ FIESTA JUNINA!', 'fx.frenzy': 'FRENESI!', 'fx.bingo': 'BINGO!', 'fx.bingoNumber': 'NUMERO {n}!', 'fx.bingoCall.1': 'EMPIEZA EL JUEGO!', 'fx.bingoCall.3': 'LA TERCERA ES LA VENCIDA!', 'fx.bingoCall.7': 'EL SIETE DE LA SUERTE!', 'fx.bingoCall.11': 'UNO DETRAS DEL OTRO!', 'fx.bingoCall.13': 'SAN ANTONIO!', 'fx.bingoCall.15': 'LA NINA BONITA!', 'fx.bingoCall.18': 'MAYOR DE EDAD!', 'fx.bingoCall.22': 'LOS DOS PATITOS!', 'fx.bingoCall.24': 'SAN JUAN!', 'fx.bingoCall.29': 'SAN PEDRO!', 'fx.newYear': 'EL ANO QUE VIENE HAY MAS!', 'fx.contestStart': 'CONCURSO DE CUADRILLA!', 'fx.contest.1': 'PRIMER LUGAR!', 'fx.contest.2': 'SEGUNDO LUGAR!', 'fx.contest.3': 'TERCER LUGAR!', 'fx.pote': 'ROMPE LA OLLA!', 'fx.poc.0': 'TOC!', 'fx.poc.1': 'PAF!', 'fx.poc.2': 'PUM!', 'fx.poteBreak': 'SE ROMPIO!', 'fx.saco': 'CARRERA DE SACOS!', 'fx.sacoGo': 'YA!', 'fx.sacoYou': 'CLIC!', 'fx.sacoHop.0': 'HOP!', 'fx.sacoHop.1': 'SALTA!', 'fx.sacoHop.2': 'VAMOS!', 'fx.sacoFall.0': 'TROPIEZO!', 'fx.sacoFall.1': 'DESPACIO!', 'fx.sacoFall.2': 'SE CAYO!', 'fx.sacoPlace.1': 'PRIMER LUGAR!', 'fx.sacoPlace.2': 'SEGUNDO!', 'fx.sacoPlace.3': 'EL ULTIMO!', 'fx.sacoGone': 'SE RINDIERON!', 'fx.leilao': 'SUBASTA!', 'fx.leilaoBid': 'DOY {n}!', 'fx.leilaoCall.1': 'A LA UNA!', 'fx.leilaoCall.2': 'A LAS DOS!', 'fx.leilaoSold': 'A LAS TRES! VENDIDO!', 'fx.leilaoSign.voce': 'TU PUJA: {n}', 'fx.leilaoSign.plateia': 'PUBLICO: {n}', 'fx.leilaoSign.open': 'PUJA: {n}?', 'fx.wedding': 'BODA CAMPESTRE!', 'fx.vivas.0': 'VIVAN LOS NOVIOS!', 'fx.vivas.1': 'BESO! BESO!', 'fx.vivas.2': 'QUE LINDO!', 'fx.yes': 'SI, ACEPTO!', 'fx.ciranda': 'RONDA!', 'fx.chat.0': 'QUE FIESTA!', 'fx.chat.1': 'DONDE ESTA EL TAMAL?', 'fx.chat.2': 'CUIDADO, LA CULEBRA!', 'fx.chat.3': 'QUE ACORDEON!', 'fx.chat.4': 'VIVA SAN JUAN!', 'fx.chat.5': 'QUE CALOR DE FOGATA!', 'fx.chat.6': 'A BAILAR!', 'fx.chat.7': 'DAME UN PONCHE CALIENTE!', 'fx.chat.8': 'ME ENCANTA ESTE FORRO!', 'fx.chat.9': 'ESA MANDIOCA BAILA!', 'fx.chatRain.0': 'MIRA, ESTA LLOVIENDO!', 'fx.chatRain.1': 'AY, MI SOMBRERO!', 'fx.chatRain.2': 'DONDE ESTA EL PARAGUAS?', 'fx.set': 'CONJUNTO!', 'fx.wind': 'QUE VIENTO!', 'fx.pigeon': 'CURRUCU!', 'fx.woof': 'GUAU GUAU!', 'fx.side.beijo': 'MUAC!', 'fx.side.comidas': 'PALOMITAS!', 'fx.side.cadeia': 'ESTAS PRESO!', 'fx.side.espantalho': 'FUERA, PAJARITO!', 'fx.side.fardo': 'PIO?', 'fx.side.mastro': 'VIVA SAN JUAN!', 'fx.side.quentao': 'QUENTAO CALIENTE!', 'fx.side.carroca': 'AHI VA LA CARRETA!', 'fx.tunnel': 'EL TUNEL!', 'fx.chatWedding.0': 'VIVAN LOS NOVIOS!', 'fx.chatWedding.1': 'HABRA PASTEL?', 'fx.chatPote.0': 'ROMPELA! ROMPELA!', 'fx.chatPote.1': 'HAY DULCES ADENTRO!', 'fx.chatSaco.0': 'SALTA, SALTA!', 'fx.chatSaco.1': 'CUIDADO!', 'fx.chatLeilao.0': 'UNA MAS!', 'fx.chatLeilao.1': 'ESE ME LO LLEVO!', 'fx.chatBingo.0': 'Y MI NUMERO?', 'fx.chatBingo.1': 'ME FALTA UNO!', 'fx.sprout': 'HOLA, GENTE!', 'fx.lantern': 'VIVA SAN JUAN!', 'fx.jail.0': 'SUELTENME!', 'fx.jail.1': 'SOY INOCENTE!', 'fx.quadrilha': 'CUADRILLA!', 'fx.call.0': 'ADELANTE!', 'fx.call.1': 'ATRAS!', 'fx.call.2': 'BALANCEO!',
+      'fx.poke.0': 'JIJI!', 'fx.poke.1': 'EPA!', 'fx.poke.2': 'COSQUILLAS!', 'fx.specialDay': 'FELIZ FIESTA JUNINA!', 'fx.frenzy': 'FRENESI!', 'fx.bingo': 'BINGO!', 'fx.bingoNumber': 'NUMERO {n}!', 'fx.bingoCall.1': 'EMPIEZA EL JUEGO!', 'fx.bingoCall.3': 'LA TERCERA ES LA VENCIDA!', 'fx.bingoCall.7': 'EL SIETE DE LA SUERTE!', 'fx.bingoCall.11': 'UNO DETRAS DEL OTRO!', 'fx.bingoCall.13': 'SAN ANTONIO!', 'fx.bingoCall.15': 'LA NINA BONITA!', 'fx.bingoCall.18': 'MAYOR DE EDAD!', 'fx.bingoCall.22': 'LOS DOS PATITOS!', 'fx.bingoCall.24': 'SAN JUAN!', 'fx.bingoCall.29': 'SAN PEDRO!', 'fx.newYear': 'EL ANO QUE VIENE HAY MAS!', 'fx.contestStart': 'CONCURSO DE CUADRILLA!', 'fx.contest.1': 'PRIMER LUGAR!', 'fx.contest.2': 'SEGUNDO LUGAR!', 'fx.contest.3': 'TERCER LUGAR!', 'fx.pote': 'ROMPE LA OLLA!', 'fx.poc.0': 'TOC!', 'fx.poc.1': 'PAF!', 'fx.poc.2': 'PUM!', 'fx.poteBreak': 'SE ROMPIO!', 'fx.saco': 'CARRERA DE SACOS!', 'fx.sacoGo': 'YA!', 'fx.sacoYou': 'CLIC!', 'fx.sacoHop.0': 'HOP!', 'fx.sacoHop.1': 'SALTA!', 'fx.sacoHop.2': 'VAMOS!', 'fx.sacoFall.0': 'TROPIEZO!', 'fx.sacoFall.1': 'DESPACIO!', 'fx.sacoFall.2': 'SE CAYO!', 'fx.sacoPlace.1': 'PRIMER LUGAR!', 'fx.sacoPlace.2': 'SEGUNDO!', 'fx.sacoPlace.3': 'EL ULTIMO!', 'fx.sacoGone': 'SE RINDIERON!', 'fx.leilao': 'SUBASTA!', 'fx.leilaoBid': 'DOY {n}!', 'fx.leilaoCall.1': 'A LA UNA!', 'fx.leilaoCall.2': 'A LAS DOS!', 'fx.leilaoSold': 'A LAS TRES! VENDIDO!', 'fx.leilaoSign.voce': 'TU PUJA: {n}', 'fx.leilaoSign.plateia': 'PUBLICO: {n}', 'fx.leilaoSign.open': 'PUJA: {n}?', 'fx.wedding': 'BODA CAMPESTRE!', 'fx.vivas.0': 'VIVAN LOS NOVIOS!', 'fx.vivas.1': 'BESO! BESO!', 'fx.vivas.2': 'QUE LINDO!', 'fx.yes': 'SI, ACEPTO!', 'fx.ciranda': 'RONDA!', 'fx.chat.0': 'QUE FIESTA!', 'fx.chat.1': 'DONDE ESTA EL TAMAL?', 'fx.chat.2': 'CUIDADO, LA CULEBRA!', 'fx.chat.3': 'QUE ACORDEON!', 'fx.chat.4': 'VIVA SAN JUAN!', 'fx.chat.5': 'QUE CALOR DE FOGATA!', 'fx.chat.6': 'A BAILAR!', 'fx.chat.7': 'DAME UN PONCHE CALIENTE!', 'fx.chat.8': 'ME ENCANTA ESTE FORRO!', 'fx.chat.9': 'ESA MANDIOCA BAILA!', 'fx.chat.10': 'QUIEN HIZO ESTA PAMONHA?', 'fx.chat.11': 'ES BROMA, NO HAY SERPIENTE!', 'fx.chat.12': 'Y MI CARTITA DE AMOR?', 'fx.chat.13': 'MIRA COMO BAILA!', 'fx.chat.14': 'GUARDAME UNA CUADRILLA!', 'fx.chat.15': 'QUE HOGUERA TAN BONITA!', 'fx.chat.16': 'TENGO LOS PIES LLENOS DE TIERRA!', 'fx.chat.17': 'OTRO CURAU, POR FAVOR!', 'fx.chat.18': 'A ARRASTRAR LOS PIES!', 'fx.chat.19': 'QUE RICA LA CANJICA!', 'fx.chat.20': 'DONDE ESTA EL FOTOGRAFO?', 'fx.chat.21': 'YO LE ATINE A LA COLA DEL BURRO!', 'fx.chat.22': 'TOCA UN BAIAO, ACORDEONISTA!', 'fx.chat.23': 'MIRA SU BALANCE!', 'fx.chatRain.0': 'MIRA, ESTA LLOVIENDO!', 'fx.chatRain.1': 'AY, MI SOMBRERO!', 'fx.chatRain.2': 'DONDE ESTA EL PARAGUAS?', 'fx.set': 'CONJUNTO!', 'fx.wind': 'QUE VIENTO!', 'fx.pigeon': 'CURRUCU!', 'fx.woof': 'GUAU GUAU!', 'fx.side.beijo': 'MUAC!', 'fx.side.comidas': 'PALOMITAS!', 'fx.side.cadeia': 'ESTAS PRESO!', 'fx.side.espantalho': 'FUERA, PAJARITO!', 'fx.side.fardo': 'PIO?', 'fx.side.mastro': 'VIVA SAN JUAN!', 'fx.side.fogao': 'CANJICA CALENTITA!', 'fx.side.quentao': 'QUENTAO CALIENTE!', 'fx.side.carroca': 'AHI VA LA CARRETA!', 'fx.tunnel': 'EL TUNEL!', 'fx.chatWedding.0': 'VIVAN LOS NOVIOS!', 'fx.chatWedding.1': 'HABRA PASTEL?', 'fx.chatPote.0': 'ROMPELA! ROMPELA!', 'fx.chatPote.1': 'HAY DULCES ADENTRO!', 'fx.chatSaco.0': 'SALTA, SALTA!', 'fx.chatSaco.1': 'CUIDADO!', 'fx.alto.0': 'DENTADURA HALLADA EN LA PESCA!', 'fx.alto.1': 'PERDISTE LA CHANCLA? EN BESOS!', 'fx.alto.2': 'DUENO DEL BURRO AZUL, MUEVALO!', 'fx.alto.3': 'LA MANDIOCA MANDA UN BESO!', 'fx.alto.4': 'HAY QUENTAO CALIENTITO!', 'fx.alto.5': 'NINO PERDIDO: ES ZEZINHO!', 'fx.alto.6': 'CARTA PARA EL DEL SOMBRERO!', 'fx.alto.7': 'EL CARAMELO NO ES DE NADIE!', 'fx.alto.8': 'FORRO HASTA QUE SALGA EL SOL!', 'fx.alto.9': 'SUJETA EL SOMBRERO: XOTE!', 'fx.alto.prato': 'HAY UN PLATO LISTO EN EL FOGON!', 'fx.alto.bingo': 'BINGO EN LA KERMES! CORRE!', 'fx.alto.rings': 'AROS A 1 FICHA! CORRE!', 'fx.alto.size': 'FALTAN {n} PARA CRECER!', 'fx.cold': 'QUE FRIO!', 'fx.sticker': 'ESTAMPA NUEVA!', 'fx.visitor': 'ACORDEONISTA EN LA FIESTA!', 'fx.visitorThanks': 'GRACIAS, PATRON!', 'fx.bichos': 'HASTA LOS ANIMALES BAILAN!', 'fx.oi.0': 'HOLA!', 'fx.oi.1': 'VOLVISTE!', 'fx.oi.2': 'TE EXTRANE!', 'fx.oi.3': 'DONDE ESTABAS?', 'fx.kombi.0': 'PAMONHAS, PAMONHAS!', 'fx.kombi.1': 'PURA CREMA DE MAIZ!', 'fx.kombi.2': 'PAMONHA CALIENTITA!', 'fx.mentira': 'ES MENTIRA!', 'fx.selfie': 'PATATA!', 'fx.sss': 'SSSS!', 'fx.par.0': 'HOLA, PRENDA!', 'fx.par.1': 'BAILA CONMIGO!', 'fx.par.2': 'JIJI!', 'fx.par.3': 'SOY TODO TUYO!', 'fx.parCiume': 'Y YO QUE?', 'fx.meteoros': 'MIRA! LLUVIA DE ESTRELLAS!', 'fx.argolasHit': 'EN LA BOTELLA!', 'fx.argolasMiss': 'SERA LA PROXIMA!', 'fx.solo.0': 'SOLO DE ACORDEON!', 'fx.solo.1': 'SOLO DE ZABUMBA!', 'fx.solo.2': 'SOLO DE TRIANGULO!', 'fx.lanterna': 'PRENDAN LAS LINTERNAS!', 'fx.cordel.0': 'EN EL SERTAO HAY FORRO!', 'fx.cordel.1': 'QUIEN BAILA NO SE CANSA!', 'fx.cordel.2': 'MANDIOCA EN EL SALON!', 'fx.cordel.3': 'LA HOGUERA ES DE AMOR!', 'fx.cordel.4': 'SAN JUAN YA LLEGO!', 'fx.cordel.5': 'EL MAIZ ES DEL CORAZON!', 'fx.jegueBurro': 'IO! ES MI PRIMO?', 'fx.flag': 'ATRAPE LA BANDERITA!', 'fx.compadre.0': 'SAN JUAN LO DIJO,', 'fx.compadre.1': 'SAN PEDRO LO CONFIRMO,', 'fx.compadre.2': 'QUE SEAMOS COMPADRES,', 'fx.compadre.3': 'PORQUE SAN JUAN MANDO!', 'fx.compadre.fim': 'VIVAN LOS COMPADRES!', 'fx.compadre.testemunha': 'TESTIGO!', 'fx.cook.ready': 'LISTO!', 'fx.cook.yum': 'QUE RICO!', 'fx.cook.talk.0': 'QUE RICO OLOR!', 'fx.cook.talk.1': 'REVUELVE, REVUELVE!', 'fx.cook.talk.2': 'YA CASI!', 'fx.chapeu': 'AY, MI SOMBRERO!', 'fx.asaBranca': 'MIRA LAS PALOMAS ALA BLANCA!', 'fx.drones': 'MIRA EL SHOW DE DRONES!', 'fx.fitas': 'DANZA DE LAS CINTAS!', 'fx.estalo.0': 'PAM!', 'fx.estalo.1': 'CRAC!', 'fx.estalo.2': 'PUM!', 'fx.fotoCall': 'MIRA EL PAJARITO!', 'fx.burro': 'LA COLA DEL BURRO!', 'fx.fantasia': 'CONCURSO DE DISFRACES!', 'fx.burroPin.mosca': 'EN EL BLANCO!', 'fx.burroPin.perto': 'CASI!', 'fx.burroPin.longe': 'LEJOS!', 'fx.burroPin.fora': 'FALLASTE EL BURRO!', 'fx.cobraPega': 'LA TENGO! ES DE TELA!', 'fx.cobraAi.0': 'AY!', 'fx.cobraAi.1': 'SOCORRO!', 'fx.cobraAi.2': 'EPA!', 'fx.brrr': 'BRRR!', 'fx.quentao': 'QUENTAO! +1', 'fx.chatCold.0': 'DAME UN QUENTAO!', 'fx.chatCold.1': 'Y MI ABRIGO?', 'fx.chatLeilao.0': 'UNA MAS!', 'fx.chatLeilao.1': 'ESE ME LO LLEVO!', 'fx.chatNight.0': 'YA ES MADRUGADA Y NADIE DUERME!', 'fx.chatNight.1': 'EL FORRO SIGUE HASTA EL AMANECER!', 'fx.chatBingo.0': 'Y MI NUMERO?', 'fx.chatBingo.1': 'ME FALTA UNO!', 'fx.sprout': 'HOLA, GENTE!', 'fx.lantern': 'VIVA SAN JUAN!', 'fx.jail.0': 'SUELTENME!', 'fx.jail.1': 'SOY INOCENTE!', 'fx.quadrilha': 'CUADRILLA!', 'fx.call.0': 'ADELANTE!', 'fx.call.1': 'ATRAS!', 'fx.call.2': 'BALANCEO!',
       'fx.call.3': 'EL CAMINO DEL CAMPO!', 'fx.call.4': 'OJO, LA CULEBRA!', 'fx.call.5': 'OJO, LA LLUVIA!', 'fx.call.6': 'SALUDA A TU PAREJA!',
       'fx.call.7': 'ES SAN JUAN!', 'fx.rain': 'LLUVIA DE SAN JUAN!', 'fx.rainbow': 'ARCOIRIS!', 'fx.balloon': 'GLOBO DE LA SUERTE!',
       'fx.grew': 'CRECIO!', 'fx.newStep': 'PASO NUEVO!', 'fx.gift': 'REGALO!', 'fx.newMember': 'NUEVO EN LA PANDILLA!', 'fx.levelUp': 'SUBE DE NIVEL!',
@@ -307,9 +310,9 @@
       'fx.ringsInsert': 'ECHA UNA FICHA!',
       // Placas pintadas nas barracas (fonte de pixel, sem acento).
       'sign.barraca-pescaria': 'PESCA', 'sign.barraca-beijo': 'BESOS', 'sign.barraca-comidas': 'COMIDA',
-      'sign.cadeia': 'CARCEL', 'sign.correio': 'CORREO', 'sign.barraca-argolas': 'AROS',
+      'sign.cadeia': 'CARCEL', 'sign.barraca-cordel': 'CORDEL', 'sign.correio': 'CORREO', 'sign.barraca-argolas': 'AROS',
 
-      'tray.panel': 'Abrir panel', 'tray.shop': 'Abrir tienda', 'tray.photo': 'Sacar foto de la fiesta',
+      'tray.panel': 'Abrir panel', 'tray.shop': 'Abrir tienda', 'tray.photo': 'Sacar foto de la fiesta', 'tray.portrait': 'Sacar retrato de la Mandioca',
       'tray.pin': 'Fijar sobre las ventanas', 'tray.size': 'Tamaño', 'tray.display': 'Monitor',
       'tray.displayItem': 'Monitor {n} ({w}×{h})', 'tray.hide': 'Esconder la fiesta', 'tray.language': 'Idioma', 'tray.music': 'Música', 'tray.perf': 'Rendimiento', 'tray.sound': 'Sonido',
       'tray.quit': 'Cerrar el juego',
@@ -329,16 +332,25 @@
       tiers: {
         quintal: { name: 'Arraiá del Patio', unlocks: 'Mejoras, tienda, correo del amor y Aros de la Suerte.' },
         quermesse: { name: 'Kermés del Barrio', unlocks: 'Pesca, pareja de la cuadrilla, puestos, pedidos de los invitados, cuadrilla marcada, bingo y carrera de sacos.' },
-        cidade: { name: 'Fiesta de la Ciudad', unlocks: 'Escenario con trío de forró, salidas, hoguera, tarima de baile, quiebra de la olla, bodas campestres y subasta de premios.' },
+        cidade: { name: 'Fiesta de la Ciudad', unlocks: 'Escenario con trío de forró, salidas, hoguera, tarima de baile, quiebra de la olla, bodas campestres, subasta de premios y la cocina del Fogón de Leña.' },
         regional: { name: 'San Juan Regional', unlocks: 'Marcadora de la cuadrilla, fogonera, colados y noria.' },
-        maior: { name: 'El San Juan Más Grande del Mundo', unlocks: 'Guirnaldas de luces, fuegos artificiales y el San Juan del año que viene.' }
+        maior: { name: 'El San Juan Más Grande del Mundo', unlocks: 'Guirnaldas de luces, fuegos artificiales, pantalla gigante en el escenario, show de drones y el San Juan del año que viene.' }
       },
       posts: {
         par: { name: 'Pareja de la cuadrilla' }, sanfona: { name: 'Acordeón del escenario' },
         zabumba: { name: 'Zabumba del escenario' }, triangulo: { name: 'Triángulo del escenario' },
         marcador: { name: 'Cajón de la marcadora' }, foguista: { name: 'Junto a la hoguera' },
         beijo: { name: 'Puesto de Besos' }, pescaria: { name: 'Puesto de Pesca' }, argolas: { name: 'Puesto de Aros' },
-        mascote: { name: 'Terreno de la fiesta' }, comidas: { name: 'Puesto de Comidas' }, ambulante: { name: 'Vendedor de la fiesta' }
+        mascote: { name: 'Terreno de la fiesta' }, comidas: { name: 'Puesto de Comidas' }, ambulante: { name: 'Vendedor de la fiesta' }, fogao: { name: 'Fogón de Leña' }, cordel: { name: 'Puesto de Cordel' }
+      },
+      album: {
+        brincadeiras: { name: 'Juegos', stickers: { argolas: 'Aros de la Suerte', pescaria: 'Pesca', pote: 'Rompe la olla', saco: 'Carrera de sacos', leilao: 'Ganó la subasta' } },
+        tradicoes: { name: 'Tradiciones', stickers: { quadrilha: 'Cuadrilla marcada', casamento: 'Boda campestre', bingo: '¡Bingo!', fogueira: 'Hoguera', concurso: 'Concurso de cuadrilla' } },
+        ceu: { name: 'Cielo y clima', stickers: { chuva: 'Lluvia de San Juan', 'arco-iris': 'Olla de oro', frio: 'Friíto', balao: 'Globo de la suerte', fogos: 'Fuegos del San Juan más grande' } },
+        gente: { name: 'Gente de la fiesta', stickers: { pedido: 'Pedido atendido', penetra: 'Colado expulsado', pombo: 'Paloma mensajera', alto: 'Altavoz', role: 'Vuelta de la salida' } },
+        surpresas: { name: 'Sorpresas', stickers: { sanfoneiro: 'Acordeonista Andariego', trovao: 'Trueno en la lluvia', frenesi: 'Frenesí', 'dia-santo': 'Día de fiesta', conjunto: 'Conjunto completo' } },
+        folguedos: { name: 'Festejos', stickers: { cobra: '¡Ojo, la culebra!', retrato: 'Retrato del fotógrafo', mosca: 'Cola del burro en el blanco', pandeiro: 'Pandero en la mano', semana: 'Una semana de fiesta' } },
+        causos: { name: 'Cuentos de la fiesta', stickers: { compadres: 'Compadres de hoguera', bandeirinha: 'Banderita al viento', fantasia: 'Disfraz campeón', 'carro-boi': 'Carreta de bueyes', lendaria: 'Hoguera legendaria' } },
       },
       sets: {
         caipira: { name: 'Campesino de Raíz' },
@@ -352,14 +364,14 @@
         noivo: { name: 'Novio' },
         rainha: { name: 'Reina del Maíz' },
         rei: { name: 'Rey del Baião' }, caipirinha: { name: 'Trencitas' }, arraia: { name: 'Fiesta Encendida' },
-        caruaru: { name: 'Forrosero de Caruaru' }, arrematador: { name: 'Mejor Postor' }
+        caruaru: { name: 'Forrosero de Caruaru' }, arrematador: { name: 'Mejor Postor' }, luxo: { name: 'Campestre de Lujo' }, 'milho-verde': { name: 'Maíz Tierno' }, 'pe-de-serra': { name: 'Forró Pé-de-Serra' }, passista: { name: 'Bailarín de Frevo' }, 'roda-de-coco': { name: 'Rueda de Coco' }, 'olha-a-cobra': { name: '¡Ojo, la Culebra!' }
       },
       dances: {
         forro: { name: 'Forró' }, xote: { name: 'Xote' }, polichinelo: { name: 'Saltos de tijera' },
         sanfona: { name: 'Acordeón' }, rebolado: { name: 'Meneo' }, baiao: { name: 'Baião' },
         giro: { name: 'Giro' }, moonwalk: { name: 'Moonwalk' }, frevo: { name: 'Frevo' },
-        lambada: { name: 'Lambada' }, macarena: { name: 'Macarena' }, robo: { name: 'Robot' },
-        'arrasta-pe': { name: 'Arrastrado' }, coco: { name: 'Coco' }, passinho: { name: 'Pasito' }
+        lambada: { name: 'Lambada' }, macarena: { name: 'Macarena' }, 'boi-bumba': { name: 'Boi-bumbá' }, robo: { name: 'Robot' }, balance: { name: 'Balancé' },
+        'arrasta-pe': { name: 'Arrastrado' }, ciranda: { name: 'Ciranda' }, coco: { name: 'Coco' }, passinho: { name: 'Pasito' }, 'pisa-fulo': { name: 'Pisa la Flor' }, xaxado: { name: 'Xaxado' }
       },
       chars: {
         milho: { name: 'Maíz', role: 'Pareja de la cuadrilla', text: '+{v}% de Animación por paso' },
@@ -373,12 +385,14 @@
         faisca: { name: 'Chispa', role: 'Fogonera', text: 'La Llamarada dura +{v}%' },
         sopinha: { name: 'Sopinha', role: 'Mascota de la fiesta', text: 'Con el juego cerrado, la fiesta rinde +{v}%' },
         pipoca: { name: 'Palomita', role: 'Palomitera', text: 'Las fichas cuestan {v}% menos' },
-        amendoim: { name: 'Cacahuate', role: 'Vendedor ambulante', text: 'Las metas dan {v}% más fichas' }
+        amendoim: { name: 'Cacahuate', role: 'Vendedor ambulante', text: 'Las metas dan {v}% más fichas' },
+        canjica: { name: 'Canjica', role: 'Cocinera', text: 'Juegos (olla, sacos, burro, culebra y compadres) rinden +{v}% de Animación, y el fogón cocina en la mitad del tiempo' },
+        cocada: { name: 'Cocada', role: 'Poeta de cordel', text: 'Las cartas del correo elegante llegan {v}% más rápido' }
       },
       rarities: ['Común', 'Rara', 'Súper rara', 'Ultra rara'],
       categories: {
         chapeu: { name: 'Sombreros' }, mao: { name: 'En la mano' }, tecido: { name: 'Telas' }, terreiro: { name: 'Suelos' },
-        lado: { name: 'Puestos y adornos' }
+        lado: { name: 'Puestos y adornos' }, varal: { name: 'Banderines' }
       },
       items: {
         'chapeu-palha': { name: 'Sombrero de Paja', desc: 'Un clásico. Tapa la calva de la mandioca.' },
@@ -408,10 +422,14 @@
         ursinho: { name: 'Osito de Peluche', desc: 'El premio clásico de quien tiene puntería.' },
         peixinho: { name: 'Pececito en Bolsa', desc: 'No es de la pesca. Es tuyo de verdad.' },
         'sanfona-ouro': { name: 'Acordeón de Oro', desc: 'Traído de Caruaru. Tan bueno que toca solo.' },
+        zabumba: { name: 'Zabumba de Campina', desc: 'Traída del Parque do Povo, en Campina Grande. Bum, bum-bum.' },
         estrelinha: { name: 'Bengala de chispas', desc: 'Chispas por todos lados. ¡Lejos de la hoguera, eh!' },
         buque: { name: 'Ramo de Novia', desc: 'Quien lo atrape es la siguiente.' },
         'frango-assado': { name: 'Pollo Asado', desc: 'Ganado en la subasta, doradito y jugoso.' },
         'bolo-fuba': { name: 'Bizcocho de Maíz', desc: 'Con anís. Receta de la abuela del subastador.' },
+        pandeiro: { name: 'Pandero', desc: 'Chiqui-chiqui-pum: lleva el ritmo del coco.' },
+        sombrinha: { name: 'Sombrilla de Frevo', desc: 'Pequeñita y colorida: pide un paso de frevo.' },
+        'cobra-de-pano': { name: 'Culebra de Tela', desc: 'La de la cuadrilla. ¡Ojo, la culebra! Es mentira.' },
         'xadrez-vermelho': { name: 'Cuadros Rojos', desc: 'El uniforme oficial de cualquier arraiá.' },
         'xadrez-azul': { name: 'Cuadros Azules', desc: 'Para combinar con el cielo de junio.' },
         'xadrez-verde': { name: 'Cuadros Verdes', desc: 'Del color del maíz tierno.' },
@@ -419,17 +437,25 @@
         chita: { name: 'Chita Floreada', desc: 'Florecitas por todos lados.' },
         'chita-rosa': { name: 'Chita Rosa', desc: 'La favorita del Puesto de Besos.' },
         'xadrez-ouro': { name: 'Cuadros de Oro', desc: 'Brilla más que la hoguera.' },
+        'chita-amarela': { name: 'Chita Amarilla', desc: 'Color maíz, con florecitas.' },
+        'xadrez-roxo': { name: 'Cuadros Morados', desc: 'Para los del campo y los de la ciudad.' },
+        'varal-colorido': { name: 'Banderines de Colores', desc: 'Uno de cada color, como manda la tradición.' },
+        'varal-azul': { name: 'Banderines Azul y Blanco', desc: 'El cielo de junio, colgado.' },
+        'varal-chita': { name: 'Banderines de Chita', desc: 'Florecitas de tela meciéndose con el viento.' },
+        'varal-brasil': { name: 'Banderines Verde y Amarillo', desc: 'Fiesta con aire de Mundial.' },
+        'varal-ouro': { name: 'Banderines Dorados', desc: 'Para la fiesta que ya es tradición.' },
         'terra-batida': { name: 'Tierra Apisonada', desc: 'Buen polvo para levantar en el xote.' },
         lamacal: { name: 'Barrizal Tras la Lluvia', desc: 'Resbala, pero no se cae.' },
         gramado: { name: 'Césped de la Plaza', desc: 'Verdecito, con florecitas.' },
         areia: { name: 'Arena de Playa', desc: 'San Juan con los pies en la arena.' },
-        tablado: { name: 'Tarima de Madera', desc: 'Para oír el arrastre de los pies.' },
+        sertao: { name: 'Suelo del Sertão', desc: 'Tierra roja agrietada por el sol, con florcitas de la caatinga.' }, tablado: { name: 'Tarima de Madera', desc: 'Para oír el arrastre de los pies.' },
         'pista-forro': { name: 'Pista de Forró', desc: 'Cuadros en el suelo y brillo en la mirada.' },
         fardo: { name: 'Fardo de Heno', desc: 'Banco, escenario y escondite.' },
-        mastro: { name: 'Mástil de Banderitas', desc: 'Cintas de colores bailando al viento.' },
-        espantalho: { name: 'Espantapájaros Galán', desc: 'Pose de galán, corazón de paja.' },
-        'barril-quentao': { name: 'Barril de Quentão', desc: 'Quentão calentito para espantar el frío de junio.' },
-        carroca: { name: 'Carreta Adornada', desc: 'Lleva a la pandilla y la pamonha.' },
+        mastro: { name: 'Mástil de Banderitas', desc: 'Cinta en espiral, bandera arriba, una naranja y una mazorca colgando y cintas bailando al viento.' },
+        espantalho: { name: 'Espantapájaros Galán', desc: 'Pose de galán, corazón de paja.', effect: 'Galán del correo: cada carta da +1 ficha.' },
+        'fogao-lenha': { name: 'Fogón de Leña', desc: 'Canjica y pamonha al fuego, el aroma por toda la fiesta.', effect: 'Los pedidos de los invitados rinden +50%. Desde la Fiesta de la Ciudad, cocina platos que animan la fiesta.' },
+        'barril-quentao': { name: 'Barril de Quentão', desc: 'Quentão calentito para espantar el frío de junio.', effect: 'En el friíto vende quentão: 1 ficha cada 15 s.' },
+        carroca: { name: 'Carreta Adornada', desc: 'Lleva a la pandilla y la pamonha.', effect: 'Lleva a la pandilla: las salidas vuelven un 15% más rápido.' },
         'barraca-pescaria': { name: 'Puesto de Pesca', desc: 'Donde el Perrito Caliente lanza la caña.',
           effect: 'Activa al Pescador.' },
         'barraca-beijo': { name: 'Puesto de Besos', desc: 'Una ficha por besito. ¡Solo en la mejilla!',
@@ -437,6 +463,7 @@
         'barraca-comidas': { name: 'Puesto de Comidas', desc: 'Pamonha, canjica y curau.', effect: '+10% de Refresco.' },
         cadeia: { name: 'Cárcel del Arraiá', desc: 'Aquí el colado paga fianza.', effect: 'Los colados dan el doble de fichas.' },
         correio: { name: 'Correo del Amor', desc: 'Notitas anónimas con doble sentido.', effect: 'Las cartas llegan un 30% más rápido.' },
+        'barraca-cordel': { name: 'Puesto de Cordel', desc: 'Folletos colgados en el cordel, llenos de rimas.', effect: 'Los pedidos de los invitados aparecen más seguido.' },
         'barraca-argolas': { name: 'Puesto de Aros', desc: 'Botellas, aros y mucha puntería.',
           effect: '+1 aro por ronda en los Aros y activa a la Maestra de Aros.' }
       },
@@ -446,7 +473,8 @@
         vizinhanca: { name: 'Invitar al vecindario' },
         penetra: { name: 'Colarse en el arraiá vecino' },
         maior: { name: 'Visitar el San Juan Más Grande' },
-        caruaru: { name: 'Viaje a Caruaru' }
+        caruaru: { name: 'Viaje a Caruaru' },
+        campina: { name: 'Viaje a Campina Grande' }
       },
       bonfire: {
         labareda: { name: 'Llamarada', text: 'Cada 60 s la hoguera sube por 8 s: Animación +{v}%.' },
@@ -456,8 +484,8 @@
       landmarks: {
         milharal: { name: 'Planta de maíz' }, galinha: { name: 'Gallina' }, bananeira: { name: 'Platanero' },
         gato: { name: 'Gato dormilón' }, mandacaru: { name: 'Cactus mandacaru' }, casinha: { name: 'Casita de adobe' },
-        pipa: { name: 'Cometa en el cielo' }, coqueiro: { name: 'Cocotero' }, bode: { name: 'Chivo' }, caramelo: { name: 'Perrito caramelo' }, trem: { name: 'Trencito de la alegría' },
-        igrejinha: { name: 'Capillita' }, 'casinha-azul': { name: 'Casita azul' }, lua: { name: 'Luna de San Juan' },
+        pipa: { name: 'Cometa en el cielo' }, coqueiro: { name: 'Cocotero' }, bode: { name: 'Chivo' }, caramelo: { name: 'Perrito caramelo' }, trem: { name: 'Trencito de la alegría' }, kombi: { name: 'Furgoneta de la pamonha' }, jegue: { name: 'Burro de la manta azul' },
+        igrejinha: { name: 'Capillita' }, 'casinha-azul': { name: 'Casita azul' }, papagaio: { name: 'Loro chismoso' }, lua: { name: 'Luna de San Juan' },
         catavento: { name: 'Molinete' }, balao: { name: 'Farol de papel' }, estrelas: { name: 'Cielo estrellado' },
         carrossel: { name: 'Carrusel' }, 'balao-grande': { name: 'Globo aerostático' }, boi: { name: 'Bumba-meu-boi' },
         'ilha-quadrilha': { name: 'Isla flotante de la cuadrilla' }, 'ilha-baloes': { name: 'Isla flotante de los farolillos' }
@@ -471,7 +499,7 @@
         musica: { text: '¡Toca un xote!' }, foto: { text: '¡Sácanos una foto!' },
         pipoca: { text: '¿Palomitas dulces o saladas?' }, coracao: { text: '¡Mándame una carta de amor!' },
         quentao: { text: '¡Un quentão para calentarse!' }, cocada: { text: '¿Hay cocada?' },
-        bandeirinha: { text: '¡Faltan banderitas en esa esquina!' }, danca: { text: '¿Me enseñas ese paso?' }
+        bandeirinha: { text: '¡Faltan banderitas en esa esquina!' }, danca: { text: '¿Me enseñas ese paso?' }, canjica: { text: '¿Hay canjica en el fogón?' }, fogueira: { text: '¡Échale más leña a la hoguera!' }, sanfona: { text: '¿Dónde está el acordeonista?' }
       },
       letters: [
         'Te vi meneándote cerca de la hoguera. Casi me quemo.',
@@ -508,8 +536,38 @@
         'El viento se llevó mi banderita. ¿Tú te llevas mi corazón?',
         'Te vi bailando el robot. ¿Me programas para bailar a tu lado?',
         'Línea en el bingo, cartón lleno en el corazón.',
-        'Soy como el globo de la suerte: paso rapidito. ¡Atrápame!'
+        'Soy como el globo de la suerte: paso rapidito. ¡Atrápame!',
+        'Corrí la carrera de sacos solo para llegar más rápido a ti.',
+        'En la subasta de mi corazón, te lo llevaste todo con la primera puja.',
+        '¿Hace frío? Déjame ser tu quentão.',
+        'El altavoz anunció: hay alguien enamorado en la fiesta. Era yo.',
+        'Pegué tu estampa en mi álbum. Página completa.',
+        'Si el burro de la manta azul es de alguien, yo quiero ser tuyo.',
+        'Perseguí la furgoneta de la pamonha toda la noche solo para encontrarte.',
+        'Xaxado, xote o forró: contigo bailo cualquiera.',
+        'Soy pescador de primera: pesqué tu mirada.',
+        'Cambié todos los banderines solo para combinar contigo.',
+        'Mi corazón es como el dulce de maní: duro por fuera, dulce por dentro.',
+        'Si la hoguera se apaga, tú y yo calentamos la fiesta.',
+        'Eres mi a la una, a las dos, a las tres: ¡vendido!',
+        'Me caí tantas veces en la carrera de sacos que caí enamorado.',
+        'Contigo hasta el friíto de junio se vuelve calorcito.',
+        '¡Ojo, la culebra! Es mentira. Lo que es verdad es que me gustas.',
+        'Si clavara la cola del burro con los ojos vendados, te atinaría a ti.',
+        'El fotógrafo dijo "mira el pajarito", pero yo solo te miré a ti.',
+        'Mi corazón suena como pandero cuando pasas.',
+        'En el balancé de la cuadrilla, solo me balanceé por ti.',
+        'Toca un baião, que quiero bailar bien pegadito.',
+        'Eres el petardito de mi fiesta: pum, y salté.',
+        'Vi una estrella fugaz y te pedí otra vez.',
+        'Faltan pocos días para San Juan y ninguno para que me gustes.',
+        'En la foto de la fiesta, lo más bonito del cuadro eres tú.'
       ],
+      recipes: {
+        pamonha: { name: 'Pamonha', desc: 'Maíz tierno rallado, cocido en su hoja y atado.' },
+        curau: { name: 'Curau', desc: 'Crema dulce de maíz tierno con canela encima.' },
+        'pe-de-moleque': { name: 'Pé-de-moleque', desc: 'Maní tostado en melado de panela.' }
+      },
       achievements: {
         'primeiro-passo': { name: 'Primer paso', text: 'Bailar el primer paso.' },
         mil: { name: 'Mil de animación', text: 'Juntar 1.000 de Animación en toda la fiesta.' },
@@ -529,6 +587,11 @@
         'quebra-pote': { name: 'Rompe ollas', text: 'Romper 5 ollas.' },
         canguru: { name: 'Canguro del campo', text: 'Ganar 5 carreras de sacos.' },
         'dou-lhe-tres': { name: '¡A la una, a las dos, a las tres!', text: 'Ganar 3 premios en la subasta.' },
+        album: { name: 'Álbum completo', text: 'Pegar todas las estampas del Álbum de la Fiesta.' },
+        quentao: { name: 'Quentão calentito', text: 'Vender 20 quentões en el friíto.' },
+        'na-mosca': { name: 'En el blanco', text: 'Clavar la cola del burro justo en la X 3 veces.' },
+        retratista: { name: 'Retrato en la pared', text: 'Tomar 5 retratos con el fotógrafo ambulante.' },
+        'pega-cobra': { name: 'Atrapa culebras', text: 'Atrapar 5 culebras de tela en la cuadrilla.' },
         estilista: { name: 'Estilista campestre', text: 'Vestir 5 conjuntos diferentes.' },
         metodica: { name: 'Metódica', text: 'Cumplir 10 metas de la fiesta.' },
         'arco-iris': { name: 'Olla de oro', text: 'Encontrar la olla de oro al final del arcoíris 5 veces.' },

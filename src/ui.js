@@ -23,7 +23,9 @@
     { id: 'roles', icon: 'role', tier: 2 },
     { id: 'fogueira', icon: 'fogueira', tier: 2 },
     { id: 'correio', icon: 'carta' },
-    { id: 'bingo', icon: 'bingo', tier: 1 }
+    { id: 'bingo', icon: 'bingo', tier: 1 },
+    // A cozinha só aparece com o Fogão a Lenha num dos lados da festa.
+    { id: 'cozinha', icon: 'panela', tier: 2, needs: 'fogao-lenha' }
   ];
   const STAT_ICONS = { rebolado: 'rebolado', folego: 'folego', refresco: 'refresco', ritmo: 'ritmo' };
   // Categorias da vitrine encaixada na festa.
@@ -34,6 +36,7 @@
     { id: 'tecido', icon: 'item:xadrez-vermelho' },
     { id: 'terreiro', icon: 'item:terra-batida' },
     { id: 'lado', icon: 'item:barraca-pescaria' },
+    { id: 'varal', icon: 'item:varal-colorido' },
     { id: 'conjuntos', icon: 'item:coroa-flores' }
   ];
   // Tamanhos prontos em Ajustes (e no menu da bandeja): do menor ao maior que a alça de arrastar alcança (25% a 300%).
@@ -65,6 +68,12 @@
   }
 
   const percent = value => `${number(value * 100, value < 0.1 ? 1 : 0)}%`;
+  // Tempo redondo em minutos ("15 min", "1 h", "1 h 30 min"); com segundos quebrados, o formato longo.
+  function roundTime(ms) {
+    if (ms % 60000) return duration(ms);
+    const n = ms / 60000;
+    return n < 60 ? `${n} min` : `${Math.floor(n / 60)} h${n % 60 ? ` ${n % 60} min` : ''}`;
+  }
 
   const tabName = id => t(`tab.${id}`);
   const tabOf = id => [...TABS, ...TELAS].find(tab => tab.id === id);
@@ -97,8 +106,10 @@
     const tier = engine.tierIndex();
     const next = engine.nextTier();
     const ready = s.outings.filter((_, i) => engine.outingState(i) === 'pronto').length;
-    const counts = { pescaria: s.fishing.unlocked ? s.fishing.ready : 0, correio: s.mail.ready, roles: ready };
-    const telas = TELAS.filter(tela => !tabLocked(tela, engine)).map(tela => {
+    const counts = { pescaria: s.fishing.unlocked ? s.fishing.ready : 0, correio: s.mail.ready, roles: ready,
+      cozinha: s.cozinha.pot?.ready ? 1 : 0 };
+    const shown = TELAS.filter(tela => !tabLocked(tela, engine) && (!tela.needs || engine.isPlaced(tela.needs)));
+    const telas = shown.map(tela => {
       const count = counts[tela.id] || 0;
       return `<button class="ferramenta ${count ? 'chama' : ''} ${ctx.tela === tela.id ? 'aberta' : ''}" data-action="tela" ` +
         `data-tela="${tela.id}" title="${esc(tabName(tela.id))}">${ctx.icon(`ui:${tela.icon}`)}` +
@@ -112,12 +123,25 @@
         `<b data-buff="frenzy">${Math.ceil(r.frenzyLeft)}s</b></span>` : '',
       engine.specialDay() ? `<span class="selo ouro">${esc(t('hud.day', { name: t(`day.${engine.specialDay().id}`),
         v: Math.round(engine.specialDay().bonus * 100) }))}</span>` : '',
+      // Em junho, até o dia 23: quantos dias faltam para o São João.
+      engine.daysToSaoJoao?.() ? `<span class="selo">${esc(t('hud.countdown', { n: engine.daysToSaoJoao() }))}</span>` : '',
       s.bingo.round && !s.bingo.round.result ? `<span class="selo verde" title="${esc(t('hud.bingoTitle'))}">` +
         `${esc(t('hud.bingo', { n: engine.bingoMarks().count, total: 9 }))}</span>` : '',
       r.weddingLeft > 0 ? `<span class="selo ouro" title="${esc(t('hud.weddingTitle'))}">${esc(t('hud.wedding'))} ` +
         `<b data-buff="wedding">${Math.ceil(r.weddingLeft)}s</b></span>` : '',
       r.quadrilhaLeft > 0 ? `<span class="selo verde" title="${esc(t('hud.quadrilhaTitle'))}">${esc(t('hud.quadrilha', { v: Math.round(engine.quadrilhaBonus() * 100) }))} ` +
-        `<b data-buff="quadrilha">${Math.ceil(r.quadrilhaLeft)}s</b></span>` : ''
+        `<b data-buff="quadrilha">${Math.ceil(r.quadrilhaLeft)}s</b></span>` : '',
+      // Eventos que pedem clique na festa: leilão (lance e de quem), corrida de saco e friozinho.
+      s.leilao?.active ? `<span class="selo ouro" title="${esc(t('hud.leilaoTitle'))}">${esc(t(`hud.leilao.${s.leilao.active.leader || 'open'}`,
+        { n: s.leilao.active.leader ? s.leilao.active.price : s.leilao.active.base }))}</span>` : '',
+      s.saco?.active ? `<span class="selo verde" title="${esc(t('hud.sacoTitle'))}">${esc(t('hud.saco'))}</span>` : '',
+      s.visitor?.active ? `<span class="selo ouro" title="${esc(t('hud.visitorTitle'))}">${esc(t('hud.visitor', { v: Math.round(engine.cfg.visitorBonus * 100) }))}</span>` : '',
+      s.fotografo?.active && !s.fotografo.active.shot ? `<span class="selo ouro" title="${esc(t('hud.fotoTitle'))}">${esc(t('hud.foto'))}</span>` : '',
+      s.burro?.active && !s.burro.active.pinned ? `<span class="selo" title="${esc(t('hud.burroTitle'))}">${esc(t('hud.burro'))}</span>` : '',
+      s.fantasia?.judgeAt ? `<span class="selo ouro" title="${esc(t('hud.fantasiaTitle'))}">${esc(t('hud.fantasia'))}</span>` : '',
+      engine.cookBonus() > 0 ? `<span class="selo ouro" title="${esc(t('hud.cookTitle'))}">${esc(t('hud.cook', { dish: engine.recipe(s.cozinha.buff.id).name,
+        v: Math.round(engine.cookBonus() * 100) }))} ${until(s.cozinha.buff.until, ctx.now)}</span>` : '',
+      s.cold?.active ? `<span class="selo azul" title="${esc(t(engine.quentaoOn() ? 'hud.coldQuentao' : 'hud.coldTitle'))}">${esc(t('hud.cold'))}</span>` : ''
     ].join('');
     return `<div class="placa-linha">` +
       `<span class="recurso" title="${esc(t('res.cheer'))}">${ctx.icon('ui:animacao')}<b data-live="cheer">${compact(s.cheer)}</b></span>` +
@@ -128,7 +152,8 @@
       `<span class="convidados">${ctx.icon('ui:lotacao')}${s.size}${next ? `/${next.size}` : ''}</span></div>` +
       bar(s.fame, engine.fameNeed(), 'fama') +
       (upcoming ? `<div class="proximo" title="${esc(t('hud.nextTitle'))}">${t('hud.next', { piece: esc(upcoming.name) })}</div>` : '') +
-      `<div class="placa-barra"><div class="barra-jogo">` +
+      // Loja e argolas mais as telas: com mais de 8 botões (a cozinha), a grade ganha a 5ª coluna em vez de outra fileira.
+      `<div class="placa-barra"><div class="barra-jogo${shown.length + 2 > 8 ? ' cheia' : ''}">` +
       `<button class="ferramenta" data-action="vitrine" title="${esc(t('hud.shop'))}">${ctx.icon('ui:loja')}</button>` +
       `<button class="ferramenta argolas" data-action="argolas" title="${esc(t('rings.title'))}">${ctx.icon('ui:argolas')}` +
       `<i class="preco-argolas" data-live="ringCost"${engine.ringCost() > engine.cfg.ringCost ? '' : ' hidden'}>` +
@@ -208,6 +233,7 @@
         else if (item.source === 'argolas') { state = esc(t('shop.onlyRings')); cls = 'especial'; }
         else if (item.source === 'casamento') { state = esc(t('shop.onlyWedding')); cls = 'especial'; }
         else if (item.source === 'leilao') { state = esc(t('shop.onlyAuction')); cls = 'especial'; }
+        else if (item.source === 'cobra') { state = esc(t('shop.onlySnake')); cls = 'especial'; }
         else if (engine.itemLocked(item.id)) { state = `🔒 ${esc(engine.data.tiers[item.tier].name)}`; cls = 'especial'; }
         else state = `<span class="preco" data-cost="${item.price}" data-currency="tickets">${ctx.icon('ui:fichas')}${item.price}</span>`;
         return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-item" data-id="${item.id}" ` +
@@ -313,7 +339,8 @@
       `</div><div class="cartao"><div class="rotulo">${esc(t('party.host'))}</div>` +
       `<label class="campo">${esc(t('party.name'))}<input id="nome" maxlength="24" value="${esc(s.name)}"></label>` +
       `<p class="miudo">${esc(t('party.panelHint'))}</p>` + growthBlock(engine, growth) +
-      `<div class="botoes"><button class="btn claro" data-action="foto">${ctx.icon('ui:foto')} ${esc(t('party.photo'))}</button></div></div></div>` +
+      `<div class="botoes"><button class="btn claro" data-action="foto">${ctx.icon('ui:foto')} ${esc(t('party.photo'))}</button>` +
+      `<button class="btn claro" data-action="retrato">${ctx.icon('ui:foto')} ${esc(t('party.portrait'))}</button></div></div></div>` +
       `<div class="cartao"><div class="rotulo">${esc(t('party.yield'))}</div><div class="numeros">` +
       [[t('party.perStep'), compact(engine.stepValue())], [t('party.stepsPerSecond'), number(engine.speed(), 2)],
         [t('party.stamina'), t('party.staminaValue', { n: number(engine.maxStamina(), 0) })], [t('party.rest'), `${number(rest, 1)} s`],
@@ -453,6 +480,37 @@
       }).join('')}</div>` + (engine.charActive('faisca') ? `<p class="miudo">${esc(t('fire.spark'))}</p>` : '');
   }
 
+  function cozinha(engine, ctx) {
+    const s = engine.state;
+    const wood = `<span class="selo">${ctx.icon('ui:lenha')} ${t('outing.wood', { n: `<b data-live="wood">${compact(s.wood)}</b>` })}</span>`;
+    if (tabLocked(tabOf('cozinha'), engine)) return header(tabName('cozinha'), '') + lockNote(engine, engine.cfg.cookTier);
+    if (!engine.isPlaced('fogao-lenha')) return header(tabName('cozinha'), esc(t('cook.subtitle'))) + `<p>${esc(t('cook.needStove'))}</p>`;
+    const pot = s.cozinha.pot;
+    const dish = id => engine.recipe(id)?.name || id;
+    let status;
+    if (pot && pot.ready) {
+      status = `<div class="linha">${ctx.icon(`ui:prato-${pot.id}`, 'grande')}<p><b>${esc(t('cook.ready', { dish: dish(pot.id) }))}</b></p></div>` +
+        `<div class="botoes"><button class="btn verde grande" data-action="servir">${esc(t('cook.serve'))}</button></div>`;
+    } else if (pot) {
+      const total = engine.cookTime(engine.recipe(pot.id));
+      status = `<div class="linha">${ctx.icon(`ui:prato-${pot.id}`, 'grande')}<p>${t('cook.cooking', { dish: esc(dish(pot.id)), time: until(pot.readyAt, ctx.now) })}</p></div>` +
+        bar(total - (pot.readyAt - ctx.now), total, 'fogo');
+    } else status = `<p>${esc(t('cook.empty'))}</p>`;
+    const served = engine.cookBonus() > 0 ? `<p class="miudo">${t('cook.active', { dish: esc(dish(s.cozinha.buff.id)),
+      v: Math.round(engine.cookBonus() * 100), time: until(s.cozinha.buff.until, ctx.now) })}</p>` : '';
+    return header(tabName('cozinha'), esc(t('cook.subtitle')), wood) +
+      `<div class="cartao">${status}${served}</div>` +
+      `<div class="grade3">${engine.data.recipes.map(recipe => `<div class="cartao">${ctx.icon(`ui:prato-${recipe.id}`, 'grande')}` +
+        `<h3>${esc(recipe.name)}</h3><p class="miudo">${esc(recipe.desc)}</p>` +
+        `<p class="miudo">${esc(t('cook.info', { v: Math.round(recipe.bonus * 100), buff: roundTime(recipe.buffMinutes * 60000),
+          time: roundTime(engine.cookTime(recipe)) }))}</p><div class="botoes">` +
+        (pot ? `<button class="btn claro" disabled>${esc(t('cook.busy'))}</button>`
+          : costButton('cozinhar', `data-id="${recipe.id}"`, recipe.wood, 'wood', t('cook.cook'), ctx.icon('ui:lenha'))) +
+        `</div></div>`).join('')}</div>` +
+      `<p class="miudo">${esc(t('cook.replace'))}${engine.charActive('canjica') ? ` ${esc(t('cook.canjica'))}` : ''}</p>` +
+      `<p class="miudo">${esc(t('cook.stats', { n: s.stats.dishes }))}</p>`;
+  }
+
   function correio(engine, ctx) {
     const mail = engine.state.mail;
     const letter = ctx.lastLetter;
@@ -477,8 +535,10 @@
       return `<div class="cartao meta ${ready ? 'feita' : ''}" data-meta="${index}"><div class="linha"><div><h3>${esc(t(`goal.${goal.type}`, { n: goal.target }))}</h3>` +
         `${bar(value, goal.target, 'fama')}` +
         `<p class="miudo"><b data-meta-n>${number(value)}/${number(goal.target)}</b> · ${esc(reward)}</p></div>` +
+        `<div class="botoes">` + (ready ? '' : `<button class="btn claro trocar" data-action="meta-trocar" data-index="${index}" ` +
+        `title="${esc(t('goals.swapTitle', { n: engine.cfg.goalSwapCost }))}">↻ ${esc(t('goals.swap'))}</button>`) +
         `<button class="btn ${ready ? '' : 'claro'}" data-action="meta-resgatar" data-index="${index}"${ready ? '' : ' disabled'}>` +
-        `${esc(t('goals.claim'))}</button></div></div>`;
+        `${esc(t('goals.claim'))}</button></div></div></div>`;
     }).join('');
     return `<div class="rotulo">${esc(t('goals.title'))}</div><p class="miudo">${esc(t('goals.hint'))}</p><div class="lista">${cards}</div>`;
   }
@@ -490,10 +550,29 @@
     return `<div class="progresso">${bar(entry[0], entry[1], 'fama')}<small>${compact(entry[0])}/${compact(entry[1])}</small></div>`;
   }
 
+  // Álbum da Festa: uma página por tema, cinco figurinhas cada. A que falta aparece com "?" e o nome, para dar vontade.
+  function album(engine, ctx) {
+    const have = new Set(engine.state.album || []);
+    const pages = engine.data.album || [];
+    const full = engine.albumPages();
+    return `<div class="rotulo">${esc(t('album.title'))}</div>` +
+      `<p class="miudo">${esc(t('album.hint', { v: Math.round(engine.cfg.albumBonus * 100), n: engine.cfg.albumTickets, pages: full, total: pages.length }))}</p>` +
+      `<div class="album">${pages.map(page => {
+        const got = page.stickers.filter(sticker => have.has(sticker.id)).length;
+        const done = got === page.stickers.length;
+        return `<div class="cartao pagina ${done ? 'feita' : ''}"><div class="linha"><h3>${esc(page.name)}</h3>` +
+          `<span class="selo ${done ? 'verde' : ''}">${got}/${page.stickers.length}</span></div><div class="figurinhas">` +
+          page.stickers.map(sticker => have.has(sticker.id)
+            ? `<div class="figurinha" title="${esc(sticker.name)}">${ctx.icon(sticker.icon)}<span>${esc(sticker.name)}</span></div>`
+            : `<div class="figurinha vazia" title="${esc(t('album.missing'))}"><b>?</b><span>${esc(sticker.name)}</span></div>`).join('') +
+          `</div></div>`;
+      }).join('')}</div>`;
+  }
+
   function conquistas(engine, ctx) {
     const done = engine.state.achievements;
     return header(tabName('conquistas'), esc(t('count.of', { n: done.length, total: engine.data.achievements.length }))) +
-      metas(engine) + `<div class="rotulo">${esc(t('goals.achievements'))}</div>` +
+      metas(engine) + album(engine, ctx) + `<div class="rotulo">${esc(t('goals.achievements'))}</div>` +
       `<div class="lista">${engine.data.achievements.map(a =>
         `<div class="cartao conquista ${done.includes(a.id) ? 'feita' : ''}"><div class="linha">` +
         `${ctx.icon('ui:conquista', 'grande')}<div><h3>${esc(a.name)}</h3><p class="miudo">${esc(a.text)}</p>` +
@@ -543,7 +622,11 @@
       `<div class="rotulo">⚡ ${esc(t('settings.flash'))}</div><div class="chips">` +
       [[true, 'settings.flashOn'], [false, 'settings.flashOff']].map(([value, key]) =>
         `<button class="chip ${(st.flash !== false) === value ? 'ativa' : ''}" data-action="flash" data-value="${value ? 'on' : 'off'}">` +
-        `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.flashHint'))}</p>`;
+        `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.flashHint'))}</p>` +
+      `<div class="rotulo">✎ ${esc(t('settings.calm'))}</div><div class="chips">` +
+      [[false, 'settings.calmOff'], [true, 'settings.calmOn']].map(([value, key]) =>
+        `<button class="chip ${(st.calm === true) === value ? 'ativa' : ''}" data-action="calmo" data-value="${value ? 'on' : 'off'}">` +
+        `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.calmHint'))}</p>`;
   }
 
   function ajustes(engine, ctx) {
@@ -558,7 +641,7 @@
       [t('stats.pokes'), number(s.stats.pokes)], [t('stats.balloons'), number(s.stats.balloons)],
       [t('stats.rainbows'), number(s.stats.rainbows)], [t('stats.goals'), number(s.stats.goals)],
       [t('stats.weddings'), number(s.stats.weddings)], [t('stats.potes'), number(s.stats.potes)],
-      [t('stats.sacos'), `${number(s.stats.sacoWins)}/${number(s.stats.sacoRaces)}`], [t('stats.leiloes'), number(s.stats.leiloes)],
+      [t('stats.sacos'), `${number(s.stats.sacoWins)}/${number(s.stats.sacoRaces)}`], [t('stats.leiloes'), number(s.stats.leiloes)], [t('stats.quentao'), number(s.stats.quentao)], [t('stats.visitors'), number(s.stats.visitors)], [t('stats.cobras'), number(s.stats.cobras)], [t('stats.fotos'), number(s.stats.fotos)], [t('stats.burros'), `${number(s.stats.burroMoscas)}/${number(s.stats.burros)}`], [t('stats.fantasias'), `${number(s.stats.fantasiaWins)}/${number(s.stats.fantasias)}`], [t('stats.compadres'), number(s.stats.compadres)], [t('stats.dishes'), number(s.stats.dishes)],
       [t('stats.bingos'), number(s.stats.bingos)], [t('stats.contests'), `${number(s.stats.contestWins)}/${number(s.stats.contests)}`]
     ];
     const zoom = Math.round((st.zoom || 1) * 100);
@@ -659,6 +742,16 @@
       case 'bingo': return t('log.bingo', { draws: entry.draws, tickets: entry.tickets, n: Math.round(entry.amount || 0) });
       case 'bingo-lost': return t('log.bingoLost', { draws: entry.draws });
       case 'pote': return t('log.pote', { n: Math.round(entry.amount || 0), tickets: entry.tickets });
+      case 'visitor': return t('log.visitor', { tickets: entry.tickets });
+      case 'cobra': return t('log.cobra', { n: compact(entry.amount || 0) });
+      case 'foto': return t('log.foto', { tickets: entry.tickets });
+      case 'carro-boi': return t('log.cartWood', { n: entry.wood || 0 });
+      case 'bandeirinha': return t('log.flag');
+      case 'compadres': return t('log.compadres', { n: compact(entry.amount || 0) });
+      case 'cozinha': return t('log.cozinha', { dish: engine.recipe?.(entry.id)?.name || entry.id });
+      case 'fantasia': return t(`log.fantasia.${[1, 2, 3].includes(entry.place) ? entry.place : 3}`, { tickets: entry.tickets || 0 });
+      case 'burro': return t(`log.burro.${['mosca', 'perto', 'longe'].includes(entry.grade) ? entry.grade : 'fora'}`,
+        { n: compact(entry.amount || 0), tickets: entry.tickets || 0 });
       case 'leilao': return entry.item ? t('log.leilao', { item: engine.items[entry.item]?.name || entry.item, price: entry.price })
         : t('log.leilaoCheer', { n: Math.round(entry.amount || 0), price: entry.price });
       case 'saco': return t(`log.saco.${entry.place}`, { n: Math.round(entry.amount || 0), tickets: entry.tickets, s: number(entry.seconds || 0, 1) });
@@ -774,7 +867,7 @@
       group(t('debug.crewBooths'), [button('prendas', 0, t('debug.prendas')), button('cartas', 0, t('debug.cartas')),
         button('roles', 0, t('debug.roles')), button('turma', 0, t('debug.turma')), button('itens', 0, t('debug.itens'))]) +
       group(t('debug.atParty'), [button('pedido', 0, t('debug.callRequest')), button('penetra', 0, t('debug.callCrasher')),
-        button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
+        button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('aviso', 0, t('debug.callAnnounce')), button('frio', 0, t('debug.callCold')), button('sanfoneiro', 0, t('debug.callVisitor')), button('cobra', 0, t('debug.callSnake')), button('fotografo', 0, t('debug.callPhotographer')), button('burro', 0, t('debug.callBurro')), button('fantasia', 0, t('debug.callFantasia')), button('cozinha', 0, t('debug.callCook')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
         button('argolas', 0, t('debug.cheapRings'))]);
   }
 
@@ -809,7 +902,7 @@
       `<p class="miudo">${esc(t('bingo.stats', { cards: s.stats.bingoCards, wins: s.stats.bingos }))}</p>`;
   }
 
-  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, bingo, teste };
+  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, bingo, cozinha, teste };
   const telaName = id => (id === 'teste' || TELAS.some(entry => entry.id === id) ? tabName(id) : '');
 
   function panel(engine, ctx) {

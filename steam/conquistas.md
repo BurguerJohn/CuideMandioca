@@ -220,6 +220,22 @@ Nenhuma conquista é secreta. Quem já tinha a conquista no save antes de jogar 
 | English (english) | Going, going, gone! | Win 3 prizes at the auction. |
 | Español (spanish) | ¡A la una, a las dos, a las tres! | Ganar 3 premios en la subasta. |
 
+## ALBUM
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Álbum completo | Colar todas as figurinhas do Álbum da Festa. |
+| English (english) | Full album | Stick every sticker in the Party Album. |
+| Español (spanish) | Álbum completo | Pegar todas las estampas del Álbum de la Fiesta. |
+
+## QUENTAO
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Quentão quentinho | Vender 20 quentões no friozinho. |
+| English (english) | Nice and hot | Sell 20 quentões in cold snaps. |
+| Español (spanish) | Quentão calentito | Vender 20 quentões en el friíto. |
+
 ## ESTILISTA
 
 | Idioma (Steam) | Nome | Descrição |
@@ -235,3 +251,27 @@ Nenhuma conquista é secreta. Quem já tinha a conquista no save antes de jogar 
 | Português (Brasil) (brazilian) | Ano que vem tem mais | Encerrar um São João e começar o do ano que vem. |
 | English (english) | See you next year | Close a São João and start next year’s. |
 | Español (spanish) | El año que viene hay más | Cerrar un San Juan y empezar el del año que viene. |
+
+## NA_MOSCA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Na mosca | Pregar o rabo no burro bem no X 3 vezes. |
+| English (english) | Bullseye | Pin the tail right on the X 3 times. |
+| Español (spanish) | En el blanco | Clavar la cola del burro justo en la X 3 veces. |
+
+## RETRATISTA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Retrato na parede | Tirar 5 retratos com o fotógrafo lambe-lambe. |
+| English (english) | Portrait on the wall | Take 5 portraits with the street photographer. |
+| Español (spanish) | Retrato en la pared | Tomar 5 retratos con el fotógrafo ambulante. |
+
+## PEGA_COBRA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Pega a cobra | Pegar 5 cobras de pano na quadrilha. |
+| English (english) | Snake catcher | Catch 5 cloth snakes at the square dance. |
+| Español (spanish) | Atrapa culebras | Atrapar 5 culebras de tela en la cuadrilla. |

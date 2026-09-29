@@ -4,8 +4,8 @@ const { LANGUAGES } = require('../src/i18n.js');
 
 // Preferências da janela da festa, sempre normalizadas antes de usar ou salvar.
 const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null,
-  display: null, language: 'auto', sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false });
-const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume', 'perf', 'flash', 'music', 'startup'];
+  display: null, language: 'auto', sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
+const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm'];
 // Desempenho da festa: quadros por segundo com foco / de fundo (suave 60/30, normal 30/20, economia 20/12).
 const PERFS = ['suave', 'normal', 'economia'];
 // Idioma: "auto" segue o idioma do jogo na Steam (ou o do sistema); senão, um dos idiomas do jogo.
@@ -42,7 +42,9 @@ function normalizeSettings(raw) {
     // Música de fundo: desligada por padrão (o jogo fica aberto enquanto a pessoa trabalha).
     music: r.music === true,
     // Abrir com o Windows: desligado por padrão (só liga quem pedir, em Ajustes).
-    startup: r.startup === true
+    startup: r.startup === true,
+    // Menos letreiros (sem os números dos passos e a conversa da plateia): desligado por padrão.
+    calm: r.calm === true
   };
 }
 

@@ -315,6 +315,113 @@ def pipoca():
     return frames
 
 
+def canjica():
+    """Cozinheira do Fogão a Lenha: uma tigelinha de barro com rosto, cheia de canjica cremosa (grãos de milho e canela
+    por cima), e a colher de pau mexendo em roda sozinha. Oito quadros: a colher dá a volta e ela pisca uma vez."""
+    frames = []
+    spoon = [(4, -5), (1, -6), (-3, -5), (0, -6)]
+    for index in range(8):
+        blink = index == 5
+        layer = Layer(18, 20)
+        # A colher de pau (atrás da canjica): o cabo sai do meio e a ponta dá a volta.
+        dx, dy = spoon[index % 4]
+        layer.line(9, 8, 9 + dx, 8 + dy, 'l')
+        layer.put(9 + dx, 8 + dy, 'D')
+        # A canjica: um morrinho creme com grãos de milho e canela.
+        for y in range(5, 10):
+            for x in range(1, 17):
+                if ((x - 8.5) / 7.5) ** 2 + ((y - 9) / 3.6) ** 2 <= 1:
+                    char = 'X'
+                    if (x * 7 + y * 3) % 11 == 0:
+                        char = 'F'
+                    elif (x * 5 + y * 9) % 13 == 0:
+                        char = 'u'
+                    elif y <= 6 and x < 8:
+                        char = '9'
+                    layer.put(x, y, char)
+        # A tigela de barro: mais larga em cima, com a borda clara e a sombra do lado direito.
+        for y in range(9, 18):
+            half = 8 - max(0, y - 13)
+            for x in range(9 - half, 9 + half):
+                u = (x - (9 - half)) / (2 * half)
+                layer.put(x, y, 'T' if y == 9 else 'U' if u < 0.72 else 'u')
+        layer.rect(6, 18, 11, 18, 'u')
+        # Rosto na tigela.
+        eye = 'T' if blink else 'e'
+        for ex in (5, 11):
+            layer.put(ex, 12, eye)
+            if not blink:
+                layer.put(ex, 13, 'e')
+        layer.put(4, 14, 'c')
+        layer.put(12, 14, 'c')
+        layer.rect(7, 14, 9, 14, 'm')
+        layer.put(8, 15, 'n')
+        frames.append(outline(layer.image))
+    return frames
+
+
+def cocada():
+    """Cordelista da Barraca de Cordel: um pedaço de cocada branca (coco ralado, a beirada tostada) de chapéu de couro,
+    lendo em voz alta o folheto de cordel que segura do lado do rosto. Oito quadros: a boca recita, ela pisca uma vez e
+    vira a página no fim."""
+    frames = []
+    for index in range(8):
+        layer = Layer(20, 20)
+        # Chapéu de couro de meia-lua: a copa e a aba virada nas pontas, com a estrelinha na frente.
+        layer.rect(5, 1, 11, 3, 'U')
+        layer.rect(6, 1, 10, 1, 'l')
+        layer.rect(2, 4, 14, 4, 'D')
+        layer.put(1, 3, 'D')
+        layer.put(15, 3, 'D')
+        layer.put(8, 2, 'A')
+        # O pedaço de cocada: bloco claro com fiapos de coco e a beirada tostada (mais escura embaixo e à direita).
+        for y in range(5, 19):
+            for x in range(2, 15):
+                if (x, y) in ((2, 5), (14, 5), (2, 18), (14, 18)):
+                    continue
+                if y >= 17 or x == 14:
+                    char = 'y'
+                elif x == 2 or y == 5:
+                    char = 'x'
+                elif (x * 5 + y * 7) % 9 == 0:
+                    char = '9'
+                elif (x * 3 + y * 11) % 13 == 0:
+                    char = 'x'
+                else:
+                    char = 'X'
+                layer.put(x, y, char)
+        # Rosto: olhos, bochechas e a boca recitando (aberta e fechada), olhando de lado para o folheto.
+        blink = index == 3
+        for ex in (5, 9):
+            layer.put(ex, 8, 'T' if blink else 'e')
+            if not blink:
+                layer.put(ex, 9, 'e')
+                layer.put(ex + 1, 8, 'e')
+        layer.put(4, 11, 'c')
+        layer.put(11, 11, 'c')
+        talking = index in (0, 2, 4, 6)
+        if talking:
+            layer.rect(7, 11, 8, 12, 'm')
+            layer.put(7, 12, 'n')
+        else:
+            layer.rect(7, 11, 8, 11, 'm')
+        # O folheto de cordel na mão, do lado do rosto: capa clara com a xilogravura escura; no fim vira a página.
+        turning = index >= 6
+        layer.rect(15, 6, 19, 14, '6')
+        layer.rect(15, 6, 15, 14, 'x')
+        layer.rect(16, 7, 18, 7, 'R')
+        if turning:
+            layer.rect(17, 4, 19, 11, '9')
+            layer.rect(17, 4, 17, 11, 'x')
+        else:
+            layer.rect(16, 10, 18, 12, '0')
+            layer.put(17, 9, '0')
+        # A mãozinha segurando o folheto por baixo.
+        layer.rect(14, 14, 15, 15, 'y')
+        frames.append(outline(layer.image))
+    return frames
+
+
 def amendoim(step_frames=4):
     """Ambulante: um amendoim com cesta de pé-de-moleque no braço; anda com um balancinho e às vezes acena."""
     rows = [
@@ -410,6 +517,8 @@ ARMS = {  # braço esquerdo em coordenadas do corpo (o direito é espelhado)
     'alto': [(0, 9), (-1, 8), (-1, 4)],
     'aberto': [(0, 9), (-1, 11)],
     'palma': [(1, 10), (4, 9)],
+    # Braço esticado para o lado, um pouco para cima (os compadres de fogueira estendendo a mão por cima do fogo).
+    'estende': [(0, 9), (-3, 8), (-6, 7)],
 }
 def _tres(points):
     """Todo braço com 3 pontos (ombro, cotovelo, mão), para dar para misturar duas poses."""
@@ -441,18 +550,20 @@ CHEER_STEPS = _dobrar([('palma', 'palma', 0, None), ('aberto', 'aberto', -1, Non
 CROWD_W, CROWD_H, CROWD_PAD = 14, 20, 1
 
 
-def person(grid, fabric, pose, sleeve='3', extra=()):
+def person(grid, fabric, pose, sleeve='3', extra=(), pad=CROWD_PAD):
     """Uma pessoa da quadrilha num passo: braços, pé levantado e pulinho. `sleeve` é a cor dos braços e `extra` traz
-    desenhos por cima (buquê, livro), como (linhas, x, y) nas coordenadas do corpo."""
+    desenhos por cima (buquê, livro), como (linhas, x, y) nas coordenadas do corpo. `pad` é a folga de cada lado do
+    quadro (os compadres precisam de mais, para o braço esticado)."""
     left, right, bob, foot = pose
     body = sprite(grid, fabric)
     if foot == 'esquerda':
         body = lift_columns(body, 0, 6, 14, 18)
     elif foot == 'direita':
         body = lift_columns(body, 6, 12, 14, 18)
-    frame = blank(CROWD_W, CROWD_H)
+    width = CROWD_W - 2 * CROWD_PAD + 2 * pad
+    frame = blank(width, CROWD_H)
     top = CROWD_H - 18 + bob
-    ox = CROWD_PAD
+    ox = pad
     place(frame, body, ox, top)
     arms, hands = [], []
     for mirror, name in ((False, left), (True, right)):
@@ -461,8 +572,21 @@ def person(grid, fabric, pose, sleeve='3', extra=()):
         hx, hy = points[-1]
         hands.append((['4'], ox + hx, top + hy))
     hands += [(rows, ox + x, top + y) for rows, x, y in extra]
-    frame.alpha_composite(strokes(CROWD_W, CROWD_H, arms, hands))
+    frame.alpha_composite(strokes(width, CROWD_H, arms, hands))
     return frame
+
+
+# Compadres de fogueira: parado, os dois passos da caminhada, a mão estendida (e o mesmo com um pulinho) e a comemoração.
+# A mão estendida é a esquerda do desenho; quem fica do lado esquerdo da fogueira é desenhado espelhado.
+COMPADRE_POSES = [('baixo', 'baixo', 0, None), ('baixo', 'baixo', 0, 'esquerda'), ('baixo', 'baixo', -1, None),
+                  ('baixo', 'baixo', 0, 'direita'), ('estende', 'baixo', 0, None), ('estende', 'aberto', -1, None),
+                  ('alto', 'alto', -1, None)]
+COMPADRE_PAD = 7
+
+
+def compadres(people):
+    """Os dois compadres, um depois do outro, cada um com as poses de COMPADRE_POSES. `people` traz (grade, tecido)."""
+    return [person(grid, fabric, pose, pad=COMPADRE_PAD) for grid, fabric in people for pose in COMPADRE_POSES]
 
 
 # --- Enfeites dos lados -----------------------------------------------------------------------
@@ -499,16 +623,25 @@ CHICK = {
 
 
 def fardo(rng):
-    """Fardo de feno com um pintinho curioso que espia lá de trás."""
-    bale = hay_bale(rng)
+    """Fardos de feno empilhados (dois embaixo, um em cima), palha solta no chão e um pintinho curioso que espia de
+    trás do fardo de cima."""
+    left, right, top = hay_bale(rng, 15, 10), hay_bale(rng, 15, 10), hay_bale(rng, 15, 9)
     extra = 5
+    width = left.width + right.width - 2
+    height = extra + top.height - 2 + left.height
+    straw = Layer(width, height)
+    for x, char in ((1, 'Y'), (2, 'y'), (width - 3, 'Y'), (width - 2, 'o'), (width // 2, 'y')):
+        straw.put(x, height - 1, char)
     plan = [None] * 6 + ['topo', 'olha', 'esquerda', 'direita', 'piu', 'topo']
     frames = []
     for pose in plan:
-        frame = blank(bale.width, bale.height + extra)
+        frame = blank(width, height)
         if pose:
             rows = CHICK[pose]
-            frame.alpha_composite(strokes(frame.width, frame.height, [], [(rows, 12, extra - len(rows))]))
-        place(frame, bale, 0, extra)
+            frame.alpha_composite(strokes(width, height, [], [(rows, width // 2 + 3, extra - len(rows))]))
+        place(frame, top, (width - top.width) // 2, extra)
+        place(frame, left, 0, extra + top.height - 2)
+        place(frame, right, left.width - 2, extra + top.height - 2)
+        frame.alpha_composite(straw.image)
         frames.append(frame)
     return frames

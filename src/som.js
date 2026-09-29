@@ -181,6 +181,28 @@
         sanfona(v, 0.34, 0.45, [17, 21, 24]);
       }
     },
+    // Zurro do jegue: "i-óóó", um guincho agudo e um ronco grave, duas vezes.
+    zurro: {
+      gap: 600,
+      play: v => [0, 0.5].forEach(at => {
+        v.tom(at, 0.18, 700, { to: 900, type: 'sawtooth', gain: 0.03, filter: 2200 });
+        v.tom(at + 0.18, 0.28, 240, { to: 180, type: 'sawtooth', gain: 0.04, filter: 1200 });
+      })
+    },
+    // Buzina da Kombi da pamonha: duas notas juntas, meio desafinadas, duas vezes (bi-bi!).
+    buzina: {
+      gap: 400,
+      play: v => [0, 0.2].forEach(at => { for (const f of [392, 466]) v.tom(at, 0.14, f, { type: 'square', gain: 0.035, filter: 1600 }); })
+    },
+    // Alto-falante da quermesse: o "plim-plom" de dois tons antes do aviso, com um chiadinho de caixa de som.
+    altofalante: {
+      gap: 3000,
+      play: v => {
+        v.tom(0, 0.35, nota(28), { type: 'sine', gain: 0.07 });
+        v.tom(0.3, 0.55, nota(24), { type: 'sine', gain: 0.07 });
+        v.ruido(0, 0.8, { type: 'highpass', freq: 3000, gain: 0.012 });
+      }
+    },
     // O grito da marcação da quadrilha ("Anarriê!"): um gritinho que sobe e desce, baixinho.
     grito: { gap: 3500, play: v => { v.tom(0, 0.09, 700, { to: 1100, type: 'triangle', gain: 0.05 }); v.tom(0.08, 0.1, 1100, { to: 800, type: 'triangle', gain: 0.045 }); } },
     // A bolinha do bingo saindo do globo: dois tiquinhos de madeira.
@@ -225,6 +247,12 @@
     carinho: { gap: 250, play: v => { v.tom(0, 0.14, 320, { to: 900, type: 'sine', gain: 0.1 }); v.tom(0.13, 0.14, nota(31), { type: 'sine', gain: 0.06 }); } },
     // "Olha a cobra!": apito de escorregar, baixinho e raro.
     cobra: { gap: 4000, play: v => v.tom(0, 0.2, 700, { to: 1500, type: 'sine', gain: 0.05 }) },
+    // Papagaio: um "crrá" rouco, duas vezes.
+    papagaio: { gap: 300, play: v => { v.tom(0, 0.1, 1100, { to: 700, type: 'sawtooth', gain: 0.045, filter: 2400 }); v.tom(0.13, 0.12, 1000, { to: 650, type: 'sawtooth', gain: 0.045, filter: 2400 }); } },
+    // Show de drones: um arpejo subindo, suave e brilhante (dó, mi, sol, dó).
+    drones: { gap: 2000, play: v => [0, 4, 7, 12].forEach((step, i) => v.tom(i * 0.12, 0.4, nota(12 + step), { type: 'sine', gain: 0.035 })) },
+    // Estalinho: um estalo seco e curtinho, com um chiado de faísca atrás.
+    estalo: { gap: 90, play: v => { v.ruido(0, 0.025, { type: 'highpass', freq: 1800, gain: 0.22 }); v.ruido(0.02, 0.09, { type: 'highpass', freq: 5000, gain: 0.05 }); } },
     foto: { play: v => { v.ruido(0, 0.02, { type: 'highpass', freq: 3000, gain: 0.2 }); v.ruido(0.06, 0.03, { type: 'highpass', freq: 2000, gain: 0.16 }); } }
   };
 
@@ -233,8 +261,8 @@
   // passos um pouco à frente do relógio do áudio, então a música não engasga quando a janela fica de fundo.
   const BPM = 104;
   const COLCHEIA = 60 / BPM / 2;
-  const ACORDES = { G: [-5, -1, 2], C: [0, 4, 7], D: [2, 6, 9] }; // semitons acima do dó central
-  const BAIXOS = { G: -17, C: -12, D: -10 };
+  const ACORDES = { G: [-5, -1, 2], C: [0, 4, 7], D: [2, 6, 9], A: [-3, 1, 4], F: [-7, -3, 0] }; // semitons acima do dó central
+  const BAIXOS = { G: -17, C: -12, D: -10, A: -15, F: -19 };
   // Parte A (oito compassos) e parte B (mais oito, subindo para o dó), e volta: o laço tem dezesseis compassos.
   const COMPASSOS = ['G', 'G', 'C', 'G', 'D', 'D', 'C', 'D', 'C', 'C', 'G', 'G', 'D', 'D', 'G', 'G'];
   const MELODIA = [
@@ -270,6 +298,145 @@
     if (nota_ !== null) sanfona(v, 0, COLCHEIA * 1.6, [nota_], 0.03 * m);
   }
 
+  // A segunda música: um xote em ré maior, mais lento e balançado. Zabumba no "tum... tum-tum", baixo alternando a
+  // fundamental e a quinta, e uma melodia de notas longas (cada nota segura até a próxima).
+  const XOTE_BPM = 84;
+  const XOTE_COLCHEIA = 60 / XOTE_BPM / 2;
+  const XOTE_COMPASSOS = ['D', 'D', 'A', 'A', 'A', 'A', 'D', 'D', 'G', 'G', 'D', 'D', 'A', 'A', 'D', 'D'];
+  const XOTE_MELODIA = [
+    [18, null, 16, null, 14, null, 16, 18], [21, null, null, null, 18, null, null, null],
+    [16, null, 13, null, 9, null, 13, 16], [19, null, 18, 16, 13, null, null, null],
+    [16, null, 13, 16, 19, null, 18, 16], [13, null, 9, null, 13, null, 16, null],
+    [14, null, 18, null, 21, null, 18, null], [14, null, null, null, null, null, null, null],
+    [19, null, 18, null, 19, null, 23, null], [21, null, 19, 18, 19, null, null, null],
+    [18, null, 21, null, 18, null, 14, null], [16, null, 18, 16, 14, null, null, null],
+    [13, null, 16, null, 19, null, 18, 16], [13, null, 9, 11, 13, null, null, null],
+    [14, null, 18, 21, 18, null, 16, null], [14, null, null, null, 2, null, null, null]
+  ];
+
+  function passoDoXote(v, passo) {
+    const bar = Math.floor(passo / 8) % XOTE_COMPASSOS.length;
+    const i = passo % 8;
+    const acorde = XOTE_COMPASSOS[bar];
+    const m = VOLUME_MUSICA;
+    if (i === 0 || i === 5) v.tom(0, 0.2, 110, { to: 50, type: 'sine', gain: 0.14 * m });
+    if (i === 3) v.tom(0, 0.14, 100, { to: 55, type: 'sine', gain: 0.07 * m });
+    if (i === 2 || i === 6) v.ruido(0, 0.07, { type: 'bandpass', freq: 1700, q: 1.4, gain: 0.045 * m });
+    const aberto = i === 0 || i === 4;
+    v.tom(0, aberto ? 0.4 : 0.08, 3000, { type: 'sine', gain: (aberto ? 0.018 : 0.008) * m });
+    if (i === 0) v.tom(0, 0.5, nota(BAIXOS[acorde]), { type: 'sawtooth', gain: 0.03 * m, filter: 480, attack: 0.02 });
+    if (i === 4) v.tom(0, 0.45, nota(BAIXOS[acorde] + 7), { type: 'sawtooth', gain: 0.026 * m, filter: 480, attack: 0.02 });
+    if (i === 2 || i === 6) sanfona(v, 0, 0.26, ACORDES[acorde], 0.013 * m);
+    const row = XOTE_MELODIA[bar];
+    if (row[i] !== null) {
+      let hold = 1;
+      while (i + hold < 8 && row[i + hold] === null) hold++;
+      sanfona(v, 0, XOTE_COLCHEIA * hold * 0.95, [row[i]], 0.03 * m);
+    }
+  }
+
+  // A terceira música: um baião em lá mixolídio (com o sol natural, a sétima menor que dá a cara do baião), em 2/4. Aqui
+  // cada passo é uma semicolcheia e o compasso tem oito: a zabumba faz o "tum... tum-tum" (1, 4 e 5), o bacalhau bate
+  // no contratempo, o triângulo abre no contratempo também, e a melodia anda no 3+3+2.
+  const BAIAO_BPM = 92;
+  const BAIAO_SEMI = 60 / BAIAO_BPM / 4;
+  const BAIAO_COMPASSOS = ['A', 'A', 'G', 'G', 'D', 'D', 'A', 'A', 'A', 'A', 'G', 'G', 'D', 'D', 'A', 'A',
+    'D', 'D', 'A', 'A', 'G', 'G', 'A', 'A', 'D', 'D', 'A', 'A', 'G', 'D', 'A', 'A'];
+  const _ = null;
+  const BAIAO_MELODIA = [
+    [16, _, _, 16, _, _, 14, _], [13, _, _, 9, _, _, _, _], [19, _, _, 19, _, _, 18, _], [16, _, _, 14, _, _, _, _],
+    [18, _, _, 18, _, _, 16, _], [14, _, 13, _, 11, _, _, _], [13, _, _, 16, _, _, 13, _], [9, _, _, _, _, _, _, _],
+    [16, _, _, 16, _, _, 19, _], [21, _, _, 19, _, _, 16, _], [19, _, 18, _, 16, _, 14, _], [11, _, _, 14, _, _, _, _],
+    [18, _, _, 21, _, _, 18, _], [16, _, 14, _, 13, _, 11, _], [9, _, _, 13, _, _, 16, _], [21, _, _, _, 9, _, _, _],
+    [21, _, _, 21, _, _, 19, _], [18, _, _, 14, _, _, _, _], [16, _, _, 16, _, _, 13, _], [9, _, 11, _, 13, _, _, _],
+    [14, _, _, 14, _, _, 16, _], [19, _, 18, _, 16, _, 14, _], [13, _, _, 16, _, _, 21, _], [19, _, _, _, _, _, _, _],
+    [21, _, _, 21, _, _, 23, _], [21, _, 18, _, 14, _, _, _], [16, _, _, 13, _, _, 16, _], [21, _, _, _, 19, _, _, _],
+    [19, _, _, 16, _, _, 14, _], [18, _, _, 14, _, _, 11, _], [13, _, _, 9, _, _, 13, 16], [9, _, _, _, _, _, _, _]
+  ];
+
+  function passoDoBaiao(v, passo) {
+    const bar = Math.floor(passo / 8) % BAIAO_COMPASSOS.length;
+    const i = passo % 8;
+    const acorde = BAIAO_COMPASSOS[bar];
+    // Mais cheio de notas que os outros: um pouco mais baixo, para ficar no mesmo volume.
+    const m = VOLUME_MUSICA * 0.88;
+    // Zabumba: bumbo no 1, no 4 (mais leve) e no 5; o bacalhau (vareta no aro) no contratempo.
+    if (i === 0) v.tom(0, 0.18, 115, { to: 52, type: 'sine', gain: 0.14 * m });
+    if (i === 3) v.tom(0, 0.1, 108, { to: 58, type: 'sine', gain: 0.08 * m });
+    if (i === 4) v.tom(0, 0.16, 112, { to: 54, type: 'sine', gain: 0.12 * m });
+    if (i === 2 || i === 6) v.ruido(0, 0.05, { type: 'bandpass', freq: 2100, q: 1.6, gain: 0.045 * m });
+    // Triângulo: tique em toda semicolcheia, aberto no contratempo.
+    const aberto = i === 2 || i === 6;
+    v.tom(0, aberto ? 0.3 : 0.05, 3300, { type: 'sine', gain: (aberto ? 0.018 : 0.007) * m });
+    // Baixo acompanhando a zabumba: fundamental no 1 e no 4, quinta no 5.
+    if (i === 0) v.tom(0, 0.3, nota(BAIXOS[acorde]), { type: 'sawtooth', gain: 0.03 * m, filter: 500, attack: 0.02 });
+    if (i === 3) v.tom(0, 0.1, nota(BAIXOS[acorde]), { type: 'sawtooth', gain: 0.022 * m, filter: 500, attack: 0.01 });
+    if (i === 4) v.tom(0, 0.28, nota(BAIXOS[acorde] + 7), { type: 'sawtooth', gain: 0.026 * m, filter: 500, attack: 0.02 });
+    if (i === 2 || i === 6) sanfona(v, 0, 0.14, ACORDES[acorde], 0.014 * m);
+    const row = BAIAO_MELODIA[bar];
+    if (row[i] !== null) {
+      let hold = 1;
+      while (i + hold < 8 && row[i + hold] === null) hold++;
+      sanfona(v, 0, BAIAO_SEMI * hold * 0.9, [row[i]], 0.03 * m);
+    }
+  }
+
+  // A quarta música: um arrasta-pé em dó maior, o mais ligeiro de todos, em 2/4 (cada passo é uma semicolcheia). Forma
+  // AABB: a parte A no dó e no sol, a B começando no fá. Zabumba em cada tempo com o repique antes do segundo, baixo
+  // "pum-pá" (fundamental e quinta), sanfona curtinha no contratempo e a melodia correndo em colcheias.
+  const ARRASTA_BPM = 124;
+  const ARRASTA_SEMI = 60 / ARRASTA_BPM / 4;
+  const ARRASTA_A = ['C', 'C', 'G', 'G', 'G', 'G', 'C', 'C'];
+  const ARRASTA_B = ['F', 'F', 'C', 'C', 'G', 'G', 'C', 'C'];
+  const ARRASTA_COMPASSOS = [...ARRASTA_A, ...ARRASTA_A, ...ARRASTA_B, ...ARRASTA_B];
+  const ARRASTA_PARTE_A = [
+    [12, _, 16, _, 19, _, 16, _], [24, _, 19, _, 16, _, 12, _], [11, _, 14, _, 19, _, 14, _], [23, _, 19, _, 17, _, 14, _],
+    [14, 16, 17, _, 19, _, 17, _], [14, _, 11, _, 7, _, 11, _], [12, _, 16, _, 19, _, 24, _]
+  ];
+  const ARRASTA_PARTE_B = [
+    [17, _, 21, _, 24, _, 21, _], [17, 19, 21, _, 19, _, 17, _], [16, _, 19, _, 24, _, 19, _], [16, 17, 19, _, 16, _, 12, _],
+    [14, _, 17, _, 19, _, 23, _], [26, _, 23, _, 19, _, 17, _], [16, _, 14, _, 12, _, 11, _]
+  ];
+  // Cada parte toca duas vezes: a primeira termina puxando para a repetição, a segunda fecha.
+  const ARRASTA_MELODIA = [
+    ...ARRASTA_PARTE_A, [21, _, 19, _, 16, _, 14, _], ...ARRASTA_PARTE_A, [24, _, _, _, 12, _, _, _],
+    ...ARRASTA_PARTE_B, [12, _, 14, _, 16, _, 17, _], ...ARRASTA_PARTE_B, [12, _, _, _, _, _, _, _]
+  ];
+
+  function passoDoArrastaPe(v, passo) {
+    const bar = Math.floor(passo / 8) % ARRASTA_COMPASSOS.length;
+    const i = passo % 8;
+    const acorde = ARRASTA_COMPASSOS[bar];
+    // O mais cheio de notas de todos: mais baixo, para ficar no volume do forró.
+    const m = VOLUME_MUSICA * 0.86;
+    // Zabumba: bumbo no 1 e no 5 (os dois tempos), um repique leve no 4; o "tá" de aro no contratempo.
+    if (i === 0) v.tom(0, 0.14, 120, { to: 55, type: 'sine', gain: 0.14 * m });
+    if (i === 3) v.tom(0, 0.08, 110, { to: 60, type: 'sine', gain: 0.06 * m });
+    if (i === 4) v.tom(0, 0.14, 118, { to: 56, type: 'sine', gain: 0.12 * m });
+    if (i === 2 || i === 6) v.ruido(0, 0.05, { type: 'bandpass', freq: 2000, q: 1.5, gain: 0.05 * m });
+    // Triângulo corrido, aberto no contratempo.
+    const aberto = i === 2 || i === 6;
+    v.tom(0, aberto ? 0.25 : 0.04, 3400, { type: 'sine', gain: (aberto ? 0.017 : 0.007) * m });
+    // Baixo "pum-pá": a fundamental no primeiro tempo e a quinta no segundo.
+    if (i === 0) v.tom(0, 0.22, nota(BAIXOS[acorde]), { type: 'sawtooth', gain: 0.03 * m, filter: 520, attack: 0.015 });
+    if (i === 4) v.tom(0, 0.22, nota(BAIXOS[acorde] + 7), { type: 'sawtooth', gain: 0.027 * m, filter: 520, attack: 0.015 });
+    if (i === 2 || i === 6) sanfona(v, 0, 0.1, ACORDES[acorde], 0.014 * m);
+    const row = ARRASTA_MELODIA[bar];
+    if (row[i] !== null) {
+      let hold = 1;
+      while (i + hold < 8 && row[i + hold] === null) hold++;
+      sanfona(v, 0, ARRASTA_SEMI * hold * 0.9, [row[i]], 0.03 * m);
+    }
+  }
+
+  // As músicas do laço, uma depois da outra: o forró, o xote, o baião e o arrasta-pé, e volta.
+  const MUSICAS = [
+    { id: 'forro', colcheia: COLCHEIA, passos: PASSOS, passo: passoDaMusica },
+    { id: 'xote', colcheia: XOTE_COLCHEIA, passos: XOTE_COMPASSOS.length * 8, passo: passoDoXote },
+    { id: 'baiao', colcheia: BAIAO_SEMI, passos: BAIAO_COMPASSOS.length * 8, passo: passoDoBaiao },
+    { id: 'arrasta-pe', colcheia: ARRASTA_SEMI, passos: ARRASTA_COMPASSOS.length * 8, passo: passoDoArrastaPe }
+  ];
+
   const clampVolume = value => (Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0.5);
 
   function create(options = {}) {
@@ -284,7 +451,7 @@
     // Os relógios que agendam a música (injetáveis nos testes).
     const timers = { set: options.setInterval || (root.setInterval && root.setInterval.bind(root)),
       clear: options.clearInterval || (root.clearInterval && root.clearInterval.bind(root)) };
-    const music = { on: false, timer: null, step: 0, next: 0 };
+    const music = { on: false, timer: null, step: 0, song: 0, next: 0 };
     // O ouvido percebe volume em escala de potência: 50% na barra soa como metade.
     const level = () => volume * volume * 0.9;
 
@@ -367,9 +534,12 @@
       const horizon = ctx.currentTime + 1.4;
       if (music.next < ctx.currentTime) music.next = ctx.currentTime + 0.05;
       while (music.next < horizon) {
-        try { passoDaMusica(voice(music.next, 0, bus), music.step); } catch (_) { /* um passo com defeito não derruba a música */ }
-        music.next += COLCHEIA;
-        music.step = (music.step + 1) % PASSOS;
+        const song = MUSICAS[music.song];
+        try { song.passo(voice(music.next, 0, bus), music.step); } catch (_) { /* um passo com defeito não derruba a música */ }
+        music.next += song.colcheia;
+        music.step++;
+        // Acabou o laço desta música: entra a próxima.
+        if (music.step >= song.passos) { music.step = 0; music.song = (music.song + 1) % MUSICAS.length; }
       }
     }
 
@@ -388,6 +558,7 @@
         timers.clear(music.timer);
         music.timer = null;
         music.step = 0;
+        music.song = 0;
         if (bus) bus.gain.setTargetAtTime(0, ctx.currentTime, 0.08);
       }
       return playing;
@@ -418,8 +589,10 @@
     }
 
     return { play, set, setMusic, unlock, get enabled() { return enabled; }, get volume() { return volume; },
-      get music() { return !!music.timer; } };
+      get music() { return !!music.timer; }, get song() { return MUSICAS[music.song].id; } };
   }
 
-  return { create, SONS: Object.keys(SONS), MUSICA: { passos: PASSOS, colcheia: COLCHEIA } };
+  return { create, SONS: Object.keys(SONS), MUSICA: { passos: PASSOS, colcheia: COLCHEIA, musicas: MUSICAS.map(song => song.id) },
+    // Para os testes e o render de conferência: toca um passo de uma música numa voz qualquer.
+    passo: (id, v, n) => MUSICAS.find(song => song.id === id).passo(v, n) };
 });

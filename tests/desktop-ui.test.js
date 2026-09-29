@@ -10,7 +10,7 @@ const { fakeDocument } = require('./fake-dom');
 
 const IDS = ['#festa', '#festa-canvas', '#placa', '#avisos', '#painel', '#painel-abas', '#painel-corpo',
   '#painel-titulo', '#janela', '#janela-corpo', '#importar', '#vitrine', '#argolas', '#argolas-canvas', '#argolas-info',
-  '#tela', '#tela-corpo', '#tela-titulo'];
+  '#tela', '#tela-corpo', '#tela-titulo', '#zoom-guia'];
 
 function boot(extra = {}, desktopExtra = {}) {
   const document = fakeDocument(IDS);
@@ -233,4 +233,86 @@ test('Ajustes tem "Abrir com o Windows", desligado de fábrica', async () => {
   assert.match(html, /class="chip ativa" data-action="inicio" data-value="off"/, 'começa desligado');
   click({ action: 'inicio', value: 'on' });
   assert.deepEqual(JSON.parse(JSON.stringify(calls.filter(c => c[0] === 'settings').at(-1)[1])), { startup: true });
+});
+
+test('quem já jogava vê as novidades da versão uma vez; partida nova não', async () => {
+  const { GameEngine } = core;
+  const old = new GameEngine(data, null, {}).exportState();
+  delete old.newsSeen;
+  const saves = [];
+  const { document } = boot({}, { loadGame: () => old, saveGame: state => { saves.push(state); return true; } });
+  await Promise.resolve();
+  assert.match(document.nodes.get('#janela-corpo').innerHTML, /Novidades na festa!/);
+  assert.match(document.nodes.get('#janela-corpo').innerHTML, /Álbum da Festa/);
+  const fresh = boot();
+  await Promise.resolve();
+  assert.doesNotMatch(fresh.document.nodes.get('#janela-corpo').innerHTML, /Novidades na festa!/);
+});
+
+test('autocura: o cursor passeia em cima do jogo, a janela diz que aceita o clique, mas o mouse não chega: pede janela nova', async () => {
+  let clock = 1000;
+  const { calls, run, document } = boot({ performance: { now: () => clock } }, { repair: () => calls.push(['repair']) });
+  await Promise.resolve();
+  document.elementFromPoint = () => ({ closest: selector => selector === '.ui' ? {} : null });
+  // Movimento de verdade chegando: tudo certo, nada de conserto.
+  for (let i = 0; i < 40; i++) {
+    clock += 120;
+    document.listeners?.mousemove?.({ clientX: 10 + i, clientY: 10 });
+    run({ cursor: { x: 10 + i, y: 10, interactive: true } });
+  }
+  assert.ok(!calls.some(call => call[0] === 'repair'));
+  // Só o vigia fala (o mouse de verdade sumiu): depois de 3 s, uma janela nova; e não pede de novo logo em seguida.
+  for (let i = 0; i < 60; i++) { clock += 120; run({ cursor: { x: 60 + i, y: 10, interactive: true } }); }
+  assert.equal(calls.filter(call => call[0] === 'repair').length, 1);
+  assert.ok(calls.some(call => call[0] === 'save'), 'salva antes de trocar a janela');
+  // Cursor fora do jogo (clique vazando de propósito): não é defeito.
+  calls.length = 0;
+  clock += 200000;
+  document.elementFromPoint = () => null;
+  for (let i = 0; i < 60; i++) { clock += 120; run({ cursor: { x: 900 + i, y: 900, interactive: false } }); }
+  assert.ok(!calls.some(call => call[0] === 'repair'));
+});
+
+test('arrasto que perdeu o soltar do botão (Alt+Tab, repouso) não prende a janela: o clique volta a seguir o cursor', async () => {
+  const { calls, run, document } = boot();
+  await Promise.resolve();
+  // Um pedaço da festa (o DOM falso não sabe de `closest`): o clique começa um arrasto da festa.
+  const canvas = { closest: selector => (selector === '#festa-canvas' ? {} : null), matches: () => false };
+  document.elementFromPoint = () => canvas;
+  document.listeners.pointerdown({ target: canvas, clientX: 50, clientY: 50, button: 0, preventDefault() {} });
+  // Arrastando: a posição do cursor não mexe no clique (o soltar precisa chegar aqui).
+  calls.length = 0;
+  document.elementFromPoint = () => null;
+  run({ cursor: { x: 800, y: 800, interactive: true } });
+  assert.equal(calls.filter(call => call[0] === 'interactive').length, 0, 'o arrasto começou');
+  // Perdeu o foco no meio do arrasto (o pointerup nunca chega).
+  run({ foco: false });
+  calls.length = 0;
+  document.elementFromPoint = () => null;
+  run({ cursor: { x: 900, y: 900, interactive: true } });
+  assert.deepEqual(calls.filter(call => call[0] === 'interactive'), [['interactive', false]], 'a janela volta a vazar o clique');
+  // O mesmo com o mouse andando sem botão apertado.
+  document.elementFromPoint = () => canvas;
+  document.listeners.pointerdown({ target: canvas, clientX: 50, clientY: 50, button: 0, preventDefault() {} });
+  document.listeners.pointermove({ clientX: 200, clientY: 50, buttons: 0 });
+  calls.length = 0;
+  document.elementFromPoint = () => null;
+  run({ cursor: { x: 901, y: 900, interactive: true } });
+  assert.deepEqual(calls.filter(call => call[0] === 'interactive'), [['interactive', false]]);
+});
+
+test('arrastar a alça do zoom mostra a moldura do tamanho pedido, que acompanha o mouse; soltar some com ela', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const guide = document.querySelector('#zoom-guia');
+  guide.hidden = true;
+  const handle = { closest: selector => (selector === '[data-action="zoom-alca"]' ? {} : null), matches: () => false };
+  document.listeners.pointerdown({ target: handle, clientX: 100, clientY: 100, button: 0, preventDefault() {} });
+  document.listeners.pointermove({ clientX: 140, clientY: 100, buttons: 1 });
+  assert.equal(guide.hidden, false, 'a moldura aparece enquanto arrasta');
+  const first = parseFloat(guide.style.width);
+  document.listeners.pointermove({ clientX: 170, clientY: 100, buttons: 1 });
+  assert.ok(parseFloat(guide.style.width) > first, 'arrastar para a direita aumenta a moldura, mesmo antes do pulo da festa');
+  document.listeners.pointerup({});
+  assert.equal(guide.hidden, true, 'soltou: a moldura some');
 });

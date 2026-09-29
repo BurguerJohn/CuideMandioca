@@ -12,7 +12,7 @@
   const LANGUAGE_KEY = 'arraia-idioma';
   const REOPEN_KEY = 'arraia-reabrir';
   const DEFAULTS = { pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, sound: true, volume: 0.5,
-    perf: 'suave', flash: true, music: false, startup: false };
+    perf: 'suave', flash: true, music: false, startup: false, calm: false };
   // Quadros por segundo da festa: [com foco, de fundo] em cada perfil de desempenho.
   const PERF_RATES = { suave: [60, 30], normal: [30, 20], economia: [20, 12] };
   const rateNow = () => (PERF_RATES[ui.settings.perf] || PERF_RATES.suave)[ui.focused ? 0 : 1];
@@ -140,6 +140,45 @@
     return `${Math.round(size.physical / size.base * 100)}%`;
   }
 
+  // Guia do zoom: a festa só muda de tamanho em múltiplos inteiros de pixel (a arte fica nítida), então entre um pulo e
+  // outro parecia que a alça não fazia nada. Enquanto ela é arrastada (ou a roda gira nela), uma moldura tracejada mostra
+  // o tamanho pedido, andando junto com o mouse e presa no mesmo lado que a festa; ela pisca quando a festa pula de tamanho.
+  function showZoomGuide(linger = 0) {
+    const guide = $('#zoom-guia');
+    const anchor = ui.anchor;
+    if (!guide || !anchor) return;
+    const size = festaSize();
+    const factor = 3 * ui.settings.zoom * (globalThis.devicePixelRatio || 1) / size.physical;
+    const width = size.width * factor;
+    const keepRight = anchor.side === 'direita' || (anchor.side === 'livre' && ui.settings.placa?.dx > anchor.width / 2);
+    const left = anchor.side === 'topo' ? anchor.left + anchor.width / 2 - width / 2
+      : keepRight ? anchor.left + anchor.width - width : anchor.left;
+    guide.style.left = `${Math.round(left)}px`;
+    guide.style.bottom = `${Math.round(anchor.lift)}px`;
+    guide.style.width = `${Math.round(width)}px`;
+    guide.style.height = `${Math.round(size.top * factor)}px`;
+    const label = guide.querySelector?.('b');
+    // Na mesma conta do botão de tamanho (pixels da tela por pixel de arte), para os dois números baterem.
+    if (label) label.textContent = `${Math.round(size.physical * factor / size.base * 100)}%`;
+    const snapped = zoomLabel();
+    if (ui.zoomGuideSnap && ui.zoomGuideSnap !== snapped && guide.classList) {
+      guide.classList.remove('pulou');
+      void guide.offsetWidth;
+      guide.classList.add('pulou');
+    }
+    ui.zoomGuideSnap = snapped;
+    guide.hidden = false;
+    clearTimeout(ui.zoomGuideTimer);
+    if (linger) ui.zoomGuideTimer = setTimeout(hideZoomGuide, linger);
+  }
+
+  function hideZoomGuide() {
+    clearTimeout(ui.zoomGuideTimer);
+    ui.zoomGuideSnap = null;
+    const guide = $('#zoom-guia');
+    if (guide) guide.hidden = true;
+  }
+
   // A festa nunca passa das bordas: o terreiro inteiro fica na tela, do chão ao topo dos mastros.
   const maxLeft = size => Math.max(0, innerWidth - size.width);
   const maxLift = size => Math.max(0, innerHeight - size.top - 8);
@@ -228,8 +267,19 @@
       const dockHeight = ui.dock.open ? ($('#vitrine').offsetHeight || 220) * uiZoom() + 8 : 0;
       ui[key] = { dx: base.a.width / 2 - w / 2, dy: -base.a.top - dockHeight - h - 10, auto: true };
     }
-    element.style.left = `${Math.round(clamp(base.x + ui[key].dx, 8, Math.max(8, innerWidth - w - 8)))}px`;
-    element.style.top = `${Math.round(clamp(base.y + ui[key].dy, 8, Math.max(8, innerHeight - h - 8)))}px`;
+    let left = clamp(base.x + ui[key].dx, 8, Math.max(8, innerWidth - w - 8));
+    const top = clamp(base.y + ui[key].dy, 8, Math.max(8, innerHeight - h - 8));
+    // No lugar automático, a janela não cobre a placa (em tela pequena ela escondia os botões da direita): vai para o lado.
+    if (ui[key].auto) {
+      const placa = $('#placa');
+      const r = placa && !placa.hidden && placa.getBoundingClientRect ? placa.getBoundingClientRect() : null;
+      if (r && r.width && left < r.right + 8 && left + w > r.left - 8 && top < r.bottom + 8 && top + h > r.top - 8) {
+        if (r.right + 8 + w <= innerWidth - 8) left = r.right + 8;
+        else if (r.left - 8 - w >= 8) left = r.left - 8 - w;
+      }
+    }
+    element.style.left = `${Math.round(left)}px`;
+    element.style.top = `${Math.round(top)}px`;
   }
 
   // --- Ajustes -----------------------------------------------------------------------------------------
@@ -239,6 +289,7 @@
     som?.setMusic?.(ui.settings.music === true && !ui.settings.hidden);
     ui.festa?.setRate(rateNow());
     ui.festa?.setFlash?.(ui.settings.flash !== false);
+    ui.festa?.setCalm?.(ui.settings.calm === true);
     scaleFesta();
     renderHud(true);
     placeFesta();
@@ -395,10 +446,19 @@
     const key = [engine.tierIndex(), s.size, s.fishing.unlocked && s.fishing.ready, s.mail.ready, ready,
       now() < ui.closeArmedUntil, !!desktop, s.runtime.frenzyLeft > 0, s.runtime.quadrilhaLeft > 0, s.runtime.weddingLeft > 0,
       s.bingo.round && !s.bingo.round.result ? engine.bingoMarks().count : -1,
-      engine.specialDay()?.id].join('|');
+      engine.specialDay()?.id, engine.daysToSaoJoao(), s.leilao?.active ? `${s.leilao.active.leader}:${s.leilao.active.price}` : '', !!s.saco?.active,
+      !!s.cold?.active, !!s.visitor?.active, !!(s.fotografo?.active && !s.fotografo.active.shot), !!(s.burro?.active && !s.burro.active.pinned), !!s.fantasia?.judgeAt,
+      `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha')].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
-    $('#placa').innerHTML = UI.hud(engine, context());
+    const placa = $('#placa');
+    placa.innerHTML = UI.hud(engine, context());
+    // A placa cresce para cima com os selos (leilão, prato servido...): mudou a altura, reposiciona para ela não sair da tela.
+    if (placa.offsetHeight && placa.offsetHeight !== ui.placaHeight) {
+      const first = ui.placaHeight === undefined;
+      ui.placaHeight = placa.offsetHeight;
+      if (!first) placeFesta();
+    }
     refreshLive(true);
   }
 
@@ -432,8 +492,11 @@
       const text = card.querySelector('[data-meta-n]');
       if (text) text.textContent = `${UI.number ? UI.number(value) : value}/${UI.number ? UI.number(goal.target) : goal.target}`;
       card.classList.toggle('feita', ready);
-      const button = card.querySelector('button');
+      const button = card.querySelector('[data-action="meta-resgatar"]');
       if (button) { button.disabled = !ready; button.classList.toggle('claro', !ready); }
+      // Meta cumprida não se troca: o botão de trocar some.
+      const swap = card.querySelector('[data-action="meta-trocar"]');
+      if (swap) swap.hidden = ready;
     }
     for (const node of document.querySelectorAll('.placa .barra.fama i')) {
       node.style.width = `${Math.min(100, 100 * s.fame / Math.max(1, engine.fameNeed()))}%`;
@@ -560,7 +623,7 @@
   }
 
   // Itens que não se compram: de onde cada um vem (rolês, Argolas, casamento, leilão).
-  const ONLY_FROM = { role: 'app.onlyOutings', argolas: 'app.onlyRings', casamento: 'app.onlyWedding', leilao: 'app.onlyAuction' };
+  const ONLY_FROM = { role: 'app.onlyOutings', argolas: 'app.onlyRings', casamento: 'app.onlyWedding', leilao: 'app.onlyAuction', cobra: 'app.onlySnake' };
   function dockItem(id) {
     const item = engine.items[id];
     const side = ui.dock.side;
@@ -665,6 +728,13 @@
     location.reload();
   }
 
+  // Legenda da foto da festa: o nome dela (ou o do jogo), o porte e os convidados.
+  function photoCaption() {
+    return { title: engine.state.name && engine.state.name !== 'Mandioca' ? engine.state.name : t('app.title'),
+      subtitle: (t('party.subtitle', { tier: engine.tier().name, n: engine.state.size }) +
+        (engine.state.year > 1 ? ` · ${t('hud.year', { n: engine.state.year })}` : '')).replace(/\s*·\s*/g, ' - ') };
+  }
+
   function download(name, url) {
     const link = document.createElement('a');
     link.href = url;
@@ -742,6 +812,14 @@
       return;
     }
     if (a === 'fogueira') { done(engine.buyBonfire(d.id), t('app.fireGrew'), t('app.needWood'), 'fogo'); return; }
+    if (a === 'cozinhar') { done(engine.cook(d.id), t('app.cookStart', { dish: engine.recipe(d.id)?.name || d.id }), t('app.needWood'), 'fogo'); return; }
+    if (a === 'servir') { serveDish(); return; }
+    if (a === 'meta-trocar') {
+      const goal = engine.swapGoal(Number(d.index));
+      done(!!goal, goal ? t('app.goalSwapped', { goal: t(`goal.${goal.type}`, { n: goal.target }) }) : null,
+        t('app.needTicketsSwap', { n: engine.cfg.goalSwapCost }), 'clique');
+      return;
+    }
     if (a === 'meta-resgatar') {
       const reward = engine.claimGoal(Number(d.index));
       done(!!reward, reward ? t('app.goalClaimed', { tickets: reward.tickets }) : null, null, 'moeda');
@@ -762,10 +840,16 @@
     }
     if (a === 'foto') {
       tocar('foto');
-      const caption = { title: engine.state.name && engine.state.name !== 'Mandioca' ? engine.state.name : t('app.title'),
-        subtitle: (t('party.subtitle', { tier: engine.tier().name, n: engine.state.size }) +
-          (engine.state.year > 1 ? ` · ${t('hud.year', { n: engine.state.year })}` : '')).replace(/\s*·\s*/g, ' - ') };
-      download('mandioca-festa.png', ui.festa ? ui.festa.photo(4, caption) : '');
+      download('mandioca-festa.png', ui.festa ? ui.festa.photo(4, photoCaption()) : '');
+      return;
+    }
+    if (a === 'retrato') {
+      tocar('foto');
+      download('mandioca-retrato.png', ui.festa ? ui.festa.portrait(4, photoCaption()) : '');
+      return;
+    }
+    if (a === 'foto-salvar') {
+      if (ui.lastPhoto) download('mandioca-lambe-lambe.png', ui.lastPhoto);
       return;
     }
     if (a === 'som') {
@@ -780,6 +864,7 @@
     }
     if (a === 'perf') { changeSettings({ perf: d.value }); return; }
     if (a === 'flash') { changeSettings({ flash: d.value === 'on' }); return; }
+    if (a === 'calmo') { changeSettings({ calm: d.value === 'on' }); return; }
     if (a === 'musica') { changeSettings({ music: d.value === 'on' }); return; }
     if (a === 'inicio') { changeSettings({ startup: d.value === 'on' }); return; }
     if (a === 'ano-novo') {
@@ -827,7 +912,8 @@
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       return;
     }
-    if (a === 'importar') { $('#importar').click(); return; }
+    // Com a janela de escolher arquivo aberta, a festa fica desabilitada (o mouse não chega nela, e não é defeito).
+    if (a === 'importar') { ui.picking = true; $('#importar').click(); return; }
     if (a === 'reiniciar') {
       if (!confirm(t('app.restartConfirm'))) return;
       engine = new GameEngine(data);
@@ -849,7 +935,13 @@
   }
 
   // Cliques na própria festa. Clicar numa barraca abre a janela dela (se já está aberta, fica aberta).
-  function festaClick(region) {
+  // Servir o prato pronto do Fogão a Lenha (pelo botão da cozinha ou clicando no prato em cima do fogão).
+  function serveDish() {
+    const dish = engine.serve();
+    if (dish) done(true, t('app.cookServed', { dish: engine.recipe(dish.id)?.name || dish.id, v: Math.round(dish.bonus * 100), n: dish.minutes }), null, 'premio');
+  }
+
+  function festaClick(region, at = null) {
     if (region === 'request') {
       const result = engine.claimRequest();
       if (result) done(true, t('app.requestDone', { n: UI.compact(result.reward) }), null, 'moeda');
@@ -866,6 +958,11 @@
     } else if (typeof region === 'string' && region.startsWith('bicho:')) {
       ui.festa?.poke(region);
       tocar(BICHO_SONS[region.split(':')[1]] || 'clique');
+      // O carreiro do carro de boi deixa lenha para a fogueira (uma vez por passada).
+      if (region === 'bicho:carro-boi') {
+        const cart = engine.cartWood();
+        if (cart) { toast(t('app.cartWood', { n: cart.wood })); renderHud(true); saveLater(); }
+      }
     } else if (region === 'pote') {
       const result = engine.hitPote();
       if (result.broke) done(true, t('app.poteBreak', { n: UI.compact(result.amount), tickets: result.tickets }), null, 'quebra');
@@ -877,6 +974,43 @@
           ['conquista', 'premio', 'errou'][result.place - 1]);
       } else if (result.fell) tocar('tombo');
       else if (result.active && !result.down) tocar('pulo', { pitch: result.hops % 2 ? 0 : 3 });
+    } else if (region === 'cobra') {
+      const result = engine.catchCobra();
+      if (result) {
+        done(true, t('app.cobraCaught', { n: UI.compact(result.amount) }) +
+          (result.item ? ` ${t('app.cobraGift', { name: engine.items[result.item]?.name || result.item })}` : ''), null, 'premio');
+      }
+    } else if (region === 'burro') {
+      const result = engine.pinBurro();
+      if (result) {
+        done(true, t(`app.burroPin.${result.grade}`, { n: UI.compact(result.amount), tickets: result.tickets }), null,
+          { mosca: 'conquista', perto: 'premio', longe: 'acerto', fora: 'errou' }[result.grade]);
+      }
+    } else if (region === 'compadres') {
+      const result = engine.witnessCompadres();
+      if (result) done(true, t('app.compadres', { n: UI.compact(result.amount) }), null, 'premio');
+    } else if (region === 'prato') {
+      serveDish();
+    } else if (region === 'bandeirinha') {
+      const flag = engine.catchFlag();
+      if (flag) done(true, t('app.flag', { n: flag.tickets }), null, 'premio');
+    } else if (region === 'fotografo') {
+      const result = engine.shootFoto();
+      if (result) {
+        tocar('foto');
+        // O retrato sai na hora, com a moldura e a legenda da festa, numa janela com o botão de salvar.
+        ui.lastPhoto = ui.festa ? ui.festa.portrait(4, photoCaption()) : '';
+        showModal(`<h2>${UI.esc(t('app.fotoTitle'))}</h2>` +
+          (ui.lastPhoto ? `<img class="retrato" src="${ui.lastPhoto}" alt="${UI.esc(t('app.fotoTitle'))}">` : '') +
+          `<p>${UI.esc(t('app.fotoTickets', { n: result.tickets }))}</p>` +
+          `<div class="botoes"><button class="btn claro" data-action="foto-salvar">${UI.esc(t('app.fotoSave'))}</button>` +
+          `<button class="btn" data-action="fechar-janela">${UI.esc(t('app.fotoOk'))}</button></div>`);
+        renderHud(true);
+        saveLater();
+      }
+    } else if (region === 'sanfoneiro') {
+      const result = engine.greetVisitor();
+      if (result) done(true, t('app.visitorGreet', { n: result.tickets }), null, 'premio');
     } else if (region === 'leilao') {
       const result = engine.bidLeilao();
       if (result.broke) toast(t('app.leilaoBroke', { n: result.bid }), 'erro');
@@ -895,12 +1029,16 @@
     } else if (region === 'fogueira') { if (engine.tierIndex() >= 2) openTela('fogueira', false); }
     else if (region === 'palco') openTela('turma', false);
     else if (region === 'sopinha') { ui.festa?.poke('sopinha'); tocar('carinho'); }
+    else if (region === 'par') { ui.festa?.poke('par'); tocar('carinho'); }
+    // Clique no chão: estalinho ali mesmo (o som vem da festa).
+    else if (region === 'terreiro' && at) ui.festa?.estalo?.(at.x, at.y);
     else if (region === 'lado-esquerda' || region === 'lado-direita') {
       const side = region === 'lado-esquerda' ? 'esquerda' : 'direita';
       const id = engine.state.equipped[side];
       if (id === 'barraca-argolas') openRings();
       else if (id === 'barraca-pescaria' && engine.tierIndex() >= 1) openTela('pescaria', false);
       else if (id === 'correio') openTela('correio', false);
+      else if (id === 'fogao-lenha' && engine.cookOpen()) openTela('cozinha', false);
       else {
         // As outras barracas e os enfeites respondem ao clique na própria festa (beijo, pipoca, xô...).
         ui.festa?.poke(`lado:${side}`);
@@ -911,23 +1049,23 @@
         }
       }
     }
-    // A Mandioca, o par, o chão e os enfeites são cenário: o clique só dá foco ao jogo (a loja abre pelo botão).
+    // Os enfeites são cenário: o clique só dá foco ao jogo (a loja abre pelo botão).
   }
 
   // O som de cada barraca ou enfeite que responde ao clique.
   const LADO_SONS = { 'barraca-beijo': 'carinho', 'barraca-comidas': 'bola', cadeia: 'penetra', espantalho: 'galinha', fardo: 'pintinho',
-    mastro: 'equipar', carroca: 'lenha', 'barril-quentao': 'bola' };
+    mastro: 'equipar', carroca: 'lenha', 'barril-quentao': 'bola', 'fogao-lenha': 'fogo', 'barraca-cordel': 'revelar' };
   // O som de cada bicho da festa que reage ao clique.
-  const BICHO_SONS = { sapo: 'sapo', trem: 'apito', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca' };
+  const BICHO_SONS = { sapo: 'sapo', trem: 'apito', kombi: 'buzina', 'carro-boi': 'boi', papagaio: 'papagaio', jegue: 'zurro', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca' };
 
   // --- Eventos do motor --------------------------------------------------------------------------------
   // Som de cada acontecimento da festa (os que o jogador não causou com um clique).
-  const EVENT_SOUNDS = { contest: 'porte', daily: 'premio', 'new-year': 'porte', 'bingo-number': 'bola', 'bingo-line': 'acerto', 'bingo-win': 'conquista', 'bingo-lost': 'errou', 'quadrilha-call': 'grito', pote: 'aviso', saco: 'aviso', 'saco-go': 'juiz', leilao: 'aviso', 'leilao-call': 'martelo', set: 'premio', wedding: 'sinos', 'wedding-end': 'premio', 'special-day': 'quadrilha', quadrilha: 'quadrilha', 'goal-done': 'aviso', rain: 'chuva', thunder: 'trovao', 'rain-end': 'arcoiris', balloon: 'aviso', 'frenzy-start': 'porte', learn: 'crescer', grow: 'crescer', 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso',
+  const EVENT_SOUNDS = { contest: 'porte', daily: 'premio', 'new-year': 'porte', 'bingo-number': 'bola', 'bingo-line': 'acerto', 'bingo-win': 'conquista', 'bingo-lost': 'errou', 'quadrilha-call': 'grito', pote: 'aviso', saco: 'aviso', 'saco-go': 'juiz', leilao: 'aviso', 'leilao-call': 'martelo', announce: 'altofalante', cobra: 'cobra', fotografo: 'aviso', burro: 'aviso', 'fantasia-soon': 'aviso', cold: 'chuva', quentao: 'moeda', sticker: 'revelar', 'album-page': 'conquista', visitor: 'quadrilha', set: 'premio', wedding: 'sinos', 'wedding-end': 'premio', 'special-day': 'quadrilha', quadrilha: 'quadrilha', 'goal-done': 'aviso', rain: 'chuva', thunder: 'trovao', 'rain-end': 'arcoiris', balloon: 'aviso', 'frenzy-start': 'porte', learn: 'crescer', grow: 'crescer', 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso',
     'prize-ready': 'aviso', 'letter-ready': 'pombo', 'outing-done': 'aviso', crasher: 'penetra', request: 'pedido',
-    'size-up': 'convidado', 'flare-start': 'fogo' };
+    'size-up': 'convidado', 'flare-start': 'fogo', 'cook-ready': 'aviso' };
   // Acontecimentos que mudam o que as janelas mostram: prenda pronta, carta chegando, turma voltando do rolê...
   const REFRESH_EVENTS = new Set(['bingo-win', 'bingo-lost', 'goal-done', 'learn', 'grow', 'tier-up', 'fishing-open', 'prize-ready', 'letter-ready', 'outing-done', 'legendary', 'item',
-    'achievement']);
+    'achievement', 'cook-ready', 'cook-end', 'cook-served', 'cook-start']);
 
   // Nome da prenda do leilão: o item ou os minutos de Animação.
   const prizeName = prize => (prize?.item ? engine.items[prize.item]?.name || prize.item : t('app.leilaoPrizeCheer', { n: UI.compact(prize?.cheer || 0) }));
@@ -950,6 +1088,7 @@
       } else if (event.type === 'fishing-open') toast(t('app.fishingOpen'), 'grande');
       else if (event.type === 'prize-ready') toast(t('app.prizeReady'));
       else if (event.type === 'letter-ready') toast(t('app.letterReady'));
+      else if (event.type === 'cook-ready') toast(t('app.cookReady', { dish: engine.recipe(event.id)?.name || event.id }), 'ouro');
       else if (event.type === 'outing-done') {
         toast(t('app.outingDone', { name: engine.chars[engine.state.outings[event.index].char]?.name || t('app.someone') }));
       } else if (event.type === 'special-day') {
@@ -975,6 +1114,30 @@
         toast(t('app.pote'), 'ouro');
       } else if (event.type === 'saco') {
         toast(t('app.saco'), 'ouro');
+      } else if (event.type === 'visitor') {
+        toast(t('app.visitor', { v: Math.round(event.bonus * 100), s: event.seconds }), 'ouro');
+      } else if (event.type === 'fotografo') {
+        toast(t('app.fotografo'), 'ouro');
+      } else if (event.type === 'burro') {
+        toast(t('app.burro'));
+      } else if (event.type === 'fantasia-soon') {
+        toast(t('app.fantasiaSoon', { s: event.seconds }), 'ouro');
+      } else if (event.type === 'fantasia') {
+        if (!quiet) tocar(['conquista', 'premio', 'acerto'][event.place - 1] || 'acerto');
+        toast(t(`app.fantasia.${event.place}`, { avg: UI.number(event.average, 1), tickets: event.tickets, n: UI.compact(event.amount) }),
+          event.place === 1 ? 'ouro' : '');
+      } else if (event.type === 'sticker') {
+        const sticker = engine.data.album.flatMap(page => page.stickers).find(entry => entry.id === event.id);
+        toast(t('app.sticker', { name: sticker?.name || event.id }));
+        refresh = true;
+      } else if (event.type === 'album-page') {
+        const page = engine.data.album.find(entry => entry.id === event.id);
+        toast(t('app.albumPage', { name: page?.name || event.id, v: Math.round(event.bonus * 100), n: event.tickets }), 'ouro');
+        refresh = true;
+      } else if (event.type === 'cold') {
+        toast(t(event.quentao ? 'app.coldQuentao' : 'app.cold'));
+      } else if (event.type === 'cold-end' && event.sold) {
+        toast(t('app.coldEnd', { n: event.sold }), 'ouro');
       } else if (event.type === 'leilao') {
         toast(t('app.leilao', { prize: prizeName(event.prize), n: event.price }), 'ouro');
       } else if (event.type === 'leilao-bid' && event.who === 'plateia') {
@@ -986,6 +1149,9 @@
         refresh = true;
       } else if (event.type === 'set') {
         toast(t('app.setOn', { name: engine.data.sets.find(set => set.id === event.id)?.name || event.id, v: Math.round(event.bonus * 100) }), 'ouro');
+      } else if (event.type === 'cobra') {
+        // Só ensina enquanto a pessoa nunca pegou uma.
+        if (!engine.state.stats.cobras) toast(t('app.cobra'));
       } else if (event.type === 'wedding') {
         toast(t('app.wedding'), 'ouro');
       } else if (event.type === 'wedding-end') {
@@ -1011,7 +1177,13 @@
   }
 
   // --- Foco: a placa só aparece enquanto o jogo tem foco (o último clique foi na festa) -----------------
+  // Quem volta para a festa depois de um tempo fora (5 min ou mais) ganha um "Oi!" da Mandioca.
+  const GREET_AFTER = 5 * 60 * 1000;
   function setFocused(value) {
+    // Perdeu o foco no meio de um arrasto: o soltar do botão não vai chegar aqui.
+    if (!value && (ui.drag || ui.hold)) dropPointer();
+    if (value && !ui.focused && ui.blurAt && now() - ui.blurAt >= GREET_AFTER) ui.festa?.greet?.();
+    if (!value && ui.focused !== false) ui.blurAt = now();
     ui.focused = value;
     document.body.classList.toggle('jogo-desfocado', !value);
     // Em foco a festa anda a 60 quadros por segundo; de fundo (a pessoa trabalhando em outra janela), a 30.
@@ -1044,13 +1216,37 @@
     // Durante arrasto ou compra segurada a janela segue clicável, para o soltar do botão chegar aqui.
     if (ui.drag || ui.hold) return;
     const found = hitAt(x, y);
+    if (typeof actual === 'boolean') checkDeaf(actual && !!(found.ui || found.region));
     setInteractive(!!(found.ui || found.region));
     const canvas = $('#festa-canvas');
     if (canvas && found.region) canvas.style.cursor = ['terreiro', 'festa'].includes(found.region) ? 'grab' : 'pointer';
+    // Mouse em cima da Mandioca: o quadro confere quanto tempo ele ficou ali (ela acena, em hostHoverCheck).
+    if (found.region === 'host') ui.hostHover ||= now();
+    else ui.hostHover = 0;
     document.body.classList.toggle('sobre-festa', !!found.region || !!found.ui);
   }
 
-  document.addEventListener('mousemove', event => hover(event.clientX, event.clientY));
+  // Autocura do clique: o vigia do Electron mostra o cursor passeando em cima do jogo e a janela diz que aceita o clique,
+  // mas nenhum movimento de verdade chega à página: a janela quebrou (acontece depois do repouso do Windows) e todo clique
+  // vaza para o que está atrás. Passados DEAF_MS assim, pede uma janela nova (no máximo uma vez a cada REPAIR_EVERY; o Electron só troca com a festa fixada por cima).
+  const DEAF_MS = 3000;
+  const REPAIR_EVERY = 300000;
+  function checkDeaf(overGame) {
+    const at = performance.now();
+    if (!overGame || ui.picking || at - (ui.realMoveAt || 0) < 500) { ui.deafSince = 0; return; }
+    ui.deafSince ||= at;
+    if (at - ui.deafSince < DEAF_MS || at - (ui.repairAt ?? -Infinity) < REPAIR_EVERY || !desktop?.repair) return;
+    ui.repairAt = at;
+    ui.deafSince = 0;
+    desktop.logError?.('a festa parou de receber o mouse: pedindo uma janela nova');
+    save();
+    desktop.repair();
+  }
+
+  document.addEventListener('mousemove', event => {
+    ui.realMoveAt = performance.now();
+    hover(event.clientX, event.clientY);
+  });
 
   // Ícones e imagens não se arrastam como arquivo: o arrasto nativo cancelaria o arrasto da janela (pointercancel).
   document.addEventListener('dragstart', event => event.preventDefault());
@@ -1138,7 +1334,17 @@
     }
   });
 
+  // Arrasto ou compra segurada que perdeu o soltar do botão (Alt+Tab, repouso, janela do Windows por cima): sem isso o
+  // `hover` ficaria ignorando o mouse para sempre e a janela presa no último estado (engolindo ou vazando todo clique).
+  function dropPointer() {
+    stopHold();
+    ui.drag = null;
+    hideZoomGuide();
+  }
+
   document.addEventListener('pointermove', event => {
+    // Mouse andando sem botão apertado no meio de um arrasto: o botão foi solto longe daqui.
+    if ((ui.drag || ui.hold) && event.buttons === 0) { dropPointer(); return; }
     const drag = ui.drag;
     if (!drag || drag.kind === 'barra') return;
     const dx = event.clientX - drag.x;
@@ -1149,6 +1355,7 @@
       // Se bateu no limite, o arrasto recomeça dali: voltar o mouse já diminui, sem trecho morto.
       const factor = 2 ** ((dx - dy) / 160);
       drag.start = setZoom(drag.start * factor, false) / factor;
+      showZoomGuide();
     } else if (drag.kind === 'festa') {
       // Qualquer parte da festa arrasta, até as que abrem algo: só o clique sem arrastar abre (no pointerup).
       const size = festaSize();
@@ -1184,6 +1391,7 @@
     ui.drag = null;
     if (!drag) return;
     if (drag.kind === 'zoom') {
+      hideZoomGuide();
       if (drag.moved) changeSettings({ zoom: ui.settings.zoom, x: ui.settings.x, placa: ui.settings.placa });
       else { setZoom(1, true); tocar('clique'); }
     } else if (drag.kind === 'placa') {
@@ -1191,19 +1399,21 @@
     }
     else if (drag.kind === 'festa') {
       if (drag.moved) changeSettings({ x: ui.settings.x, lift: ui.settings.lift });
-      else comSom(() => festaClick(drag.region), null);
+      else comSom(() => festaClick(drag.region, { x: drag.x, y: drag.y }), null);
     }
   });
   // O navegador cancelou o ponteiro (começou um arrasto nativo, por exemplo): nada fica preso "arrastando".
   document.addEventListener('pointercancel', () => {
     stopHold();
     ui.drag = null;
+    hideZoomGuide();
   });
 
   document.addEventListener('wheel', event => {
     if (!event.target.closest?.('[data-action="zoom-alca"]')) return;
     event.preventDefault();
     setZoom(ui.settings.zoom * 1.12 ** (-Math.sign(event.deltaY)), true);
+    showZoomGuide(700);
   }, { passive: false });
 
   document.addEventListener('click', event => {
@@ -1265,7 +1475,9 @@
     }, null);
   });
 
+  $('#importar').addEventListener('cancel', () => { ui.picking = false; });
   $('#importar').addEventListener('change', async event => {
+    ui.picking = false;
     const file = event.target.files[0];
     if (!file) return;
     try {
@@ -1294,6 +1506,9 @@
       else if (command === 'vitrine') openDock();
       else if (command === 'argolas') openRings();
       else if (command === 'foto') act({ dataset: { action: 'foto' } });
+      else if (command === 'retrato') act({ dataset: { action: 'retrato' } });
+      // O computador vai dormir: salva agora.
+      else if (command === 'salvar') save();
       else if (command?.settings) applySettings(command.settings);
       else if (typeof command?.foco === 'boolean') setFocused(command.foco);
       // O Electron conta onde o cursor está de tempos em tempos: se o repasse do mouse do Windows falhar, a festa
@@ -1307,6 +1522,13 @@
   function frame(t) {
     const delta = (t - lastFrame) / 1000;
     lastFrame = t;
+    // Voltando do repouso (ou de muito tempo com a festa escondida): o tempo parado rende como jogo fechado.
+    const woke = engine.wake();
+    if (woke && woke.cheer >= 1) {
+      toast(I18N.t('app.wake', { time: UI.duration(woke.seconds * 1000), n: UI.compact(woke.cheer) }) +
+        (woke.guests > 0 ? ` ${I18N.t('app.welcomeGuests', { n: woke.guests })}` : ''), 'ouro');
+      saveLater();
+    }
     let remaining = Math.min(delta, desktop ? 30 : 1);
     while (remaining > 0) { const step = Math.min(remaining, 0.25); engine.tick(step); remaining -= step; }
     const events = engine.drainEvents();
@@ -1318,8 +1540,18 @@
     }
     if (ui.saveSoon && t >= ui.saveSoon) { ui.saveSoon = 0; save(); }
     if (t - ui.lastSave > 30000) save();
+    hostHoverCheck();
+    // Muito tempo sem olhar para o jogo (10 min em outra janela): a Mandioca fica sonolenta e cochila mais nos descansos.
+    ui.festa?.setSleepy?.(ui.focused === false && ui.blurAt > 0 && now() - ui.blurAt > 600000);
     renderHud();
     refreshLive();
+  }
+
+  // Deixar o mouse parado em cima da Mandioca por um instante: ela acena e diz oi (no máximo a cada 30 s).
+  function hostHoverCheck() {
+    if (!ui.hostHover || now() - ui.hostHover < 1200 || now() - (ui.hostWaveAt || 0) < 30000) return;
+    ui.hostWaveAt = now();
+    ui.festa?.greet?.();
   }
 
   // O próximo quadro é pedido antes de tudo: um erro num quadro não pode congelar a festa para sempre.
@@ -1358,7 +1590,7 @@
 
   const canvas = $('#festa-canvas');
   if (globalThis.ArraiaFesta && sprites && typeof canvas?.getContext === 'function') {
-    ui.festa = globalThis.ArraiaFesta.create(canvas, sprites);
+    ui.festa = globalThis.ArraiaFesta.create(canvas, sprites, { sound: name => tocar(name) });
     scaleFesta();
   }
   const ringsCanvas = $('#argolas-canvas');
@@ -1381,22 +1613,32 @@
   // Depois de trocar o idioma, a festa volta com os Ajustes abertos.
   let reopen = desktop?.reopen || null;
   try { reopen = reopen || sessionStorage.getItem(REOPEN_KEY); sessionStorage.removeItem(REOPEN_KEY); } catch (_) { /* sem armazenamento */ }
+  // Novidades desta versão para quem já jogava: a lista entra na janela de boas-vindas (ou numa janela só dela).
+  // O gravador de vídeos (trailer/captura) abre saves antigos: nada de janela de novidades no meio do vídeo.
+  const recording = typeof globalThis.__gravador === 'function';
+  const news = !reopen && !recording && engine.state.newsSeen < engine.cfg.newsVersion
+    ? `<h3>${UI.esc(t('news.title'))}</h3><ul class="novidades">${Array.from({ length: engine.cfg.newsItems },
+      (_, i) => `<li>${UI.esc(t(`news.${i + 1}`))}</li>`).join('')}</ul>` : '';
+  if (news) { engine.state.newsSeen = engine.cfg.newsVersion; saveLater(); }
   if (reopen) {
     openPanel(reopen);
     toast(t('app.languageChanged'));
   } else if (engine.welcome) {
     showModal(`<h2>${UI.esc(t('app.welcomeBack'))}</h2><p>${t('app.welcomeBackText', {
       time: UI.duration(engine.welcome.seconds * 1000), n: UI.compact(engine.welcome.cheer) })}` +
+      (engine.welcome.guests > 0 ? ` ${t('app.welcomeGuests', { n: engine.welcome.guests })}` : '') +
       (engine.welcome.bunny ? ` ${UI.esc(t('app.welcomeBunny', { v: Math.round(engine.welcome.bunny * 100) }))}` : '') + '</p>' +
       `<p class="miudo">${UI.esc(t(engine.welcome.capped ? 'app.welcomeCapped' : 'app.welcomeRule',
-        { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
+        { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` + news +
       `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('app.welcomeBackOk'))}</button></div>`);
   } else if (firstRun) {
     ui.festa?.sprout?.();
     showModal(`<h2>${UI.esc(t('app.title'))}!</h2>${t('app.firstRun')}` +
       `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('app.firstRunOk'))}</button></div>`);
+  } else if (news) {
+    showModal(news + `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('news.ok'))}</button></div>`);
   }
   if (typeof requestAnimationFrame === 'function') requestAnimationFrame(animate);
   // Gravador de vídeos (trailer/captura): só existe quando a página foi aberta por ele.
-  if (typeof globalThis.__gravador === 'function') globalThis.__gravador({ engine: () => engine, ui });
+  if (typeof globalThis.__gravador === 'function') globalThis.__gravador({ engine: () => engine, ui, festaClick });
 })();

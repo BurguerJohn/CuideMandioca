@@ -15,8 +15,9 @@ function fakeSteam(order, language = 'spanish') {
   };
 }
 
-function loadMain({ language, packaged = false } = {}) {
+function loadMain({ language, packaged = false, timeout = setTimeout, clear = clearTimeout } = {}) {
   const listeners = new Map();
+  const power = {};
   const intervals = [];
   const appEvents = {};
   const cursor = { x: 0, y: 0 };
@@ -72,13 +73,14 @@ function loadMain({ language, packaged = false } = {}) {
     screen: { getPrimaryDisplay: () => display, getAllDisplays: () => [display], on() {}, getCursorScreenPoint: () => cursor },
     Tray: class { setToolTip() {} on() {} setContextMenu(menu) { trayMenu = menu; } },
     Menu: { buildFromTemplate: template => template },
-    nativeImage: { createFromPath: () => ({}) }
+    nativeImage: { createFromPath: () => ({}) },
+    powerMonitor: { on: (name, fn) => { power[name] = fn; } }
   };
   const missing = () => { const error = new Error('missing'); error.code = 'ENOENT'; throw error; };
   const mocks = {
     electron,
     'node:fs': { readFileSync: missing, existsSync: () => false, copyFileSync() {}, mkdirSync() {}, writeFileSync() {},
-      renameSync() {} },
+      renameSync() {}, statSync: missing, appendFileSync: (_file, text) => order.push(['log', text.trim().slice(27)]) },
     'node:path': path,
     './window-state': require('../desktop/window-state'),
     './save-store': { loadSave: () => null, writeSave: () => { order.push('write'); return true; } },
@@ -88,8 +90,8 @@ function loadMain({ language, packaged = false } = {}) {
   };
   const source = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'main.js'), 'utf8');
   vm.runInNewContext(source, { require: name => mocks[name], __dirname: path.join(__dirname, '..', 'desktop'),
-    console, setTimeout, clearTimeout, setInterval: fn => intervals.push(fn) });
-  return { listeners, handlers, order, window: () => windowObject, windows, intervals, appEvents, cursor, tray: () => trayMenu };
+    console, setTimeout: timeout, clearTimeout: clear, setInterval: fn => intervals.push(fn) });
+  return { listeners, handlers, order, window: () => windowObject, windows, intervals, appEvents, cursor, tray: () => trayMenu, power };
 }
 
 test('janela cobre a área útil, vaza cliques e só aceita IPC da própria festa', async () => {
@@ -114,7 +116,7 @@ test('janela cobre a área útil, vaza cliques e só aceita IPC da própria fest
 
   const settings = await handlers.get('desktop:update-settings')(own, { zoom: 1.5, pinned: false, lixo: 1 });
   assert.deepEqual(settings, { pinned: false, zoom: 1.5, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null,
-    sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false });
+    sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
   assert.equal(win.onTop, false);
   assert.equal(await handlers.get('desktop:update-settings')({ sender: {} }, { zoom: 2 }), null);
 
@@ -242,4 +244,48 @@ test('o menu da bandeja tem os mesmos tamanhos que a alça alcança e liga a abe
   startup.click({ checked: true });
   assert.equal(JSON.parse(JSON.stringify(order.filter(entry => entry[0] === 'login').at(-1)[1])).openAtLogin, true);
   assert.equal(tray().find(item => item.label === I18N.t('settings.startup')).checked, true, 'o menu refeito mostra ligado');
+  const calm = tray().find(item => item.label === I18N.t('settings.calmOn'));
+  assert.equal(calm.checked, false, 'com todos os letreiros de fábrica');
+  calm.click({ checked: true });
+  assert.equal(tray().find(item => item.label === I18N.t('settings.calmOn')).checked, true, 'menos letreiros ligado pela bandeja');
+});
+
+test('repouso: salva antes de dormir e, ao acordar com a tela desbloqueada, a festa ganha uma janela nova (o clique volta)', async () => {
+  // Relógio falso: o que foi cancelado não dispara.
+  const timers = new Map();
+  let next = 0;
+  const pending = { splice: () => { const due = [...timers.values()]; timers.clear(); return due; } };
+  const { power, order, window, windows } = loadMain({ timeout: fn => { timers.set(++next, fn); return next; },
+    clear: id => timers.delete(id) });
+  await Promise.resolve();
+  const first = window();
+  power.suspend();
+  assert.deepEqual(order.filter(entry => Array.isArray(entry) && entry[0] === 'send').at(-1), ['send', 'desktop:command', 'salvar']);
+  // Acordou e desbloqueou quase juntos: uma troca só.
+  power.resume();
+  power['unlock-screen']();
+  pending.splice(0).forEach(fn => fn());
+  assert.equal(windows.length, 2, 'acordou: janela nova');
+  assert.equal(power['lock-screen'], undefined, 'não depende do aviso de bloqueio');
+  assert.ok(first.destroyed, 'a velha fechou (e salvou) antes');
+  assert.equal(window().ignore, true, 'a nova começa deixando o clique vazar, como sempre');
+  // Acordar sem bloqueio também troca.
+  power.resume();
+  pending.splice(0).forEach(fn => fn());
+  assert.equal(windows.length, 3);
+  I18N.setLanguage('pt-BR');
+});
+
+test('autocura: a página pede janela nova quando o mouse não chega nela, mas só com a festa fixada por cima', async () => {
+  const { listeners, handlers, window, windows } = loadMain();
+  await Promise.resolve();
+  const own = () => ({ sender: window().webContents });
+  listeners.get('desktop:repair')({ sender: {} });
+  assert.equal(windows.length, 1, 'outra origem não troca a janela');
+  listeners.get('desktop:repair')(own());
+  assert.equal(windows.length, 2, 'fixada (o padrão): janela nova');
+  await handlers.get('desktop:update-settings')(own(), { pinned: false });
+  listeners.get('desktop:repair')(own());
+  assert.equal(windows.length, 2, 'solta, pode ter outra janela por cima: não é defeito');
+  I18N.setLanguage('pt-BR');
 });

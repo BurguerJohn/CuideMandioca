@@ -83,6 +83,34 @@ test('música: agenda os passos à frente do relógio do áudio, fica quieta sem
   assert.equal(timers.active.size, 0);
   // Um laço tem dezesseis compassos (parte A e parte B) de oito colcheias.
   assert.equal(Som.MUSICA.passos, 128);
+  // Quatro músicas no laço: o forró, o xote, o baião e o arrasta-pé, uma depois da outra.
+  assert.deepEqual([...Som.MUSICA.musicas], ['forro', 'xote', 'baiao', 'arrasta-pe']);
   // Sem relógio injetado nem global disponível, ligar a música não quebra.
   assert.equal(Som.create({ AudioContext: null }).setMusic(true), false);
+});
+
+test('música: depois do laço do forró entra o xote, depois o baião, o arrasta-pé, e volta o forró', () => {
+  const { AudioContext } = fakeAudio();
+  let clock = 0;
+  class Clocked extends AudioContext { get currentTime() { return clock; } set currentTime(_) {} }
+  const timers = { active: new Map(), next: 1 };
+  const som = Som.create({ AudioContext: Clocked, enabled: true, volume: 0.5,
+    setInterval: fn => { timers.active.set(timers.next, fn); return timers.next++; }, clearInterval: id => timers.active.delete(id) });
+  som.setMusic(true);
+  assert.equal(som.song, 'forro');
+  // O forró tem 128 colcheias a 104 BPM: uns 37 s. Andando o relógio aos poucos, o xote entra depois disso.
+  const forro = Som.MUSICA.passos * Som.MUSICA.colcheia;
+  while (clock < forro + 2) { clock += 0.5; timers.active.forEach(fn => fn()); }
+  assert.equal(som.song, 'xote');
+  const xote = 128 * (60 / 84 / 2);
+  while (clock < forro + xote + 2) { clock += 0.5; timers.active.forEach(fn => fn()); }
+  assert.equal(som.song, 'baiao');
+  const baiao = 256 * (60 / 92 / 4);
+  while (clock < forro + xote + baiao + 2) { clock += 0.5; timers.active.forEach(fn => fn()); }
+  assert.equal(som.song, 'arrasta-pe');
+  const arrasta = 256 * (60 / 124 / 4);
+  while (clock < forro + xote + baiao + arrasta + 2) { clock += 0.5; timers.active.forEach(fn => fn()); }
+  assert.equal(som.song, 'forro');
+  som.setMusic(false);
+  assert.equal(som.song, 'forro', 'desligar volta para o começo');
 });

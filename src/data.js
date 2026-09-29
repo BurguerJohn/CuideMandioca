@@ -19,11 +19,11 @@ globalThis.GAME_DATA = {
     { id: 'quermesse', name: 'Quermesse do Bairro', size: 10,
       unlocks: 'Pescaria, par da quadrilha, barracas, pedidos dos convidados, quadrilha marcada, bingo e corrida de saco.' },
     { id: 'cidade', name: 'Festa da Cidade', size: 25,
-      unlocks: 'Palco com trio de forró, rolês, fogueira, tablado de dança, quebra-pote, casamento na roça e leilão de prendas.' },
+      unlocks: 'Palco com trio de forró, rolês, fogueira, tablado de dança, quebra-pote, casamento na roça, leilão de prendas e a cozinha do Fogão a Lenha.' },
     { id: 'regional', name: 'São João Regional', size: 50,
       unlocks: 'Marcadora da quadrilha, foguista, penetras e roda-gigante.' },
     { id: 'maior', name: 'Maior São João do Mundo', size: 100,
-      unlocks: 'Lâmpadas no varal, fogos de artifício e o São João do ano que vem.' }
+      unlocks: 'Lâmpadas no varal, fogos de artifício, telão no palco, show de drones e o São João do ano que vem.' }
   ],
 
   // Postos da festa: onde cada papel trabalha e quando o posto abre.
@@ -39,7 +39,9 @@ globalThis.GAME_DATA = {
     argolas: { name: 'Barraca das Argolas', item: 'barraca-argolas' },
     mascote: { name: 'Terreiro', tier: 1 },
     comidas: { name: 'Barraca de Comidas', item: 'barraca-comidas' },
-    ambulante: { name: 'Ambulante da festa', tier: 1 }
+    ambulante: { name: 'Ambulante da festa', tier: 1 },
+    fogao: { name: 'Fogão a Lenha', item: 'fogao-lenha' },
+    cordel: { name: 'Barraca de Cordel', item: 'barraca-cordel' }
   },
 
   // A turma. Vem da pescaria; peixe repetido sobe o nível (até 10).
@@ -69,7 +71,11 @@ globalThis.GAME_DATA = {
     { id: 'pipoca', name: 'Pipoca', rarity: 2, post: 'comidas', role: 'Pipoqueira',
       effect: 'ticket', base: 0.10, per: 0.03, text: 'Fichas custam {v}% menos' },
     { id: 'amendoim', name: 'Amendoim', rarity: 1, post: 'ambulante', role: 'Ambulante',
-      effect: 'goal', base: 0.20, per: 0.08, text: 'Metas dão {v}% mais fichas' }
+      effect: 'goal', base: 0.20, per: 0.08, text: 'Metas dão {v}% mais fichas' },
+    { id: 'canjica', name: 'Canjica', rarity: 2, post: 'fogao', role: 'Cozinheira',
+      effect: 'feast', base: 0.20, per: 0.05, text: 'Brincadeiras (pote, saco, burro, cobra e compadres) rendem +{v}% de Animação, e o fogão cozinha na metade do tempo' },
+    { id: 'cocada', name: 'Cocada', rarity: 1, post: 'cordel', role: 'Cordelista',
+      effect: 'letter', base: 0.15, per: 0.04, text: 'Cartas do correio elegante chegam {v}% mais depressa' }
   ],
   rarities: [
     { name: 'Comum', chance: 0.70, wood: 1 },
@@ -83,19 +89,24 @@ globalThis.GAME_DATA = {
   dances: [
     { id: 'forro', name: 'Forró', at: 0 },
     { id: 'xote', name: 'Xote', at: 100 },
-    { id: 'polichinelo', name: 'Polichinelo', at: 600 },
-    { id: 'sanfona', name: 'Sanfona', at: 2500 },
-    { id: 'rebolado', name: 'Rebolado', at: 8000 },
-    { id: 'baiao', name: 'Baião', at: 20000 },
-    { id: 'giro', name: 'Giro', at: 45000 },
-    { id: 'moonwalk', name: 'Moonwalk', at: 90000 },
-    { id: 'frevo', name: 'Frevo', at: 160000 },
-    { id: 'lambada', name: 'Lambada', at: 240000 },
-    { id: 'macarena', name: 'Macarena', at: 340000 },
-    { id: 'robo', name: 'Robô', at: 480000 },
-    { id: 'arrasta-pe', name: 'Arrasta-pé', at: 650000 },
-    { id: 'coco', name: 'Coco', at: 850000 },
-    { id: 'passinho', name: 'Passinho', at: 1100000 }
+    { id: 'polichinelo', name: 'Polichinelo', at: 500 },
+    { id: 'sanfona', name: 'Sanfona', at: 2000 },
+    { id: 'rebolado', name: 'Rebolado', at: 5500 },
+    { id: 'baiao', name: 'Baião', at: 13000 },
+    { id: 'giro', name: 'Giro', at: 30000 },
+    { id: 'moonwalk', name: 'Moonwalk', at: 55000 },
+    { id: 'frevo', name: 'Frevo', at: 100000 },
+    { id: 'lambada', name: 'Lambada', at: 150000 },
+    { id: 'macarena', name: 'Macarena', at: 215000 },
+    { id: 'boi-bumba', name: 'Boi-bumbá', at: 250000 },
+    { id: 'robo', name: 'Robô', at: 300000 },
+    { id: 'balance', name: 'Balancê', at: 350000 },
+    { id: 'arrasta-pe', name: 'Arrasta-pé', at: 400000 },
+    { id: 'ciranda', name: 'Ciranda', at: 460000 },
+    { id: 'coco', name: 'Coco', at: 520000 },
+    { id: 'passinho', name: 'Passinho', at: 660000 },
+    { id: 'pisa-fulo', name: 'Pisa na Fulô', at: 730000 },
+    { id: 'xaxado', name: 'Xaxado', at: 800000 }
   ],
 
   // Metas da festa: sempre 3 abertas. Cada tipo conta um número do jogo a partir de quando a meta entrou (engine.goalCounter);
@@ -103,13 +114,15 @@ globalThis.GAME_DATA = {
   goals: [
     { id: 'steps', tier: 0 }, { id: 'guests', tier: 0 }, { id: 'levels', tier: 0 }, { id: 'pokes', tier: 0 },
     { id: 'letters', tier: 0 }, { id: 'fish', tier: 1 }, { id: 'requests', tier: 1 }, { id: 'rings', tier: 0 },
-    { id: 'outings', tier: 2 }, { id: 'crashers', tier: 3 }
+    { id: 'outings', tier: 2 }, { id: 'crashers', tier: 3 }, { id: 'sacos', tier: 1 }, { id: 'potes', tier: 2 }, { id: 'lances', tier: 2 }, { id: 'cobras', tier: 1 }, { id: 'burros', tier: 2 }, { id: 'fantasias', tier: 2 }, { id: 'compadres', tier: 1 },
+    // `needs`: a meta só é sorteada com esse enfeite num dos lados da festa.
+    { id: 'pratos', tier: 2, needs: 'fogao-lenha' }
   ],
 
   // Loja. Lados aceitam enfeites desde o início e barracas a partir da Quermesse.
   categories: [
     { id: 'chapeu', name: 'Chapéus' }, { id: 'mao', name: 'Na mão' }, { id: 'tecido', name: 'Tecidos' },
-    { id: 'terreiro', name: 'Terreiros' }, { id: 'lado', name: 'Barracas e enfeites' }
+    { id: 'terreiro', name: 'Terreiros' }, { id: 'lado', name: 'Barracas e enfeites' }, { id: 'varal', name: 'Varais' }
   ],
   items: [
     { id: 'chapeu-palha', cat: 'chapeu', name: 'Chapéu de Palha', price: 0, source: 'inicial',
@@ -153,10 +166,15 @@ globalThis.GAME_DATA = {
       desc: 'Não é da pescaria. É seu mesmo.' },
     { id: 'sanfona-ouro', cat: 'mao', name: 'Sanfona de Ouro', price: 0, source: 'role',
       desc: 'Trazida de Caruaru. Toca sozinha de tão boa.' },
+    { id: 'zabumba', cat: 'mao', name: 'Zabumba de Campina', price: 0, source: 'role',
+      desc: 'Trazida do Parque do Povo, em Campina Grande. Tum, tum-tum.' },
     { id: 'estrelinha', cat: 'mao', name: 'Estrelinha', price: 9, desc: 'Faísca pra todo lado. Longe da fogueira, hein!' },
     { id: 'buque', cat: 'mao', name: 'Buquê da Noiva', price: 0, source: 'casamento', desc: 'Quem pegar é a próxima.' },
     { id: 'frango-assado', cat: 'mao', name: 'Frango Assado', price: 0, source: 'leilao', desc: 'Arrematado no leilão, douradinho e suculento.' },
     { id: 'bolo-fuba', cat: 'mao', name: 'Bolo de Fubá', price: 0, source: 'leilao', desc: 'Com erva-doce. Receita da vó do leiloeiro.' },
+    { id: 'pandeiro', cat: 'mao', name: 'Pandeiro', price: 11, desc: 'Tchic-tchic-tum: segura o ritmo do coco.' },
+    { id: 'sombrinha', cat: 'mao', name: 'Sombrinha de Frevo', price: 9, desc: 'Pequenininha e colorida: pede um passo de frevo.' },
+    { id: 'cobra-de-pano', cat: 'mao', name: 'Cobra de Pano', price: 0, source: 'cobra', desc: 'A da quadrilha. Olha a cobra! É mentira.' },
 
     { id: 'xadrez-vermelho', cat: 'tecido', name: 'Xadrez Vermelho', price: 0, source: 'inicial',
       desc: 'O uniforme oficial de qualquer arraiá.' },
@@ -166,12 +184,23 @@ globalThis.GAME_DATA = {
     { id: 'chita', cat: 'tecido', name: 'Chita Florida', price: 8, desc: 'Florzinha pra todo lado.' },
     { id: 'chita-rosa', cat: 'tecido', name: 'Chita Rosa', price: 8, desc: 'A preferida da Barraca do Beijo.' },
     { id: 'xadrez-ouro', cat: 'tecido', name: 'Xadrez de Ouro', price: 0, source: 'role', desc: 'Brilha mais que a fogueira.' },
+    { id: 'chita-amarela', cat: 'tecido', name: 'Chita Amarela', price: 9, desc: 'Cor de milho, com florzinha.' },
+    { id: 'xadrez-roxo', cat: 'tecido', name: 'Xadrez Roxo', price: 10, desc: 'Pra quem é da roça e da cidade.' },
+
+    // Varais: as bandeirinhas da festa inteira (cores e desenho vêm de art/exportar.py, VARAIS).
+    { id: 'varal-colorido', cat: 'varal', name: 'Bandeirinhas Coloridas', price: 0, source: 'inicial',
+      desc: 'Uma de cada cor, como manda o figurino.' },
+    { id: 'varal-azul', cat: 'varal', name: 'Bandeirinhas Azul e Branco', price: 8, desc: 'O céu de junho, pendurado.' },
+    { id: 'varal-chita', cat: 'varal', name: 'Bandeirinhas de Chita', price: 10, desc: 'Florzinha de tecido balançando no vento.' },
+    { id: 'varal-brasil', cat: 'varal', name: 'Bandeirinhas Verde e Amarelo', price: 12, desc: 'Arraiá em clima de Copa.' },
+    { id: 'varal-ouro', cat: 'varal', name: 'Bandeirinhas Douradas', price: 16, desc: 'Pra festa que já virou tradição.' },
 
     { id: 'terra-batida', cat: 'terreiro', name: 'Terra Batida', price: 0, source: 'inicial',
       desc: 'Poeira boa de levantar no xote.' },
     { id: 'lamacal', cat: 'terreiro', name: 'Lamaçal Pós-Chuva', price: 6, desc: 'Escorrega, mas não cai.' },
     { id: 'gramado', cat: 'terreiro', name: 'Gramado da Praça', price: 8, desc: 'Verdinho, com florzinha.' },
     { id: 'areia', cat: 'terreiro', name: 'Areia de Praia', price: 10, desc: 'São João com pé na areia.' },
+    { id: 'sertao', cat: 'terreiro', name: 'Chão do Sertão', price: 9, desc: 'Terra vermelha rachada de sol, com florzinha da caatinga.' },
     { id: 'tablado', cat: 'terreiro', name: 'Tablado de Madeira', price: 12, desc: 'Pra ouvir o arrasta-pé.' },
     { id: 'pista-forro', cat: 'terreiro', name: 'Pista de Forró', price: 0, source: 'role',
       desc: 'Xadrez no chão e brilho no olhar.' },
@@ -179,12 +208,16 @@ globalThis.GAME_DATA = {
     { id: 'fardo', cat: 'lado', kind: 'enfeite', name: 'Fardo de Feno', price: 0, source: 'inicial',
       desc: 'Banco, palco e esconderijo.' },
     { id: 'mastro', cat: 'lado', kind: 'enfeite', name: 'Mastro de Bandeirinhas', price: 0, source: 'inicial',
-      desc: 'Fitas coloridas dançando no vento.' },
+      desc: 'Fita em espiral, bandeira no topo, laranja e espiga penduradas e fitas dançando no vento.' },
     { id: 'espantalho', cat: 'lado', kind: 'enfeite', name: 'Espantalho Galã', price: 8,
-      desc: 'Pose de galã, coração de palha.' },
-    { id: 'carroca', cat: 'lado', kind: 'enfeite', name: 'Carroça Enfeitada', price: 12, desc: 'Leva a turma e a pamonha.' },
+      desc: 'Pose de galã, coração de palha.', effect: 'Galã do correio: cada carta rende +1 ficha.' },
+    { id: 'carroca', cat: 'lado', kind: 'enfeite', name: 'Carroça Enfeitada', price: 12, desc: 'Leva a turma e a pamonha.',
+      effect: 'Leva a turma: os rolês voltam 15% mais rápido.' },
     { id: 'barril-quentao', cat: 'lado', kind: 'enfeite', name: 'Barril de Quentão', price: 14,
-      desc: 'Quentão quentinho pra espantar o frio de junho.' },
+      desc: 'Quentão quentinho pra espantar o frio de junho.', effect: 'No friozinho, vende quentão: 1 ficha a cada 15 s.' },
+    { id: 'fogao-lenha', cat: 'lado', kind: 'enfeite', name: 'Fogão a Lenha', price: 16,
+      desc: 'Canjica e pamonha no fogo, cheirinho pela festa toda.',
+      effect: 'Pedidos dos convidados rendem +50%. Da Festa da Cidade em diante, cozinha pratos que animam a festa.' },
     { id: 'barraca-pescaria', cat: 'lado', kind: 'barraca', tier: 1, name: 'Barraca de Pescaria', price: 15,
       desc: 'Onde o Cachorro-Quente joga a vara.', effect: 'Ativa o Pescador.' },
     { id: 'barraca-beijo', cat: 'lado', kind: 'barraca', tier: 1, name: 'Barraca do Beijo', price: 15,
@@ -195,11 +228,13 @@ globalThis.GAME_DATA = {
       desc: 'Penetra aqui paga fiança.', effect: 'Penetras rendem o dobro de fichas.' },
     { id: 'correio', cat: 'lado', kind: 'barraca', tier: 1, name: 'Correio Elegante', price: 20,
       desc: 'Recadinho anônimo com duplo sentido.', effect: 'Cartas chegam 30% mais rápido.' },
+    { id: 'barraca-cordel', cat: 'lado', kind: 'barraca', tier: 1, name: 'Barraca de Cordel', price: 14,
+      desc: 'Folhetos pendurados no barbante, cheios de rima.', effect: 'Pedidos dos convidados aparecem mais vezes.' },
     { id: 'barraca-argolas', cat: 'lado', kind: 'barraca', tier: 1, name: 'Barraca das Argolas', price: 16,
       desc: 'Garrafa, argola e muita mira.', effect: '+1 argola por rodada nas Argolas e ativa a Argoleira.' }
   ],
   equipped: { chapeu: 'chapeu-palha', mao: 'bandeirinha', tecido: 'xadrez-vermelho', terreiro: 'terra-batida',
-    esquerda: 'fardo', direita: 'mastro' },
+    esquerda: 'fardo', direita: 'mastro', varal: 'varal-colorido' },
 
   // Rolês: um membro da turma sai para buscar lenha. Enquanto isso, o posto dele fica vazio.
   outings: [
@@ -210,10 +245,24 @@ globalThis.GAME_DATA = {
       item: 'pista-forro', chance: 0.15 },
     { id: 'maior', name: 'Visitar o Maior São João', minutes: 480, wood: 90, tier: 3, item: 'xadrez-ouro', chance: 0.12 },
     // A viagem longa, para deixar rodando durante a noite.
-    { id: 'caruaru', name: 'Viagem a Caruaru', minutes: 720, wood: 160, tier: 4, item: 'sanfona-ouro', chance: 0.25 }
+    { id: 'caruaru', name: 'Viagem a Caruaru', minutes: 720, wood: 160, tier: 4, item: 'sanfona-ouro', chance: 0.25 },
+    // A outra capital do São João (a eterna rival de Caruaru pelo título de maior do mundo).
+    { id: 'campina', name: 'Viagem a Campina Grande', minutes: 600, wood: 150, tier: 4, item: 'zabumba', chance: 0.25 }
   ],
 
   // Fogueira: melhorias pagas com lenha. Com 30 melhorias ela vira lendária.
+  // Cozinha do Fogão a Lenha (Festa da Cidade em diante, com o fogão num dos lados): um prato por vez vai ao fogo, gasta
+  // `wood` de lenha, fica `minutes` cozinhando (metade com a Canjica no fogão) e, servido, dá `bonus` a mais em tudo por
+  // `buffMinutes`. Servir outro prato troca o que estava valendo.
+  recipes: [
+    { id: 'pamonha', name: 'Pamonha', wood: 4, minutes: 3, bonus: 0.2, buffMinutes: 15,
+      desc: 'Milho verde ralado, cozido na palha e amarradinho.' },
+    { id: 'curau', name: 'Curau', wood: 10, minutes: 8, bonus: 0.35, buffMinutes: 25,
+      desc: 'Creme de milho verde com canela por cima.' },
+    { id: 'pe-de-moleque', name: 'Pé-de-moleque', wood: 25, minutes: 20, bonus: 0.5, buffMinutes: 60,
+      desc: 'Amendoim torrado no melado de rapadura.' }
+  ],
+
   bonfire: [
     { id: 'labareda', name: 'Labareda', text: 'A cada 60 s a fogueira sobe por 8 s: Animação +{v}%.' },
     { id: 'brasa', name: 'Brasa Viva', text: 'Depois do descanso, 6 s de Animação +{v}%.' },
@@ -236,9 +285,11 @@ globalThis.GAME_DATA = {
       { size: 31, id: 'caramelo', name: 'Vira-lata caramelo' },
       { size: 34, id: 'igrejinha', name: 'Igrejinha' },
       { size: 41, id: 'casinha-azul', name: 'Casinha azul' },
+      { size: 44, id: 'papagaio', name: 'Papagaio fofoqueiro' },
       { size: 48, id: 'lua', name: 'Lua de São João' },
       { size: 56, id: 'catavento', name: 'Cata-vento' },
       { size: 66, id: 'balao', name: 'Balão de papel' },
+      { size: 71, id: 'jegue', name: 'Jegue da manta azul' },
       { size: 78, id: 'estrelas', name: 'Céu estrelado' },
       // Festas bem grandes: o arraiá vira parque.
       { size: 92, id: 'carrossel', name: 'Carrossel' },
@@ -247,7 +298,8 @@ globalThis.GAME_DATA = {
       // O mapa cresce para cima: ilhas flutuando no céu, presas aos mastros.
       { size: 150, id: 'ilha-quadrilha', name: 'Ilha flutuante da quadrilha' },
       { size: 185, id: 'ilha-baloes', name: 'Ilha flutuante dos balões' },
-      { size: 240, id: 'trem', name: 'Trem da alegria' }
+      { size: 240, id: 'trem', name: 'Trem da alegria' },
+      { size: 300, id: 'kombi', name: 'Carro da pamonha' }
     ],
     cycle: [
       { id: 'balaozinho', name: 'Balãozinho no varal', max: 40 },
@@ -267,7 +319,10 @@ globalThis.GAME_DATA = {
     { id: 'quentao', text: 'Um quentão pra esquentar!' },
     { id: 'cocada', text: 'Tem cocada aí?' },
     { id: 'bandeirinha', text: 'Faltou bandeirinha naquele canto!' },
-    { id: 'danca', text: 'Me ensina esse passo?' }
+    { id: 'danca', text: 'Me ensina esse passo?' },
+    { id: 'canjica', text: 'Tem canjica no fogão?' },
+    { id: 'fogueira', text: 'Bota mais lenha na fogueira!' },
+    { id: 'sanfona', text: 'Cadê o sanfoneiro?' }
   ],
 
   letters: [
@@ -305,7 +360,32 @@ globalThis.GAME_DATA = {
     'O vento levou minha bandeirinha. Você leva meu coração?',
     'Vi você no robô. Me programa pra dançar do seu lado?',
     'Linha no bingo, cartela cheia no coração.',
-    'Sou como o balão de sorte: passo rapidinho. Me pega!'
+    'Sou como o balão de sorte: passo rapidinho. Me pega!',
+    'Corri de saco só pra chegar mais rápido perto de você.',
+    'No leilão do meu coração, você arrematou tudo no primeiro lance.',
+    'Tá frio? Me deixa ser o seu quentão.',
+    'O alto-falante anunciou: tem alguém apaixonado na festa. Era eu.',
+    'Colei sua figurinha no meu álbum. Página completa.',
+    'Se o jegue da manta azul é de alguém, eu quero ser seu.',
+    'Passei a noite atrás do carro da pamonha só pra te achar.',
+    'Xaxado, xote ou forró: com você eu danço qualquer um.',
+    'Sou pescador de primeira: fisguei o seu olhar.',
+    'Troquei o varal inteiro de bandeirinhas só pra combinar com você.',
+    'Meu coração é igual pé de moleque: duro por fora, doce por dentro.',
+    'Se a fogueira apagar, a gente esquenta a festa.',
+    'Você é o meu dou-lhe três: vendido!',
+    'Tomei tanto tombo na corrida de saco que caí de amores.',
+    'Com você até o friozinho de junho vira calorzinho.',
+    'Olha a cobra! É mentira. O que é verdade é que eu gosto de você.',
+    'Se eu pregasse o rabo no burro de olho vendado, ia acertar você.',
+    'O lambe-lambe disse "olha o passarinho", mas eu só olhei pra você.',
+    'Meu coração bate igual pandeiro quando você passa.',
+    'No balancê da quadrilha eu balancei foi por você.',
+    'Toca um baião, que eu quero dançar agarradinho.',
+    'Você é o estalinho da minha festa: pá, e eu pulei.',
+    'Vi uma estrela cadente e pedi você de novo.',
+    'Faltam poucos dias pro São João e zero pra eu gostar de você.',
+    'Na foto da festa, o mais bonito do quadro é você.'
   ],
 
   achievements: [
@@ -322,6 +402,11 @@ globalThis.GAME_DATA = {
     { id: 'quebra-pote', name: 'Quebra-pote', text: 'Quebrar 5 potes.' },
     { id: 'canguru', name: 'Canguru da roça', text: 'Ganhar 5 corridas de saco.' },
     { id: 'dou-lhe-tres', name: 'Dou-lhe três!', text: 'Arrematar 3 prendas no leilão.' },
+    { id: 'album', name: 'Álbum completo', text: 'Colar todas as figurinhas do Álbum da Festa.' },
+    { id: 'quentao', name: 'Quentão quentinho', text: 'Vender 20 quentões no friozinho.' },
+    { id: 'na-mosca', name: 'Na mosca', text: 'Pregar o rabo no burro bem no X 3 vezes.' },
+    { id: 'retratista', name: 'Retrato na parede', text: 'Tirar 5 retratos com o fotógrafo lambe-lambe.' },
+    { id: 'pega-cobra', name: 'Pega a cobra', text: 'Pegar 5 cobras de pano na quadrilha.' },
     { id: 'estilista', name: 'Estilista caipira', text: 'Vestir 5 conjuntos diferentes.' },
     { id: 'mil', name: 'Mil de animação', text: 'Juntar 1.000 de Animação na festa toda.' },
     { id: 'quermesse', name: 'Quermesse', text: 'Chegar à Quermesse do Bairro.' },
@@ -341,6 +426,55 @@ globalThis.GAME_DATA = {
   ],
 
   // Conjuntos: vestir as três peças juntas (chapéu, mão e tecido) rende o bônus do conjunto em cima de tudo.
+  // Álbum da Festa: figurinhas dos momentos vividos, em páginas de cinco. Cada figurinha sai de um acontecimento do motor
+  // (`event`; com `tier`, só a partir desse porte) ou de uma entrada do diário (`record`). Página completa: albumBonus a
+  // mais em tudo, para sempre, e albumTickets fichas.
+  album: [
+    { id: 'brincadeiras', name: 'Brincadeiras', stickers: [
+      { id: 'argolas', name: 'Argolas da Sorte', icon: 'ui:argolas', record: 'rings' },
+      { id: 'pescaria', name: 'Pescaria', icon: 'ui:pescaria', record: 'fished' },
+      { id: 'pote', name: 'Quebra-pote', icon: 'ui:pote', record: 'pote' },
+      { id: 'saco', name: 'Corrida de saco', icon: 'ui:saco', record: 'saco' },
+      { id: 'leilao', name: 'Arremate no leilão', icon: 'ui:leilao', record: 'leilao' }] },
+    { id: 'tradicoes', name: 'Tradições', stickers: [
+      { id: 'quadrilha', name: 'Quadrilha marcada', icon: 'ui:quadrilha', event: 'quadrilha' },
+      { id: 'casamento', name: 'Casamento na roça', icon: 'ui:casamento', event: 'wedding' },
+      { id: 'bingo', name: 'Bingo!', icon: 'ui:bingo', record: 'bingo' },
+      { id: 'fogueira', name: 'Fogueira', icon: 'ui:fogueira', record: 'bonfire' },
+      { id: 'concurso', name: 'Concurso de quadrilha', icon: 'ui:conquista', record: 'contest' }] },
+    { id: 'ceu', name: 'Céu e tempo', stickers: [
+      { id: 'chuva', name: 'Chuva de São João', icon: 'ui:chuva', event: 'rain' },
+      { id: 'arco-iris', name: 'Pote de ouro', icon: 'ui:arco', record: 'rainbow' },
+      { id: 'frio', name: 'Friozinho', icon: 'ui:frio', event: 'cold' },
+      { id: 'balao', name: 'Balão de sorte', icon: 'ui:balao', record: 'balloon' },
+      { id: 'fogos', name: 'Fogos do Maior São João', icon: 'ui:fogos', event: 'tier-up', tier: 4 }] },
+    { id: 'gente', name: 'Gente da festa', stickers: [
+      { id: 'pedido', name: 'Pedido atendido', icon: 'ui:pedido', record: 'request' },
+      { id: 'penetra', name: 'Penetra expulso', icon: 'ui:penetra', record: 'crasher' },
+      { id: 'pombo', name: 'Pombo-correio', icon: 'ui:pombo', event: 'letter-ready' },
+      { id: 'alto', name: 'Alto-falante', icon: 'ui:alto', event: 'announce' },
+      { id: 'role', name: 'Volta do rolê', icon: 'ui:role', record: 'outing' }] },
+    { id: 'surpresas', name: 'Surpresas', stickers: [
+      { id: 'sanfoneiro', name: 'Sanfoneiro Andarilho', icon: 'ui:sanfoneiro', record: 'visitor' },
+      { id: 'trovao', name: 'Trovão na chuva', icon: 'ui:trovao', event: 'thunder' },
+      { id: 'frenesi', name: 'Frenesi', icon: 'ui:animacao', event: 'frenzy-start' },
+      { id: 'dia-santo', name: 'Dia de festa', icon: 'ui:festa', event: 'special-day' },
+      { id: 'conjunto', name: 'Conjunto completo', icon: 'ui:loja', event: 'set' }] },
+    // `when` filtra o acontecimento: um número é o mínimo (streak: 7), o resto tem que ser igual (grade: 'mosca').
+    { id: 'folguedos', name: 'Folguedos', stickers: [
+      { id: 'cobra', name: 'Olha a cobra!', icon: 'ui:cobra', event: 'cobra-caught' },
+      { id: 'retrato', name: 'Retrato do lambe-lambe', icon: 'ui:fotografo', record: 'foto' },
+      { id: 'mosca', name: 'Rabo na mosca', icon: 'ui:burro', event: 'burro-pin', when: { grade: 'mosca' } },
+      { id: 'pandeiro', name: 'Pandeiro na mão', icon: 'item:pandeiro', event: 'item', when: { id: 'pandeiro' } },
+      { id: 'semana', name: 'Uma semana de festa', icon: 'ui:presente', event: 'daily', when: { streak: 7 } }] },
+    { id: 'causos', name: 'Causos da festa', stickers: [
+      { id: 'compadres', name: 'Compadres de fogueira', icon: 'ui:compadres', record: 'compadres' },
+      { id: 'bandeirinha', name: 'Bandeirinha no ar', icon: 'item:bandeirinha', record: 'bandeirinha' },
+      { id: 'fantasia', name: 'Fantasia campeã', icon: 'ui:fantasia', event: 'fantasia', when: { win: true } },
+      { id: 'carro-boi', name: 'Carro de boi', icon: 'ui:carro-boi', record: 'carro-boi' },
+      { id: 'lendaria', name: 'Fogueira lendária', icon: 'ui:lendaria', record: 'legendary' }] }
+  ],
+
   sets: [
     { id: 'caipira', name: 'Caipira de Raiz', hat: 'chapeu-palha', hand: 'espiga', fabric: 'remendado', bonus: 0.03 },
     { id: 'pescador', name: 'Pescador', hat: 'palha-furada', hand: 'vara-pescar', fabric: 'xadrez-azul', bonus: 0.04 },
@@ -356,7 +490,13 @@ globalThis.GAME_DATA = {
     { id: 'caipirinha', name: 'Maria Chiquinha', hat: 'maria-chiquinha', hand: 'espiga', fabric: 'xadrez-vermelho', bonus: 0.04 },
     { id: 'arraia', name: 'Arraiá Aceso', hat: 'tiara-bandeirinhas', hand: 'estrelinha', fabric: 'xadrez-azul', bonus: 0.05 },
     { id: 'caruaru', name: 'Forrozeiro de Caruaru', hat: 'vaqueiro', hand: 'sanfona-ouro', fabric: 'xadrez-vermelho', bonus: 0.07 },
-    { id: 'arrematador', name: 'Arrematador', hat: 'chapeu-coco', hand: 'frango-assado', fabric: 'xadrez-azul', bonus: 0.06 }
+    { id: 'arrematador', name: 'Arrematador', hat: 'chapeu-coco', hand: 'frango-assado', fabric: 'xadrez-azul', bonus: 0.06 },
+    { id: 'luxo', name: 'Caipira de Luxo', hat: 'chapeu-coco', hand: 'bolo-fuba', fabric: 'xadrez-roxo', bonus: 0.05 },
+    { id: 'milho-verde', name: 'Milho Verde', hat: 'coroa-flores', hand: 'espiga', fabric: 'chita-amarela', bonus: 0.04 },
+    { id: 'pe-de-serra', name: 'Forró Pé-de-Serra', hat: 'rei-baiao', hand: 'zabumba', fabric: 'xadrez-vermelho', bonus: 0.07 },
+    { id: 'passista', name: 'Passista de Frevo', hat: 'coroa-flores', hand: 'sombrinha', fabric: 'chita-rosa', bonus: 0.04 },
+    { id: 'roda-de-coco', name: 'Roda de Coco', hat: 'lenco-chita', hand: 'pandeiro', fabric: 'chita-amarela', bonus: 0.04 },
+    { id: 'olha-a-cobra', name: 'Olha a Cobra!', hat: 'tiara-chifrinho', hand: 'cobra-de-pano', fabric: 'xadrez-verde', bonus: 0.05 }
   ],
 
   config: {
@@ -375,13 +515,50 @@ globalThis.GAME_DATA = {
     // de Animação e fichas para quem clicar.
     rainEvery: [1200, 2400], rainSeconds: 50, rainbowSeconds: 45, rainMin: 10, rainbowCheer: 240,
     goalSlots: 3,
+    // Trocar uma meta que ainda não foi cumprida por outra, de outro tipo: custa goalSwapCost fichas.
+    goalSwapCost: 1,
+    // Novidades: quem já tinha partida de antes desta versão vê a janela "Novidades na festa!" uma vez (news.* nos idiomas).
+    // Suba o número quando houver novidades novas para contar.
+    newsVersion: 2, newsItems: 8,
     // Dias de santo de verdade (pelo relógio do computador): a festa rende mais o dia todo e solta fogos em qualquer porte.
-    specialDays: [{ id: 'antonio', month: 6, day: 13, bonus: 0.5 }, { id: 'joao', month: 6, day: 24, bonus: 1 },
-      { id: 'pedro', month: 6, day: 29, bonus: 0.5 }],
+    // Sem `day`, vale o mês inteiro (as festas julinas de julho); um dia exato sempre ganha de um mês inteiro.
+    // 12 de junho é o Dia dos Namorados no Brasil (véspera de Santo Antônio, o casamenteiro): +20% e carta vale 1 ficha a mais.
+    specialDays: [{ id: 'namorados', month: 6, day: 12, bonus: 0.2 }, { id: 'antonio', month: 6, day: 13, bonus: 0.5 }, { id: 'joao', month: 6, day: 24, bonus: 1 },
+      { id: 'pedro', month: 6, day: 29, bonus: 0.5 }, { id: 'julina', month: 7, bonus: 0.2 }],
+    // Aniversário da festa (todo ano, no dia em que a partida começou): a festa rende birthdayBonus a mais o dia todo.
+    birthdayBonus: 0.3,
+    // Sanfoneiro Andarilho: raro (a cada visitorEvery s, da Quermesse em diante) ele atravessa a festa tocando por
+    // visitorSeconds s. Enquanto toca, tudo rende visitorBonus a mais; cumprimentar (clique) dá visitorTickets + porte fichas.
+    visitorEvery: [5400, 9000], visitorSeconds: 40, visitorBonus: 0.5, visitorTickets: 3, visitorMinTier: 1,
+    // Fotógrafo lambe-lambe: de vez em quando (fotoEvery s, da Quermesse em diante) ele monta a câmera ao lado da
+    // Mandioca e espera fotoSeconds s pela pose. Clicar nele tira o retrato da festa e rende fotoTickets fichas + o porte.
+    fotoEvery: [3600, 7200], fotoSeconds: 50, fotoWalk: 6, fotoTickets: 2, fotoMinTier: 1,
+    // Rabo no burro: de tempos em tempos (burroEvery s, da Festa da Cidade em diante) o cavalete aparece na beira da pista
+    // por burroSeconds s. O rabo balança "de olhos vendados" por cima do papel (burroSwing px em volta de burroCenter px do
+    // X, que fica perto da borda, na anca do jegue; burroPeriods s) e o clique prega: pela
+    // distância até o X, na mosca (até 2 px) leva burroTickets fichas + o porte e burroCheer s de Animação; perto (até 5),
+    // 1 ficha e metade; longe (até 9), um quinto; fora, só a risada (e 5 s).
+    burroEvery: [1200, 2100], burroSeconds: 40, burroMinTier: 2, burroSwing: [9.5, 2], burroCenter: -6.5, burroPeriods: [1.7, 1.1],
+    burroCheer: 50, burroTickets: 3,
+    // Concurso de fantasia: a cada fantasiaEvery s (da Festa da Cidade em diante) avisa com fantasiaPrep s de antecedência
+    // (dá tempo de trocar a roupa) e os três jurados dão nota para a roupa da Mandioca. 1º lugar com média de fantasiaFirst.
+    // Carro de boi: lenha que o carreiro deixa no clique (cartWood + porte), no máximo a cada cartCooldown s.
+    cartWood: 3, cartCooldown: 150,
+    // Bandeirinha que o vento solta: pegar antes de cair rende 1 ficha, no máximo a cada flagCooldown s.
+    flagCooldown: 120,
+    // Porte em que o Fogão a Lenha passa a cozinhar (o mesmo em que a lenha aparece na placa).
+    cookTier: 2,
+    // Compadres de fogueira: ser a testemunha (clicar no casal enquanto recitam) rende compadreCheer s de Animação,
+    // no máximo a cada compadreCooldown s.
+    compadreCheer: 30, compadreCooldown: 150,
+    fantasiaEvery: [2700, 4500], fantasiaPrep: 60, fantasiaMinTier: 2, fantasiaFirst: 9, fantasiaSecond: 7.5,
     // Quadrilha marcada: de tempos em tempos (com a festa na Quermesse ou maior) a quadrilha toda anda em zigue-zague pela
     // pista, com os gritos da marcação a cada callEvery segundos, e a festa rende mais por quadrilhaSeconds segundos
     // (o dobro do bônus com a Pamonha, a marcadora, no caixote).
     quadrilhaEvery: [300, 540], quadrilhaSeconds: 24, quadrilhaBonus: 0.25, callEvery: 4,
+    // "Olha a cobra!": no grito da cobra (o 5º da marcação), às vezes uma cobra de pano atravessa a pista de verdade.
+    // Clicar nela antes que fuja (cobraSeconds) rende cobraCheer s de Animação, e a primeira vez dá a Cobra de Pano.
+    cobraChance: 0.5, cobraSeconds: 4.5, cobraCheer: 25,
     // São João do ano que vem: no Maior São João do Mundo dá para encerrar a festa e recomeçar no quintal, com a turma, as
     // roupas, as barracas, as fichas e as conquistas. Cada ano encerrado vira Tradição: a festa rende yearBonus a mais.
     yearBonus: 0.25,
@@ -419,6 +596,14 @@ globalThis.GAME_DATA = {
     // leilaoCall s e vende na terceira. Quem já tem todas as prendas do leilão disputa leilaoCheer s de Animação.
     leilaoEvery: [1080, 1800], leilaoBase: 3, leilaoMax: [1.3, 2.6], leilaoRival: [1.2, 4.2], leilaoCall: 2.6, leilaoWait: 20,
     leilaoCheer: 300, leilaoMinTier: 2,
+    // Alto-falante da quermesse: da Quermesse em diante, um aviso a cada announceEvery segundos (piada ou dica).
+    announceEvery: [150, 300],
+    // Friozinho de São João: da Quermesse em diante, a cada coldEvery segundos (fora da chuva) a noite esfria por
+    // coldSeconds s: a festa solta fumacinha pela boca e, com o Barril de Quentão num dos lados, vende uma ficha de
+    // quentão a cada coldSale s.
+    coldEvery: [1500, 2700], coldSeconds: 75, coldSale: 15, coldMinTier: 1,
+    // Álbum da Festa: cada página completa rende albumBonus a mais em tudo (para sempre) e albumTickets fichas.
+    albumBonus: 0.02, albumTickets: 5,
     // Casamento na roça: quando a quadrilha acaba (a partir do porte weddingMinTier, o da Festa da Cidade, que tem pista para
     // ele), com chance weddingChance sai um casamento. Os noivos e o padre entram na
     // pista por weddingSeconds segundos; cada clique neles joga arroz (um a cada riceCooldown s) e o presente dos noivos

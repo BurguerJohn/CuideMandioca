@@ -792,6 +792,59 @@ AAyAAyAAyAAya
 XXXXXXXXXXXXX
 .SSSSSSSSSSS.
 """, (6, 7)),
+    # Zabumba de Campina: o tambor de lado, couro claro nas bocas, corpo vermelho com a corda em zigue-zague e a alça.
+    'zabumba': ("""
+...xx....
+..x..x...
+.WWWWWWW.
+WRxRRRxRW
+WRRxRxRRW
+WRRRxRRRW
+WRRxRxRRW
+WRxRRRxRW
+.WWWWWWW.
+""", (8, 5)),
+    # Sombrinha de frevo: a cúpula de gomos coloridos (vermelho, amarelo, verde e azul) com a barra recortada e o cabo.
+    'sombrinha': ("""
+.....A.....
+...RRAGG...
+..RRRAGGG..
+.RRRRAGGGJ.
+RRRRAAAGGJJ
+R.RA.A.G.JJ
+.....d.....
+.....d.....
+.....d.....
+....dd.....
+""", (5, 9)),
+    # Pandeiro: aro de madeira com as platinelas de metal e o couro claro; segurado pela borda de baixo.
+    'pandeiro': ("""
+..SlllS..
+.lWWWWWl.
+SWWWWWWWS
+lWWWWWWWl
+lWWxWWWWl
+SWWWWWWWS
+.lWWWWWl.
+..SlllS..
+""", (2, 7)),
+    # A cobra de pano da quadrilha, segurada pelo meio: a cabeça de olho de botão em cima, o rabo pendurado.
+    'cobra-de-pano': ("""
+.GGGG....
+GGXXGG...
+GGXeGGRR.
+.ggggg..R
+...gGG...
+...AGg...
+..gGg....
+..GA.....
+..gGg....
+...gGG...
+....AG...
+...gG....
+..GA.....
+..G......
+""", (3, 6)),
     'peixinho': ("""
 ...xx...
 ...xx...
@@ -861,6 +914,30 @@ SHIRT_ICON = """
 """
 
 UI_ICONS = {
+    # Panela de barro com tampa: o botão da cozinha na placa.
+    'panela': """
+...ss....
+.sSSSSSs.
+.kKKKKKk.
+kkkkkkkkk
+.kkkkkkk.
+..kkkkk..
+""",
+    # Roseta de campeã do concurso de fantasia (figurinha do Álbum).
+    'fantasia': """
+..AFAFAFA..
+.FAAAAAAAF.
+AARRRRRRRAA
+FARRXXXRRAF
+AARXXAXXRAA
+FARRXXXRRAF
+AARRRRRRRAA
+.FAAAAAAAF.
+..AFJJJFA..
+...JJ.JJ...
+..JJ...JJ..
+..JJ...JJ..
+""",
     'bingo': """
 rrrrrrrrrrrrr
 rRRRRRRRRRRRr
@@ -1098,7 +1175,52 @@ sssssssss
 """,
 }
 
+# Pratos do Fogão a Lenha (a cozinha): pamonha na palha amarrada, curau com canela na tigela de barro e pé-de-moleque.
+DISHES = {
+    'pamonha': """
+.gGGGGGGGGg.
+YgGyGGGGyGgY
+YGGyGGGGyGGY
+YGGyGGGGyGGY
+YgGyGGGGyGgY
+.gGGGGGGGGg.
+""",
+    'curau': """
+...FFFF...
+.FFoFFFFF.
+FFFFFFoFFF
+kKKKKKKKKk
+.kkkkkkkk.
+..kkkkkk..
+""",
+    'pe-de-moleque': """
+DDDDDDDDDD
+DTDlDDTDlD
+DDlDTDDlDD
+DTDDlDTDDD
+DDlDDDDlTD
+dddddddddd
+""",
+}
+
 REQUEST_ICONS = {
+    'canjica': """
+.XFX.
+XXXXX
+UUUUU
+.UUU.
+""",
+    'fogueira': """
+..q..
+.qfq.
+qfFfq
+.DDD.
+""",
+    'sanfona': """
+RWRWR
+RJRJR
+RWRWR
+""",
     'milho': """
 .AF.
 AFAF

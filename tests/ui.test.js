@@ -132,3 +132,30 @@ test('formatos de número e tempo em português', () => {
   assert.equal(UI.duration(3_720_000), '1h 02min');
   assert.equal(UI.esc('<b>'), '&lt;b&gt;');
 });
+
+test('a aba Conquistas mostra o Álbum da Festa: figurinha colada com ícone, a que falta com "?"', () => {
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  engine.emit('rain');
+  const html = UI.panel(engine, ctx(engine, { tab: 'conquistas', icon: key => `<i data-icon="${key}"></i>` }));
+  assert.match(html, /Álbum da Festa/);
+  assert.match(html, /class="figurinha" title="Chuva de São João"><i data-icon="ui:chuva">/);
+  assert.match(html, /figurinha vazia[^>]*><b>\?<\/b><span>Quebra-pote<\/span>/);
+  assert.match(html, /0 de 7 completas/);
+});
+
+test('a placa mostra selos do leilão (lance e de quem), da corrida de saco e do friozinho', () => {
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  const s = engine.state;
+  while (s.size < 25) engine.addFame(engine.fameNeed() - s.fame);
+  engine.debug('leilao');
+  engine.debug('saco');
+  engine.debug('frio');
+  let html = UI.hud(engine, ctx(engine));
+  assert.match(html, /Leilão: \d+\?/);
+  assert.match(html, /Corrida de saco!/);
+  assert.match(html, /Friozinho/);
+  s.tickets = 50;
+  engine.bidLeilao();
+  html = UI.hud(engine, ctx(engine));
+  assert.match(html, /Leilão: \d+ \(seu\)/);
+});

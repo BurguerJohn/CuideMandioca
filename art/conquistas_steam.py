@@ -45,6 +45,11 @@ ICONS = {
     'estilista': ('item:veu-noiva', '#9d5cf0'),
     'canguru': ('ui:saco', '#35a03a'),
     'dou-lhe-tres': ('ui:leilao', '#ffd21e'),
+    'album': ('ui:foto', '#9d5cf0'),
+    'quentao': ('ui:frio', '#ff8a12'),
+    'na-mosca': ('ui:burro', '#ee2f3c'),
+    'retratista': ('ui:fotografo', '#3a6cf0'),
+    'pega-cobra': ('ui:cobra', '#35a03a'),
     'metodica': ('ui:conquista', '#ff8a12'),
 }
 INK = (18, 9, 6, 255)
@@ -109,7 +114,8 @@ def main():
         image.save(OUT / f'{name}.jpg', quality=95)
         locked = ImageOps.grayscale(image).point(lambda v: int(v * 0.55))
         locked.convert('RGB').save(OUT / f'{name}_bloqueada.jpg', quality=95)
-    sheet = Image.new('RGB', (SIZE * 8, SIZE * 4), (28, 26, 58))
+    rows = (len(ICONS) + 7) // 8
+    sheet = Image.new('RGB', (SIZE * 8, SIZE * 2 * rows), (28, 26, 58))
     for i, id_ in enumerate(ICONS):
         name = api_name(id_)
         sheet.paste(Image.open(OUT / f'{name}.jpg'), ((i % 8) * SIZE, (i // 8) * 2 * SIZE))

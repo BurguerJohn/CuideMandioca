@@ -50,7 +50,7 @@
   // O que cada barraca ou enfeite do lado diz quando alguém clica (src/lang, fx.side.*).
   const SIDE_SAYS = { 'barraca-beijo': 'fx.side.beijo', 'barraca-comidas': 'fx.side.comidas', cadeia: 'fx.side.cadeia',
     espantalho: 'fx.side.espantalho', fardo: 'fx.side.fardo', mastro: 'fx.side.mastro', carroca: 'fx.side.carroca',
-    'barril-quentao': 'fx.side.quentao' };
+    'barril-quentao': 'fx.side.quentao', 'fogao-lenha': 'fx.side.fogao' };
   // Enfeites do fundo que giram mais depressa depois de um clique.
   const SPINNERS = new Set(['carrossel', 'catavento']);
   // Números do bingo que o locutor canta com apelido (src/lang, fx.bingoCall.<n>).
@@ -125,7 +125,9 @@
     return eq;
   }
 
-  function create(canvas, bundle) {
+  // `hooks.sound(nome)` toca um som do jogo (a festa só pede; quem toca é o app, que respeita o som desligado).
+  function create(canvas, bundle, hooks = {}) {
+    const sound = name => { try { hooks.sound?.(name); } catch (_) { /* som é enfeite */ } };
     const images = {};
     let pending = 0;
     for (const [name, src] of Object.entries(bundle.images)) {
@@ -134,6 +136,19 @@
       image.onload = () => { pending--; };
       image.src = src;
       images[name] = image;
+    }
+    // Ícones do painel que a festa também desenha (a figurinha nova do Álbum), carregados só quando precisa.
+    const iconImages = {};
+    function iconImage(key) {
+      const entry = bundle.icons && bundle.icons[key];
+      if (!entry) return null;
+      if (!iconImages[key]) {
+        const image = new Image();
+        image.src = entry.src;
+        iconImages[key] = image;
+      }
+      const image = iconImages[key];
+      return image.complete && image.width ? { image, w: entry.w, h: entry.h } : null;
     }
     // A festa é pintada direto no canvas da página, no tamanho da arte (o CSS amplia). Ele fica na memória comum
     // (willReadFrequently) porque o clique lê os pixels para saber em que o cursor está.
@@ -157,7 +172,7 @@
       particles: [], texts: [], arrivals: new Map(), shown: {}, celebrateUntil: 0, jumpUntil: 0,
       nextBlink: 0, blinkUntil: 0, nextSpark: 0, nextSweat: 0, nextFirework: 0, nextNote: 0, nextHeart: {}, frame: 0, previous: 0,
       lastDraw: 0, stepSum: 0, stepCrit: false, stepAt: 0, crasherSeen: null, leaving: null,
-      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, pote: { sway: 0, at: 0 }, potePos: null, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, dog: {}, peddler: {}, bunny: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
+      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
       nextZ: 0, nextSmoke: 0, pops: [],
       light: null, nextFireSmoke: 0, dustAt: 0, rockets: [], flashes: [], shooting: null, nextShoot: 0, glintAt: 0
     };
@@ -207,6 +222,8 @@
     const rng = Math.random;
     let rate = 60;
     let flashOn = true;
+    let calm = false;
+    let sleepy = false;
     let minFrame = 15;
 
     function resize(width) {
@@ -610,6 +627,7 @@
       if (id === 'barraca-beijo') return engine.charActive('aipim') ? 'aipim' : 'balcao-dama';
       if (id === 'barraca-argolas') return engine.charActive('pacoca') ? 'pacoca' : 'balcao-cavalheiro';
       if (id === 'barraca-comidas') return engine.charActive('pipoca') ? 'pipoca' : 'balcao-dama';
+      if (id === 'barraca-cordel') return engine.charActive('cocada') ? 'cocada' : 'balcao-dama';
       return id === 'cadeia' ? 'balcao-cavalheiro' : 'balcao-dama';
     }
 
@@ -642,8 +660,17 @@
       const meta = side.meta;
       const y = GROUND - meta.h + 1;
       const frame = frameAt(meta, now, side.x * 0.37);
+      const fitas = side.id === 'mastro' ? fitasNow(now) : null;
+      if (fitas) drawFitas(fitas, side, y, now, true);
       shadow(side.x + meta.w / 2, meta.w - 2, 0.9);
       sprite(meta, frame, side.x, y);
+      if (fitas) drawFitas(fitas, side, y, now, false);
+      if (side.id === 'fogao-lenha' && engine.charActive('canjica') && bundle.chars.canjica) {
+        // A cozinheira fica do lado do fogão que dá para o meio da festa, mexendo a canjica.
+        const cook = bundle.chars.canjica;
+        const cx = name === 'lado-esquerda' ? side.x + meta.w - 6 : side.x - cook.w + 6;
+        sprite(cook, frameAt(cook, now, side.x), cx, GROUND - cook.h + 2, name !== 'lado-esquerda');
+      }
       if (meta.sign) drawSign(meta.sign, side.x, y, tr(`sign.${side.id}`));
       if (meta.front) {
         const jailed = side.id === 'cadeia' && now < fx.jailUntil && bundle.props.penetra;
@@ -666,6 +693,134 @@
         float('coracao', side.x + meta.keeper[0] + (rng() - 0.5) * 10, y + meta.keeper[1] + 2, now, ['#ff4f9e', '#ff8a96']);
       }
       regions.push({ id: name, x: side.x, y, w: meta.w, h: meta.h });
+      if (side.id === 'fogao-lenha') drawKitchen(engine, side, y, now);
+    }
+
+    // Cozinha do Fogão a Lenha: com prato no fogo sai mais vapor da panela; pronto, o prato fica pulando em cima do
+    // fogão com um brilho (clicar nele serve) e, servido, voa num arco até a Mandioca.
+    function drawKitchen(engine, side, y, now) {
+      const kitchen = engine.state.cozinha;
+      const dishes = bundle.props.pratos;
+      fx.stovePos = { x: side.x + side.meta.w / 2, y: y - 4 };
+      const pot = kitchen && kitchen.pot;
+      if (!pot || !dishes) return;
+      if (!pot.ready) {
+        // Barrinha de cozimento em cima do fogão: enche de laranja até o prato ficar pronto.
+        const total = Math.max(1, pot.readyAt - (pot.startAt || pot.readyAt - 1));
+        const done = Math.max(0, Math.min(1, 1 - (pot.readyAt - engine.now()) / total));
+        const bx = Math.round(side.x + side.meta.w / 2 - 8);
+        const by = y - 6;
+        g.fillStyle = INK;
+        g.fillRect(bx, by, 16, 4);
+        g.fillStyle = '#58341c';
+        g.fillRect(bx + 1, by + 1, 14, 2);
+        g.fillStyle = Math.floor(now / 300) % 2 ? '#ffac2a' : '#ff8a12';
+        g.fillRect(bx + 1, by + 1, Math.round(14 * done), 2);
+        // De vez em quando sai um comentário do fogão (a Canjica, se estiver lá; o papagaio gosta de repetir).
+        if (!calm && now >= (fx.nextCookTalk || (fx.nextCookTalk = now + 6000 + rng() * 6000))) {
+          fx.nextCookTalk = now + 14000 + rng() * 12000;
+          const text = tr(`fx.cook.talk.${Math.floor(rng() * 3)}`);
+          say(text, Math.max(layout.L + 30, Math.min(layout.R - 30, side.x + side.meta.w / 2)), Math.max(10, y - 12), now, '#fff8e8', 1600, 6);
+          fx.lastChat = { text, at: now, echoed: false };
+        }
+        if (now >= (fx.nextCookSteam || 0)) {
+          fx.nextCookSteam = now + 160 + rng() * 160;
+          fx.particles.push({ x: side.x + 16 + (rng() - 0.5) * 6, y: y + 8, vx: (rng() - 0.5) * 0.006, vy: -0.016 - rng() * 0.008,
+            born: now, ttl: 1200 + rng() * 600, smoke: true, wobble: rng() * 6 });
+        }
+        return;
+      }
+      const frame = Math.max(0, dishes.ids.indexOf(pot.id));
+      const dx = Math.round(side.x + side.meta.w / 2 - dishes.w / 2);
+      const dy = y - dishes.h - 3 + Math.round(Math.sin(now / 260) * 2);
+      halo(dx + dishes.w / 2, dy + dishes.h / 2, 10, '#ffd21e', 0.22 + 0.08 * Math.sin(now / 200));
+      sprite(dishes, frame, dx, dy);
+      if (now >= (fx.nextDishGlint || 0)) {
+        fx.nextDishGlint = now + 500 + rng() * 500;
+        fx.particles.push({ x: dx + rng() * dishes.w, y: dy + rng() * 3, vx: 0, vy: -0.01, born: now, ttl: 500, colors: ['#fff8e8', '#ffd21e'] });
+      }
+      regions.push({ id: 'prato', x: dx - 3, y: dy - 4, w: dishes.w + 6, h: dishes.h + 8 });
+    }
+
+    // O prato servido voa do fogão até a boca da Mandioca.
+    const DISH_FLY_MS = 900;
+    function drawDishFly(now) {
+      const fly = fx.dishFly;
+      const dishes = bundle.props.pratos;
+      if (!fly || !dishes) return;
+      const t = (now - fly.at) / DISH_FLY_MS;
+      if (t >= 1) {
+        fx.dishFly = null;
+        const x = layout.host.x + 12;
+        const y = GROUND - Math.round(34 * fx.scale);
+        float('coracao', x, y - 6, now, ['#ff4f9e', '#ff8a96']);
+        // Do lado da Mandioca, para não brigar com os números dos passos que sobem em cima dela.
+        say(tr('fx.cook.yum'), Math.max(layout.L + 14, x - 24), Math.max(10, GROUND - Math.round(46 * fx.scale)), now, '#fff8e8', 1400, 8);
+        return;
+      }
+      if (t < 0) return;
+      const tx = layout.host.x + 12;
+      const ty = GROUND - Math.round(34 * fx.scale);
+      const x = fly.from.x + (tx - fly.from.x) * t;
+      const y = fly.from.y + (ty - fly.from.y) * t - Math.sin(Math.PI * t) * 26;
+      sprite(dishes, Math.max(0, dishes.ids.indexOf(fly.id)), Math.round(x - dishes.w / 2), Math.round(y - dishes.h / 2));
+    }
+
+    // Dança das fitas: com o Mastro de São João na festa, de vez em quando quatro crianças pegam cada uma uma fita do topo
+    // e rodam em volta dele, trançando as fitas no pau de cima para baixo. Quem está do lado de trás passa atrás do mastro.
+    const FITAS_MS = 15000;
+    const FITAS_EASE = 900;
+    const FITAS_COLORS = ['#ee2f3c', '#ffd21e', '#3a6cf0', '#35a03a'];
+    function fitasNow(now) {
+      const f = fx.fitas || (fx.fitas = { at: 0, next: now + 35000 + rng() * 35000 });
+      // Na chuva ninguém começa a dança das fitas: fica para quando parar.
+      if (!f.at && now >= f.next && fx.wx.rain < 0.15) { f.at = now; f.said = false; sound('crianca'); }
+      if (f.at && now - f.at > FITAS_MS) { f.at = 0; f.next = now + 100000 + rng() * 60000; }
+      return f.at ? f : null;
+    }
+
+    function drawFitas(f, side, y, now, behind) {
+      const kids = bundle.crowd.kids;
+      if (!kids) return;
+      const age = now - f.at;
+      // O topo do mastro (a ponta de latão) e o pau, no desenho de art/scene.py (mastro_sao_joao, contornado).
+      const poleX = side.x + 8;
+      const topY = y + 8;
+      const k = Math.max(0, Math.min(1, age / FITAS_EASE, (FITAS_MS - age) / FITAS_EASE));
+      if (!behind && !f.said) {
+        f.said = true;
+        say(tr('fx.fitas'), poleX, Math.max(10, topY - 12), now, '#ffd21e', 2000, 8);
+      }
+      // A trança: desce pelo pau conforme as voltas, nas cores das quatro fitas (na frente do mastro).
+      if (!behind) {
+        const braided = Math.floor(Math.min(1, age / (FITAS_MS * 0.8)) * 22);
+        for (let dy = 0; dy < braided; dy++) {
+          g.fillStyle = FITAS_COLORS[(dy + (dy >> 1)) % 4];
+          g.fillRect(poleX - 1, topY + 3 + dy, 2, 1);
+        }
+      }
+      for (let i = 0; i < 4; i++) {
+        const theta = age / 3400 * Math.PI * 2 + i * Math.PI / 2;
+        const depth = Math.sin(theta);
+        if ((depth < 0) !== behind) continue;
+        const radius = 7 + 9 * k;
+        const x = Math.round(Math.max(layout.L + 1, Math.min(layout.R - kids.w - 1, poleX + Math.cos(theta) * radius - kids.w / 2)));
+        const ky = GROUND - kids.h + 2 + Math.round(depth * 2);
+        g.globalAlpha = k;
+        // A fita esticada do topo até a mão da criança.
+        g.fillStyle = FITAS_COLORS[i];
+        const hx = x + kids.w / 2;
+        const hy = ky + 6;
+        const steps = Math.max(Math.abs(hx - poleX), Math.abs(hy - topY));
+        for (let s = 0; s <= steps; s += 1) {
+          const t = s / steps;
+          g.fillRect(Math.round(poleX + (hx - poleX) * t), Math.round(topY + (hy - topY) * t + Math.sin(t * Math.PI) * 2), 1, 1);
+        }
+        shadow(x + kids.w / 2, 6, 0.7 * k);
+        const fabric = hash(i, 41) % bundle.crowd.fabrics;
+        sprite(kids, fabric * 2 + (Math.floor(now / 120 + i) % 2), x, ky, Math.cos(theta + Math.PI / 2) < 0);
+        g.globalAlpha = 1;
+      }
     }
 
     // Varais e bandeirinhas desenhados uma vez só e reusados: a curva de cada varal (muda só com o tamanho da festa)
@@ -696,10 +851,18 @@
     }
 
     const flags = new Map();
+    // Cores do varal equipado: cada bandeirinha é [cor, sombra, brilho, florzinha?]. Sem varal no pacote, as de sempre.
+    const DEFAULT_FLAGS = FLAGS.map((color, index) => [color, FLAG_DARK[index], FLAG_LIGHT[index]]);
+    let varal = { id: 'varal-colorido', colors: DEFAULT_FLAGS };
+    function setVaral(id) {
+      const found = id !== 'varal-colorido' && bundle.varais && bundle.varais[id];
+      varal = found ? { id, colors: found.colors } : { id: 'varal-colorido', colors: DEFAULT_FLAGS };
+    }
     function flagImage(c, level) {
-      const key = c * 8 + level + 3;
+      const key = `${varal.id}:${c}:${level}`;
       let image = flags.get(key);
       if (image) return image;
+      const [base, dark, light, dot] = varal.colors[c % varal.colors.length];
       image = document.createElement('canvas');
       image.width = 7;
       image.height = 6;
@@ -709,7 +872,7 @@
         const ox = Math.round(shift * dy / 6);
         for (let dx = -2; dx <= 2; dx++) {
           if ((dy === 5 && dx === 0) || (dy === 6 && Math.abs(dx) <= 1)) continue;
-          p.fillStyle = dx === 2 || dy === 1 ? FLAG_DARK[c] : dx === -2 && dy === 2 ? FLAG_LIGHT[c] : FLAGS[c];
+          p.fillStyle = dx === 2 || dy === 1 ? dark : dx === -2 && dy === 2 ? light : dot && dx === 0 && dy === 3 ? dot : base;
           p.fillRect(dx + ox + 3, dy - 1, 1, 1);
         }
       }
@@ -751,7 +914,7 @@
       let index = 0;
       for (let i = 3; i < points.length; i += 8, index++) {
         const [x, y] = points[i];
-        const c = (index + phase) % FLAGS.length;
+        const c = (index + phase) % varal.colors.length;
         const gust = fx.windNow;
         const level = Math.max(-3, Math.min(3, Math.round(3 * Math.sin(now / (420 - 230 * Math.abs(gust)) + index * 0.8) + 2.5 * gust)));
         g.drawImage(flagImage(c, level), x - 3, y + 1);
@@ -767,6 +930,100 @@
       g.fillRect(x + 1, top, 1, GROUND - top + 1);
       g.fillStyle = '#361a0c';
       for (let y = top + 4; y < GROUND; y += 9) g.fillRect(x, y, 2, 1);
+    }
+
+    // Figurinha nova do Álbum: um cartãozinho branco com fita adesiva e o desenho da figurinha sobe da cabeça da Mandioca,
+    // balançando, e some.
+    function drawSticker(now) {
+      const st = fx.sticker;
+      if (!st) return;
+      const age = now - st.at;
+      if (age > 2400) { fx.sticker = null; return; }
+      const icon = iconImage(st.key);
+      const t = age / 2400;
+      const x = Math.round(layout.host.x + 12 - 11 + Math.sin(age / 260) * 2);
+      const y = Math.round(GROUND - Math.round(58 * fx.scale) - 24 - 16 * Math.min(1, t * 2));
+      g.globalAlpha = t > 0.8 ? (1 - t) / 0.2 : 1;
+      g.fillStyle = INK;
+      g.fillRect(x - 1, y - 1, 24, 26);
+      g.fillStyle = '#fff8e8';
+      g.fillRect(x, y, 22, 24);
+      g.fillStyle = 'rgba(255, 210, 30, 0.75)';
+      g.fillRect(x + 7, y - 2, 8, 3);
+      if (icon) {
+        const scale = Math.min(1, 18 / Math.max(icon.w, icon.h));
+        const w = Math.max(1, Math.round(icon.w * scale));
+        const h = Math.max(1, Math.round(icon.h * scale));
+        g.imageSmoothingEnabled = false;
+        g.drawImage(icon.image, x + Math.round((22 - w) / 2), y + Math.round((24 - h) / 2), w, h);
+      }
+      g.globalAlpha = 1;
+    }
+
+    // Friozinho de São João: a noite fica azulada (entra e sai devagar) e quem está na festa solta fumacinha pela boca; de
+    // vez em quando alguém reclama do frio.
+    function drawCold(engine, now) {
+      const on = !!(engine.state.cold && engine.state.cold.active);
+      const dt = Math.min(200, now - (fx.coldAt || now));
+      fx.coldAt = now;
+      fx.cold = Math.max(0, Math.min(1, fx.cold + (on ? 1 : -1) * dt / 2500));
+      if (fx.cold <= 0) return;
+      g.globalCompositeOperation = 'source-atop';
+      g.fillStyle = `rgba(150, 190, 255, ${(0.17 * fx.cold).toFixed(3)})`;
+      g.fillRect(0, 0, view.width, H);
+      g.globalCompositeOperation = 'source-over';
+      if (!on || now < fx.nextBreath) return;
+      fx.nextBreath = now + 70 + rng() * 120;
+      const rows = [[layout.audience, 9, 8], [layout.audience2, 14, 7], [layout.audience3, 19, 6]].filter(([list]) => list.length);
+      const mouths = rows.length ? rows.map(([list, lift, face]) => ({ list, lift, face })) : [];
+      const pick = mouths[Math.floor(rng() * (mouths.length + 1))];
+      let x;
+      let y;
+      if (pick) {
+        const guest = pick.list[Math.floor(rng() * pick.list.length)];
+        x = guest.x + 7;
+        y = GROUND - pick.lift - pick.face;
+      } else {
+        // A Mandioca também: a fumacinha sai da altura da boca dela.
+        x = layout.host.x + 12;
+        y = GROUND - Math.round(26 * fx.scale);
+      }
+      fx.particles.push({ x, y, vx: (rng() < 0.5 ? -1 : 1) * (0.004 + rng() * 0.004), vy: -0.006 - rng() * 0.004, born: now,
+        ttl: 900 + rng() * 500, breath: true });
+      if (rng() < 0.02 && pick) say(tr('fx.brrr'), x, y - 8, now, '#cfe3ff', 1000, 6);
+    }
+
+    // Alto-falante da quermesse no alto do mastro da direita (da Quermesse em diante). Quando fala, a boca treme e saem
+    // as ondinhas do som; o aviso sobe num texto que sempre cabe dentro da festa.
+    const ANNOUNCE_LINES = 10;
+    function drawSpeaker(now, poleTop) {
+      const meta = bundle.scenery.altofalante;
+      if (!meta || layout.tier < 1) return;
+      const talking = fx.announce && now < fx.announce.until;
+      const x = layout.R + 1 - meta.w + 3;
+      const y = poleTop - 2;
+      sprite(meta, talking && Math.floor(now / 90) % 2 ? 1 : 0, x, y);
+      if (talking) {
+        const k = (now / 260) % 1;
+        g.globalAlpha = 1 - k;
+        g.fillStyle = '#fff8e8';
+        for (const wave of [k, (k + 0.5) % 1]) {
+          const r = 2 + Math.round(wave * 5);
+          for (let dy = -r; dy <= r; dy += 2) g.fillRect(x - 2 - Math.round(Math.sqrt(Math.max(0, r * r - dy * dy))), y + 4 + dy, 1, 1);
+        }
+        g.globalAlpha = 1;
+      }
+    }
+    function announce(engine, event, now) {
+      const hint = event.hint && event.roll < 0.4 ? event.hint : null;
+      const text = hint ? tr(`fx.alto.${hint.id}`, { n: hint.n }) : tr(`fx.alto.${Math.floor(event.roll * ANNOUNCE_LINES) % ANNOUNCE_LINES}`);
+      const width = String(text).length * 4;
+      const poleTop = GROUND - POLE_H[layout.tier];
+      const x = Math.max(layout.L + width / 2 + 2, Math.min(layout.R - width / 2 - 2, layout.R - width / 2 - 8));
+      fx.announce = { until: now + 3600, text };
+      say(text, x, Math.max(8, poleTop - 10), now, '#fff8e8', 3600, 4);
+      // O papagaio fofoqueiro repete o recado do alto-falante (depois que ele acaba).
+      fx.lastChat = { text, at: now + 1500, echoed: false };
     }
 
     // Tablado de dança: pintado uma vez por largura e reusado (as tábuas não mudam de um quadro para o outro).
@@ -811,7 +1068,9 @@
       if (now < fx.celebrateUntil) return tags.comemora[Math.floor(now / 85) % tags.comemora.length];
       if (!r.dancing) {
         // Cada descanso tem um jeito: ofega, se abana, se espreguiça ou bebe água (sorteado quando ela cansa).
-        const list = (tags.descansos && tags.descansos[fx.restKind]) || tags.descanso;
+        // A tigela de canjica usa o mesmo gesto da espiga (a mão vai da tigela à boca).
+        const kind = fx.restKind === 'canjica' ? 'milho' : fx.restKind;
+        const list = (tags.descansos && tags.descansos[kind]) || tags.descanso;
         return list[Math.floor(now / (fx.restKind === 'ofega' ? 260 : 340)) % list.length];
       }
       const speed = engine.speed();
@@ -867,13 +1126,19 @@
       const resting = !s.runtime.dancing && now >= fx.celebrateUntil;
       const drinking = resting && fx.restKind === 'bebe';
       const eating = resting && fx.restKind === 'milho';
+      const tasting = resting && fx.restKind === 'canjica';
+      const reading = resting && fx.restKind === 'carta';
       const base = bundle.hand[eq.mao];
-      const item = !drinking && !eating && base && sized(base, stage);
+      const item = !drinking && !eating && !reading && !tasting && base && sized(base, stage);
       if (item) {
         const itemFrame = item.fps && s.runtime.dancing ? frameAt(item, now) : 0;
-        sprite(item, itemFrame, x + Math.round(anchors.hand[0] - item.pivot[0]), y + Math.round(anchors.hand[1] - item.pivot[1]));
+        const ix = x + Math.round(anchors.hand[0] - item.pivot[0]);
+        const iy = y + Math.round(anchors.hand[1] - item.pivot[1]);
+        sprite(item, itemFrame, ix, iy);
+        handFx(eq.mao, ix, iy, item, now, s.runtime.dancing);
       }
       sprite(sheet, frame, x, y);
+      fx.hostShot = { sheet, frame };
       rim(sheet, frame, x, y, false, cx);
       if (drinking) {
         // Copo d'água na mão que sobe até a boca: vidro claro, água azul e um brilho.
@@ -887,6 +1152,35 @@
         g.fillRect(cupX, cupY + 1, 3, 3);
         g.fillStyle = '#ffffff';
         g.fillRect(cupX, cupY, 1, 2);
+      }
+      if (reading) {
+        // Bilhete do correio elegante na mão: papel creme com as linhas escritas e o selo de coração.
+        const px = x + Math.round(anchors.hand[0]) - 3;
+        const py = y + Math.round(anchors.hand[1]) - 6;
+        g.fillStyle = INK;
+        g.fillRect(px - 1, py - 1, 9, 7);
+        g.fillStyle = '#fff8e8';
+        g.fillRect(px, py, 7, 5);
+        g.fillStyle = '#c8b8a0';
+        g.fillRect(px + 1, py + 1, 4, 1);
+        g.fillRect(px + 1, py + 3, 3, 1);
+        g.fillStyle = '#ee2f3c';
+        g.fillRect(px + 5, py + 3, 2, 2);
+      }
+      if (tasting) {
+        // Tigelinha de canjica da Canjica: barro por fora, creme com canela por cima e a colher.
+        const bx = x + Math.round(anchors.hand[0]) - 2;
+        const by = y + Math.round(anchors.hand[1]) - 3;
+        g.fillStyle = INK;
+        g.fillRect(bx - 1, by - 1, 7, 5);
+        g.fillStyle = '#9a6030';
+        g.fillRect(bx, by + 1, 5, 2);
+        g.fillStyle = '#fff4e4';
+        g.fillRect(bx, by, 5, 1);
+        g.fillStyle = '#c07a36';
+        g.fillRect(bx + 1, by, 1, 1);
+        g.fillStyle = '#dca66a';
+        g.fillRect(bx + 3, by - 2, 1, 2);
       }
       if (eating) {
         // Espiga de milho na mão: grãos amarelos com as fileiras mais escuras e a palha verde embaixo.
@@ -919,15 +1213,35 @@
         }
       }
       if (now >= fx.nextBlink) { fx.blinkUntil = now + 130; fx.nextBlink = now + 2200 + rng() * 2600; }
-      if (now < fx.blinkUntil && s.runtime.dancing && now >= fx.celebrateUntil) {
+      // No giro, de lado ou de costas, o quadro não tem olhos no lugar de sempre (âncora nula): nada de piscar ali.
+      // Um olhar (coração, estrela, felizinha) vale mais que o piscar enquanto dura.
+      const look = fx.look && now < fx.look.until && kit.looks ? kit.looks[fx.look.kind] : null;
+      if (anchors.eyes && look) {
+        sprite(look, 0, x + Math.round(anchors.eyes[0]), y + Math.round(anchors.eyes[1]));
+      } else if (anchors.eyes && now < fx.blinkUntil && s.runtime.dancing && now >= fx.celebrateUntil) {
         sprite(kit.blink, 0, x + Math.round(anchors.eyes[0]), y + Math.round(anchors.eyes[1]));
       }
       const baseHat = bundle.hats[eq.chapeu];
       if (baseHat) {
         const hat = sized(baseHat, stage);
         const head = kit.anchors[fx.previous].head;
-        const hx = x + Math.round(head[0] + hat.ox);
-        const hy = y + Math.round(head[1] + hat.oy);
+        let hx = x + Math.round(head[0] + hat.ox);
+        let hy = y + Math.round(head[1] + hat.oy);
+        const fly = fx.hatFly;
+        if (fly && now >= fly.at) {
+          const t = (now - fly.at) / HAT_FLY_MS;
+          if (t >= 1) fx.hatFly = null;
+          else {
+            if (!fly.said) {
+              fly.said = true;
+              say(tr('fx.chapeu'), cx, y - 10, now, '#fff8e8', 1600, 8);
+            }
+            // Sobe, vai com o vento, para no alto balançando e volta pro lugar.
+            const up = Math.sin(Math.min(1, t * 1.2) * Math.PI);
+            hx += Math.round(fly.dir * Math.sin(t * Math.PI) * 12 + Math.sin(now / 90) * up);
+            hy -= Math.round(up * 16);
+          }
+        }
         sprite(hat, 0, hx, hy);
         if (SHINY.has(eq.chapeu)) glint(now, hx + hat.w * 0.72, hy + 2);
       }
@@ -941,6 +1255,55 @@
         halo(cx, y + kit.h * 0.55, Math.round(14 + 16 * t), '#ffffff', 0.6 * (1 - t));
       }
       regions.push({ id: 'host', x: x + 2, y, w: kit.w - 4, h: kit.h });
+    }
+
+    // Cada item de mão tem o seu jeitinho: o triângulo e a sanfona soltam notas no ritmo, a estrelinha solta faísca, o
+    // lampião ilumina, o pau de selfie dispara o flash, o peixinho faz bolha, o frango e o bolo soltam vapor, o buquê
+    // perde pétala, a maçã do amor solta coração e a cobra de pano faz "sss".
+    const HAND_FX = {
+      triangulo: { every: 640, dancing: true }, 'sanfona-ouro': { every: 420, dancing: true }, estrelinha: { every: 90 },
+      'pau-selfie': { every: 7000 }, peixinho: { every: 850 }, 'frango-assado': { every: 520 }, 'bolo-fuba': { every: 700 },
+      buque: { every: 1500 }, 'maca-amor': { every: 3200 }, 'cobra-de-pano': { every: 9000, dancing: true },
+      pandeiro: { every: 380, dancing: true }, zabumba: { every: 560, dancing: true }
+    };
+    function handFx(id, ix, iy, item, now, dancing) {
+      const top = ix + item.w / 2;
+      if (id === 'lampiao') halo(top, iy + item.h * 0.55, 9, '#ffc460', 0.16 + 0.04 * Math.sin(now / 90));
+      if (id === 'pau-selfie' && now < (fx.selfieUntil || 0)) {
+        halo(top, iy + 1, 7, '#ffffff', 0.8 * (fx.selfieUntil - now) / 140);
+        g.fillStyle = '#ffffff';
+        g.fillRect(Math.round(top) - 1, iy, 3, 2);
+      }
+      const rule = HAND_FX[id];
+      if (!rule || (rule.dancing && !dancing)) return;
+      if (fx.handId !== id) { fx.handId = id; fx.handNext = now + rule.every * rng(); }
+      if (now < fx.handNext) return;
+      fx.handNext = now + rule.every * (0.7 + rng() * 0.6);
+      if (id === 'triangulo') float('nota', top + 3, iy, now, ['#cfe3ff']);
+      else if (id === 'sanfona-ouro') float('nota', top + (rng() < 0.5 ? -4 : 4), iy, now, ['#ffd21e', '#fff07a', FLAGS[Math.floor(rng() * 6)]]);
+      else if (id === 'estrelinha') {
+        // Faísca da estrelinha: sai da ponta para os lados e cai esfriando.
+        fx.particles.push({ x: top + (rng() - 0.5) * 3, y: iy + 1, vx: (rng() - 0.5) * 0.05, vy: -0.02 - rng() * 0.02, gravity: 0.00006,
+          born: now, ttl: 380 + rng() * 260, colors: SPARK, ember: true });
+      } else if (id === 'pau-selfie') {
+        fx.selfieUntil = now + 140;
+        say(tr('fx.selfie'), top, iy - 6, now, '#ffffff', 800, 6);
+      } else if (id === 'peixinho') {
+        fx.particles.push({ x: top + (rng() - 0.5) * 3, y: iy + item.h * 0.6, vx: 0, vy: -0.006, born: now, ttl: 700, colors: ['#e8f6ff'], twinkle: true });
+      } else if (id === 'frango-assado' || id === 'bolo-fuba') {
+        fx.particles.push({ x: top + (rng() - 0.5) * item.w * 0.6, y: iy + 2, vx: (rng() - 0.5) * 0.003, vy: -0.008, born: now, ttl: 900, breath: true });
+      } else if (id === 'buque') {
+        fx.particles.push({ x: top + (rng() - 0.5) * item.w, y: iy + 2, vx: (rng() - 0.5) * 0.01, vy: 0.008, born: now, ttl: 1400,
+          colors: ['#ff8a96', '#ff4f9e'], flip: 160, wobble: rng() * 6 });
+      } else if (id === 'maca-amor') float('coracao', top, iy - 1, now, ['#ff4f9e']);
+      else if (id === 'cobra-de-pano') say(tr('fx.sss'), top + 4, iy - 4, now, '#9ef05a', 900, 6);
+      else if (id === 'zabumba') float('nota', top + (rng() < 0.5 ? -3 : 3), iy + 2, now, ['#ff907a', '#fff07a']);
+      else if (id === 'pandeiro') {
+        // Tchic-tchic: brilho numa platinela e, de vez em quando, uma nota.
+        const side = rng() < 0.5 ? 0 : item.w - 1;
+        fx.particles.push({ x: ix + side, y: iy + item.h / 2 - 1, vx: 0, vy: -0.004, born: now, ttl: 220, colors: ['#fffff0', '#c8ccd6'], twinkle: true });
+        if (rng() < 0.4) float('nota', top, iy - 1, now, ['#fff07a', FLAGS[Math.floor(rng() * 6)]]);
+      }
     }
 
     function drawCrowd(engine, now, list, sheet, bottom, flipEvery) {
@@ -963,6 +1326,8 @@
       const waveAt = wave ? layout.L + (layout.R - layout.L + 40) * (now - wave.at) / 1700 - 20 : 0;
       const cheering = !dancing && now < fx.celebrateUntil;
       const aside = sheet === crowd.dancers && weddingOn(engine) ? layout.wedding.hide : null;
+      // "Olha a chuva!" da marcação: os pares abrem o guarda-chuva por um instante (e é mentira).
+      const joke = dancing && now < (fx.fakeRainUntil || 0);
       for (const guest of list) {
         if (aside && aside.has(guest.index)) continue;
         const seed = hash(guest.index, sheet === crowd.dancers ? 7 : 13);
@@ -975,6 +1340,11 @@
           const type = flipEvery ? (dx ? 1 : 0) : (seed >> 5) % 2;
           let x = guest.x + dx;
           if (weave) x += Math.round((guest.index % 2 ? 1 : -1) * Math.sin(now / 620 + guest.index * 0.9) * 9 * weave);
+          const move = dancing && fx.callMove && now - fx.callMove.at < 3500 ? fx.callMove : null;
+          const moveT = move ? (now - move.at) / 3500 : 0;
+          if (move && move.kind === 'caminho') x += Math.round(Math.sin(moveT * Math.PI) * 10);
+          const step = move && (move.kind === 'anavan' || move.kind === 'anarrie') ? (move.kind === 'anavan' ? 1 : -1) * Math.round(Math.sin(moveT * Math.PI) * 1.4) : 0;
+          const bow = (move && move.kind === 'cumprimenta' && moveT < 0.6 ? Math.round(Math.sin(moveT / 0.6 * Math.PI) * 2) : 0) + step;
           const front = wave ? Math.abs((wave.dir > 0 ? x : layout.R + layout.L - x) - waveAt) : Infinity;
           const person = type * crowd.fabrics + (flipEvery && dx ? (fabric + 2) % crowd.fabrics : fabric);
           // Dentro da onda: braços para o alto e um pulo que sobe e desce conforme a onda passa.
@@ -982,6 +1352,9 @@
           const frame = inWave ? crowd.ola + person : tunnel ? person * steps + (Math.floor(now / 420 + phase) % 2 ? 2 : 6) : person * steps + beat;
           const hop = inWave ? -Math.round(4 * Math.cos(front / 18 * Math.PI / 2))
             : cheering ? -Math.round(2 * Math.abs(Math.sin(now / 130 + seed))) : 0;
+          // "Olha a cobra!": quem está perto da cobra de pano pula com os braços para cima.
+          const scared = dancing && fx.cobraX != null && Math.abs(x + 6 - fx.cobraX) < 14;
+          const startled = fx.startle && now < fx.startle.until && Math.abs(x + 6 - fx.startle.x) < 12;
           const arrival = fx.arrivals.get(`${sheet.image}:${guest.index}`);
           if (arrival) {
             const t = Math.min(1, (now - arrival.at) / 1200);
@@ -989,10 +1362,13 @@
             if (t >= 1) fx.arrivals.delete(`${sheet.image}:${guest.index}`);
           }
           if (dancing) shadow(x + 6, 8, sheet === crowd.dancers ? 1 : 0.6);
-          const top = bottom - sheet.h + 1 + (dancing ? jump : hop);
-          sprite(sheet, frame, x - (crowd.pad || 0), top, flip);
-          rim(sheet, frame, x - (crowd.pad || 0), top, flip, x + 6);
-          guestUmbrella(seed + dx, x - (crowd.pad || 0), top);
+          const leap = scared ? -3 - Math.round(4 * Math.abs(Math.sin(now / 95 + seed))) : startled ? -3 : 0;
+          const shown = scared ? person * steps + 2 : frame;
+          if (scared) fx.scared++;
+          const top = bottom - sheet.h + 1 + (dancing ? Math.min(jump, leap) : Math.min(hop, leap)) + bow;
+          sprite(sheet, shown, x - (crowd.pad || 0), top, flip);
+          rim(sheet, shown, x - (crowd.pad || 0), top, flip, x + 6);
+          guestUmbrella(seed + dx, x - (crowd.pad || 0), top, joke);
         }
       }
     }
@@ -1088,6 +1464,7 @@
       const y = GROUND - 6 - meta.h + 1;
       sprite(meta, 0, x, y);
       const floor = y + meta.floor;
+      if (layout.tier >= 4) drawTelao(x + 63, y + 22, now);
       for (let k = 0, lx = x + 5; lx < x + meta.w - 4; k++, lx += 7) {
         const lit = Math.floor(now / 160 - k) % 4 === 0;
         const color = FLAGS[k % 6];
@@ -1098,11 +1475,28 @@
         g.fillRect(lx, floor + 1, 1, 1);
       }
       const playing = [];
+      // Solo: de vez em quando um do trio dá um passo à frente pulando e as notas saem em rajada.
+      if (!fx.solo || now - fx.solo.at > 2600) {
+        if (fx.solo) fx.solo = null;
+        if (!fx.nextSolo) fx.nextSolo = now + 60000 + rng() * 60000;
+        if (now >= fx.nextSolo) {
+          const active = ['cenoura', 'inhame', 'batata'].map((id, i) => (engine.charActive(id) ? i : -1)).filter(i => i >= 0);
+          fx.nextSolo = now + 120000 + rng() * 120000;
+          if (active.length) {
+            const i = active[Math.floor(rng() * active.length)];
+            fx.solo = { i, at: now };
+            say(tr(`fx.solo.${i}`), x + meta.slots[i] + 8, Math.max(10, floor - 40), now, '#ffd21e', 1800, 8);
+          }
+        }
+      }
       ['cenoura', 'inhame', 'batata'].forEach((id, i) => {
         if (!engine.charActive(id)) return;
         const char = bundle.chars[id];
-        sprite(char, frameAt(char, now, i * 0.5), x + meta.slots[i] - 1, floor - char.h + 1);
+        const solo = fx.solo && fx.solo.i === i;
+        const lift = solo ? -Math.round(Math.abs(Math.sin((now - fx.solo.at) / 160)) * 3) : 0;
+        sprite(char, frameAt(char, now * (solo ? 1.8 : 1), i * 0.5), x + meta.slots[i] - 1, floor - char.h + 1 + lift);
         playing.push(x + meta.slots[i] + 8);
+        if (solo && rng() < 0.25) float('nota', x + meta.slots[i] + 8, floor - 22, now, [FLAGS[Math.floor(rng() * 6)]]);
       });
       // O trio toca: notinhas coloridas sobem do palco.
       if (playing.length && now >= fx.nextNote) {
@@ -1111,6 +1505,40 @@
       }
       regions.push({ id: 'palco', x, y, w: meta.w, h: meta.h - 14 });
       drawAuctioneer(engine, now, x, floor);
+    }
+
+    // Telão do Maior São João do Mundo: um painel de LED no fundo do palco mostrando a Mandioca dançando ao vivo (o quadro
+    // dela do último desenho, reduzido), com as linhas do LED e uma moldura de luzinhas piscando.
+    function drawTelao(sx, sy, now) {
+      const shot = fx.hostShot;
+      if (!shot) return;
+      const w = 32;
+      const h = 18;
+      g.fillStyle = INK;
+      g.fillRect(sx - 2, sy - 2, w + 4, h + 4);
+      g.fillStyle = '#0c1430';
+      g.fillRect(sx, sy, w, h);
+      const sheet = shot.sheet;
+      const image = images[sheet.image];
+      if (image) {
+        // Close da câmera: só a parte de cima do quadro (rosto e tronco), maior.
+        const top = Math.round(sheet.h * 0.2);
+        const part = Math.round(sheet.h * 0.5);
+        const scale = (h - 1) / part;
+        const dw = Math.round(sheet.w * scale);
+        g.drawImage(image, (shot.frame % sheet.frames) * sheet.w, top, sheet.w, part, sx + Math.round((w - dw) / 2), sy + 1, dw, h - 1);
+      }
+      // Linhas do LED e um brilho azulado por cima.
+      g.fillStyle = 'rgba(12, 20, 48, 0.18)';
+      for (let r = 1; r < h; r += 2) g.fillRect(sx, sy + r, w, 1);
+      // Moldura de luzinhas que acendem em volta.
+      for (let k = 0; k < 12; k++) {
+        const t = k / 12;
+        const px = t < 0.5 ? sx - 1 + Math.round(t * 2 * (w + 1)) : sx - 1 + Math.round((1 - (t - 0.5) * 2) * (w + 1));
+        const py = t < 0.5 ? sy - 2 : sy + h + 1;
+        g.fillStyle = Math.floor(now / 200 + k) % 3 === 0 ? '#fffff0' : FLAGS[k % 6];
+        g.fillRect(px, py, 1, 1);
+      }
     }
 
     // Leilão de prendas: o leiloeiro no palco, entre o Inhame e a Batata-Doce. Fala sem parar (boca e martelo no alto) e
@@ -1142,6 +1570,26 @@
         fx.nextFireSmoke = now + 260 + rng() * 260;
         fx.particles.push({ x: cx + (rng() - 0.5) * f.meta.w * 0.3, y: y + 2, vx: (rng() - 0.3) * 0.006, vy: -0.012 - rng() * 0.006,
           born: now, ttl: 1800 + rng() * 900, smoke: true, wobble: rng() * 6 });
+      }
+      // Milho assando: da Festa da Cidade em diante, duas espigas encostadas na beira da fogueira, tostadinhas.
+      if (layout.tier >= 2) {
+        for (const [dx, lean] of [[-2, 1], [f.meta.w - 1, -1]]) {
+          const bx = f.x + dx;
+          const by = GROUND - 8;
+          for (let k = 0; k < 6; k++) {
+            const px = bx + Math.round(lean * (k < 3 ? 0 : 1));
+            g.fillStyle = INK;
+            g.fillRect(px - 1, by + k, 4, 1);
+          }
+          for (let k = 0; k < 5; k++) {
+            const px = bx + Math.round(lean * (k < 3 ? 0 : 1));
+            g.fillStyle = k < 4 ? (k % 2 ? '#c07e08' : '#ffd21e') : '#35a03a';
+            g.fillRect(px, by + k, 2, 1);
+          }
+          if (rng() < 0.01) {
+            fx.particles.push({ x: bx + 1, y: by - 1, vx: (rng() - 0.5) * 0.004, vy: -0.01, born: now, ttl: 900, smoke: true, wobble: rng() * 6 });
+          }
+        }
       }
       if (engine.charActive('faisca')) {
         const spark = bundle.chars.faisca;
@@ -1179,6 +1627,7 @@
 
     function drawCrasher(engine, now) {
       const active = engine.state.crasher.active;
+      if (!active && !fx.crasherSeen) fx.crasherX = null;
       const meta = bundle.props.penetra;
       if (active && !fx.crasherSeen) fx.crasherSeen = { at: now, side: active.side };
       if (!active && fx.crasherSeen) {
@@ -1191,12 +1640,14 @@
         const t = Math.min(1, (now - fx.crasherSeen.at) / 2200);
         const x = edge(fx.crasherSeen.side) + (target - edge(fx.crasherSeen.side)) * t;
         fx.crasherSeen.x = x;
+        fx.crasherX = x + meta.w / 2;
         shadow(x + 7, 10);
         sprite(meta, t < 1 ? frameAt(meta, now) : 0, x, GROUND - meta.h + 1 + (t < 1 ? 0 : Math.round(Math.sin(now / 200))),
           fx.crasherSeen.side > 0);
         regions.push({ id: 'crasher', x: x - 2, y: GROUND - meta.h - 2, w: meta.w + 4, h: meta.h + 4 });
         if (t >= 1) write('?', x + 7, GROUND - meta.h - 7, '#fff07a');
       } else if (fx.leaving) {
+        fx.crasherX = null;
         const t = (now - fx.leaving.at) / 700;
         if (t >= 1) fx.leaving = null;
         else {
@@ -1381,6 +1832,13 @@
       if (!fx.wind && now >= fx.nextWind && fx.wx.rain < 0.2) {
         fx.wind = { at: now, until: now + 12000, dir: rng() < 0.5 ? -1 : 1 };
         fx.nextWind = now + 240000 + rng() * 240000;
+        // Às vezes a rajada leva o chapéu da Mandioca: ele voa num arco e cai de volta na cabeça.
+        if (rng() < 0.35) fx.hatFly = { at: now + 2500, dir: fx.wind.dir, said: false };
+        // E às vezes solta uma bandeirinha do varal, que cai rodopiando (clicável até chegar no chão).
+        if (layout.tier >= 1 && rng() < 0.6) {
+          fx.looseFlag = { at: now + 1500 + rng() * 3000, x: layout.L + 20 + rng() * (layout.width - 40), dir: fx.wind.dir,
+            color: FLAGS[Math.floor(rng() * FLAGS.length)] };
+        }
         say(tr('fx.wind'), layout.L + layout.width / 2, Math.max(10, GROUND - POLE_H[layout.tier] - 18), now, '#cfe3ff', 1800, 6);
       }
       const gust = fx.wind;
@@ -1393,6 +1851,27 @@
           gravity: 0.000004, born: now, ttl: 2600 + rng() * 1800, wobble: rng() * 6, flip: 90 + rng() * 100,
           colors: [['#9ef05a', '#35a03a'], ['#ffd21e', '#c07e08'], ['#ff8ac8', '#ad1e66'], ['#fff4e4', '#c8ccd6']][Math.floor(rng() * 4)] });
       }
+    }
+
+    const HAT_FLY_MS = 1900;
+
+    // A bandeirinha solta: sai do varal, cai devagar indo com o vento e rodopiando; no chão fica um tempinho e some.
+    const FLAG_FALL_MS = 5200;
+    function drawLooseFlag(now, poleTop) {
+      const f = fx.looseFlag;
+      if (!f || now < f.at) return;
+      const t = (now - f.at) / FLAG_FALL_MS;
+      if (t >= 1.5) { fx.looseFlag = null; return; }
+      const k = Math.min(1, t);
+      const x = Math.round(f.x + f.dir * 30 * k + Math.sin(now / 260) * 3 * (1 - k));
+      const y = Math.round(poleTop + 6 + (GROUND - 3 - poleTop - 6) * k * k * (3 - 2 * k));
+      const wide = t >= 1 || Math.floor(now / 180) % 2 === 0;
+      g.fillStyle = INK;
+      if (wide) { g.fillRect(x - 3, y - 1, 7, 4); g.fillRect(x - 1, y + 3, 3, 1); } else g.fillRect(x - 2, y - 1, 5, 5);
+      g.fillStyle = f.color;
+      if (wide) { g.fillRect(x - 2, y, 5, 1); g.fillRect(x - 1, y + 1, 3, 1); g.fillRect(x, y + 2, 1, 1); }
+      else { g.fillRect(x - 1, y, 3, 1); g.fillRect(x - 1, y + 1, 2, 1); g.fillRect(x - 1, y + 2, 1, 1); }
+      if (t < 1) regions.push({ id: 'bandeirinha', x: x - 7, y: y - 6, w: 15, h: 14 });
     }
 
     // Guarda-chuva desenhado uma vez por cor e largura: aba com brilho à esquerda e sombra à direita, cabo torto.
@@ -1605,12 +2084,56 @@
     }
 
     // Guarda-chuva das pessoas da festa quando chove (a maioria abre um).
-    function guestUmbrella(seed, x, top) {
-      if (fx.wx.rain < 0.15 || seed % 3 === 0) return;
+    function guestUmbrella(seed, x, top, joke = false) {
+      if (joke ? seed % 4 === 0 : fx.wx.rain < 0.15 || seed % 3 === 0) return;
       g.drawImage(umbrella((seed >> 4) % FLAGS.length, 9), Math.round(x + 5), Math.round(top - 4));
     }
 
-    function drawSky(now, poleTop) {
+    // Lua de verdade: a fase vem do relógio (mês lunar de 29,53 dias a partir de uma lua nova conhecida). 0 = nova,
+    // 0,5 = cheia. Desenhada como se vê do Brasil (hemisfério sul): a crescente acende do lado esquerdo.
+    const SYNODIC = 29.530588853 * 86400000;
+    const NEW_MOON = Date.UTC(2000, 0, 6, 18, 14);
+    function moonPhase(time) {
+      const p = ((time - NEW_MOON) / SYNODIC) % 1;
+      return p < 0 ? p + 1 : p;
+    }
+    // Quanto da lua está acesa (0 a 1).
+    const moonLight = phase => (1 - Math.cos(phase * Math.PI * 2)) / 2;
+    const moonCache = new Map();
+    function moonImage(meta, phase) {
+      const bucket = Math.round(phase * 16) % 16;
+      if (moonCache.has(bucket)) return moonCache.get(bucket);
+      const source = images[meta.image];
+      if (!source || !source.complete || !source.width) return null;
+      const image = document.createElement('canvas');
+      image.width = meta.w;
+      image.height = meta.h;
+      const p = image.getContext('2d');
+      p.drawImage(source, 0, 0, meta.w, meta.h, 0, 0, meta.w, meta.h);
+      // Sombra: o que não está aceso fica quase transparente (dá para ver o contorno da lua nova de leve).
+      const q = bucket / 16;
+      const a = Math.cos(q * Math.PI * 2);
+      const r = (meta.w - 2) / 2;
+      const cx = meta.w / 2;
+      const cy = meta.h / 2;
+      p.globalCompositeOperation = 'destination-out';
+      p.fillStyle = 'rgba(0, 0, 0, 0.82)';
+      for (let py = 0; py < meta.h; py++) {
+        for (let px = 0; px < meta.w; px++) {
+          const u = (px + 0.5 - cx) / r;
+          const v = (py + 0.5 - cy) / r;
+          const edge = Math.sqrt(Math.max(0, 1 - v * v));
+          // Hemisfério norte: crescendo, acende a direita; minguando, a esquerda. No sul é o espelho.
+          const x = -u;
+          const lit = q < 0.5 ? x > a * edge : x < -a * edge;
+          if (!lit) p.fillRect(px, py, 1, 1);
+        }
+      }
+      moonCache.set(bucket, image);
+      return image;
+    }
+
+    function drawSky(engine, now, poleTop) {
       const { L, R, has } = layout;
       if (has.has('estrelas')) {
         const room = Math.max(6, poleTop - 6);
@@ -1626,6 +2149,22 @@
             g.fillRect(x, y - 1, 1, 3);
           }
         }
+        // Cruzeiro do Sul (o da bandeira): Gacrux em cima, Acrux embaixo, Mimosa e Delta dos lados e a Intrometida perto
+        // do meio, um pouco à esquerda da lua (ou das ilhas), com brilho mais forte que o resto.
+        const cx = Math.round(L + layout.width * (layout.islands.length ? 0.42 : 0.2));
+        const cy = Math.max(4, Math.min(room - 12, 6));
+        for (const [dx, dy, big, k] of [[0, 0, true, 0], [1, 10, true, 1], [-4, 4, true, 2], [5, 5, false, 3], [2, 7, false, 4]]) {
+          const glow = Math.sin(now / 900 + k * 2.3);
+          const x = cx + dx;
+          const y = cy + dy;
+          g.fillStyle = glow > 0.3 ? '#fffff0' : '#dfe8ff';
+          g.fillRect(x, y, 1, 1);
+          if (big) {
+            g.fillStyle = `rgba(255, 255, 240, ${(0.35 + 0.25 * glow).toFixed(2)})`;
+            g.fillRect(x - 1, y, 3, 1);
+            g.fillRect(x, y - 1, 1, 3);
+          }
+        }
         spots.set('estrelas', { x: (L + R) / 2, y: 12 });
       }
       if (has.has('lua')) {
@@ -1633,13 +2172,18 @@
         // Com as ilhas do céu ocupando os cantos, a lua vai para o meio do céu.
         const x = layout.islands.length ? Math.round(L + layout.width * 0.64) : R - moon.w - 6;
         const y = 4 + Math.round(Math.sin(now / 3000));
-        halo(x + moon.w / 2, y + moon.h / 2, 13, '#fff4c0', 0.2);
+        const phase = moonPhase(engine.now());
+        halo(x + moon.w / 2, y + moon.h / 2, 13, '#fff4c0', 0.2 * moonLight(phase));
         // Clicar na lua faz ela dar um pulinho.
         const bounce = Math.round(critter('lua', x, y, moon.w, moon.h, now) / 2);
-        sprite(moon, 0, x, y + bounce);
+        const image = moonImage(moon, phase);
+        if (image) g.drawImage(image, x, y + bounce);
+        else sprite(moon, 0, x, y + bounce);
         spots.set('lua', { x: x + moon.w / 2, y: y + 6 });
       }
-      drawShootingStar(now, poleTop);
+      drawShootingStar(engine, now, poleTop);
+      drawDrones(now);
+      drawAsaBranca(now, poleTop);
       if (has.has('pipa')) {
         const kite = bundle.scenery.pipa;
         const kx = Math.round((layout.islands.length ? L + layout.width * 0.3 : L + 22) + Math.sin(now / 1700) * 5 + fx.windNow * 8);
@@ -1671,9 +2215,159 @@
     }
 
     // Estrela cadente: de vez em quando (da Quermesse em diante) risca o céu acima do varal, com rastro que apaga.
-    function drawShootingStar(now, poleTop) {
+    // Show de drones do Maior São João do Mundo (porte 4): de tempos em tempos, pontinhos de luz sobem de trás do palco e
+    // desenham no céu um coração, uma estrela, um balão junino, um "VIVA" e a própria Mandioca, e descem apagando. Fica no
+    // céu (atrás das bandeirinhas e do palco), como coisa longe.
+    const DRONE_COUNT = 34;
+    const DRONE_COLORS = { R: '#ff4f5e', A: '#ffe27a', J: '#6fa8ff', G: '#7ef07a', D: '#e3a232', K: '#ff8a12', H: '#ff8ad0', W: '#ffffff' };
+    const DRONE_SHAPES = [
+      ['.HH.HH.', 'HHHHHHH', 'HHHHHHH', '.HHHHH.', '..HHH..', '...H...'],
+      ['...A...', '...A...', 'AAAAAAA', '.AAAAA.', '..AAA..', '.AA.AA.', 'A.....A'],
+      ['...R...', '..RAR..', '.RAJAR.', 'RAJJJAR', '.RAJAR.', '..RAR..', '...R...', '...K...'],
+      ['A...A.AAA.A...A..A..', 'A...A..A..A...A.A.A.', '.A.A...A...A.A..AAA.', '..A...AAA...A...A.A.'],
+      ['..G.G..', '.GGGGG.', '...G...', '..DDD..', '..DDD..', '..DDD..', '...D...'],
+      ['...K...', '..KAK..', '.KAWAK.', '.KAWAK.', '..RRR..', '.D.D.D.'],
+      ['RRWWWRR', 'RWJWJWR', 'RRWWWRR', 'RWJWJWR', 'RRWWWRR']
+    ];
+    // Formas de 0 a 2 e 5 e 6 se revezam; o VIVA (3) e a Mandioca (4) fecham todo show.
+    const DRONE_OPEN = [0, 1, 2, 5, 6];
+    const DRONE_SHOW = 5;
+    const DRONE_MOVE = 1800;
+    const DRONE_HOLD = 3600;
+    const dronePoints = DRONE_SHAPES.map(rows => {
+      const points = [];
+      rows.forEach((row, y) => [...row].forEach((char, x) => { if (char !== '.') points.push({ x, y, color: DRONE_COLORS[char] }); }));
+      const w = rows[0].length;
+      const h = rows.length;
+      // Cada drone vai para um ponto (os que sobram repetem pontos, os que faltam pulam pontos igualmente).
+      return Array.from({ length: DRONE_COUNT }, (_, i) => {
+        const p = points[Math.floor(i * points.length / DRONE_COUNT)];
+        return { x: (p.x - (w - 1) / 2) * 3, y: (p.y - (h - 1) / 2) * 3, color: p.color };
+      });
+    });
+    function drawDrones(now) {
+      if (layout.tier < 4) { fx.drones = null; return; }
+      const d = fx.drones || (fx.drones = { at: 0, next: now + 60000 + rng() * 60000 });
+      const total = DRONE_MOVE + DRONE_SHOW * (DRONE_MOVE + DRONE_HOLD) + DRONE_MOVE;
+      if (!d.at && now >= d.next && fx.wx.rain < 0.15) {
+        // Três formas sorteadas e depois VIVA e a Mandioca (com chuva, os drones esperam).
+        const open = [...DRONE_OPEN].sort(() => rng() - 0.5).slice(0, 3);
+        Object.assign(d, { at: now, said: false, viva: false, order: [...open, 3, 4] });
+        sound('drones');
+      }
+      if (!d.at) return;
+      const age = now - d.at;
+      if (age > total) { d.at = 0; d.next = now + 480000 + rng() * 240000; return; }
+      if (!d.said && age > DRONE_MOVE) {
+        d.said = true;
+        const guest = layout.audience[Math.floor(rng() * layout.audience.length)];
+        if (guest) say(tr('fx.drones'), guest.x + 6, GROUND - 40, now, '#cfe3ff', 2200, 6);
+      }
+      const cx = Math.round(layout.L + layout.width * 0.4);
+      const cy = 28 + (layout.islands.length ? ISLAND_SKY * 0.5 : 0);
+      const base = { x: 0, y: GROUND - cy - 20 };
+      const ease = t => t * t * (3 - 2 * t);
+      // Em que forma está (e a anterior, para a travessia), e quanto já andou.
+      const slot = DRONE_MOVE + DRONE_HOLD;
+      const local = age - DRONE_MOVE;
+      const index = Math.max(-1, Math.min(DRONE_SHOW, Math.floor(local / slot)));
+      const order = d.order || [0, 1, 2, 3, 4];
+      const shape = k => dronePoints[order[Math.max(0, Math.min(DRONE_SHOW - 1, k))]];
+      // Quando os drones escrevem VIVA, a plateia comemora junto.
+      if (order[index] === 3 && !d.viva) { d.viva = true; fx.celebrateUntil = now + 1600; }
+      for (let i = 0; i < DRONE_COUNT; i++) {
+        let from;
+        let to;
+        let t;
+        let fade = 1;
+        if (age < DRONE_MOVE) {
+          from = { x: (i - DRONE_COUNT / 2) * 2, y: base.y };
+          to = shape(0)[i];
+          t = age / DRONE_MOVE;
+          fade = Math.min(1, age / 400);
+        } else if (index >= DRONE_SHOW) {
+          from = shape(DRONE_SHOW - 1)[i];
+          to = { x: (i - DRONE_COUNT / 2) * 2, y: base.y };
+          t = Math.min(1, (local - DRONE_SHOW * slot) / DRONE_MOVE);
+          fade = 1 - t;
+        } else {
+          const inSlot = local - index * slot;
+          from = shape(index - 1)[i];
+          to = shape(index)[i];
+          t = index === 0 ? 1 : Math.min(1, inSlot / DRONE_MOVE);
+        }
+        const k = ease(Math.max(0, Math.min(1, t)));
+        const x = Math.round(cx + from.x + (to.x - from.x) * k);
+        const y = Math.round(cy + from.y + (to.y - from.y) * k + Math.sin(now / 500 + i) * 0.4);
+        const color = (k > 0.5 ? to.color : from.color) || '#ffffff';
+        const twinkle = 0.75 + 0.25 * Math.sin(now / 160 + i * 1.3);
+        g.globalAlpha = fade * twinkle;
+        halo(x, y, 2, color, 0.35 * fade);
+        g.fillStyle = color;
+        g.fillRect(x, y, 1, 1);
+        g.globalAlpha = 1;
+      }
+    }
+
+    // Asa-branca: de vez em quando um bando de pombas asa-branca (a da música do Luiz Gonzaga) cruza o céu em V, bem
+    // longe, batendo as asas cada uma no seu tempo. Às vezes alguém da plateia repara.
+    const FLOCK_MS = 9000;
+    function drawAsaBranca(now, poleTop) {
+      if (layout.tier < 1) return;
+      const f = fx.flock || (fx.flock = { at: 0, next: now + 90000 + rng() * 90000 });
+      if (!f.at && now >= f.next && fx.wx.rain < 0.15) {
+        Object.assign(f, { at: now, dir: rng() < 0.5 ? 1 : -1, n: 5 + Math.floor(rng() * 3), y: 16 + rng() * Math.max(4, poleTop - 30), said: false });
+      }
+      if (!f.at) return;
+      const t = (now - f.at) / FLOCK_MS;
+      if (t >= 1) { f.at = 0; f.next = now + 180000 + rng() * 180000; return; }
+      if (!f.said && t > 0.35 && layout.audience.length) {
+        f.said = true;
+        if (rng() < 0.4) {
+          const guest = layout.audience[Math.floor(rng() * layout.audience.length)];
+          say(tr('fx.asaBranca'), guest.x + 6, GROUND - 40, now, '#fff8e8', 2200, 6);
+        }
+      }
+      const span = layout.width + 60;
+      const lead = f.dir > 0 ? layout.L - 30 + span * t : layout.R + 30 - span * t;
+      for (let i = 0; i < f.n; i++) {
+        // Formação em V: a da frente puxa, as outras vêm atrás, alternando os lados.
+        const rank = Math.ceil(i / 2);
+        const side = i % 2 ? -1 : 1;
+        const x = Math.round(lead - f.dir * rank * 7);
+        const y = Math.round(f.y + side * rank * 4 + Math.sin(now / 600 + i) * 0.6);
+        const up = Math.floor(now / 170 + i * 0.7) % 2 === 0;
+        g.fillStyle = '#f4f2ea';
+        g.fillRect(x - 1, y, 3, 1);
+        g.fillRect(x - 2, y + (up ? -1 : 1), 1, 1);
+        g.fillRect(x + 2, y + (up ? -1 : 1), 1, 1);
+        g.fillStyle = '#9aa0ae';
+        g.fillRect(x, y, 1, 1);
+      }
+    }
+
+    // Chuvas de meteoros de verdade (mês, dia do pico): na noite do pico e na vizinha, o céu da festa ganha estrela
+    // cadente a cada poucos segundos. Quadrântidas, Líridas, Eta Aquáridas, Delta Aquáridas, Perseidas, Oriônidas,
+    // Leônidas e Geminídeas.
+    const METEOR_PEAKS = [[1, 3], [4, 22], [5, 6], [7, 30], [8, 12], [10, 21], [11, 17], [12, 14]];
+    function meteorNight(time) {
+      const day = new Date(time);
+      return METEOR_PEAKS.some(([month, peak]) => {
+        const at = new Date(day.getFullYear(), month - 1, peak).getTime();
+        return Math.abs(time - at) < 1.5 * 86400000;
+      });
+    }
+
+    function drawShootingStar(engine, now, poleTop) {
       if (layout.tier < 1) return;
       if (!fx.nextShoot) fx.nextShoot = now + 6000 + rng() * 10000;
+      const shower = meteorNight(engine.now());
+      if (shower && !fx.showerSaid && layout.audience.length) {
+        fx.showerSaid = true;
+        const guest = layout.audience[Math.floor(rng() * layout.audience.length)];
+        say(tr('fx.meteoros'), guest.x + 6, GROUND - 40, now + 3000, '#cfe3ff', 2400, 6);
+      }
+      if (shower && fx.nextShoot - now > 4500) fx.nextShoot = now + 1500 + rng() * 3000;
       if (!fx.shooting && now >= fx.nextShoot) {
         const dir = rng() < 0.5 ? -1 : 1;
         fx.shooting = { x: layout.L + layout.width * (dir > 0 ? 0.1 + rng() * 0.4 : 0.5 + rng() * 0.4), y: 3 + rng() * 10,
@@ -1841,8 +2535,8 @@
 
     // Bichos que reagem ao clique: pulinho, o grito escrito em cima e, para a galinha, umas penas. Cada bicho tem um
     // id de região `bicho:<tipo>[:<n>]`; `react` guarda a hora do último clique em cada um.
-    const CRITTER_SAYS = { galinha: ['CO-CO-CO!', 'COCORICO!'], pintinho: ['PIU!', 'PIU PIU!'], bode: ['BEEE!'],
-      gato: ['MIAU!', 'RRRR...'], boi: ['MUUU!'], igreja: ['DENG DONG!', 'BLIM BLOM!'], lua: ['ZZZ...', 'WOW!'], roda: ['WHEEE!', 'UHUU!'], trem: ['PIUIII!', 'TCHU TCHU!'], sapo: ['CROAC!', 'COAX!'], carrossel: ['UIII!', 'OBA!'], catavento: ['VUUU!', 'FIU!'], caramelo: ['AU AU!', 'AUUU!', 'HUMF!'], pipa: ['ZUM!', 'WHOOSH!'], amendoim: ['QUEM QUER?', 'AMENDOIM!'], crianca: ['HIHI!', 'PEGA!', 'OBA!'] };
+    const CRITTER_SAYS = { papagaio: ['CURRUPACO!', 'CRAAA!'], 'carro-boi': ['MUUU!', 'NHEC NHEC!'], galinha: ['CO-CO-CO!', 'COCORICO!'], pintinho: ['PIU!', 'PIU PIU!'], bode: ['BEEE!'],
+      gato: ['MIAU!', 'RRRR...'], boi: ['MUUU!'], igreja: ['DENG DONG!', 'BLIM BLOM!'], lua: ['ZZZ...', 'WOW!'], roda: ['WHEEE!', 'UHUU!'], trem: ['PIUIII!', 'TCHU TCHU!'], sapo: ['CROAC!', 'COAX!'], carrossel: ['UIII!', 'OBA!'], jegue: ['IÓ-IÓ!', 'IÓÓÓ!', 'HUMF!'], kombi: ['BI-BI!', 'FOM FOM!'], catavento: ['VUUU!', 'FIU!'], caramelo: ['AU AU!', 'AUUU!', 'HUMF!'], pipa: ['ZUM!', 'WHOOSH!'], amendoim: ['QUEM QUER?', 'AMENDOIM!'], crianca: ['HIHI!', 'PEGA!', 'OBA!'] };
     const critterHop = (id, now) => {
       const t = now - (fx.react[id] ?? -1e9);
       return t >= 0 && t < 380 ? -Math.round(3 * Math.sin(Math.PI * t / 380)) : 0;
@@ -1878,7 +2572,31 @@
         say(tr('fx.woof'), d.x + dog.w / 2, GROUND - dog.h - 6, now, '#fff8e8', 900, 8);
         bunny.flee = { until: now + 4000 };
       }
-      if (d.plan === 'chase') {
+      // Penetra na festa: o caramelo acorda, corre até ele e fica latindo enquanto ele estiver ali.
+      if (fx.crasherX != null && d.plan !== 'guard') {
+        Object.assign(d, { plan: 'guard', barkAt: now });
+        if (d.x === undefined) d.x = lo;
+      }
+      if (d.plan === 'guard') {
+        const step = Math.min(100, Math.max(0, now - (d.at || now))) * 0.05;
+        d.at = now;
+        if (fx.crasherX == null) Object.assign(d, { plan: 'roam', mode: 'para', until: now + 2000 });
+        else {
+          const target = Math.max(lo, Math.min(hi, fx.crasherX - dog.w / 2 - Math.sign(fx.crasherX - dog.w / 2 - d.x || 1) * 14));
+          const gap = target - d.x;
+          d.dir = Math.sign(fx.crasherX - (d.x + dog.w / 2)) || d.dir;
+          d.x += Math.sign(gap) * Math.min(Math.abs(gap), step);
+          frame = Math.abs(gap) > 1 ? Math.floor(now / 70) % 4 : 4 + Math.floor(now / 180) % 2;
+          if (Math.abs(gap) <= 1 && now >= d.barkAt) {
+            d.barkAt = now + 1300 + rng() * 800;
+            say(tr('fx.woof'), d.x + dog.w / 2, GROUND - dog.h - 6, now, '#fff8e8', 800, 8);
+            sound('latido');
+          }
+        }
+      }
+      // De guarda, o quadro já saiu acima; se o penetra foi embora neste quadro, ele cai no passeio logo abaixo.
+      if (d.plan === 'guard') frame = frame ?? 4;
+      else if (d.plan === 'chase') {
         const step = Math.min(100, Math.max(0, now - (d.at || now))) * 0.05;
         d.at = now;
         const target = (bunny.x ?? d.x) - Math.sign((bunny.x ?? d.x) - d.x || 1) * 10;
@@ -1962,8 +2680,285 @@
       spots.set('trem', { x: x + train.w / 2, y: y + 6 });
     }
 
+    // Sanfoneiro Andarilho: atravessa a festa pela frente, da esquerda para a direita, no tempo da visita (pelo relógio do
+    // motor), abrindo e fechando o fole; halo dourado e notinhas subindo. Clicar cumprimenta.
+    // "Olha a cobra!": a cobra de pano atravessa a pista rente ao chão, na frente dos pares, em cobraSeconds. Quem está
+    // perto pula (drawCrowd lê fx.cobraX), clicar nela pega (região 'cobra') e, se chegar do outro lado, é mentira.
+    function cobraTrack(engine, now) {
+      const snake = bundle.scenery.cobra;
+      const r = engine.state.runtime;
+      if (!snake) return null;
+      const total = engine.cfg.cobraSeconds * 1000;
+      // Festa aberta no meio da travessia: a cobra entra de onde já devia estar.
+      if (!fx.cobra && r.cobraLeft > 0) fx.cobra = { start: now - (total - r.cobraLeft * 1000), dir: r.cobraDir || 1, caught: null, shouts: 0 };
+      const c = fx.cobra;
+      if (!c) return null;
+      if (c.caught != null) return c.at;
+      // O motor já encerrou (ou a festa recarregou): a cobra não fica parada na beira da pista.
+      if (!(r.cobraLeft > 0) && now - c.start > total + 500) { fx.cobra = null; return null; }
+      const t = Math.max(0, Math.min(1, (now - c.start) / total));
+      const from = layout.danceLeft - snake.w - 6;
+      const to = layout.danceRight + 6;
+      const x = Math.round(c.dir > 0 ? from + (to - from) * t : to - (to - from) * t);
+      return { x, t };
+    }
+
+    function drawCobra(engine, now, floor) {
+      const c = fx.cobra;
+      const snake = bundle.scenery.cobra;
+      if (!c || !snake) return;
+      const flip = c.dir < 0;
+      const base = floor - snake.h + 4;
+      if (c.caught != null) {
+        // Pegou: a cobra sobe molinha no ar e some.
+        const t = (now - c.caught) / 800;
+        if (t >= 1) { fx.cobra = null; return; }
+        g.globalAlpha = Math.max(0, 1 - t * t);
+        sprite(snake, Math.floor(now / 60) % snake.frames, c.at.x, base - Math.round(22 * Math.sin(t * Math.PI / 2)), flip);
+        g.globalAlpha = 1;
+        return;
+      }
+      const at = cobraTrack(engine, now);
+      if (!at) return;
+      shadow(at.x + snake.w / 2, snake.w - 6, 0.5);
+      sprite(snake, Math.floor(now / 110) % snake.frames, at.x, base, flip);
+      regions.push({ id: 'cobra', x: at.x - 4, y: base - 6, w: snake.w + 8, h: snake.h + 10 });
+      // Duas vezes na travessia alguém do par mais perto grita.
+      if (c.shouts < 2 && at.t > [0.3, 0.65][c.shouts] && layout.couples.length) {
+        const guest = layout.couples.reduce((best, cand) => Math.abs(cand.x + 12 - at.x) < Math.abs(best.x + 12 - at.x) ? cand : best);
+        say(tr(`fx.cobraAi.${Math.floor(rng() * 3)}`), guest.x + 12, floor - 32, now, '#fff07a', 900, 6);
+        c.shouts++;
+      }
+    }
+
+    // O peixinho que pula da pescaria quando sai prenda: laranja com a barbatana, virando no ar, e o respingo azul.
+    const FISH_MS = 900;
+    function drawFishJump(now) {
+      const f = fx.fishJump;
+      if (!f) return;
+      const t = (now - f.at) / FISH_MS;
+      if (t >= 1) {
+        if (!f.splashed) {
+          f.splashed = true;
+          for (let i = 0; i < 6; i++) {
+            fx.particles.push({ x: f.x + f.dir * 16 + (rng() - 0.5) * 4, y: f.y, vx: (rng() - 0.5) * 0.03, vy: -0.03 - rng() * 0.02,
+              gravity: 0.00012, born: now, ttl: 380, colors: ['#9fc8ff', '#48a8ff'] });
+          }
+        }
+        fx.fishJump = null;
+        return;
+      }
+      const x = Math.round(f.x + f.dir * 16 * t);
+      const y = Math.round(f.y - Math.sin(t * Math.PI) * 18);
+      const head = t < 0.5 ? -1 : 1;
+      g.fillStyle = INK;
+      g.fillRect(x - 3, y - 1, 7, 4);
+      g.fillStyle = '#ff8a12';
+      g.fillRect(x - 2, y, 4, 2);
+      g.fillStyle = '#ffc460';
+      g.fillRect(x - 2, y, 2, 1);
+      // Rabo do lado de trás do pulo e o olhinho na frente.
+      g.fillStyle = '#b44a0a';
+      g.fillRect(f.dir > 0 ? x - 3 : x + 2, y + (head < 0 ? 0 : 1), 1, 1);
+      g.fillStyle = INK;
+      g.fillRect(f.dir > 0 ? x + 1 : x - 2, y, 1, 1);
+    }
+
+    // Rabo no burro: o cavalete na beira da pista, o rabo balançando por cima do papel (vendado) e, depois do clique, o
+    // rabo pregado onde caiu. O balanço vem do motor (engine.burroOffset), para o desenho e a nota baterem.
+    const BURRO_ALVO = [23, 10];
+    function drawBurro(engine, now) {
+      const b = engine.state.burro && engine.state.burro.active;
+      const meta = bundle.scenery.burro;
+      if (!b || !meta) { fx.burroPos = null; return; }
+      // Na beira esquerda da pista, sem nunca tapar a Mandioca.
+      const x = Math.round(Math.min(layout.danceLeft + 2, layout.host.x - meta.w - 2));
+      const y = GROUND - meta.h + 3;
+      shadow(x + meta.w / 2, meta.w - 4, 0.8);
+      sprite(meta, 0, x, y);
+      const [dx, dy] = b.pinned ? [b.pinned.dx, b.pinned.dy] : engine.burroOffset(engine.now() - b.born);
+      const tx = x + BURRO_ALVO[0] + dx;
+      const ty = y + BURRO_ALVO[1] + dy;
+      // O rabo: a cordinha marrom e o tufo escuro na ponta.
+      g.fillStyle = '#58341c';
+      g.fillRect(tx, ty, 1, 1);
+      g.fillRect(tx + 1, ty + 1, 1, 1);
+      g.fillRect(tx + 1, ty + 2, 1, 1);
+      g.fillStyle = '#2e1812';
+      g.fillRect(tx + 1, ty + 3, 2, 2);
+      g.fillRect(tx + 2, ty + 5, 1, 1);
+      fx.burroPos = { x: x + meta.w / 2, y, pinned: !!b.pinned };
+      if (!b.pinned) {
+        regions.push({ id: 'burro', x: x - 2, y: y - 4, w: meta.w + 4, h: meta.h + 6 });
+        spots.set('burro', { x: x + meta.w / 2, y });
+        if (now >= (fx.burroHintAt || 0)) {
+          fx.burroHintAt = now + 3200;
+          say(tr('fx.sacoYou'), x + meta.w / 2, Math.max(10, y - 8), now, '#fffff0', 1200, 6);
+        }
+      }
+    }
+
+    // Estalinho (a bombinha de papel que estoura no chão): as crianças jogam um de vez em quando no pé da plateia, e
+    // clicar no chão da festa joga outro ali. Clarão, faísca, fumacinha, um "pá!" e quem está perto dá um pulo.
+    function estalo(x, y, now) {
+      if (now - (fx.estaloAt || -1e9) < 180) return false;
+      fx.estaloAt = now;
+      fx.particles.push({ x: x - 1, y: y - 2, vx: 0, vy: 0, born: now, ttl: 140, colors: ['#fffff0'], shape: 'brilho' });
+      for (let k = 0; k < 6; k++) {
+        fx.particles.push({ x, y: y - 1, vx: (rng() - 0.5) * 0.08, vy: -0.03 - rng() * 0.04, gravity: 0.00012, born: now,
+          ttl: 200 + rng() * 180, colors: SPARK, ember: true });
+      }
+      fx.particles.push({ x, y: y - 3, vx: (rng() - 0.5) * 0.004, vy: -0.006, born: now, ttl: 800, smoke: true });
+      say(tr(`fx.estalo.${Math.floor(rng() * 3)}`), x, y - 10, now, '#fff8e8', 650, 6);
+      fx.startle = { x, until: now + 380 };
+      // O Sopinha perto do estalo dá um binky (o pulinho de coelho feliz).
+      if (fx.bunny && fx.bunny.x !== undefined && Math.abs(fx.bunny.x - x) < 24) fx.bunny.poke = true;
+      sound('estalo');
+      return true;
+    }
+
+    function ambientEstalo(now) {
+      if (layout.tier < 1 || fx.wx.rain >= 0.15 || !layout.audience.length) return;
+      if (!fx.nextEstalo) fx.nextEstalo = now + 20000 + rng() * 20000;
+      if (now < fx.nextEstalo) return;
+      fx.nextEstalo = now + 25000 + rng() * 30000;
+      const guest = layout.audience[Math.floor(rng() * layout.audience.length)];
+      estalo(Math.round(guest.x + 6 + (rng() - 0.5) * 8), GROUND - 8, now);
+    }
+
+    // Clique no chão (coordenadas da tela): estalinho no ponto, rente ao chão.
+    function throwEstalo(clientX, clientY, now = root.performance?.now?.() || 0) {
+      const point = locate(clientX, clientY);
+      if (!point || !layout) return false;
+      const y = Math.min(GROUND + 2, Math.max(GROUND - 12, point.y - view.float));
+      return estalo(point.x, y, now);
+    }
+
+    function drawVisitor(engine, now) {
+      const v = engine.state.visitor && engine.state.visitor.active;
+      const meta = bundle.scenery.sanfoneiro;
+      if (!v || !meta) { fx.visitorPos = null; return; }
+      const p = Math.max(0, Math.min(1, (engine.now() - v.born) / Math.max(1, v.until - v.born)));
+      const x = Math.round(layout.L - meta.w + p * (layout.width + meta.w));
+      const y = GROUND - meta.h + 2 - (Math.floor(now / 180) % 2);
+      halo(x + meta.w / 2, y + meta.h / 2, 14, '#ffd21e', 0.18 + 0.06 * Math.sin(now / 200));
+      shadow(x + meta.w / 2, meta.w - 2, 0.8);
+      sprite(meta, Math.floor(now / 180) % meta.frames, x, y);
+      if (now >= (fx.nextVisitorNote || 0)) {
+        fx.nextVisitorNote = now + 420 + rng() * 260;
+        float('nota', x + meta.w / 2, y - 2, now, ['#ffd21e', '#fff07a', FLAGS[Math.floor(rng() * 6)]]);
+      }
+      fx.visitorPos = { x: x + meta.w / 2, y };
+      if (!v.greeted) {
+        regions.push({ id: 'sanfoneiro', x: x - 2, y: y - 4, w: meta.w + 4, h: meta.h + 6 });
+        spots.set('sanfoneiro', { x: x + meta.w / 2, y });
+      }
+    }
+
+    // Fotógrafo lambe-lambe: entra pela direita empurrando o tripé, monta a câmera ao lado da Mandioca e do par (a
+    // lente virada para eles) e espera a pose debaixo do pano preto. Clicar nele (região 'fotografo') tira o retrato;
+    // depois ele fecha o tripé e vai embora por onde veio.
+    function drawFotografo(engine, now) {
+      const f = engine.state.fotografo && engine.state.fotografo.active;
+      const meta = bundle.scenery.fotografo;
+      if (!f || !meta) { fx.fotoPos = null; return; }
+      const t = engine.now();
+      const walk = engine.cfg.fotoWalk * 1000;
+      const beside = layout.par ? layout.par.x + 18 : layout.host.x + 30;
+      const spot = Math.round(Math.min(layout.R - meta.w, beside));
+      const out = layout.R + 10;
+      let x = spot;
+      let frame = 4 + (Math.floor(now / 700) % 2);
+      let flip = false;
+      if (t < f.born + walk) {
+        x = Math.round(out + (spot - out) * Math.max(0, t - f.born) / walk);
+        frame = Math.floor(now / 200) % 4;
+      } else if (t >= f.leaveAt) {
+        x = Math.round(spot + (out - spot) * Math.min(1, (t - f.leaveAt) / Math.max(1, f.until - f.leaveAt)));
+        frame = Math.floor(now / 200) % 4;
+        flip = true;
+      }
+      const y = GROUND - meta.h + 2;
+      const ready = t >= f.born + walk && t < f.leaveAt && !f.shot;
+      // Esperando a pose: um brilho claro pulsando em volta, para ele não sumir no meio da plateia.
+      if (ready) halo(x + meta.w / 2, y + meta.h / 2, 15, '#fffff0', 0.14 + 0.06 * Math.sin(now / 240));
+      shadow(x + meta.w / 2 + 3, meta.w - 6, 0.8);
+      sprite(meta, frame, x, y, flip);
+      const lens = { x: x + 7, y: y + 10 };
+      if (now < (fx.fotoFlash || 0)) {
+        const k = (fx.fotoFlash - now) / 260;
+        halo(lens.x, lens.y, 16, '#ffffff', 0.9 * k);
+        g.fillStyle = '#ffffff';
+        g.fillRect(lens.x - 2, lens.y, 5, 1);
+        g.fillRect(lens.x, lens.y - 2, 1, 5);
+      }
+      fx.fotoPos = { x: x + meta.w / 2, y, lens };
+      if (ready) {
+        regions.push({ id: 'fotografo', x: x - 2, y: y - 4, w: meta.w + 4, h: meta.h + 6 });
+        spots.set('fotografo', { x: x + meta.w / 2, y });
+        // "Olha o passarinho!": de vez em quando ele chama a pose, e a Mandioca faz a carinha para o retrato.
+        if (now >= (fx.fotoCallAt || 0)) {
+          fx.fotoCallAt = now + 8000 + rng() * 3000;
+          if (!fx.look || now >= fx.look.until) fx.look = { kind: 'feliz', until: now + 1600 };
+          say(tr('fx.fotoCall'), Math.min(layout.R - 30, x + meta.w / 2), Math.max(10, y - 8), now, '#fffff0', 1600, 6);
+        }
+      }
+    }
+
+    // Carro de boi (São João Regional em diante): de tempos em tempos a junta de bois passa devagar lá no fundo, atrás
+    // da plateia, puxando o carro de palha com a roda maciça girando. Clicar nele dá um mugido.
+    function drawCarroBoi(now) {
+      const cart = bundle.scenery['carro-boi'];
+      if (!cart || layout.tier < 3) return;
+      const c = fx.carroBoi || (fx.carroBoi = { at: 0, next: now + 60000 + rng() * 90000 });
+      if (!c.at && now >= c.next) { Object.assign(c, { at: now, dir: rng() < 0.5 ? 1 : -1 }); sound('boi'); }
+      if (!c.at) return;
+      const span = layout.width + cart.w * 2 + 20;
+      const travel = (now - c.at) * 0.012;
+      if (travel > span) { c.at = 0; c.next = now + 180000 + rng() * 120000; return; }
+      const x = Math.round(c.dir > 0 ? layout.L - cart.w - 10 + travel : layout.R + 10 - travel);
+      const y = GROUND - 19 - cart.h + 2;
+      const hop = critter('carro-boi', x, y, cart.w, cart.h, now);
+      shadow(x + cart.w / 2, cart.w - 8, 0.5);
+      sprite(cart, Math.floor(now / 260) % cart.frames, x, y + hop, c.dir < 0);
+    }
+
+    // Carro da pamonha (com 300 convidados): a Kombi passa pela frente da festa de tempos em tempos, anunciando pelo
+    // alto-falante do teto. Clicar nela dá uma buzinada.
+    const KOMBI_LINES = 3;
+    function drawKombi(now) {
+      const van = bundle.scenery.kombi;
+      const k = fx.kombi || (fx.kombi = { x: 0, on: false, nextAt: now + 20000, sayAt: 0, line: 0 });
+      if (!k.on) {
+        if (now < k.nextAt) return;
+        Object.assign(k, { on: true, start: now, sayAt: now + 600, line: Math.floor(rng() * KOMBI_LINES) });
+        sound('altofalante');
+      }
+      const x = Math.round(layout.L - van.w - 10 + (now - k.start) * 0.028);
+      if (x > layout.R + 10) {
+        k.on = false;
+        k.nextAt = now + 70000 + rng() * 70000;
+        return;
+      }
+      const y = GROUND - van.h + 3;
+      const hop = critter('kombi', x, y, van.w, van.h, now);
+      shadow(x + van.w / 2, van.w - 4, 0.7);
+      sprite(van, Math.floor(now / 120) % van.frames, x, y + hop);
+      if (now >= k.sayAt) {
+        k.sayAt = now + 3400;
+        k.line = (k.line + 1) % KOMBI_LINES;
+        const text = tr(`fx.kombi.${k.line}`);
+        const half = String(text).length * 2 + 2;
+        say(text, Math.min(layout.R - half, Math.max(layout.L + half, x + van.w / 2)), Math.max(10, y - 10), now, '#fff07a', 2400, 6);
+      }
+      spots.set('kombi', { x: x + van.w / 2, y: y + 4 });
+    }
+
     function drawCritters(now) {
       const has = layout.has;
+      // Na quadrilha marcada os bichos dançam também: um pulinho no ritmo, cada um na sua batida.
+      const dancing = now < (fx.bichosUntil || 0);
+      const beat = offset => (dancing ? -Math.round(Math.abs(Math.sin(now / 190 + offset)) * 2) : 0);
       const lo = layout.danceLeft + 2;
       const hi = Math.max(lo + 10, layout.danceRight - 10);
       if (has.has('bode')) {
@@ -1971,8 +2966,20 @@
         const state = roam(fx.goat, now, lo, Math.max(lo + 24, layout.host.x - 16), 0.004, 0.8);
         const frame = state.mode === 'anda' ? Math.floor(now / 260) % 2 : 2 + Math.floor(now / 420) % 2;
         const hop = critter('bode', state.x, GROUND - goat.h + 2, goat.w, goat.h, now);
-        sprite(goat, frame, state.x, GROUND - goat.h + 2 + hop, state.dir < 0);
+        sprite(goat, frame, state.x, GROUND - goat.h + 2 + hop + beat(0), state.dir < 0);
         spots.set('bode', { x: state.x + goat.w / 2, y: GROUND - goat.h });
+      }
+      if (has.has('jegue')) {
+        // Jegue da manta azul: anda devagar entre a Mandioca e a fogueira, para mexendo a orelha ou baixa a cabeça pra
+        // pastar.
+        const donkey = bundle.scenery.jegue;
+        const left = Math.min(hi - donkey.w - 4, layout.host.x + 34);
+        const state = roam(fx.jegue, now, left, Math.max(left + 20, hi - donkey.w), 0.006, 0.7);
+        const frame = state.mode === 'anda' ? Math.floor(now / 300) % 2 : Math.floor(now / 2600) % 3 === 0 ? 2 : 3;
+        const hop = critter('jegue', state.x, GROUND - donkey.h + 2, donkey.w, donkey.h, now);
+        shadow(state.x + donkey.w / 2, donkey.w - 8, 0.7);
+        sprite(donkey, frame, state.x, GROUND - donkey.h + 2 + hop + beat(1), state.dir < 0);
+        spots.set('jegue', { x: state.x + donkey.w / 2, y: GROUND - donkey.h });
       }
       if (has.has('boi')) {
         // Bumba-meu-boi: dança pelo terreiro, para, rodopia (vira de lado) e segue; as fitas balançam no passo.
@@ -1981,7 +2988,7 @@
         const spin = state.mode === 'para' && Math.floor(now / 380) % 2;
         shadow(state.x + ox.w / 2, ox.w - 6, 0.8);
         const hop = critter('boi', state.x, GROUND - ox.h + 2, ox.w, ox.h, now);
-        sprite(ox, frameAt(ox, now), state.x, GROUND - ox.h + 2 + hop, (state.dir < 0) !== !!spin);
+        sprite(ox, frameAt(ox, now), state.x, GROUND - ox.h + 2 + hop + beat(2), (state.dir < 0) !== !!spin);
         spots.set('boi', { x: state.x + ox.w / 2, y: GROUND - ox.h });
       }
       if (!has.has('galinha')) return;
@@ -2002,12 +3009,12 @@
         }
         const frame = moving ? Math.floor(now / 120 + i) % 2 : (Math.floor(now / 700 + i) % 3 === 0 ? 2 : 0);
         const hop = critter(`pintinho:${i}`, baby.x, GROUND - chick.h + 2, chick.w, chick.h, now);
-        sprite(chick, frame, baby.x, GROUND - chick.h + 2 + hop, (moving ? baby.dir : state.dir) < 0);
+        sprite(chick, frame, baby.x, GROUND - chick.h + 2 + hop + beat(i * 0.7), (moving ? baby.dir : state.dir) < 0);
         spots.set(`pintinho:${i + 1}`, { x: baby.x + 3, y: GROUND - 6 });
       }
       const frame = state.mode === 'anda' ? Math.floor(now / 170) % 2 : 2 + Math.floor(now / 150) % 2;
       const hop = critter('galinha', state.x, GROUND - hen.h + 2, hen.w, hen.h, now);
-      sprite(hen, frame, state.x, GROUND - hen.h + 2 + hop, state.dir < 0);
+      sprite(hen, frame, state.x, GROUND - hen.h + 2 + hop + beat(3), state.dir < 0);
       spots.set('galinha', { x: state.x + hen.w / 2, y: GROUND - hen.h });
     }
 
@@ -2052,7 +3059,14 @@
         for (let i = 0; i < 3; i++) float('coracao', b.x + meta.w / 2 + (i - 1) * 7, GROUND - meta.h - 16 - i % 2 * 3, now, HEARTS);
       } else if (now >= b.until) {
         const resting = !engine.state.runtime.dancing;
-        if (b.mode === 'pula' && b.hops > 1) { b.hops--; hop(); }
+        // No friozinho ele vai pulando até a fogueira e deita do lado dela (um pouco antes da caminha do caramelo).
+        const warm = engine.state.cold?.active ? Math.max(lo, Math.min(hi, layout.fire.x - meta.w - 14)) : null;
+        if (warm !== null && Math.abs(b.x - warm) > HOP_DX) {
+          b.dir = warm > b.x ? 1 : -1;
+          b.hops = 1;
+          hop();
+        } else if (warm !== null) Object.assign(b, { mode: 'deita', until: now + 2500 });
+        else if (b.mode === 'pula' && b.hops > 1) { b.hops--; hop(); }
         else if (resting && b.mode !== 'deita' && rng() < 0.6) Object.assign(b, { mode: 'deita', until: now + 3000 + rng() * 4000 });
         else if (resting && b.mode === 'deita') b.until = now + 1500;
         else if (b.mode === 'senta' && rng() < 0.65) {
@@ -2114,8 +3128,10 @@
       const cx = side.x + meta.w / 2;
       const keeperX = meta.keeper ? side.x + meta.keeper[0] : cx;
       const keeperY = meta.keeper ? top + meta.keeper[1] : top + 6;
-      const line = SIDE_SAYS[side.id];
-      if (line) say(tr(line), cx, Math.max(10, top - 6), now, '#fff8e8', 1100, 8);
+      const line = side.id === 'barraca-cordel' ? `fx.cordel.${Math.floor(rng() * 6)}` : SIDE_SAYS[side.id];
+      if (line) say(tr(line), cx, Math.max(10, top - 6), now, '#fff8e8', side.id === 'barraca-cordel' ? 2000 : 1100, 8);
+      // O papagaio fofoqueiro também decora os versos do cordel.
+      if (side.id === 'barraca-cordel') fx.lastChat = { text: tr(line), at: now, echoed: false };
       if (side.id === 'barraca-beijo') {
         for (let i = 0; i < 5; i++) float('coracao', keeperX + (i - 2) * 5, keeperY + 2 - (i % 2) * 3, now, ['#ff4f9e', '#ff8a96']);
       } else if (side.id === 'barraca-comidas') {
@@ -2131,11 +3147,28 @@
         }
       } else if (side.id === 'mastro') {
         confetti(now, cx, top + 4, 14);
+      } else if (side.id === 'fogao-lenha') {
+        // Mexe a panela: sobe um bafo de vapor e umas faíscas saem da boca do fogão.
+        for (let i = 0; i < 4; i++) {
+          fx.particles.push({ x: side.x + 16 + (rng() - 0.5) * 6, y: top + 10, vx: (rng() - 0.5) * 0.004, vy: -0.01, born: now, ttl: 900, breath: true });
+          fx.particles.push({ x: side.x + 15 + (rng() - 0.5) * 6, y: top + 27, vx: (rng() - 0.5) * 0.04, vy: -0.03 - rng() * 0.02,
+            gravity: 0.00008, born: now, ttl: 400 + rng() * 200, colors: SPARK, ember: true });
+        }
       }
     }
 
     function poke(id) {
       if (id === 'sopinha') { fx.bunny.poke = true; return; }
+      if (id === 'par' && layout && layout.par) {
+        // O par (o Milho) também gosta de carinho: dá um pulinho, solta um coração e uma gracinha.
+        const now = root.performance?.now?.() || 0;
+        if (now - (fx.parHop || -1e9) < 500) return;
+        fx.parHop = now;
+        const px = layout.par.x + 8;
+        say(tr(`fx.par.${Math.floor(rng() * 4)}`), px, GROUND - 34, now, '#9ef05a', 1100, 8);
+        float('coracao', px, GROUND - 26, now, ['#ff4f9e', '#ff8a96']);
+        return;
+      }
       if (id === 'coracoes' && layout) {
         // Carta aberta: a Mandioca fica toda derretida (corações subindo em volta dela).
         const now = root.performance?.now?.() || 0;
@@ -2232,7 +3265,7 @@
       const fireMid = fire.x + fire.meta.w / 2;
       const radius = fire.meta.w / 2 + 9;
       if (fx.ring && now - fx.ring.at > RING_MS + RING_EASE) fx.ring = null;
-      if (!fx.ring && count > 1) {
+      if (!fx.ring && count > 1 && !fx.compadre?.at) {
         if (!fx.nextRing) fx.nextRing = now + 30000 + rng() * 30000;
         if (now >= fx.nextRing) {
           fx.ring = { at: now, n: Math.min(count, 5) };
@@ -2283,6 +3316,150 @@
           fx.particles.push({ x: x + meta.w / 2 - dir * 3, y: GROUND - 1, vx: -dir * 0.006, vy: -0.004,
             gravity: 0.000008, born: now, ttl: 320, colors: ['rgba(236, 206, 156, 0.8)', 'rgba(206, 174, 132, 0.4)'] });
         }
+      }
+    }
+
+    // Compadres de fogueira: de tempos em tempos um rapaz e uma moça saem da plateia e param um de cada lado da fogueira,
+    // de mão estendida por cima do fogo (uma ponte de fagulhas liga as mãos), recitando os versos. Entre um verso e outro
+    // trocam de lado dando a volta na fogueira: quem está na esquerda passa pela frente, o outro por trás. No fim viram
+    // compadres: pulinhos e corações. Enquanto dura, clicar neles é ser a testemunha (engine.witnessCompadres).
+    const COMPADRE = { in: 1600, verse: 2100, swap: 1500, end: 2000, out: 1600 };
+    const COMPADRE_VERSES = 4;
+    const COMPADRE_MS = COMPADRE.in + COMPADRE_VERSES * COMPADRE.verse + (COMPADRE_VERSES - 1) * COMPADRE.swap + COMPADRE.end +
+      COMPADRE.out;
+    function compadreStage(age) {
+      let t = age;
+      if (t < COMPADRE.in) return { kind: 'in', k: t / COMPADRE.in, swaps: 0 };
+      t -= COMPADRE.in;
+      for (let i = 0; i < COMPADRE_VERSES; i++) {
+        if (t < COMPADRE.verse) return { kind: 'verse', index: i, age: t, swaps: i };
+        t -= COMPADRE.verse;
+        if (i === COMPADRE_VERSES - 1) break;
+        if (t < COMPADRE.swap) return { kind: 'swap', k: t / COMPADRE.swap, swaps: i };
+        t -= COMPADRE.swap;
+      }
+      const swaps = COMPADRE_VERSES - 1;
+      if (t < COMPADRE.end) return { kind: 'end', age: t, swaps };
+      return { kind: 'out', k: Math.min(1, (t - COMPADRE.end) / COMPADRE.out), swaps };
+    }
+
+    function updateCompadres(engine, now) {
+      fx.compadreDraw = null;
+      const meta = bundle.props.compadres;
+      if (!meta || layout.tier < 1) { fx.compadre = null; return; }
+      const c = fx.compadre || (fx.compadre = { at: 0, next: now + 90000 + rng() * 90000 });
+      if (!c.at && now >= c.next) {
+        // Não começa no meio da ciranda, do casamento, da quadrilha nem na chuva: tenta de novo daqui a pouco.
+        const busy = fx.ring || weddingOn(engine) || engine.state.runtime.quadrilhaLeft > 0 || fx.wx.rain > 0.15;
+        if (busy) c.next = now + 20000;
+        else Object.assign(c, { at: now, said: -1, witnessed: false, ended: false });
+      }
+      if (!c.at) return;
+      const age = now - c.at;
+      if (age >= COMPADRE_MS) { c.at = 0; c.next = now + 240000 + rng() * 180000; return; }
+      const stage = compadreStage(age);
+      const fire = layout.fire;
+      const mid = fire.x + fire.meta.w / 2;
+      const rx = fire.meta.w / 2 + 10;
+      const people = [];
+      for (let p = 0; p < 2; p++) {
+        // O rapaz começa na esquerda e a moça na direita; cada troca inverte.
+        const side = (p === 0 ? -1 : 1) * (stage.swaps % 2 ? -1 : 1);
+        let cx = mid + side * rx;
+        let depth = 0;
+        let alpha = 1;
+        let walking = false;
+        let pose = 0;
+        let flip = side < 0;
+        if (stage.kind === 'in' || stage.kind === 'out') {
+          const away = stage.kind === 'in' ? 1 - stage.k : stage.k;
+          cx = mid + side * (rx + 34 * away * away * (3 - 2 * away));
+          alpha = Math.max(0, Math.min(1, (1 - away) * 2.5));
+          walking = away > 0.03;
+          flip = stage.kind === 'in' ? side < 0 : side > 0;
+        } else if (stage.kind === 'swap') {
+          const e = stage.k * stage.k * (3 - 2 * stage.k);
+          const theta = side < 0 ? Math.PI * (1 - e) : -Math.PI * e;
+          cx = mid + Math.cos(theta) * rx;
+          depth = Math.sin(theta);
+          walking = true;
+          flip = side < 0;
+        } else if (stage.kind === 'verse') {
+          const speaking = stage.index % 2 === p && stage.age < 1400;
+          pose = stage.age < 200 ? 0 : speaking && Math.floor(stage.age / 280) % 2 ? 5 : 4;
+        } else if (stage.kind === 'end') {
+          pose = Math.floor((stage.age + p * 180) / 240) % 2 ? 6 : 0;
+        }
+        if (walking) pose = Math.floor(now / 130 + p * 2) % 4;
+        const x = Math.round(cx - meta.w / 2);
+        const y = GROUND - meta.h + 1 + Math.round(depth * 2);
+        people.push({ p, x, y, cx, flip, alpha, behind: depth < -0.2, frame: p * meta.poses + pose,
+          hand: { x: flip ? x + meta.w - 3 : x + 2, y: y + 9 } });
+      }
+      fx.compadreDraw = { stage, people, mid };
+      if (stage.kind === 'verse' && c.said < stage.index) {
+        c.said = stage.index;
+        const who = people[stage.index % 2];
+        say(tr(`fx.compadre.${stage.index}`), Math.max(layout.L + 40, Math.min(layout.R - 40, who.cx)), Math.max(10, who.y - 8), now,
+          '#fff8e8', COMPADRE.verse - 200, 6);
+      }
+      if (stage.kind === 'end' && !c.ended) {
+        c.ended = true;
+        const text = tr('fx.compadre.fim');
+        say(text, mid, Math.max(10, GROUND - fire.meta.h - 12), now, '#ffd21e', COMPADRE.end, 8);
+        // O papagaio fofoqueiro também gosta de repetir essa.
+        fx.lastChat = { text, at: now, echoed: false };
+        for (const who of people) float('coracao', who.cx, who.y + 2, now, ['#ff4f9e', '#ff8a96']);
+        sound('carinho');
+      }
+    }
+
+    function drawCompadres(now, behind) {
+      const d = fx.compadreDraw;
+      const meta = bundle.props.compadres;
+      if (!d || !meta) return;
+      for (const who of d.people) {
+        if (who.behind !== behind) continue;
+        g.globalAlpha = who.alpha;
+        shadow(who.cx, 8, 0.7 * who.alpha);
+        sprite(meta, who.frame, who.x, who.y, who.flip);
+        g.globalAlpha = 1;
+      }
+      if (behind) return;
+      const { stage, people } = d;
+      if (stage.kind === 'verse' && stage.age >= 200) {
+        // A ponte de fagulhas: sai das duas mãos e se encontra lá em cima, por cima das chamas.
+        const [a, b] = people[0].hand.x < people[1].hand.x ? people : [people[1], people[0]];
+        const top = Math.max(8, GROUND - layout.fire.meta.h - 4);
+        const reveal = Math.min(1, (stage.age - 200) / 700);
+        // Um ponto por pixel do arco (o comprimento é mais ou menos a largura mais duas vezes a altura), com contorno
+        // escuro para não sumir em cima das chamas e o miolo piscando de dourado a branco.
+        const rise = a.hand.y - top;
+        const steps = Math.max(8, Math.round(b.hand.x - a.hand.x + rise * 2));
+        const points = [];
+        for (let s = 0; s <= steps; s++) {
+          const t = s / steps;
+          if (t > reveal / 2 && t < 1 - reveal / 2) continue;
+          points.push([Math.round(a.hand.x + (b.hand.x - a.hand.x) * t),
+            Math.round(a.hand.y + (b.hand.y - a.hand.y) * t - rise * Math.sin(Math.PI * t)), s]);
+        }
+        g.fillStyle = INK;
+        for (const [x, y] of points) g.fillRect(x - 1, y - 1, 3, 3);
+        const glint = Math.floor(now / 40) % (steps + 20);
+        for (const [x, y, s] of points) {
+          g.fillStyle = Math.abs(s - glint) < 3 || Math.abs(steps - s - glint) < 3 ? '#ffffff' : (s >> 2) % 2 ? '#ffd21e' : '#ffac2a';
+          g.fillRect(x, y, 1, 1);
+        }
+        if (reveal >= 1 && rng() < 0.12) {
+          fx.particles.push({ x: a.hand.x + (b.hand.x - a.hand.x) / 2 + (rng() - 0.5) * 6, y: top, vx: (rng() - 0.5) * 0.01,
+            vy: -0.01 - rng() * 0.01, gravity: 0.00002, born: now, ttl: 700, colors: ['#fff8e8', '#ffd21e'] });
+        }
+      }
+      const c = fx.compadre;
+      if (c && !c.witnessed && stage.kind !== 'out') {
+        const x0 = Math.min(people[0].x, people[1].x);
+        const x1 = Math.max(people[0].x, people[1].x) + meta.w;
+        regions.push({ id: 'compadres', x: x0, y: GROUND - meta.h - 2, w: x1 - x0, h: meta.h + 3 });
       }
     }
 
@@ -2501,11 +3678,16 @@
     }
 
     // Conversa da plateia: de vez em quando (Quermesse em diante) alguém solta uma frase em cima da cabeça; na chuva, comenta a chuva.
-    const CHAT = 10;
+    const CHAT = 24;
     const CHAT_RAIN = 3;
+    // Madrugada: da meia-noite às 5 da manhã, pelo relógio do computador.
+    const lateNight = engine => { const hour = new Date(engine.now()).getHours(); return hour < 5; };
+
     function drawChatter(engine, now) {
-      if (layout.tier < 1 || now < fx.nextChat) return;
+      if (calm || layout.tier < 1 || now < fx.nextChat) return;
       fx.nextChat = now + 8000 + rng() * 9000;
+      // Enquanto os compadres recitam os versos, a plateia fica quietinha escutando.
+      if (fx.compadre?.at) return;
       const rows = [[layout.audience, 9], [layout.audience2, 14], [layout.audience3, 19]].filter(([list]) => list.length);
       if (!rows.length) return;
       const [list, lift] = rows[Math.floor(rng() * rows.length)];
@@ -2516,10 +3698,65 @@
         : weddingOn(engine) ? `fx.chatWedding.${two()}`
           : engine.state.pote?.active ? `fx.chatPote.${two()}`
             : engine.state.saco?.active?.start ? `fx.chatSaco.${two()}`
+              : engine.state.cold?.active ? `fx.chatCold.${two()}`
               : engine.state.leilao?.active?.leader ? `fx.chatLeilao.${two()}`
             : engine.state.bingo?.round && !engine.state.bingo.round.result && rng() < 0.6 ? `fx.chatBingo.${two()}`
+              : lateNight(engine) && rng() < 0.35 ? `fx.chatNight.${two()}`
               : `fx.chat.${Math.floor(rng() * CHAT)}`;
       say(tr(line), Math.max(layout.L + 14, Math.min(layout.R - 14, guest.x + 6)), GROUND - lift - 26, now, '#fff8e8', 2600, 6);
+      fx.lastChat = { text: tr(line), at: now, echoed: false };
+    }
+
+    // Lanterninhas do celular: da Festa da Cidade em diante, de vez em quando a plateia acende a lanterna do celular e
+    // balança os braços por uns 12 s (pontinhos de luz em cima das cabeças).
+    const LIGHTS_MS = 12000;
+    function drawPhoneLights(now) {
+      if (layout.tier < 2 || !layout.audience.length) return;
+      const l = fx.phones || (fx.phones = { at: 0, next: now + 90000 + rng() * 90000 });
+      if (!l.at && now >= l.next && fx.wx.rain < 0.15) {
+        l.at = now;
+        const guest = layout.audience[Math.floor(rng() * layout.audience.length)];
+        say(tr('fx.lanterna'), guest.x + 6, GROUND - 40, now, '#fffff0', 2000, 6);
+      }
+      if (!l.at) return;
+      const age = now - l.at;
+      if (age > LIGHTS_MS) { l.at = 0; l.next = now + 360000 + rng() * 240000; return; }
+      const fade = Math.min(1, age / 800, (LIGHTS_MS - age) / 800);
+      const rows = [[layout.audience3, 19], [layout.audience2, 14], [layout.audience, 9]];
+      for (const [list, lift] of rows) {
+        list.forEach((guest, i) => {
+          if (hash(guest.index, 53) % 5 > 1) return;
+          const x = Math.round(guest.x + 6 + Math.sin(now / 520 + i) * 2);
+          const y = GROUND - lift - 22 + Math.round(Math.cos(now / 700 + i) * 1);
+          g.globalAlpha = fade;
+          halo(x, y + 1, 5, '#f4f8ff', 0.45 * fade);
+          g.fillStyle = '#ffffff';
+          g.fillRect(x, y, 1, 2);
+          g.globalAlpha = 1;
+        });
+      }
+    }
+
+    // Papagaio fofoqueiro (44 convidados): pousado no alto do poste da esquerda, de vez em quando repete o que alguém
+    // da plateia acabou de falar (em verde, de bico aberto) ou solta um "currupaco". Bate a asa às vezes.
+    function drawParrot(now, poleTop) {
+      const bird = bundle.scenery.papagaio;
+      if (!bird || !layout.has.has('papagaio')) return;
+      const x = layout.L - 3 - Math.round(bird.w / 2) + 1;
+      const y = poleTop - bird.h + 2;
+      const chat = fx.lastChat;
+      if (chat && !chat.echoed && now - chat.at > 2600) {
+        chat.echoed = true;
+        if (rng() < 0.45) {
+          fx.parrotTalk = now + 1400;
+          sound('papagaio');
+          say(chat.text, Math.max(layout.L + 20, x + 20), Math.max(10, y - 6), now, '#9ef05a', 2200, 6);
+        }
+      }
+      const talking = now < (fx.parrotTalk || 0);
+      const flap = !talking && Math.floor(now / 250) % 24 === 0;
+      const hop = critter('papagaio', x, y, bird.w, bird.h, now);
+      sprite(bird, talking ? Math.floor(now / 140) % 2 : flap ? 2 : 0, x, y + hop);
     }
 
     // Balões de São João: com 50 convidados, de vez em quando alguém solta um balão aceso, que sobe balançando até
@@ -2625,12 +3862,14 @@
       drawPote(engine, now, GROUND - POLE_H[tier]);
       drawSaco(engine, now);
       drawAuctionPrize(engine, now);
+      drawSticker(now);
       drawChatter(engine, now);
       drawScorecards(now);
       drawFrenzy(engine, now);
       drawLuckBalloon(engine, now);
       drawPot(engine, now);
       drawRain(now, GROUND - POLE_H[tier]);
+      drawCold(engine, now);
       if (now < fx.flashUntil) {
         // Relâmpago: acende tudo o que já foi desenhado (nada vaza para o desktop transparente).
         g.globalCompositeOperation = 'source-atop';
@@ -2655,6 +3894,14 @@
         const t = age / p.ttl;
         const [x, y] = at(p, age);
         if (p.shape) { drawShape(SHAPES[p.shape], Math.round(x), Math.round(y), p.colors[0], t > 0.7 ? (1 - t) / 0.3 : 1); continue; }
+        if (p.breath) {
+          // Fumacinha do friozinho: um sopro branco que sai da boca, cresce um pouco e some.
+          const radius = 1 + Math.floor(t * 2.5);
+          g.globalAlpha = 0.9 * (1 - t * t);
+          g.drawImage(glow(radius, '#f4f8ff', 1.1), Math.round(x - radius), Math.round(y - radius));
+          g.globalAlpha = 1;
+          continue;
+        }
         if (p.smoke) {
           // Fumaça: um disco pontilhado que cresce e some enquanto sobe.
           const radius = Math.min(5, 1 + Math.floor(t * 5));
@@ -2690,6 +3937,8 @@
         g.fillRect(Math.round(x), Math.round(y), 1, p.drop ? 2 : 1);
         if (p.drop) { g.fillStyle = '#ffffff'; g.fillRect(Math.round(x), Math.round(y), 1, 1); }
       }
+      // Menos letreiros (Ajustes): os passos continuam rendendo, só não sobe o número.
+      if (calm && fx.stepSum) { fx.stepSum = 0; fx.stepCrit = false; }
       if (fx.stepSum && now - fx.stepAt > 140) {
         // Os números dos passos não se atropelam: o novo empurra os anteriores para cima, em pilha.
         let top = GROUND - Math.round(50 * fx.scale);
@@ -2708,6 +3957,8 @@
         const item = fx.texts[i];
         const age = now - item.born;
         if (age > item.ttl) { fx.texts.splice(i, 1); continue; }
+        // Texto marcado para depois (o resultado do concurso, o grito sobre os bichos): ainda não aparece.
+        if (age < 0 || fx.hideTexts) continue;
         const t = age / item.ttl;
         write(item.text, item.x, item.y - item.rise * Math.min(1, t * 1.6), item.color, t > 0.75 ? (1 - t) * 4 : 1);
       }
@@ -2781,11 +4032,20 @@
     }
 
     // Eventos do motor viram efeitos na festa.
+    const LOOKS = { wedding: 'coracao', 'wedding-end': 'coracao', 'letter-ready': 'coracao', achievement: 'estrela',
+      'tier-up': 'estrela', 'bingo-win': 'estrela', 'leilao-sold': 'estrela', 'saco-end': 'estrela', 'pote-break': 'estrela',
+      grow: 'estrela', learn: 'estrela', legendary: 'estrela', contest: 'estrela', poke: 'feliz', equip: 'feliz', 'cobra-caught': 'feliz', foto: 'estrela', 'burro-pin': 'feliz', compadres: 'coracao', 'flag-caught': 'feliz', 'cook-served': 'coracao' };
     function onEvents(engine, events, now = root.performance?.now?.() || 0) {
       if (!layout) return;
       const hostX = layout.host.x + 12;
       const up = n => GROUND - Math.round(n * fx.scale);
       for (const event of events) {
+        // A Mandioca reage com o olhar: coração no amor, estrela nas vitórias, felizinha no carinho e na roupa nova.
+        const kind = LOOKS[event.type];
+        if (kind && (event.type !== 'leilao-sold' || event.winner === 'voce') && (event.type !== 'saco-end' || event.place === 1) &&
+          (event.type !== 'contest' || event.place === 1)) {
+          fx.look = { kind, until: now + (kind === 'feliz' ? 1100 : 1800) };
+        }
         if (event.type === 'grow') {
           // A Mandioca cresceu: clarão, estrelinhas em anel, confete e o aviso em cima dela.
           fx.grow = { at: now, stage: event.stage };
@@ -2820,6 +4080,19 @@
           confetti(now, hostX, GROUND - 40, 50);
           for (let k = 0; k < 5; k++) spawnFirework(now, k * 250);
           say(tr('fx.newYear'), hostX, Math.max(10, GROUND - POLE_H[layout.tier] - 14), now, '#ffd21e', 2600, 8);
+        } else if (event.type === 'rings') {
+          // Fim de rodada nas Argolas: a barraca comemora na festa (confete conforme os acertos) ou consola.
+          const side = [layout.leftSide, layout.rightSide].find(entry => entry && entry.id === 'barraca-argolas');
+          if (side) {
+            const x = side.x + side.meta.w / 2;
+            const top = GROUND - side.meta.h;
+            if (event.hits > 0) confetti(now, x, top + 12, 6 + event.hits * 5);
+            say(tr(event.hits > 0 ? 'fx.argolasHit' : 'fx.argolasMiss'), x, Math.max(10, top - 4), now, event.hits > 0 ? '#9ef05a' : '#fff8e8', 1400, 8);
+          }
+        } else if (event.type === 'fished') {
+          // Pescou: um peixinho pula do tanque da Barraca de Pescaria, dá um arco e cai de volta com um respingo.
+          const side = [layout.leftSide, layout.rightSide].find(entry => entry && entry.id === 'barraca-pescaria');
+          if (side) fx.fishJump = { at: now, x: side.x + side.meta.w / 2, y: GROUND - 14, dir: rng() < 0.5 ? -1 : 1, splashed: false };
         } else if (event.type === 'letter-ready') {
           // Chegou carta: o pombo-correio traz, voando até a barraca do correio (ou até a Mandioca).
           const side = [layout.leftSide, layout.rightSide].find(entry => entry.id === 'correio');
@@ -2829,8 +4102,13 @@
         } else if (event.type === 'crasher-caught' && event.jailed) {
           fx.jailUntil = now + 60000;
           fx.nextPlea = now + 800;
-        } else if (event.type === 'contest') {
+        } else if (event.type === 'fantasia-soon') {
+          say(tr('fx.fantasia'), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
+            Math.max(10, GROUND - POLE_H[layout.tier] - 30), now, '#ff8ad0', 2400, 8);
+        } else if (event.type === 'contest' || event.type === 'fantasia') {
           // Os jurados (três pessoas da plateia da frente) levantam a plaquinha com a nota, e o lugar sobe em cima da pista.
+          // No concurso de fantasia ela faz pose de passarela enquanto os jurados levantam as notas.
+          if (event.type === 'fantasia') { fx.look = { kind: 'estrela', until: now + 2600 }; fx.celebrateUntil = now + 1800; }
           const judges = layout.audience.slice().sort((a, b) => a.x - b.x);
           const picks = judges.length >= 3 ? [judges[Math.floor(judges.length * 0.25)], judges[Math.floor(judges.length * 0.5)],
             judges[Math.floor(judges.length * 0.75)]] : [];
@@ -2849,6 +4127,8 @@
           const x = layout.caller ? layout.caller.x + 8 : layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2;
           say(call ? `${event.n}: ${call}` : tr('fx.bingoNumber', { n: event.n }), x, Math.max(10, GROUND - POLE_H[layout.tier] - 24), now,
             event.mine ? '#9ef05a' : '#fff8e8', 1900, 6);
+          // Os números com apelido o papagaio adora repetir.
+          if (call) fx.lastChat = { text: call, at: now, echoed: false };
         } else if (event.type === 'bingo-win') {
           fx.celebrateUntil = now + 1500;
           confetti(now, hostX, up(40), 40);
@@ -2880,6 +4160,96 @@
               born: now, ttl: 900 + rng() * 500, colors: ['#c07a36', '#7c421e', '#dca66a'] });
           }
           confetti(now, at.x, at.y, 34);
+        } else if (event.type === 'sticker') {
+          const sticker = (engine.data.album || []).flatMap(page => page.stickers).find(entry => entry.id === event.id);
+          if (sticker) {
+            fx.sticker = { key: sticker.icon, at: now };
+            iconImage(sticker.icon);
+            say(tr('fx.sticker'), layout.host.x + 12, GROUND - Math.round(58 * fx.scale) - 44, now, '#ffd21e', 1800, 6);
+          }
+        } else if (event.type === 'cobra') {
+          fx.cobra = { start: now, dir: event.dir || 1, caught: null, shouts: 0 };
+          // A galinha e os pintinhos também levam susto com a cobra (de pano, mas eles não sabem).
+          const hen = layout.has.has('galinha') && spots.get('galinha');
+          if (hen) {
+            fx.react.galinha = now + 600;
+            for (let i = 0; i < 12; i++) fx.react[`pintinho:${i}`] = now + 700 + i * 60;
+            say('CO-CO-CO!', hen.x, Math.max(10, hen.y - 8), now + 600, '#fff8e8', 1100, 8);
+          }
+        } else if (event.type === 'cobra-caught') {
+          const at = fx.cobra && cobraTrack(engine, now);
+          if (at) {
+            fx.cobra.caught = now;
+            fx.cobra.at = { x: at.x };
+            const x = at.x + (bundle.scenery.cobra?.w || 20) / 2;
+            say(tr('fx.cobraPega'), Math.min(layout.R - 40, Math.max(layout.L + 40, x)), Math.max(10, GROUND - 40), now, '#9ef05a', 1600, 8);
+            confetti(now, x, GROUND - 12, 14);
+          }
+        } else if (event.type === 'cobra-end') {
+          fx.cobra = null;
+          say(tr('fx.mentira'), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
+            Math.max(10, GROUND - POLE_H[layout.tier] - 10), now, '#ff907a', 1800, 8);
+        } else if (event.type === 'foto') {
+          // O clique do lambe-lambe: flash na lente, a festa inteira acende um instante e todo mundo diz "xis".
+          fx.fotoFlash = now + 260;
+          if (flashOn) fx.flashUntil = now + 90;
+          fx.celebrateUntil = now + 900;
+          say(tr('fx.selfie'), hostX, up(66), now, '#ffffff', 1400, 8);
+        } else if (event.type === 'cook-ready') {
+          if (fx.stovePos) say(tr('fx.cook.ready'), fx.stovePos.x, Math.max(10, fx.stovePos.y - 14), now, '#ffd21e', 1800, 8);
+        } else if (event.type === 'cook-served') {
+          if (fx.stovePos) fx.dishFly = { at: now, id: event.id, from: { ...fx.stovePos } };
+        } else if (event.type === 'compadres') {
+          const c = fx.compadre;
+          const mid = layout.fire.x + layout.fire.meta.w / 2;
+          if (c) c.witnessed = true;
+          confetti(now, mid, GROUND - 20, 16);
+          say(tr('fx.compadre.testemunha'), mid, Math.max(10, GROUND - layout.fire.meta.h - 22), now, '#9ef05a', 1600, 8);
+        } else if (event.type === 'flag-caught') {
+          const f = fx.looseFlag;
+          if (f) {
+            const t = Math.min(1, (now - f.at) / FLAG_FALL_MS);
+            const x = f.x + f.dir * 30 * t;
+            confetti(now, x, GROUND - 30, 10);
+            say(tr('fx.flag'), x, Math.max(10, GROUND - 44), now, '#9ef05a', 1400, 8);
+          }
+          fx.looseFlag = null;
+        } else if (event.type === 'burro') {
+          say(tr('fx.burro'), layout.danceLeft + 16, Math.max(10, GROUND - 44), now, '#ffd21e', 2000, 8);
+          // O jegue da festa desconfia do desenho no cavalete.
+          const jegue = layout.has.has('jegue') && spots.get('jegue');
+          if (jegue) {
+            say(tr('fx.jegueBurro'), jegue.x, Math.max(10, jegue.y - 10), now + 1800, '#fff8e8', 1800, 6);
+          }
+        } else if (event.type === 'burro-pin') {
+          const at = fx.burroPos || { x: layout.danceLeft + 16, y: GROUND - 30 };
+          say(tr(`fx.burroPin.${event.grade}`), at.x, Math.max(10, at.y - 10), now, event.grade === 'mosca' ? '#9ef05a' : '#fff07a', 1800, 8);
+          if (event.grade === 'mosca') { confetti(now, at.x, at.y + 6, 24); fx.celebrateUntil = now + 900; }
+        } else if (event.type === 'fotografo') {
+          fx.fotoCallAt = now + 7000;
+        } else if (event.type === 'visitor') {
+          say(tr('fx.visitor'), layout.L + layout.width / 2, Math.max(10, GROUND - POLE_H[layout.tier] - 18), now, '#ffd21e', 2400, 8);
+        } else if (event.type === 'visitor-greet') {
+          const at = fx.visitorPos;
+          if (at) {
+            say(tr('fx.visitorThanks'), at.x, Math.max(10, at.y - 10), now, '#9ef05a', 1400, 8);
+            for (let i = 0; i < 4; i++) float('coracao', at.x + (i - 1.5) * 5, at.y - 4 - (i % 2) * 3, now, ['#ff4f9e', '#ff8a96']);
+          }
+        } else if (event.type === 'cold') {
+          say(tr('fx.cold'), layout.L + layout.width / 2, Math.max(10, GROUND - POLE_H[layout.tier] - 18), now, '#cfe3ff', 2200, 6);
+        } else if (event.type === 'quentao') {
+          // Um gole de quentão vendido: a canequinha sobe do barril com a ficha.
+          const side = layout.leftSide?.id === 'barril-quentao' ? layout.leftSide : layout.rightSide?.id === 'barril-quentao' ? layout.rightSide : null;
+          if (side) {
+            const x = side.x + Math.round(side.meta.w / 2);
+            say(tr('fx.quentao'), x, GROUND - side.meta.h - 4, now, '#ffd21e', 1200, 10);
+            for (let i = 0; i < 3; i++) {
+              fx.particles.push({ x: x + (rng() - 0.5) * 6, y: GROUND - side.meta.h + 6, vx: (rng() - 0.5) * 0.006, vy: -0.01 - rng() * 0.006,
+                born: now, ttl: 900 + rng() * 300, breath: true });
+            }
+          }
+        } else if (event.type === 'announce') {
+          announce(engine, event, now);
         } else if (event.type === 'leilao') {
           fx.leilao = { hit: now, sold: null, bid: 0 };
           const at = fx.leilaoPos || (layout.stage ? { x: layout.stage.x + 70, y: GROUND - 40 } : null);
@@ -2973,6 +4343,12 @@
           confetti(now, w.left + w.width / 2, GROUND - 30, 30 + Math.round(event.share * 40));
         } else if (event.type === 'quadrilha') {
           fx.tunnelSaid = false;
+          fx.bichosUntil = now + engine.cfg.quadrilhaSeconds * 1000;
+          // Com bicho na festa, alguém da plateia repara que eles entraram na dança.
+          if (['bode', 'jegue', 'boi', 'galinha'].some(id => layout.has.has(id)) && layout.audience.length) {
+            const guest = layout.audience[Math.floor(rng() * layout.audience.length)];
+            say(tr('fx.bichos'), guest.x + 6, GROUND - 40, now + 2500, '#9ef05a', 2200, 6);
+          }
           fx.jumpUntil = now + 320;
           confetti(now, layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2, GROUND - 40, 30);
           say(tr('fx.quadrilha'), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
@@ -2980,9 +4356,21 @@
         } else if (event.type === 'quadrilha-call') {
           // A marcadora grita e todo mundo dá um pulinho.
           fx.jumpUntil = now + 320;
-          say(tr(`fx.call.${event.n % 8}`), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
+          // O quarto grito varia (caminho da roça, cumprimenta a dama, então é São João); o da cobra e o da chuva ficam no lugar.
+          const call = event.n % 8 === 3 ? [3, 6, 7][Math.floor(rng() * 3)] : event.n % 8;
+          // O grito vira movimento: no caminho da roça a fila anda para o lado e volta; no cumprimento, os pares se curvam.
+          if (call === 3 || call === 6) fx.callMove = { kind: call === 3 ? 'caminho' : 'cumprimenta', at: now };
+          // Anavan: os pares dão um passo à frente; anarriê: um passo para trás.
+          if (call === 0 || call === 1) fx.callMove = { kind: call === 0 ? 'anavan' : 'anarrie', at: now };
+          say(tr(`fx.call.${call}`), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
             Math.max(10, GROUND - POLE_H[layout.tier] - 10 - (event.n % 2) * 10), now,
             ['#ff907a', '#9ef05a', '#9fc8ff', '#fff07a'][event.n % 4], 1800, 8);
+          // "Olha a chuva!" sem chuva nenhuma: guarda-chuvas abertos por um instante e a marcadora desmente.
+          if (event.n % 8 === 5 && fx.wx.rain < 0.15) {
+            fx.fakeRainUntil = now + 1500;
+            say(tr('fx.mentira'), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
+              Math.max(10, GROUND - POLE_H[layout.tier] - 20), now + 1500, '#ff907a', 1600, 8);
+          }
         } else if (event.type === 'rain') {
           say(tr('fx.rain'), layout.L + layout.width / 2, Math.max(8, GROUND - POLE_H[layout.tier] - 40), now, '#9fc8ff', 2200, 4);
         } else if (event.type === 'thunder') {
@@ -2993,6 +4381,8 @@
           // Carinho na Mandioca: ela comemora um instante, solta uma gracinha e uns corações.
           fx.celebrateUntil = now + 650;
           say(tr(`fx.poke.${Math.floor(rng() * 3)}`), hostX, up(64), now, '#ff8a96', 900, 8);
+          // Às vezes o par fica com ciúme do carinho.
+          if (layout.par && rng() < 0.2) say(tr('fx.parCiume'), layout.par.x + 8, GROUND - 34, now + 700, '#9ef05a', 1200, 8);
           for (let i = 0; i < 3; i++) float('coracao', hostX + (i - 1) * 8, up(46) - i % 2 * 4, now, ['#ff4f9e', '#ff8a96']);
           if (event.value) { fx.stepSum += event.value; fx.stepAt = now; }
         } else if (event.type === 'balloon') {
@@ -3018,7 +4408,17 @@
             say(tr('fx.cobra'), hostX, up(62), now, '#ff907a', 1100, 6);
           }
         } else if (event.type === 'rest-start') {
-          fx.restKind = ['ofega', 'ofega', 'abana', 'alonga', 'bebe', 'milho', 'cochilo'][Math.floor(rng() * 7)];
+          // Com carta esperando no correio, às vezes ela descansa lendo uma (e fica toda derretida).
+          if (engine.state.mail.ready > 0 && rng() < 0.35 && bundle.mandioca.meta.tags.descansos?.carta) {
+            fx.restKind = 'carta';
+            fx.look = { kind: 'coracao', until: now + 2200 };
+          } else if ((sleepy && rng() < 0.7) || (lateNight(engine) && rng() < 0.5)) {
+            // De madrugada (pelo relógio do computador), metade dos descansos vira cochilo.
+            fx.restKind = 'cochilo';
+          } else if (engine.charActive('canjica') && rng() < 0.3) {
+            // Com a Canjica no fogão, às vezes o descanso é uma tigelinha de canjica.
+            fx.restKind = 'canjica';
+          } else fx.restKind = ['ofega', 'ofega', 'abana', 'alonga', 'bebe', 'milho', 'cochilo'][Math.floor(rng() * 7)];
           say(tr('fx.phew'), hostX + Math.round(14 * fx.scale), up(40), now, '#fff8e8', 1300, 5);
         }
         else if (event.type === 'rest-end' && engine.state.bonfire.brasa > 0) say(tr('fx.ember'), hostX, up(56), now, '#ffac2a');
@@ -3125,25 +4525,34 @@
       });
     }
 
+    // Passos de embalo (o par balança de um lado para o outro) e de pisada (o par pula no ritmo).
+    const PAR_SWAY = new Set(['xote', 'balance', 'ciranda', 'arrasta-pe', 'lambada']);
+    const PAR_HOP = new Set(['coco', 'xaxado', 'passinho', 'boi-bumba', 'frevo', 'polichinelo']);
+
     // Tudo o que aparece num quadro, de trás para frente.
     function paint(engine, now, preview, eq) {
       const s = engine.state;
+      setVaral(eq.varal);
       const tier = layout.tier;
       const poleTop = GROUND - POLE_H[tier];
       fx.wx = weatherOf(engine);
       updateWind(now);
-      drawSky(now, poleTop);
+      drawSky(engine, now, poleTop);
       drawRainbow(engine);
       drawClouds(now, poleTop);
       drawIslands(engine, now, poleTop);
       drawBack(now);
       drawBackdrop(now);
+      drawCarroBoi(now);
       drawStage(engine, now);
       drawCrowd(engine, now, layout.audience3, bundle.crowd.audience3, GROUND - 19, false);
       drawCrowd(engine, now, layout.audience2, bundle.crowd.audience2, GROUND - 14, false);
       drawCrowd(engine, now, layout.audience, bundle.crowd.audience, GROUND - 9, false);
+      drawPhoneLights(now);
       drawPole(layout.L - 3, poleTop);
       drawPole(layout.R + 1, poleTop);
+      drawParrot(now, poleTop);
+      drawSpeaker(now, poleTop);
       // No Maior São João do Mundo, a cada 40 convidados a mais entra outro varal (até 5), com lâmpadas.
       const strings = STRINGS[tier] + (tier >= 4 ? Math.min(2, Math.floor((s.size - 100) / 40)) : 0);
       for (let i = 0; i < strings; i++) {
@@ -3156,45 +4565,92 @@
       drawPuddles(now);
       regions.push({ id: 'terreiro', x: layout.L, y: GROUND, w: layout.width, h: terrain.bottom - terrain.top });
       if (tier >= 2) drawDanceFloor(layout.danceLeft, layout.danceRight);
+      // O fogão marca onde está a cada quadro (se saiu da festa, não fica posição velha para o "tá pronto").
+      fx.stovePos = null;
       drawSide(engine, layout.leftSide, now, 'lado-esquerda');
       const floor = GROUND - 3 * (tier >= 2 ? 1 : 0);
+      const snakeAt = cobraTrack(engine, now);
+      fx.cobraX = snakeAt ? snakeAt.x + bundle.scenery.cobra.w / 2 : null;
+      fx.scared = 0;
       drawCrowd(engine, now, layout.backCouples, bundle.crowd.dancersBack, floor - 4, true);
       drawWeddingArch(engine, now, floor);
       drawCrowd(engine, now, layout.couples, bundle.crowd.dancers, floor, true);
       drawWeddingParty(engine, now, floor);
       const dance = tier >= 2 ? -3 : 0;
+      // O carro da pamonha passa atrás da Mandioca (na frente dos pares), para não tapar a anfitriã.
+      if (layout.has.has('kombi') && bundle.scenery.kombi) drawKombi(now);
       drawHost(engine, now, dance, eq);
       if (preview) write(tr('fx.preview'), layout.host.x + 12, GROUND + dance - Math.round(60 * fx.scale), '#9fc8ff');
       if (layout.par) {
         const milho = bundle.chars.milho;
         const frame = s.runtime.dancing ? Math.floor(s.runtime.lift * 4) % 4 : 0;
-        shadow(layout.par.x + 8, 10);
-        sprite(milho, frame, layout.par.x, GROUND + dance - milho.h + 1);
-        rim(milho, frame, layout.par.x, GROUND + dance - milho.h + 1, false, layout.par.x + 8);
+        const hopAge = now - (fx.parHop || -1e9);
+        let hop = hopAge >= 0 && hopAge < 420 ? -Math.round(5 * Math.sin(hopAge / 420 * Math.PI)) : 0;
+        // O par acompanha o jeito do passo da Mandioca: balança nos passos de embalo e pula nos de pisada.
+        let sway = 0;
+        if (s.runtime.dancing && PAR_SWAY.has(s.runtime.dance)) sway = Math.round(Math.sin(now / 380) * 1.5);
+        if (s.runtime.dancing && PAR_HOP.has(s.runtime.dance) && !hop) hop = -Math.round(Math.max(0, Math.sin(now / 190)) * 2);
+        const px = layout.par.x + sway;
+        shadow(px + 8, 10);
+        sprite(milho, frame, px, GROUND + dance - milho.h + 1 + hop);
+        rim(milho, frame, px, GROUND + dance - milho.h + 1 + hop, false, px + 8);
         regions.push({ id: 'par', x: layout.par.x, y: GROUND + dance - milho.h, w: milho.w, h: milho.h });
       }
       drawCritters(now);
       drawSopinha(engine, now);
       drawCaller(engine, now);
       updateKids(engine, now);
+      updateCompadres(engine, now);
       drawKids(now, true);
+      drawCompadres(now, true);
       drawFire(engine, now);
       drawSide(engine, layout.rightSide, now, 'lado-direita');
       drawKids(now, false);
+      drawCompadres(now, false);
       if (layout.has.has('caramelo') && bundle.scenery.caramelo) drawDog(engine, now);
       if (layout.has.has('trem') && bundle.scenery.trem) drawTrain(now);
+      drawVisitor(engine, now);
+      drawFotografo(engine, now);
+      drawBurro(engine, now);
+      drawFishJump(now);
+      drawLooseFlag(now, GROUND - POLE_H[layout.tier]);
+      drawDishFly(now);
       if (engine.state.size < 25 && bundle.scenery.sapo) drawFrog(now);
       drawPeddler(engine, now);
       drawCrasher(engine, now);
       drawRequest(engine, now);
+      ambientEstalo(now);
+      // A cobra passa por cima dos bichos e das flores da beira, para não sumir no meio da festa cheia.
+      drawCobra(engine, now, floor);
       drawLights(engine, now);
       drawEffects(engine, now);
       popScenery(now);
     }
 
+    // Voltando de um salto no relógio: os eventos da festa que venceram nesse meio-tempo (fitas, drones, carro de boi,
+    // compadres, solos do trio...) não começam todos juntos; entram um de cada vez, com uns 30 s entre eles.
+    function staggerFx(now) {
+      const due = [];
+      for (const key of ['fitas', 'drones', 'flock', 'carroBoi', 'compadre', 'phones']) {
+        const f = fx[key];
+        if (f && !f.at && f.next <= now) due.push(at => { f.next = at; });
+      }
+      for (const key of ['nextSolo', 'nextWind', 'nextRing', 'nextEstalo']) {
+        if (fx[key] && fx[key] <= now) due.push(at => { fx[key] = at; });
+      }
+      for (let i = due.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [due[i], due[j]] = [due[j], due[i]];
+      }
+      due.forEach((set, i) => set(now + 20000 + i * 30000 + rng() * 10000));
+    }
+
     function draw(engine, now, preview = null) {
       if (pending > 0 || now - fx.lastDraw < minFrame) return;
+      // Um salto no relógio (o computador dormiu, a janela ficou escondida): os eventos da festa espalham.
+      if (fx.lastDraw > 0 && Number.isFinite(fx.lastDraw) && now - fx.lastDraw > 60000) staggerFx(now);
       fx.lastDraw = now;
+      fx.lastArgs = { engine, now, preview };
       const s = engine.state;
       const eq = withPreview(s.equipped, preview);
       const next = buildLayout(engine, eq);
@@ -3282,12 +4738,25 @@
 
     // Foto da festa: o céu de fundo e, embaixo, uma moldura de foto instantânea com o título e o porte (`caption`).
     // Tudo é montado no tamanho da arte e ampliado de uma vez, sem suavização.
-    function photo(scale = 4, caption = null) {
+    // `crop` ({x, y, w, h} no quadro da festa) recorta um pedaço, como o retrato do lambe-lambe; sem ele, a festa toda.
+    // A foto sai sem os letreiros que voam (números dos passos, gritos, nome do passo): o último quadro é refeito limpo.
+    function cleanFrame() {
+      const last = fx.lastArgs;
+      if (!last) return;
+      fx.hideTexts = true;
+      fx.lastDraw = -Infinity;
+      try { draw(last.engine, last.now, last.preview); } finally { fx.hideTexts = false; }
+    }
+
+    // `raw` fica com o quadro como está na tela (letreiros e tudo), para as capturas de teste.
+    function photo(scale = 4, caption = null, crop = null, raw = false) {
+      if (!raw) cleanFrame();
+      const area = crop || { x: 0, y: 0, w: view.width, h: H };
       const pad = 6;
       const bottom = caption ? 17 : pad;
       const art = document.createElement('canvas');
-      art.width = view.width + pad * 2;
-      art.height = H + pad + bottom;
+      art.width = area.w + pad * 2;
+      art.height = area.h + pad + bottom;
       const p = art.getContext('2d');
       p.fillStyle = '#fdf3e0';
       p.fillRect(0, 0, art.width, art.height);
@@ -3297,14 +4766,14 @@
       p.fillRect(0, 0, 1, art.height);
       p.fillRect(art.width - 1, 0, 1, art.height);
       p.fillStyle = INK;
-      p.fillRect(pad - 1, pad - 1, view.width + 2, H + 2);
-      const sky = p.createLinearGradient(0, pad, 0, pad + H);
+      p.fillRect(pad - 1, pad - 1, area.w + 2, area.h + 2);
+      const sky = p.createLinearGradient(0, pad - area.y, 0, pad - area.y + H);
       sky.addColorStop(0, '#1c1a3a');
       sky.addColorStop(0.7, '#5c4a8a');
       sky.addColorStop(1, '#e28a6e');
       p.fillStyle = sky;
-      p.fillRect(pad, pad, view.width, H);
-      p.drawImage(buffer, pad, pad);
+      p.fillRect(pad, pad, area.w, area.h);
+      p.drawImage(buffer, area.x, area.y, area.w, area.h, pad, pad, area.w, area.h);
       if (caption) {
         const words = text => String(text).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9+\-.,!?: ]/g, ' ');
         const line = (text, y, color) => {
@@ -3318,8 +4787,8 @@
             cursor += 4;
           }
         };
-        line(caption.title, H + pad + 3, '#7c421e');
-        line(caption.subtitle, H + pad + 10, '#b44a0a');
+        line(caption.title, area.h + pad + 3, '#7c421e');
+        line(caption.subtitle, area.h + pad + 10, '#b44a0a');
       }
       const shot = document.createElement('canvas');
       shot.width = art.width * scale;
@@ -3328,6 +4797,17 @@
       out.imageSmoothingEnabled = false;
       out.drawImage(art, 0, 0, shot.width, shot.height);
       return shot.toDataURL('image/png');
+    }
+
+    // Retrato do lambe-lambe: de perto, a Mandioca e o par no meio, do chapéu ao chão.
+    function portrait(scale = 4, caption = null) {
+      if (!layout) return photo(scale, caption);
+      const hostX = layout.host.x + 12;
+      const cx = layout.par ? (hostX + layout.par.x + 8) / 2 : hostX;
+      const w = Math.min(view.width, 150);
+      const x = Math.round(Math.max(0, Math.min(view.width - w, cx - w / 2)));
+      const y = Math.max(0, GROUND - 84);
+      return photo(scale, caption, { x, y, w, h: Math.min(H, GROUND + 12) - y });
     }
 
     function sizeInfo() {
@@ -3354,14 +4834,28 @@
 
     // Clarão dos relâmpagos ligado ou desligado (Ajustes).
     function setFlash(on) { flashOn = on !== false; }
+    // Menos letreiros: sem os números dos passos e sem a conversa da plateia (os avisos dos eventos continuam).
+    function setCalm(on) { calm = on === true; }
+    // Sonolenta: a pessoa está há muito tempo em outra janela (o app avisa); os descansos viram cochilo quase sempre.
+    function setSleepy(on) { sleepy = on === true; }
 
     // Estado dos enfeites que vêm e vão sozinhos (para os testes e as fotos): vento (-1 a 1) e ciranda das crianças.
-    function probe() { return { leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, arrivals: fx.arrivals.size }; }
+    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size }; }
+
+    // A pessoa voltou para a festa depois de um tempo fora: a Mandioca dá um pulinho, faz o olhar felizinho e cumprimenta.
+    const GREETINGS = 4;
+    function greet(now = root.performance?.now?.() || 0) {
+      if (!layout) return;
+      fx.look = { kind: 'feliz', until: now + 1600 };
+      fx.celebrateUntil = now + 900;
+      fx.jumpUntil = now + 300;
+      say(tr(`fx.oi.${Math.floor(rng() * GREETINGS)}`), layout.host.x + 12, GROUND - Math.round(58 * fx.scale) - 6, now, '#fff07a', 1800, 8);
+    }
 
     // Partida nova: a Mandioca brota da terra (a abertura do jogo).
     function sprout(now = root.performance?.now?.() || 0) { fx.sprout = now; }
 
-    return { draw, setScale, setRate, setFlash, hit, onEvents, celebrate, poke, photo, areas, probe, sprout, size: sizeInfo };
+    return { draw, setScale, setRate, setFlash, setCalm, setSleepy, hit, onEvents, celebrate, poke, photo, portrait, areas, probe, sprout, greet, moonPhase, estalo: throwEstalo, size: sizeInfo };
   }
 
   root.ArraiaFesta = { create, terrainWidth, amount, pixelText, withPreview };

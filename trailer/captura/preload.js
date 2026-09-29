@@ -54,6 +54,13 @@ window.__passo = ms => {
   return now;
 };
 window.__agora = () => now;
+// Repouso do computador: o relógio pula, mas nenhum timer dispara uma vez por intervalo perdido; cada um dispara no
+// máximo uma vez ao acordar (como no Windows), e depois vem um quadro.
+window.__dormir = ms => {
+  now += ms;
+  for (const timer of timers.values()) if (timer.at < now) timer.at = now;
+  return window.__passo(0);
+};
 
 // --- Jogo sem botão de teste ------------------------------------------------------------------------
 let gameData;

@@ -437,8 +437,7 @@ def crate():
     return layer.image
 
 
-def hay_bale(rng):
-    width, height = 20, 12
+def hay_bale(rng, width=20, height=12):
     layer = Layer(width, height)
     for y in range(1, height - 1):
         for x in range(1, width - 1):
@@ -449,10 +448,11 @@ def hay_bale(rng):
             elif roll < 0.35:
                 char = 'Y'
             layer.put(x, y, char)
-    for tx in (5, 14):
+    for tx in (round(width * 0.25), round(width * 0.7)):
         layer.rect(tx, 1, tx, height - 2, 'd')
     image = outline(layer.image.crop((1, 1, width - 1, height - 1)))
-    for x, y in ((0, 4), (19, 6), (4, 0), (15, 0)):
+    # Palhas espetadas para fora do contorno.
+    for x, y in ((0, height // 3), (width - 1, height // 2), (width // 5, 0), (width * 3 // 4, 0)):
         image.putpixel((x, y), hex_rgb(PALETTE['Y']) + (255,))
     return image
 
@@ -472,6 +472,50 @@ def flag_mast(height=34, phase=None):
             wave = 0 if phase is None else 0.9 * math.sin(phase + step * 0.45 + index) * step / 12
             layer.put(cx + 3 + step * 0.35 + index * 0.4 + wave, 4 + step, color)
     return layer.image
+
+
+def mastro_sao_joao(phase=0.0, height=44):
+    """Mastro de São João: o pau enfeitado com fita em espiral, a bandeira no topo balançando (com o coração), uma
+    laranja e uma espiga penduradas e as fitas soltas dançando no vento."""
+    width = 20
+    layer = Layer(width, height)
+    cx = 6
+    top = 9
+    # O pau, com a fita enrolada em espiral: faixas diagonais de duas linhas (vermelho, amarelo e azul).
+    colors = 'RAJ'
+    for y in range(top, height):
+        for dx in (0, 1):
+            layer.put(cx + dx, y, colors[((y - dx) // 2) % 3])
+        layer.put(cx + 1, y, {'R': 'r', 'A': 'a', 'J': 'j'}[colors[((y - 1) // 2) % 3]])
+    # A ponta do mastro.
+    layer.grid(['.AA.', 'AFFa', '.aa.'], cx - 1, top - 3)
+    # A bandeira no topo: pano amarelo com barra vermelha e o coração, ondulando (cada coluna sobe ou desce um pouco).
+    flag_w, flag_h = 9, 7
+    for fx in range(flag_w):
+        wave = round(math.sin(phase + fx * 0.7) * (fx / flag_w) * 1.6)
+        for fy in range(flag_h):
+            edge = fy == 0 or fy == flag_h - 1 or fx == flag_w - 1
+            layer.put(cx + 2 + fx, 1 + fy + wave, 'R' if edge else 'F')
+    heart = [(4, 2), (6, 2), (3, 3), (4, 3), (5, 3), (6, 3), (7, 3), (4, 4), (5, 4), (6, 4), (5, 5)]
+    for hx, hy in heart:
+        wave = round(math.sin(phase + hx * 0.7) * (hx / flag_w) * 1.6)
+        layer.put(cx + 2 + hx - 1, 1 + hy + wave - 1, 'H')
+    # Laranja e espiga penduradas por barbante, do lado contrário das fitas.
+    layer.put(cx + 3, top + 3, 'x')
+    layer.rect(cx + 3, top + 4, cx + 4, top + 5, 'K')
+    layer.put(cx + 3, top + 4, 'O')
+    layer.put(cx + 3, top + 9, 'x')
+    layer.put(cx + 3, top + 10, 'x')
+    layer.rect(cx + 3, top + 11, cx + 4, top + 15, 'A')
+    layer.put(cx + 3, top + 11, 'F')
+    layer.put(cx + 4, top + 16, 'G')
+    layer.put(cx + 3, top + 16, 'g')
+    # Fitas soltas do topo, dançando no vento.
+    for index, color in enumerate('HJG'):
+        for step in range(6 + index * 3):
+            wave = 0.9 * math.sin(phase + step * 0.45 + index) * step / 12
+            layer.put(cx - 2 - step * 0.35 - index * 0.5 + wave, top + 2 + step, color)
+    return outline(layer.image)
 
 
 def dance_floor(width):

@@ -34,6 +34,8 @@ KITS = [
         # Olhos: bloco (linha, coluna) e as trocas de cada jeito de olhar; boca: idem.
         'eyes_at': (3, 5),
         'eyes': {'abertos': None, 'fechados': ('666667', 'ee66ee'), 'cansados': ('e6666e', '6e66e7')},
+        # Olhares que o jogo põe por cima dos olhos (como o piscar): coração, estrela e felizinha (^ ^).
+        'looks': {'coracao': ('H6HH6H', '6H66H6'), 'estrela': ('6A66A6', 'AFAAFA'), 'feliz': ('6e66e6', 'e6ee6e')},
         'mouth_at': (5, 5),
         'mouths': {'canta': None, 'sorri': ('cm66mc', '37mm73'), 'ofega': ('c6mm6c', '37nn73')},
         # Área do rosto que vira casca de costas (linhas e colunas, fim exclusivo).
@@ -67,6 +69,7 @@ KITS = [
         ],
         'eyes_at': (3, 5),
         'eyes': {'abertos': None, 'fechados': ('66666667', '6ee66ee7'), 'cansados': ('6e6666e7', '66e66e67')},
+        'looks': {'coracao': ('H6H6H6H7', '6H666H67'), 'estrela': ('6A666A67', 'AFA6AFA7'), 'feliz': ('6e666e67', 'e6e6e6e7')},
         'mouth_at': (6, 5),
         'mouths': {'canta': None, 'sorri': ('6m6666m7', '37mmmm73'), 'ofega': ('666mm667', '37mnnm73')},
         'face': (2, 8, 4, 14),
@@ -103,6 +106,8 @@ KITS = [
         'eyes_at': (4, 6),
         'eyes': {'abertos': None, 'fechados': ('66666667', '6ee66ee7', '66666667'),
                  'cansados': ('6e6666e7', '66e66e67', '6e6666e7')},
+        'looks': {'coracao': ('H6H6H6H7', 'HHH6HHH7', '6H666H67'), 'estrela': ('6A666A67', 'AFA6AFA7', '6A666A67'),
+                  'feliz': ('66666667', '6e666e67', 'e6e6e6e7')},
         'mouth_at': (8, 6),
         'mouths': {'canta': None, 'sorri': ('6m6666m7', '37mmmm73'), 'ofega': ('666mm667', '37mnnm73')},
         'face': (2, 10, 4, 16),
@@ -130,6 +135,17 @@ def face(stage, eyes='abertos', mouth='canta', back=False):
     return '\n'.join(rows)
 
 
+# Os mesmos olhares no tamanho inteiro (o bloco dos olhos do CORE de art/exportar.py tem 8 × 3, como o da mandioquinha).
+LOOKS_FULL = {'coracao': ('H6H6H6H7', 'HHH6HHH7', '6H666H67'), 'estrela': ('6A666A67', 'AFA6AFA7', '6A666A67'),
+              'feliz': ('66666667', '6e666e67', 'e6e6e6e7')}
+
+
+def look(stage, name):
+    """O olhar `name` (coracao, estrela ou feliz) no tamanho `stage` (3 = inteiro), para desenhar por cima dos olhos."""
+    rows = LOOKS_FULL[name] if stage >= len(KITS) else KITS[stage]['looks'][name]
+    return '\n'.join(rows)
+
+
 def blink(stage):
     """Os olhos fechados do tamanho `stage` (o jogo desenha por cima do rosto na hora de piscar)."""
     return '\n'.join(KITS[stage]['eyes']['fechados'])
@@ -141,6 +157,9 @@ def check():
     for stage, kit in enumerate(KITS):
         for number, row in enumerate(kit['core']):
             assert len(row) == widths[stage], (stage, number, len(row), row)
+        closed = kit['eyes']['fechados']
+        for rows in kit['looks'].values():
+            assert len(rows) == len(closed) and all(len(a) == len(b) for a, b in zip(rows, closed)), (stage, rows)
         for table, (row, col) in ((kit['eyes'], kit['eyes_at']), (kit['mouths'], kit['mouth_at'])):
             base = kit['core']
             for patch in table.values():

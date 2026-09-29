@@ -42,6 +42,12 @@ test('todos os idiomas têm as mesmas chaves e as mesmas variáveis', () => {
   }
 });
 
+test('a janela de novidades tem texto para cada item, em todos os idiomas', () => {
+  for (const id of ids) {
+    for (let i = 1; i <= data.config.newsItems; i++) assert.ok(`news.${i}` in langs[id].ui, `${id}: falta news.${i}`);
+  }
+});
+
 test('o conteúdo do jogo (itens, turma, cartas, conquistas...) tem tradução completa', () => {
   const lists = { stats: data.stats, tiers: data.tiers, chars: data.chars, categories: data.categories, items: data.items,
     outings: data.outings, bonfire: data.bonfire, landmarks: data.scenery.landmarks, cycle: data.scenery.cycle,
@@ -52,6 +58,13 @@ test('o conteúdo do jogo (itens, turma, cartas, conquistas...) tem tradução c
       for (const entry of list) assert.ok(d[name]?.[entry.id], `${id}: ${name}.${entry.id}`);
     }
     for (const post of Object.keys(data.posts)) assert.ok(d.posts[post], `${id}: posts.${post}`);
+    // Toda aba da loja e do painel tem nome traduzido (senão aparece a chave, como "dock.varal").
+    const UI = require('../src/ui.js');
+    for (const entry of UI.DOCK) assert.ok(langs[id].ui[`dock.${entry.id}`], `${id}: aba da loja ${entry.id}`);
+    for (const page of data.album) {
+      assert.ok(d.album?.[page.id]?.name, `${id}: página ${page.id} do álbum`);
+      for (const sticker of page.stickers) assert.ok(d.album[page.id].stickers?.[sticker.id], `${id}: figurinha ${sticker.id}`);
+    }
     for (const goal of data.goals) assert.ok(langs[id].ui[`goal.${goal.id}`], `${id}: texto da meta ${goal.id}`);
     for (let stage = 0; stage <= data.config.growthAt.length; stage++) {
       assert.ok(langs[id].ui[`growth.stage.${stage}`], `${id}: nome do tamanho ${stage}`);
@@ -130,7 +143,7 @@ test('as palavras das placas das barracas cabem na madeira, em letras da fonte d
   require('../src/festa-sprites.js');
   const sides = globalThis.FESTA_SPRITES.sides;
   const signs = Object.entries(sides).filter(([, meta]) => meta.sign);
-  assert.equal(signs.length, 6, 'as seis barracas têm placa');
+  assert.equal(signs.length, 7, 'as sete barracas têm placa');
   for (const id of ids) {
     for (const [kind, meta] of signs) {
       const word = langs[id].ui[`sign.${kind}`];

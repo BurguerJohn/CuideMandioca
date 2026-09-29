@@ -25,7 +25,7 @@ import cenario
 import crescer
 import danca
 import tamanhos
-from scene import (BACK_TINT, HEART, Layer, awning, bonfire, booth_back, booth_counter, crate, flag_mast,
+from scene import (BACK_TINT, HEART, Layer, awning, bonfire, booth_back, booth_counter, crate, flag_mast, mastro_sao_joao,
                    sign, stage)
 from sprites import PALETTE
 
@@ -39,7 +39,8 @@ FRAME_W, FRAME_H = 24 + PAD * 2, 40 + PAD
 # corpo e o rosto desenhados no próprio tamanho (art/tamanhos.py) e os mesmos braços, pernas e poses em escala, então toda
 # dança nova já vem nos quatro tamanhos. Chapéus e itens de mão dos tamanhos menores saem reduzidos (art/crescer.py).
 GROWTH = [0.62, 0.75, 0.88, 1.0]
-FABRICS = ['xadrez-vermelho', 'xadrez-azul', 'xadrez-verde', 'remendado', 'chita', 'chita-rosa', 'xadrez-ouro']
+FABRICS = ['xadrez-vermelho', 'xadrez-azul', 'xadrez-verde', 'remendado', 'chita', 'chita-rosa', 'xadrez-ouro', 'chita-amarela',
+           'xadrez-roxo']
 CROWD_FABRICS = ['xadrez-azul', 'chita', 'xadrez-vermelho', 'chita-rosa', 'xadrez-verde', 'remendado']
 # Cada pessoa da festa é um tecido com um chapéu: palha (o de sempre), de couro, azul ou lenço vermelho; nas damas, a coroa
 # de flores troca de cor. Quatro "jeitos" por tecido, então a multidão deixa de ser uma fila de gêmeos.
@@ -61,11 +62,14 @@ sprites.FABRICS.update({
     'xadrez-verde': ['vvgg', 'vvgg', 'ggXX', 'ggXX'],
     'remendado': ['RRRJJJ', 'RRRJJJ', 'RRRJJJ', 'AAAPPP', 'AAAPPP', 'AAAPPP'],
     'xadrez-ouro': ['aaAA', 'aaAA', 'AAFF', 'AAFF'],
+    # Chita amarela (cor de milho com florzinha vermelha e azul) e xadrez roxo.
+    'chita-amarela': ['AAAAAA', 'AARAAA', 'ARJRAA', 'AARAAg', 'AAAAAA', 'AgAAJA'],
+    'xadrez-roxo': ['iiPP', 'iiPP', 'PPXX', 'PPXX'],
 })
 
 images = {}
 manifest = {'mandioca': {}, 'hats': {}, 'hand': {}, 'chars': {}, 'crowd': {}, 'sides': {}, 'props': {},
-            'fires': {}, 'requests': {}, 'terrains': {}, 'rings': {}, 'scenery': {}}
+            'fires': {}, 'requests': {}, 'terrains': {}, 'rings': {}, 'scenery': {}, 'varais': {}}
 icons = {}
 
 
@@ -83,7 +87,7 @@ def strip(frames):
 VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'criancas', 'penetra', 'casamento', 'lado-', 'caixote',
           'cenario-galinha', 'cenario-pintinho', 'cenario-gato', 'cenario-bode', 'cenario-balao', 'cenario-mandioquinha',
           'cenario-milharal', 'cenario-bananeira', 'cenario-coqueiro', 'cenario-mandacaru', 'cenario-carrossel',
-          'cenario-balao-grande', 'cenario-boi', 'cenario-balao-ouro', 'cenario-pote', 'cenario-caramelo', 'cenario-pombo', 'cenario-trem', 'cenario-sapo', 'cenario-saco', 'cenario-leiloeiro')
+          'cenario-balao-grande', 'cenario-boi', 'cenario-balao-ouro', 'cenario-pote', 'cenario-caramelo', 'cenario-pombo', 'cenario-trem', 'cenario-sapo', 'cenario-saco', 'cenario-leiloeiro', 'cenario-kombi', 'cenario-jegue', 'cenario-sanfoneiro', 'cenario-fotografo', 'cenario-carro-boi', 'cenario-papagaio', 'compadres')
 LUZ_QUENTE = (255, 236, 196)
 
 
@@ -384,8 +388,11 @@ def spin_frames(fabric, build=None):
         angle = index * math.pi / 8
         squash = max(0.55, abs(math.cos(angle)))
         hop = round(3 * math.sin(math.pi * index / 16))
-        frame, mark = build(fabric, 0, 0, 'aberto', 'aberto', 'ambas', 'canta', hop=hop,
-                            back=4 <= index <= 12, squash=squash)
+        back = 4 <= index <= 12
+        frame, mark = build(fabric, 0, 0, 'aberto', 'aberto', 'ambas', 'canta', hop=hop, back=back, squash=squash)
+        # De lado (apertada) ou de costas não tem rosto no lugar de sempre: sem âncora dos olhos, o jogo não pisca ali.
+        if back or squash < 1:
+            mark = {**mark, 'eyes': None}
         frames.append(frame)
         marks.append(mark)
     return frames, marks
@@ -465,6 +472,10 @@ def export_mandioca():
     manifest['mandioca']['meta'] = {'w': FRAME_W, 'h': FRAME_H, 'pad': PAD, 'anchors': anchors, 'tags': tags}
     blink = sprite('\n'.join(EYES['fechados']))
     manifest['mandioca']['blink'] = add('piscar', blink)
+    # Olhares (coração, estrela, felizinha) que o jogo põe por cima dos olhos quando algo acontece, em cada tamanho.
+    looks = lambda stage: {name: add(f'olhar-{name}' + (f'-t{stage}' if stage < 3 else ''), sprite(tamanhos.look(stage, name)))
+                           for name in tamanhos.LOOKS_FULL}
+    manifest['mandioca']['looks'] = looks(3)
     # Os quatro tamanhos: cada um com as suas folhas por tecido, âncoras (fracionárias: o jogo arredonda a soma) e o
     # ponto do chão (`cx`, o meio do corpo) que fica no mesmo lugar em todos.
     growth = []
@@ -472,7 +483,7 @@ def export_mandioca():
         if scale == 1.0:
             sheets = {fabric: manifest['mandioca'][fabric] for fabric in FABRICS}
             growth.append({'scale': 1, 'w': FRAME_W, 'h': FRAME_H, 'cx': PAD + 12, 'anchors': anchors, 'tags': tags,
-                           'sheets': sheets, 'blink': manifest['mandioca']['blink']})
+                           'sheets': sheets, 'blink': manifest['mandioca']['blink'], 'looks': manifest['mandioca']['looks']})
             continue
         sheets = {}
         small_marks = None
@@ -484,7 +495,7 @@ def export_mandioca():
         first = sheets[FABRICS[0]]
         growth.append({'scale': scale, 'w': first['w'], 'h': first['h'], 'cx': round((PAD + 12) * scale, 2),
                        'anchors': small_marks, 'tags': tags, 'sheets': sheets,
-                       'blink': add(f'piscar-t{stage}', sprite(tamanhos.blink(stage)))})
+                       'blink': add(f'piscar-t{stage}', sprite(tamanhos.blink(stage))), 'looks': looks(stage)})
     manifest['mandioca']['growth'] = growth
 
 
@@ -621,6 +632,10 @@ def export_chars():
     # ambulante, que passeia pela frente da festa.
     manifest['chars']['pipoca'] = add('turma-pipoca', animar.pipoca(), fps=7, top=1)
     manifest['chars']['amendoim'] = add('turma-amendoim', animar.amendoim(), fps=8)
+    # Canjica, a cozinheira, mexendo a panela do lado do Fogão a Lenha.
+    manifest['chars']['canjica'] = add('turma-canjica', animar.canjica(), fps=6)
+    # Cocada, a cordelista, lendo o folheto no balcão da Barraca de Cordel.
+    manifest['chars']['cocada'] = add('turma-cocada', animar.cocada(), fps=5, top=5)
     manifest['chars']['balcao-cavalheiro'] = add('turma-balcao-cavalheiro',
                                                  animar.keeper(sprites.CAVALHEIRO, 'xadrez-azul', [(4, 5), (7, 5)]), fps=3)
     manifest['chars']['balcao-dama'] = add('turma-balcao-dama', animar.keeper(sprites.DAMA, 'chita', [(4, 5), (7, 5)]), fps=3)
@@ -628,7 +643,7 @@ def export_chars():
     full = {'aipim': sprite(sprites.AIPIM, 'chita-rosa'), 'cachorro': sprite(sprites.CACHORRO),
             'pacoca': sprite(sprites.PACOCA)}
     for char_id in ('milho', 'cenoura', 'inhame', 'batata', 'pamonha', 'faisca', 'pacoca', 'aipim', 'cachorro', 'sopinha',
-                    'pipoca', 'amendoim'):
+                    'pipoca', 'amendoim', 'canjica', 'cocada'):
         if char_id in full:
             icons[f'char:{char_id}'] = full[char_id]
         else:
@@ -661,6 +676,16 @@ def export_crowd():
         'ola': len(cheer) - len(ola),
     }
     manifest['crowd']['dancers']['rim'] = luz('multidao')
+    # Compadres de fogueira: um rapaz de chapéu de couro e uma moça de coroa amarela, estendendo a mão por cima do fogo.
+    manifest['props']['compadres'] = add('compadres', animar.compadres([(dressed(sprites.CAVALHEIRO, 1), 'xadrez-verde'),
+                                                                        (dressed(sprites.DAMA, 1), 'chita-rosa')]))
+    manifest['props']['compadres']['poses'] = len(animar.COMPADRE_POSES)
+    # Os pratos do Fogão a Lenha, na ordem de sprites.DISHES (quadros do mesmo tamanho, apoiados embaixo).
+    dishes = [fill(text) for text in sprites.DISHES.values()]
+    dish_w, dish_h = max(d.width for d in dishes), max(d.height for d in dishes)
+    manifest['props']['pratos'] = add('pratos', [animar.place(animar.blank(dish_w, dish_h), d, (dish_w - d.width) // 2,
+                                                              dish_h - d.height) for d in dishes])
+    manifest['props']['pratos']['ids'] = list(sprites.DISHES)
     manifest['props']['penetra'] = add('penetra', animar.penetra(), fps=8)
     # Casamento na roça: noivo, noiva e padre (3 quadros cada: parado, respirando, comemorando) e o caramanchão de flores.
     manifest['props']['casamento'] = add('casamento', casamento.personagens(), fps=1)
@@ -679,6 +704,7 @@ BOOTHS = {
     'cadeia': ('sXs', 8, 39),
     'correio': ('HXh', 6, 41),
     'barraca-argolas': ('GXg', 6, 41),
+    'barraca-cordel': ('PXi', 6, 41),
 }
 
 
@@ -701,6 +727,16 @@ def booth_parts(kind, frame=0):
         for hx in range(8, 40, 7):
             back.put(hx + 1, 25, 'd')
             back.grid(['XXX', 'XHX'], hx, 26)
+    if kind == 'barraca-cordel':
+        # Os folhetos de cordel pendurados no barbante, cada um com a capa de xilogravura (um risco escuro no meio).
+        for row, y in enumerate((25, 31)):
+            back.rect(4, y - 1, width - 5, y - 1, 'x')
+            for index, hx in enumerate(range(6 + row * 3, 42, 6)):
+                cover = 'XxTXxT'[(index + row) % 6]
+                back.put(hx + 1, y, 'd')
+                back.rect(hx, y + 1, hx + 2, y + 4, cover)
+                back.put(hx + 1, y + 2, '0')
+                back.put(hx + 1, y + 3, '0')
     booth_counter(front, width, base)
     if kind == 'barraca-beijo':
         if frame == 1:  # o coração do balcão bate
@@ -738,6 +774,16 @@ def booth_parts(kind, frame=0):
         glint = {0: (22, base - 9), 1: (23, base - 8), 2: (24, base - 7)}.get(frame)
         if glint:
             front.put(*glint, 'z')
+    elif kind == 'barraca-cordel':
+        # Pilhas de folhetos no balcão e um aberto, virando a página.
+        for x, color in ((6, 'x'), (11, 'T'), (33, 'X'), (38, 'x')):
+            front.rect(x, base - 20, x + 3, base - 18, color)
+            front.rect(x, base - 20, x + 3, base - 20, 'W')
+        page = frame % 2
+        front.rect(19, base - 21, 28, base - 18, 'X')
+        front.rect(23, base - 21, 24, base - 18, 'd')
+        front.rect(20, base - 20 + page, 22, base - 20 + page, 's')
+        front.rect(25, base - 20 + (1 - page), 27, base - 20 + (1 - page), 's')
     elif kind == 'barraca-argolas':
         dark = {'G': 'g', 'J': 'j', 'R': 'r', 'A': 'a', 'P': 'i'}
         for index, (x, color) in enumerate(zip(range(7, 42, 7), 'GJRAP')):
@@ -834,6 +880,66 @@ def quentao_barrel(step=0):
     return image
 
 
+def wood_stove(step=0):
+    """Fogão a lenha de barro: a boca com a brasa piscando, a chapa de ferro com a panela de barro (canjica) e o caldeirão
+    preto (pamonha), a colher de pau, a chaminé fumegando e a lenha empilhada do lado (quatro quadros)."""
+    layer = Layer(36, 32)
+    # Lenha empilhada à esquerda: três toras com a ponta clara.
+    for y, x0 in ((27, 0), (27, 5), (24, 2)):
+        layer.rect(x0, y, x0 + 4, y + 2, 'D')
+        layer.rect(x0, y, x0, y + 2, 'l')
+        layer.put(x0, y + 1, 'T')
+    # Corpo de barro (mais claro em cima), com a boca em arco.
+    layer.rect(9, 18, 34, 31, 'U')
+    layer.rect(9, 18, 34, 19, 'T')
+    layer.rect(33, 18, 34, 31, 'u')
+    # Juntas dos tijolos de barro, desencontradas.
+    for row, y in enumerate((21, 25, 29)):
+        for x in range(10 + (row % 2) * 3, 33, 6):
+            if not (11 <= x <= 19 and y >= 24):
+                layer.put(x, y, 'u')
+                layer.put(x, y - 1, 'u')
+    for y in range(24, 31):
+        half = 4 if y > 25 else 3 if y == 25 else 2
+        for x in range(15 - half, 16 + half):
+            layer.put(x, y, 'd')
+    # A brasa dentro da boca, piscando.
+    embers = [(12, 29), (13, 28), (14, 29), (15, 28), (16, 29), (17, 28), (18, 29), (14, 27), (16, 27)]
+    for k, (x, y) in enumerate(embers):
+        layer.put(x, y, 'FfqK'[(k + step) % 4])
+    layer.rect(12, 30, 18, 30, 'q')
+    # Chapa de ferro por cima.
+    layer.rect(9, 16, 34, 17, 's')
+    layer.rect(9, 16, 34, 16, 'S')
+    # Panela de barro com canjica (creme) e o caldeirão preto.
+    layer.rect(11, 10, 19, 15, 'k')
+    layer.rect(11, 10, 19, 10, 'K')
+    layer.rect(12, 11, 18, 11, 'x')
+    layer.put(10, 12, 'k')
+    layer.put(20, 12, 'k')
+    layer.rect(22, 11, 29, 15, '1')
+    layer.rect(22, 11, 29, 11, 's')
+    layer.rect(23, 12, 28, 12, 'A')
+    # Colher de pau dentro da panela de barro.
+    layer.line(17, 11, 21, 5, 'l')
+    layer.put(21, 4, 'D')
+    # Chaminé no fundo, à direita.
+    layer.rect(31, 4, 33, 15, 's')
+    layer.rect(31, 4, 31, 15, 'S')
+    image = outline(layer.image)
+    # Vapor das panelas e fumaça da chaminé, sem contorno e meio transparentes.
+    steam = Layer(image.width, image.height)
+    for k, (x0, top, bottom, char) in enumerate(((15, 2, 9, 'X'), (26, 4, 10, 'X'), (33, 0, 4, 'M'))):
+        for y in range(top, bottom):
+            wiggle = round(math.sin((y + step * 1.6 + k * 2) * 0.9) * 1.2)
+            if (y + k + step) % 3 != 0:
+                steam.put(x0 + wiggle, y, char)
+    vapor = steam.image
+    vapor.putalpha(vapor.getchannel('A').point(lambda a: a * 150 // 255))
+    image.alpha_composite(vapor)
+    return image
+
+
 def cart(phase=0):
     layer = Layer(42, 26)
     layer.rect(2, 8, 37, 17, 'D')
@@ -864,11 +970,12 @@ def cart(phase=0):
 def export_sides():
     rng = random.Random(3)
     manifest['sides']['fardo'] = add('lado-fardo', animar.fardo(rng), fps=4)
-    manifest['sides']['mastro'] = add('lado-mastro', [flag_mast(phase=i * math.pi / 2) for i in range(4)], fps=5)
+    manifest['sides']['mastro'] = add('lado-mastro', [mastro_sao_joao(phase=i * math.pi / 2) for i in range(4)], fps=5)
     manifest['sides']['espantalho'] = add('lado-espantalho', animar.espantalho(scarecrow()), fps=3)
     manifest['sides']['carroca'] = add('lado-carroca', [cart(phase) for phase in range(2)], fps=2)
     manifest['sides']['barril-quentao'] = add('lado-barril-quentao', [quentao_barrel(step) for step in range(4)], fps=4)
-    for kind in ('barraca-pescaria', 'barraca-beijo', 'barraca-comidas', 'cadeia', 'correio', 'barraca-argolas'):
+    manifest['sides']['fogao-lenha'] = add('lado-fogao-lenha', [wood_stove(step) for step in range(4)], fps=4)
+    for kind in ('barraca-pescaria', 'barraca-beijo', 'barraca-comidas', 'cadeia', 'correio', 'barraca-argolas', 'barraca-cordel'):
         parts = [booth_parts(kind, frame) for frame in range(BOOTH_FRAMES)]
         _, x0, x1 = BOOTHS[kind]
         manifest['sides'][kind] = add(f'lado-{kind}', [back for back, _ in parts], fps=4,
@@ -983,7 +1090,33 @@ def export_rings():
     for y in range(82, height):
         for x in range(width):
             layer.put(x, y, 'd' if (y - 82) % 6 == 5 else ('D' if (y // 6) % 2 else 'l'))
-    manifest['rings']['fundo'] = add('argolas-fundo', layer.image)
+    # Prateleira de prêmios no alto da parede: ursinhos de cores diferentes e peixinhos no saquinho (os prêmios de
+    # verdade das Argolas), com a tábua e as mãos-francesas.
+    background = layer.image
+    shelf = 31
+    for x in range(6, width - 6):
+        background.putpixel((x, shelf), hex_rgb(PALETTE['T']) + (255,))
+        background.putpixel((x, shelf + 1), hex_rgb(PALETTE['u']) + (255,))
+    for x in (12, width // 2, width - 13):
+        for k in range(4):
+            background.putpixel((x + k, shelf + 2 + k), hex_rgb(PALETTE['u']) + (255,))
+    bear, bear_pivot = sprites.HAND_FILL['ursinho']
+    fish, fish_pivot = sprites.HAND_FILL['peixinho']
+    prizes = [fill(bear), fill(fish), recolor(fill(bear), {'U': 'H', 'T': 'c'}), fill(fish), recolor(fill(bear), {'U': 'b', 'T': 'X'}),
+              fill(fish), recolor(fill(bear), {'U': 'A', 'T': 'F'})]
+    step = (width - 28) / (len(prizes) - 1)
+    for k, prize in enumerate(prizes):
+        x = round(14 + k * step - prize.width / 2)
+        background.alpha_composite(prize, (x, shelf - prize.height + 1))
+    # Luz quente de cima: as tábuas mais claras perto do toldo e mais escuras embaixo, só um toque.
+    glow = Image.new('RGBA', background.size, (0, 0, 0, 0))
+    gp = glow.load()
+    for y in range(13, 78):
+        k = max(0.0, 1 - (y - 13) / 55)
+        for x in range(width):
+            gp[x, y] = (255, 214, 138, round(46 * k * k))
+    background.alpha_composite(glow)
+    manifest['rings']['fundo'] = add('argolas-fundo', background)
     # Uma garrafa por prêmio. Quanto melhor o prêmio, mais larga a boca e menos folga a argola tem para passar:
     # folga = (vão da argola - boca) / 2, que precisa bater com config.ringAim em src/data.js (há teste para isso).
     kinds = [  # prêmio, boca, linhas de gargalo, corpo, cor, sombra, faixa
@@ -1040,6 +1173,126 @@ def rainbow_icon():
     return outline(layer.image)
 
 
+def album_quentao():
+    """Figurinha do friozinho: caneca de barro de quentão com o vapor subindo em dois fios."""
+    layer = Layer(13, 14)
+    layer.rect(2, 6, 8, 12, 'k')
+    layer.rect(2, 6, 3, 12, 'K')
+    layer.rect(8, 6, 8, 12, 'u')
+    layer.rect(2, 6, 8, 6, 'Q')
+    layer.rect(3, 6, 7, 6, 'q')
+    layer.rect(9, 8, 10, 8, 'k')
+    layer.rect(10, 8, 10, 10, 'k')
+    layer.rect(9, 10, 10, 10, 'k')
+    image = outline(layer.image)
+    # Vapor por cima, sem contorno e meio transparente (como o do barril), em dois fios que ondulam.
+    steam = Layer(image.width, image.height)
+    for x0, shift in ((5, 0), (7, 1)):
+        for y in range(0, 6):
+            steam.put(x0 + ((y + shift) // 2) % 2, y, 'X')
+    vapor = steam.image
+    vapor.putalpha(vapor.getchannel('A').point(lambda a: a * 190 // 255))
+    image.alpha_composite(vapor)
+    return image
+
+
+def album_thunder():
+    """Figurinha do trovão: nuvem escura com o raio amarelo saindo dela."""
+    layer = Layer(14, 16)
+    for x, y, r in ((4, 4, 3), (8, 3, 3.5), (11, 5, 2.5)):
+        for yy in range(9):
+            for xx in range(14):
+                if (xx - x) ** 2 + (yy - y) ** 2 <= r * r:
+                    layer.put(xx, yy, 'M' if yy < y else 'L')
+    layer.rect(2, 6, 12, 7, 'L')
+    for x, y in ((8, 8), (7, 9), (6, 10), (7, 10), (8, 10), (7, 11), (6, 12), (5, 13), (5, 14)):
+        layer.put(x, y, 'A')
+    layer.put(8, 9, 'F')
+    return outline(layer.image)
+
+
+def album_rain():
+    """Figurinha da chuva: nuvem cinza com gotas azuis caindo."""
+    layer = Layer(14, 14)
+    for x, y, r in ((4, 4, 3), (8, 3, 3.5), (11, 5, 2.5)):
+        for yy in range(12):
+            for xx in range(14):
+                if (xx - x) ** 2 + (yy - y) ** 2 <= r * r:
+                    layer.put(xx, yy, 'w' if yy < y else 'M')
+    layer.rect(2, 6, 12, 7, 'M')
+    for x, y in ((3, 9), (6, 11), (9, 9), (12, 11), (4, 13), (10, 13)):
+        layer.put(x, y, 'B')
+        layer.put(x, y - 1, 'C')
+    return outline(layer.image)
+
+
+def album_fireworks():
+    """Figurinha dos fogos: um estouro de raios coloridos com o miolo branco."""
+    layer = Layer(15, 15)
+    colors = 'HAJGKP'
+    for k in range(12):
+        angle = k * math.pi / 6
+        for step in range(2, 7):
+            layer.put(7 + math.cos(angle) * step, 7 + math.sin(angle) * step, colors[k % 6] if step > 3 else 'F')
+    layer.put(7, 7, 'z')
+    return outline(layer.image)
+
+
+def album_request():
+    """Figurinha do pedido: o balão de fala da festa com a exclamação."""
+    layer = Layer(13, 13)
+    layer.rect(1, 1, 11, 8, 'X')
+    layer.rect(1, 1, 11, 1, 'z')
+    layer.rect(3, 9, 4, 9, 'X')
+    layer.put(3, 10, 'X')
+    layer.rect(6, 2, 6, 5, 'R')
+    layer.put(6, 7, 'R')
+    return outline(layer.image)
+
+
+# Varais de bandeirinhas: cada bandeirinha é (cor, sombra, brilho[, florzinha]), repetidas ao longo do fio.
+VARAIS = {
+    'varal-colorido': [('R', 'r', 'p'), ('A', 'a', 'F'), ('g', 'v', 'G'), ('J', 'j', 'b'), ('H', 'h', 'c'), ('K', 'k', 'O'),
+                       ('C', 'J', 'b'), ('P', 'i', 'I')],
+    'varal-azul': [('J', 'j', 'b'), ('X', 'E', 'z')],
+    'varal-chita': [('R', 'r', 'p', 'X'), ('H', 'h', 'c', 'A'), ('g', 'v', 'G', 'H'), ('A', 'a', 'F', 'R')],
+    'varal-brasil': [('g', 'v', 'G'), ('A', 'a', 'F'), ('g', 'v', 'G'), ('A', 'a', 'F'), ('J', 'j', 'b')],
+    'varal-ouro': [('A', 'a', 'F'), ('X', 'E', 'z'), ('f', 'k', 'O')],
+}
+
+
+def varal_icon(colors):
+    """Ícone do varal na loja: um pedaço de fio com três bandeirinhas nas cores dele."""
+    layer = Layer(17, 10)
+    for x in range(17):
+        layer.put(x, 1 + round(1.4 * math.sin(math.pi * x / 16)), 'd')
+    for k, x0 in enumerate((1, 6, 11)):
+        base, dark, light = colors[k % len(colors)][:3]
+        top = 2 + round(1.4 * math.sin(math.pi * (x0 + 2) / 16))
+        for dy in range(5):
+            for dx in range(5):
+                if (dy == 3 and dx in (0, 4)) or (dy == 4 and dx != 2):
+                    continue
+                layer.put(x0 + dx, top + dy, dark if dx == 4 or dy == 0 else light if dx == 0 and dy == 1 else base)
+        if len(colors[k % len(colors)]) > 3:
+            layer.put(x0 + 2, top + 2, colors[k % len(colors)][3])
+    return outline(layer.image)
+
+
+def album_compadres():
+    """Figurinha dos compadres de fogueira: os dois de mão estendida, as mãos se encontrando, e um coraçãozinho em cima."""
+    people = animar.compadres([(dressed(sprites.CAVALHEIRO, 1), 'xadrez-verde'), (dressed(sprites.DAMA, 1), 'chita-rosa')])
+    poses = len(animar.COMPADRE_POSES)
+    him = people[4].transpose(Image.FLIP_LEFT_RIGHT)
+    her = people[poses + 4]
+    width = him.width + her.width - 6
+    image = animar.blank(width, him.height + 5)
+    image.alpha_composite(him, (0, 5))
+    image.alpha_composite(her, (him.width - 6, 5))
+    image.alpha_composite(animar.strokes(width, image.height, [], [(['R.R', 'RRR', '.R.'], him.width - 5, 1)]))
+    return image.crop(image.getbbox())
+
+
 def export_icons():
     for name, text in sprites.UI_ICONS.items():
         icons[f'ui:{name}'] = fill(text)
@@ -1054,6 +1307,30 @@ def export_icons():
     icons['ui:saco'] = racer.crop(racer.getbbox())
     auctioneer = cenario.leiloeiro()[1]
     icons['ui:leilao'] = auctioneer.crop(auctioneer.getbbox())
+    # Figurinhas do Álbum da Festa que ainda não tinham ícone.
+    crop = lambda image: image.crop(image.getbbox())
+    icons['ui:quadrilha'] = crop(animar.person(sprites.DAMA, 'chita', ('alto', 'alto', 0, None), sleeve='H'))
+    icons['ui:frio'] = album_quentao()
+    icons['ui:penetra'] = crop(animar.penetra()[0])
+    icons['ui:pombo'] = crop(cenario.pombo()[0])
+    icons['ui:alto'] = crop(cenario.altofalante()[1])
+    icons['ui:chuva'] = album_rain()
+    icons['ui:fogos'] = album_fireworks()
+    icons['ui:pedido'] = album_request()
+    icons['ui:sanfoneiro'] = crop(cenario.sanfoneiro()[1])
+    icons['ui:fotografo'] = crop(cenario.fotografo()[0])
+    icons['ui:cobra'] = crop(cenario.cobra()[0])
+    icons['ui:burro'] = crop(cenario.burro()[0].crop((0, 0, 30, 22)))  # só o quadro, sem as pernas do cavalete
+    icons['ui:trovao'] = album_thunder()
+    icons['ui:compadres'] = album_compadres()
+    for dish, text in sprites.DISHES.items():
+        icons[f'ui:prato-{dish}'] = fill(text)
+    icons['ui:carro-boi'] = crop(cenario.carro_de_boi()[0])
+    legendary = images['fogueira-lendaria'].crop((0, 0, manifest['fires']['lendaria']['w'], manifest['fires']['lendaria']['h']))
+    icons['ui:lendaria'] = crop(legendary)
+    for varal, colors in VARAIS.items():
+        icons[f'item:{varal}'] = varal_icon(colors)
+        manifest['varais'][varal] = {'colors': [[f'#{PALETTE[c].lstrip("#")}' for c in flag] for flag in colors]}
     for fabric in FABRICS:
         icons[f'item:{fabric}'] = fill(sprites.SHIRT_ICON, fabric)
 
@@ -1069,6 +1346,9 @@ TERRAINS = {
                 'low': 'u', 'edge': '1', 'speck': 'Ss', 'flowers': 'HAXHAXP', 'tuft': 'GGg'},
     'areia': {'top': 'YYYYx', 'mid': 'xxxY', 'sub': 'xxTx', 'soil': 'TTxT', 'deep': 'TTU',
               'low': 'U', 'edge': 'u', 'speck': 'Xp', 'flowers': 'Xp', 'tuft': 'xY'},
+    # Chão do Sertão: terra vermelha rachada de sol, com florzinha amarela da caatinga e tufo seco.
+    'sertao': {'top': 'kkUkk', 'mid': 'kUkU', 'sub': 'Uuk', 'soil': 'kUUk', 'deep': 'UuuU', 'low': 'u', 'edge': '1',
+               'speck': 'u1', 'flowers': 'AFA', 'tuft': 'oy'},
     'tablado': {'top': 'l', 'mid': 'D', 'sub': 'd', 'soil': 'TTTU', 'deep': 'UUUT', 'low': 'u', 'edge': '1',
                 'speck': 'Ss', 'flowers': '', 'tuft': '', 'pattern': 'planks'},
     'pista-forro': {'top': 'e', 'mid': 'X', 'sub': 's', 'soil': 'TTTU', 'deep': 'UUUT', 'low': 'u', 'edge': '1',

@@ -22,6 +22,7 @@ ESQUERDO = {
     'bumbo': ((3, 24), (6, 27)),         # balanço solto do lado do corpo
     'rasga': ((2, 22), (-1, 25)),        # braço solto para trás
     'boca': ((3, 21), (8, 16)),          # mão na boca (bebendo)
+    'chifre': ((0, 16), (5, 8)),         # mãos em cima da cabeça, apontando para cima: os chifres do boi
 }
 DIREITO = {nome: _espelho(pontos) for nome, pontos in ESQUERDO.items()}
 
@@ -41,11 +42,14 @@ DESCANSOS = {
     # Cochilo em pé: os braços caem, a cabeça pesa e ela cabeceia de sono.
     'cochilo': [(2, 'baixo', 'baixo', 'sorri', 'fechados'), (3, 'baixo', 'baixo', 'sorri', 'fechados'),
                 (3, 'baixo', 'baixo', 'ofega', 'fechados'), (1, 'baixo', 'baixo', 'sorri', 'cansados')],
+    # Lê uma cartinha do correio elegante (o bilhete é desenhado pelo jogo na mão): sorri, suspira e pisca.
+    'carta': [(1, 'peito', 'baixo', 'sorri', 'abertos'), (1, 'peito', 'baixo', 'sorri', 'abertos'),
+              (0, 'peito', 'baixo', 'canta', 'abertos'), (1, 'peito', 'baixo', 'sorri', 'fechados')],
 }
 
 # nome: (rótulo, passos até aprender). O forró todo mundo já sabe.
 ORDEM = ['forro', 'xote', 'polichinelo', 'sanfona', 'rebolado', 'baiao', 'giro', 'moonwalk', 'frevo', 'lambada', 'macarena',
-         'robo', 'arrasta-pe', 'coco', 'passinho']
+         'boi-bumba', 'robo', 'balance', 'arrasta-pe', 'ciranda', 'coco', 'passinho', 'pisa-fulo', 'xaxado']
 
 DANCAS = {
     # Passo básico do forró: o que já existia (definido no exportador, DANCE).
@@ -150,6 +154,33 @@ DANCAS = {
         (0, 0, 'peito', 'aberto', 'esquerda', 'canta'), (1, -1, 'peito', 'aberto', 'ambas', 'sorri'),
     ],
 
+    # Boi-bumbá: as mãos viram os chifres do boi. Investe para um lado e para o outro, abaixa a cabeça na marrada, pisa
+    # forte e termina com o pulo.
+    'boi-bumba': [
+        (0, -2, 'chifre', 'chifre', 'esquerda', 'sorri'), (1, -1, 'chifre', 'chifre', 'ambas', 'canta'),
+        (0, 2, 'chifre', 'chifre', 'direita', 'sorri'), (1, 1, 'chifre', 'chifre', 'ambas', 'canta'),
+        (2, 0, 'chifre', 'chifre', 'ambas', 'sorri'), (0, 0, 'aberto', 'aberto', {'esquerda': 3, 'direita': 0}, 'canta'),
+        (0, 0, 'aberto', 'aberto', {'esquerda': 0, 'direita': 3}, 'canta'), (0, 0, 'v', 'v', 'ambas', 'canta', 1),
+    ],
+
+    # Balancê: o passo da quadrilha. Mãos na cintura balançando de um lado para o outro, o "anavan" com um braço
+    # esticado (segurando a mão do par), o cumprimento à dama tirando o chapéu e o "viva!" de braços para cima.
+    'balance': [
+        (0, -2, 'cintura', 'cintura', {'esquerda': 2, 'direita': 0}, 'sorri'), (1, -1, 'cintura', 'cintura', 'ambas', 'canta'),
+        (0, 2, 'cintura', 'cintura', {'esquerda': 0, 'direita': 2}, 'sorri'), (1, 1, 'cintura', 'cintura', 'ambas', 'canta'),
+        (0, -1, 'aberto', 'cintura', 'esquerda', 'sorri'), (0, 1, 'cintura', 'aberto', 'direita', 'sorri'),
+        (2, 0, 'chapeu', 'baixo', 'ambas', 'sorri'), (0, 0, 'v', 'v', 'ambas', 'canta', 1),
+    ],
+
+    # Ciranda: a roda de mãos dadas de Pernambuco. Braços abertos segurando as mãos de quem está do lado, passo para o
+    # lado com uma descidinha no tempo forte e, uma vez por volta, a roda inteira ergue os braços.
+    'ciranda': [
+        (0, -1, 'aberto', 'aberto', {'esquerda': 2, 'direita': 0}, 'canta'), (1, -1, 'aberto', 'aberto', 'ambas', 'sorri'),
+        (0, 0, 'aberto', 'aberto', {'esquerda': 0, 'direita': 2}, 'canta'), (1, 1, 'aberto', 'aberto', 'ambas', 'sorri'),
+        (0, 1, 'aberto', 'aberto', {'esquerda': 2, 'direita': 0}, 'canta'), (1, 1, 'aberto', 'aberto', 'ambas', 'sorri'),
+        (0, 0, 'v', 'v', 'ambas', 'canta'), (1, 0, 'aberto', 'aberto', 'ambas', 'sorri'),
+    ],
+
     # Coco: bate palma no peito e pisa forte, um pé de cada vez, com um pulinho de vez em quando.
     'coco': [
         (0, 0, 'peito', 'peito', {'esquerda': 3, 'direita': 0}, 'canta'), (1, 0, 'aberto', 'aberto', 'ambas', 'sorri'),
@@ -164,5 +195,23 @@ DANCAS = {
         (1, -1, 'alto', 'baixo', 'ambas', 'canta'), (0, 1, 'baixo', 'alto', 'ambas', 'canta'),
         (0, -1, 'rasga', 'bumbo', {'esquerda': 3, 'direita': 0}, 'sorri', 1), (0, 1, 'bumbo', 'rasga', {'esquerda': 0, 'direita': 3}, 'sorri', 1),
         (1, 0, 'cintura', 'cintura', 'ambas', 'canta'), (0, 0, 'v', 'v', 'ambas', 'sorri', 2),
+    ],
+
+    # Pisa na fulô: mãos na cintura pisando forte com um pé e com o outro, depois se inclina para cada lado com a mão na
+    # boca chamando "ô!", bate palma no peito e fecha com o pulo.
+    'pisa-fulo': [
+        (0, -1, 'cintura', 'cintura', {'esquerda': 3, 'direita': 0}, 'canta'), (1, 0, 'cintura', 'cintura', 'ambas', 'sorri'),
+        (0, 1, 'cintura', 'cintura', {'esquerda': 0, 'direita': 3}, 'canta'), (1, 0, 'cintura', 'cintura', 'ambas', 'sorri'),
+        (0, -2, 'boca', 'aberto', 'esquerda', 'canta'), (0, 2, 'aberto', 'boca', 'direita', 'canta'),
+        (1, 0, 'peito', 'peito', 'ambas', 'sorri'), (0, 0, 'v', 'v', 'ambas', 'canta', 1),
+    ],
+
+    # Xaxado: a dança dos cangaceiros. Mão no chapéu, o outro braço cruzado segurando o "fuzil", o corpo agachado e o pé
+    # batendo forte no chão, um de cada vez; troca de lado no meio e termina com o grito de braços para cima.
+    'xaxado': [
+        (1, -1, 'chapeu', 'cruza', {'esquerda': 3, 'direita': 0}, 'canta'), (2, -1, 'chapeu', 'cruza', 'ambas', 'sorri'),
+        (1, 0, 'chapeu', 'cruza', {'esquerda': 0, 'direita': 3}, 'canta'), (2, 0, 'chapeu', 'cruza', 'ambas', 'sorri'),
+        (1, 1, 'cruza', 'chapeu', {'esquerda': 3, 'direita': 0}, 'canta'), (2, 1, 'cruza', 'chapeu', 'ambas', 'sorri'),
+        (1, 0, 'cruza', 'chapeu', {'esquerda': 0, 'direita': 3}, 'canta'), (0, 0, 'v', 'v', 'ambas', 'canta', 1),
     ],
 }

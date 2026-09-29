@@ -111,10 +111,17 @@
     byId(data.items, override.items, ['name', 'desc', 'effect']);
     byId(data.outings, override.outings, ['name']);
     byId(data.bonfire, override.bonfire, ['name', 'text']);
+    byId(data.recipes || [], override.recipes, ['name', 'desc']);
     byId(data.scenery.landmarks, override.landmarks, ['name']);
     byId(data.scenery.cycle, override.cycle, ['name']);
     byId(data.requests, override.requests, ['text']);
     byId(data.achievements, override.achievements, ['name', 'text']);
+    for (const page of data.album || []) {
+      const text = override.album?.[page.id];
+      if (!text) continue;
+      if (typeof text.name === 'string') page.name = text.name;
+      for (const sticker of page.stickers) if (typeof text.stickers?.[sticker.id] === 'string') sticker.name = text.stickers[sticker.id];
+    }
     for (const [key, text] of Object.entries(override.posts || {})) {
       if (data.posts[key] && typeof text.name === 'string') data.posts[key].name = text.name;
     }
