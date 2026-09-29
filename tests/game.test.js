@@ -205,13 +205,13 @@ test('argolas: cada rodada dobra o preço e cada espera sem jogar corta pela met
 
 test('cada convidado novo traz uma peça de cenário', () => {
   const { engine } = game();
-  for (let size = 2; size <= 150; size++) assert.ok(engine.sceneryPiece(size), `lotação ${size} traz alguma coisa`);
+  for (let size = 2; size <= 200; size++) assert.ok(engine.sceneryPiece(size), `lotação ${size} traz alguma coisa`);
   for (const mark of data.scenery.landmarks) {
     assert.equal(engine.sceneryPiece(mark.size).id, mark.id, `${mark.name} chega com ${mark.size} convidados`);
   }
   const hen = data.scenery.landmarks.find(mark => mark.id === 'galinha').size;
   for (let size = 2; size < hen; size++) assert.notEqual(engine.sceneryPiece(size).id, 'pintinho', 'pintinho só depois da galinha');
-  const late = engine.scenery(150);
+  const late = engine.scenery(200);
   for (const entry of data.scenery.cycle) assert.ok((late.counts[entry.id] || 0) <= entry.max, entry.id);
   assert.equal(late.landmarks.length, data.scenery.landmarks.length);
   assert.deepEqual(engine.scenery(1), { landmarks: [], counts: {} });

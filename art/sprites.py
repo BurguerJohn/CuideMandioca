@@ -320,6 +320,40 @@ CACHORRO = """
 ....0000....0000....
 """
 
+# Criança da festa (aparece correndo quando a festa enche): a mesma cara de mandioca e chapéu de palha da
+# quadrilha, em miniatura. Dois quadros de corrida: pernas abertas e pernas juntas.
+CRIANCA = """
+...0000...
+..0YYYy0..
+.0YYYYYo0.
+..000000..
+..046620..
+..0e66e0..
+..04mm20..
+.0#++++-0.
+.0#++++-0.
+..000000..
+..040030..
+..0d00d0..
+..00..00..
+"""
+
+CRIANCA_PASSO = """
+...0000...
+..0YYYy0..
+.0YYYYYo0.
+..000000..
+..046620..
+..0e66e0..
+..04mm20..
+.0#++++-0.
+.0#++++-0.
+..000000..
+...0430...
+...0dd0...
+...0000...
+"""
+
 # Sopinha, o coelho mini lop (das fotos em sopinha/): branco com manta bege nas costas, orelhas caídas cinza,
 # anel bege no olho, faixa branca da testa ao nariz e a mancha escura no focinho. De perfil, virado para a direita.
 SOPINHA = """

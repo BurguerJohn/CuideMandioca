@@ -326,7 +326,9 @@
         gato: { name: 'Sleepy cat' }, mandacaru: { name: 'Mandacaru cactus' }, casinha: { name: 'Mud hut' },
         pipa: { name: 'Kite in the sky' }, coqueiro: { name: 'Coconut palm' }, bode: { name: 'Goat' },
         igrejinha: { name: 'Little chapel' }, 'casinha-azul': { name: 'Blue house' }, lua: { name: 'São João moon' },
-        catavento: { name: 'Pinwheel' }, balao: { name: 'Paper lantern' }, estrelas: { name: 'Starry sky' }
+        catavento: { name: 'Pinwheel' }, balao: { name: 'Paper lantern' }, estrelas: { name: 'Starry sky' },
+        carrossel: { name: 'Carousel' }, 'balao-grande': { name: 'Hot-air balloon' }, boi: { name: 'Bumba-meu-boi' },
+        'ilha-quadrilha': { name: 'Floating dance island' }, 'ilha-baloes': { name: 'Floating lantern island' }
       },
       cycle: {
         balaozinho: { name: 'String lantern' }, pintinho: { name: 'Chick' },

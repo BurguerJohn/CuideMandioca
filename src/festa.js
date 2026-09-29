@@ -33,16 +33,24 @@
   // Chapéus de metal ou pedraria: ganham o brilho de joia.
   const SHINY = new Set(['coroa-milho', 'rei-baiao', 'coroa-flores', 'tiara-chifrinho']);
   const MARGIN = 16;
-  const H = 204;
-  const GROUND = 160;
+  const BASE_H = 204;
+  const BASE_GROUND = 160;
+  // Com ilhas flutuando no céu, a festa ganha céu em cima: a altura e o chão descem juntos, e o fundo do terreiro
+  // continua no mesmo lugar da tela (a festa cresce para cima, onde a tela tem espaço).
+  const ISLAND_SKY = 50;
+  const ISLAND_W = 84;
+  const ISLANDS = ['ilha-quadrilha', 'ilha-baloes'];
+  let H = BASE_H;
+  let GROUND = BASE_GROUND;
   const TIER_MIN = [128, 190, 270, 340, 400];
-  const MAX_W = 440;
+  const MAX_W = 600;
   const POLE_H = [40, 56, 92, 124, 140];
   const STRINGS = [1, 1, 2, 3, 3];
   // Formas das partículas desenhadas pixel a pixel (1 = pinta), com contorno escuro.
   const SHAPES = { coracao: ['101', '111', '010'], nota: ['011', '010', '110', '110'] };
   // Marcos de cenário que ficam no fundo, atrás da plateia.
-  const BACK_AT = ['milharal', 'bananeira', 'mandacaru', 'casinha', 'coqueiro', 'igrejinha', 'casinha-azul', 'catavento'];
+  const BACK_AT = ['milharal', 'bananeira', 'mandacaru', 'casinha', 'coqueiro', 'igrejinha', 'casinha-azul', 'catavento',
+    'carrossel'];
   const RIDGE = { top: '#77b050', mid: '#2d783a', low: '#17432d' };
   const spread = (i, offset) => (offset + i * 0.618034) % 1;
 
@@ -58,7 +66,10 @@
   const pick = (list, rng) => list[Math.floor(rng() * list.length) % list.length];
 
   function terrainWidth(engine) {
-    return Math.min(MAX_W, Math.max(TIER_MIN[engine.tierIndex()], 112 + 3 * (engine.state.size - 1)));
+    // 3 px por convidado até ~110 convidados (440 px); depois a festa segue crescendo, 2 px por convidado, até 600.
+    const size = engine.state.size;
+    const grown = size <= 110 ? 112 + 3 * (size - 1) : 439 + 2 * (size - 110);
+    return Math.min(MAX_W, Math.max(TIER_MIN[engine.tierIndex()], grown));
   }
 
   function amount(value) {
@@ -116,15 +127,17 @@
       image.src = src;
       images[name] = image;
     }
-    const buffer = document.createElement('canvas');
-    const g = buffer.getContext('2d', { willReadFrequently: true });
-    const out = canvas.getContext('2d');
+    // A festa é pintada direto no canvas da página, no tamanho da arte (o CSS amplia). Ele fica na memória comum
+    // (willReadFrequently) porque o clique lê os pixels para saber em que o cursor está.
+    const buffer = canvas;
+    const g = canvas.getContext('2d', { willReadFrequently: true });
     const view = { css: 3, physical: 3, width: 0, float: 0, limit: null, capped: false };
     const fx = {
-      particles: [], texts: [], arrivals: new Map(), guestsShown: null, celebrateUntil: 0, jumpUntil: 0,
+      particles: [], texts: [], arrivals: new Map(), shown: {}, celebrateUntil: 0, jumpUntil: 0,
       nextBlink: 0, blinkUntil: 0, nextSpark: 0, nextSweat: 0, nextFirework: 0, nextNote: 0, nextHeart: {}, frame: 0, previous: 0,
       lastDraw: 0, stepSum: 0, stepCrit: false, stepAt: 0, crasherSeen: null, leaving: null,
-      hen: {}, goat: {}, bunny: {}, chicks: [], nextZ: 0, nextSmoke: 0, pops: [],
+      hen: {}, goat: {}, boi: {}, bunny: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
+      nextZ: 0, nextSmoke: 0, pops: [],
       light: null, nextFireSmoke: 0, dustAt: 0, rockets: [], flashes: [], shooting: null, nextShoot: 0, glintAt: 0
     };
     // Brilhos em pixel: anéis concêntricos de cor sólida, cada um mais transparente (a luz fica redonda e limpa,
@@ -166,9 +179,12 @@
     let layoutKey = '';
     let terrain = null;
     let ridge = null;
+    let sky = 0;
+    let islandTerrains = [];
     let regions = [];
     let spots = new Map();
     const rng = Math.random;
+    let rate = 60;
     let minFrame = 15;
 
     function resize(width) {
@@ -178,8 +194,9 @@
       applyScale();
     }
 
-    // Altura do que aparece: do fundo do terreiro ao topo dos mastros (o céu acima é transparente).
-    const contentHeight = () => H - (GROUND - POLE_H[layout ? layout.tier : 0]) + 3;
+    // Altura do que aparece: do fundo do terreiro ao topo dos mastros, ou das ilhas do céu (o céu acima é transparente).
+    const contentTop = () => GROUND - POLE_H[layout ? layout.tier : 0] - (sky ? ISLAND_SKY - 8 : 0);
+    const contentHeight = () => H - contentTop() + 3;
 
     function applyScale() {
       const dpr = root.devicePixelRatio || 1;
@@ -191,13 +208,15 @@
         physical = Math.max(1, Math.min(wanted, Math.floor(fit * dpr)));
       }
       view.capped = physical < wanted;
-      if (physical === view.physical && canvas.width === view.width * physical) return;
+      if (physical === view.physical && canvas.width === view.width && canvas.height === H) return;
       view.physical = physical;
-      canvas.width = view.width * physical;
-      canvas.height = H * physical;
-      canvas.style.width = `${canvas.width / dpr}px`;
-      canvas.style.height = `${canvas.height / dpr}px`;
-      out.imageSmoothingEnabled = false;
+      // O canvas tem o tamanho da festa em pixels de arte; quem amplia é o CSS (image-rendering: pixelated), por um
+      // fator inteiro de pixels da tela. Ampliar na mão a cada quadro era a maior conta da festa cheia.
+      canvas.width = view.width;
+      canvas.height = H;
+      canvas.style.width = `${view.width * physical / dpr}px`;
+      canvas.style.height = `${H * physical / dpr}px`;
+      updateRate();
     }
 
     function setScale(css, limit = null) {
@@ -265,7 +284,8 @@
     // Terreiro flutuante gerado na hora, com a paleta do terreiro equipado.
     function buildTerrain(width, palette, seed) {
       const r = mulberry(seed);
-      const depth = 12 + Math.round((width - 112) / (MAX_W - 112) * 14);
+      // A ilha fica mais funda conforme alarga (26 linhas com 440 px, 33 com 600).
+      const depth = 12 + Math.round((width - 112) / 328 * 14);
       const w = width + 2;
       const h = depth + 22;
       const top = 3;
@@ -378,7 +398,7 @@
       const L = MARGIN;
       const R = MARGIN + width;
       const sides = bundle.sides;
-      const lay = { tier, width, L, R, couples: [], audience: [] };
+      const lay = { tier, width, L, R, couples: [], backCouples: [], audience: [], audience2: [], audience3: [] };
       let left = L + 4;
       let right = R - 4;
       const leftItem = sides[eq.esquerda];
@@ -412,17 +432,33 @@
       const guests = Math.max(0, s.size - 1);
       const couples = Math.min(Math.floor(guests / 2), slots.length);
       for (let i = 0; i < couples; i++) lay.couples.push({ x: slots[i], index: i });
+      let rest = guests - couples * 2;
+      // Quadrilha de verdade tem duas filas: com a da frente cheia, os pares seguintes dançam atrás, meio passo ao lado.
+      if (tier >= 1 && couples === slots.length) {
+        const back = slots.map(x => x + 13).filter(x => x + 25 <= right);
+        const count = Math.min(Math.floor(rest / 2), back.length);
+        for (let i = 0; i < count; i++) lay.backCouples.push({ x: back[i], index: 200 + i });
+        rest -= count * 2;
+      }
       if (tier >= 2) {
         const stage = bundle.props.palco;
         lay.stage = { x: lay.host.x - 20, meta: stage };
       }
       if (tier >= 1) {
-        const rest = Math.max(0, guests - couples * 2);
-        const spots = [];
-        for (let x = L + 8; x < R - 20; x += 11) spots.push(x);
-        const count = Math.min(rest, spots.length);
-        const order = spots.map((x, i) => [x, hash(i, 91) % 1000]).sort((a, b) => a[1] - b[1]);
-        for (let i = 0; i < count; i++) lay.audience.push({ x: order[i][0], index: i });
+        // Plateia em até três fileiras: cada uma enche depois da da frente, mais alta e mais escura (mais longe).
+        // As de trás não ficam na frente do palco (o trio de forró aparece).
+        const stage = lay.stage ? [lay.stage.x - 8, lay.stage.x + lay.stage.meta.w - 6] : null;
+        [[0, 'audience'], [5, 'audience2'], [2, 'audience3']].forEach(([offset, key], row) => {
+          const spots = [];
+          for (let x = L + 8 + offset; x < R - 20; x += 11) {
+            if (row && stage && x > stage[0] && x < stage[1]) continue;
+            spots.push(x);
+          }
+          const count = Math.min(rest, spots.length);
+          const order = spots.map((x, i) => [x, hash(i, 91 + row * 17) % 1000]).sort((a, b) => a[1] - b[1]);
+          for (let i = 0; i < count; i++) lay[key].push({ x: order[i][0], index: row * 100 + i });
+          rest -= count;
+        });
       }
       if (tier >= 3) lay.backdrop = { kind: 'roda', x: L + 2 };
       else if (tier === 2) {
@@ -436,8 +472,10 @@
       lay.scenery = engine.scenery();
       lay.has = new Set(lay.scenery.landmarks);
       lay.back = placeBack(lay, lay.scenery.landmarks.filter(id => BACK_AT.includes(id) && bundle.scenery[id]));
+      lay.islands = ISLANDS.filter(id => lay.has.has(id));
       lay.key = [width, tier, eq.esquerda, eq.direita, eq.terreiro, engine.legendary(),
-        withPar, engine.charActive('pamonha'), couples, lay.audience.length, s.size].join('|');
+        withPar, engine.charActive('pamonha'), couples, lay.backCouples.length, lay.audience.length, lay.audience2.length,
+        lay.audience3.length, s.size].join('|');
       return lay;
     }
 
@@ -534,17 +572,59 @@
       regions.push({ id: name, x: side.x, y, w: meta.w, h: meta.h });
     }
 
-    function drawBunting(left, right, top, sag, phase, lamps, now) {
+    // Varais e bandeirinhas desenhados uma vez só e reusados: a curva de cada varal (muda só com o tamanho da festa)
+    // e cada bandeirinha em 7 jeitos de balançar. Pintar pixel a pixel era quase toda a conta do quadro na festa cheia.
+    const strings = new Map();
+    function stringCurve(left, right, top, sag) {
+      const key = `${left}|${right}|${top}|${sag}`;
+      let curve = strings.get(key);
+      if (curve) return curve;
       const mid = (left + right) / 2;
       const half = (right - left) / 2;
       const points = [];
-      g.fillStyle = '#361a0c';
+      const image = document.createElement('canvas');
+      image.width = right - left + 1;
+      image.height = Math.ceil(sag) + 2;
+      const p = image.getContext('2d');
+      p.fillStyle = '#361a0c';
       for (let x = left; x <= right; x++) {
         const t = (x - mid) / half;
         const y = Math.round(top + sag * (1 - t * t));
-        g.fillRect(x, y, 1, 1);
+        p.fillRect(x - left, y - top, 1, 1);
         points.push([x, y]);
       }
+      if (strings.size > 40) strings.clear();
+      curve = { image, points };
+      strings.set(key, curve);
+      return curve;
+    }
+
+    const flags = new Map();
+    function flagImage(c, level) {
+      const key = c * 8 + level + 3;
+      let image = flags.get(key);
+      if (image) return image;
+      image = document.createElement('canvas');
+      image.width = 7;
+      image.height = 6;
+      const p = image.getContext('2d');
+      const shift = level * 1.3 / 3;
+      for (let dy = 1; dy < 7; dy++) {
+        const ox = Math.round(shift * dy / 6);
+        for (let dx = -2; dx <= 2; dx++) {
+          if ((dy === 5 && dx === 0) || (dy === 6 && Math.abs(dx) <= 1)) continue;
+          p.fillStyle = dx === 2 || dy === 1 ? FLAG_DARK[c] : dx === -2 && dy === 2 ? FLAG_LIGHT[c] : FLAGS[c];
+          p.fillRect(dx + ox + 3, dy - 1, 1, 1);
+        }
+      }
+      flags.set(key, image);
+      return image;
+    }
+
+    function drawBunting(left, right, top, sag, phase, lamps, now) {
+      const curve = stringCurve(Math.round(left), Math.round(right), Math.round(top), sag);
+      g.drawImage(curve.image, Math.round(left), Math.round(top));
+      const points = curve.points;
       if (lamps) {
         for (let i = 2; i < points.length; i += 6) {
           const [x, y] = points[i];
@@ -562,15 +642,8 @@
       for (let i = 3; i < points.length; i += 8, index++) {
         const [x, y] = points[i];
         const c = (index + phase) % FLAGS.length;
-        const shift = 1.3 * Math.sin(now / 420 + index * 0.8);
-        for (let dy = 1; dy < 7; dy++) {
-          const ox = Math.round(shift * dy / 6);
-          for (let dx = -2; dx <= 2; dx++) {
-            if ((dy === 5 && dx === 0) || (dy === 6 && Math.abs(dx) <= 1)) continue;
-            g.fillStyle = dx === 2 || dy === 1 ? FLAG_DARK[c] : dx === -2 && dy === 2 ? FLAG_LIGHT[c] : FLAGS[c];
-            g.fillRect(x + dx + ox, y + dy, 1, 1);
-          }
-        }
+        const level = Math.round(3 * Math.sin(now / 420 + index * 0.8));
+        g.drawImage(flagImage(c, level), x - 3, y + 1);
       }
     }
 
@@ -655,7 +728,12 @@
 
     function drawCrowd(engine, now, list, sheet, bottom, flipEvery) {
       const crowd = bundle.crowd;
+      const dancing = sheet === crowd.dancers || sheet === crowd.dancersBack;
       const jump = now < fx.jumpUntil ? -2 : 0;
+      // A "ola": uma onda de braços abertos atravessa a plateia; nas comemorações a plateia inteira pula junto.
+      const wave = !dancing && fx.wave ? fx.wave : null;
+      const waveAt = wave ? layout.L + (layout.R - layout.L + 40) * (now - wave.at) / 1700 - 20 : 0;
+      const cheering = !dancing && now < fx.celebrateUntil;
       for (const guest of list) {
         const seed = hash(guest.index, sheet === crowd.dancers ? 7 : 13);
         const fabric = seed % crowd.fabrics;
@@ -665,16 +743,22 @@
         const entries = flipEvery ? [[0, false], [13, true]] : [[0, (seed >> 3) % 2 === 0]];
         for (const [dx, flip] of entries) {
           const type = flipEvery ? (dx ? 1 : 0) : (seed >> 5) % 2;
-          const frame = (type * crowd.fabrics + (flipEvery && dx ? (fabric + 2) % crowd.fabrics : fabric)) * steps + beat;
           let x = guest.x + dx;
+          const front = wave ? Math.abs((wave.dir > 0 ? x : layout.R + layout.L - x) - waveAt) : Infinity;
+          const person = type * crowd.fabrics + (flipEvery && dx ? (fabric + 2) % crowd.fabrics : fabric);
+          // Dentro da onda: braços para o alto e um pulo que sobe e desce conforme a onda passa.
+          const inWave = front < 18 && crowd.ola !== undefined;
+          const frame = inWave ? crowd.ola + person : person * steps + beat;
+          const hop = inWave ? -Math.round(4 * Math.cos(front / 18 * Math.PI / 2))
+            : cheering ? -Math.round(2 * Math.abs(Math.sin(now / 130 + seed))) : 0;
           const arrival = fx.arrivals.get(`${sheet.image}:${guest.index}`);
           if (arrival) {
             const t = Math.min(1, (now - arrival.at) / 1200);
             x = arrival.from + (x - arrival.from) * t;
             if (t >= 1) fx.arrivals.delete(`${sheet.image}:${guest.index}`);
           }
-          if (sheet === crowd.dancers) shadow(x + 6, 8);
-          const top = bottom - sheet.h + 1 + (sheet === crowd.dancers ? jump : 0);
+          if (dancing) shadow(x + 6, 8, sheet === crowd.dancers ? 1 : 0.6);
+          const top = bottom - sheet.h + 1 + (dancing ? jump : hop);
           sprite(sheet, frame, x - (crowd.pad || 0), top, flip);
           rim(sheet, frame, x - (crowd.pad || 0), top, flip, x + 6);
         }
@@ -937,7 +1021,8 @@
       }
       if (has.has('lua')) {
         const moon = bundle.scenery.lua;
-        const x = R - moon.w - 6;
+        // Com as ilhas do céu ocupando os cantos, a lua vai para o meio do céu.
+        const x = layout.islands.length ? Math.round(L + layout.width * 0.64) : R - moon.w - 6;
         const y = 4 + Math.round(Math.sin(now / 3000));
         halo(x + moon.w / 2, y + moon.h / 2, 13, '#fff4c0', 0.2);
         sprite(moon, 0, x, y);
@@ -946,7 +1031,7 @@
       drawShootingStar(now, poleTop);
       if (has.has('pipa')) {
         const kite = bundle.scenery.pipa;
-        const kx = Math.round(L + 22 + Math.sin(now / 1700) * 5);
+        const kx = Math.round((layout.islands.length ? L + layout.width * 0.3 : L + 22) + Math.sin(now / 1700) * 5);
         const ky = Math.round(Math.max(3, poleTop - 40) + Math.cos(now / 1300) * 3);
         const [ax, ay, bx, by] = [L - 2, poleTop, kx + 6, ky + 9];
         g.fillStyle = 'rgba(255, 244, 228, 0.8)';
@@ -956,6 +1041,19 @@
         }
         sprite(kite, frameAt(kite, now), kx, ky);
         spots.set('pipa', { x: kx + 6, y: ky + 4 });
+      }
+      // Balão de ar quente amarrado atrás do lado direito: balança devagar, a corda desce até o chão, e a chama do
+      // maçarico acende o fundo do balão.
+      if (has.has('balao-grande')) {
+        const balloon = bundle.scenery['balao-grande'];
+        const bx = Math.round(R - 46 + Math.sin(now / 2100) * 3);
+        const by = Math.round(GROUND - 96 + Math.cos(now / 1500) * 2);
+        g.fillStyle = 'rgba(54, 26, 12, 0.9)';
+        for (let y = by + balloon.h - 3; y < GROUND - 6; y += 2) g.fillRect(bx + Math.round(balloon.w / 2), y, 1, 1);
+        const frame = frameAt(balloon, now);
+        if (frame) halo(bx + balloon.w / 2, by + 20, 6, '#ffac2a', 0.4);
+        sprite(balloon, frame, bx, by);
+        spots.set('balao-grande', { x: bx + balloon.w / 2, y: by + 10 });
       }
     }
 
@@ -1112,6 +1210,15 @@
         sprite(goat, frame, state.x, GROUND - goat.h + 2, state.dir < 0);
         spots.set('bode', { x: state.x + goat.w / 2, y: GROUND - goat.h });
       }
+      if (has.has('boi')) {
+        // Bumba-meu-boi: dança pelo terreiro, para, rodopia (vira de lado) e segue; as fitas balançam no passo.
+        const ox = bundle.scenery.boi;
+        const state = roam(fx.boi, now, lo, Math.max(lo + 30, hi - ox.w), 0.01, 0.5);
+        const spin = state.mode === 'para' && Math.floor(now / 380) % 2;
+        shadow(state.x + ox.w / 2, ox.w - 6, 0.8);
+        sprite(ox, frameAt(ox, now), state.x, GROUND - ox.h + 2, (state.dir < 0) !== !!spin);
+        spots.set('boi', { x: state.x + ox.w / 2, y: GROUND - ox.h });
+      }
       if (!has.has('galinha')) return;
       const hen = bundle.scenery.galinha;
       const state = roam(fx.hen, now, lo, hi, 0.008, 0.6);
@@ -1252,9 +1359,88 @@
       g.globalAlpha = 1;
     }
 
+    // Crianças correndo pela frente da festa: a primeira chega com 45 convidados, e mais uma a cada 25 (até 6).
+    // Cada uma corre para um lado, para, dá um pulinho e volta; às vezes uma corre atrás da outra.
+    function drawKids(engine, now) {
+      const size = engine.state.size;
+      const count = size < 45 ? 0 : Math.min(6, 1 + Math.floor((size - 45) / 25));
+      const meta = bundle.crowd.kids;
+      if (!count || !meta) return;
+      const lo = layout.L + 6;
+      const hi = layout.R - meta.w - 6;
+      for (let i = 0; i < count; i++) {
+        const kid = fx.kids[i] || (fx.kids[i] = { fabric: hash(i, 29) % bundle.crowd.fabrics });
+        const leader = i % 2 && fx.kids[i - 1]?.x !== undefined ? fx.kids[i - 1] : null;
+        const state = roam(kid, now, lo, hi, 0.032, 0.35);
+        // Pega-pega: a de número ímpar corre atrás da anterior quando está longe dela.
+        if (leader && state.mode === 'anda' && Math.abs(leader.x - state.x) > 14) state.dir = Math.sign(leader.x - state.x);
+        const moving = state.mode === 'anda';
+        const step = moving ? Math.floor(now / 110 + i) % 2 : 0;
+        const hopping = !moving && Math.floor(now / 500 + i) % 4 === 0;
+        const y = GROUND - meta.h + 2 - (hopping ? 2 : 0);
+        shadow(state.x + meta.w / 2, 6, 0.7);
+        sprite(meta, kid.fabric * 2 + step, state.x, y, state.dir < 0);
+        if (moving && now - (kid.dustAt || 0) > 420) {
+          kid.dustAt = now;
+          fx.particles.push({ x: state.x + meta.w / 2 - state.dir * 3, y: GROUND - 1, vx: -state.dir * 0.006, vy: -0.004,
+            gravity: 0.000008, born: now, ttl: 320, colors: ['rgba(236, 206, 156, 0.8)', 'rgba(206, 174, 132, 0.4)'] });
+        }
+      }
+    }
+
+    // Balões de São João: com 50 convidados, de vez em quando alguém solta um balão aceso, que sobe balançando até
+    // sumir no céu. Quanto mais gente, mais balões.
+    function drawLanterns(engine, now) {
+      const size = engine.state.size;
+      if (size >= 50 && now >= fx.nextLantern) {
+        fx.nextLantern = now + Math.max(1800, 9000 - (size - 50) * 45) * (0.6 + rng() * 0.8);
+        const island = fx.islands && fx.islands['ilha-baloes'];
+        const fromIsland = island && rng() < 0.4;
+        const from = fromIsland ? island.x0 + 10 + rng() * (ISLAND_W - 20)
+          : layout.audience.length ? layout.audience[Math.floor(rng() * layout.audience.length)].x + 6
+            : layout.L + rng() * layout.width;
+        fx.lanterns.push({ x: from, y: fromIsland ? island.surface - 18 : GROUND - 26, born: now, sway: rng() * 6,
+          speed: 0.009 + rng() * 0.005,
+          color: rng() < 0.5 ? '#ee2f3c' : rng() < 0.5 ? '#ff8a12' : '#ffd21e' });
+      }
+      for (let i = fx.lanterns.length - 1; i >= 0; i--) {
+        const b = fx.lanterns[i];
+        const age = now - b.born;
+        const y = Math.round(b.y - age * b.speed);
+        if (y < -12) { fx.lanterns.splice(i, 1); continue; }
+        const x = Math.round(b.x + Math.sin(age / 700 + b.sway) * 3);
+        const flicker = 0.75 + 0.25 * Math.sin(age / 90 + b.sway);
+        halo(x + 1, y + 3, 5, '#ffac2a', 0.35 * flicker);
+        g.fillStyle = INK;
+        g.fillRect(x - 1, y - 1, 5, 6);
+        g.fillStyle = b.color;
+        g.fillRect(x, y, 3, 4);
+        g.fillStyle = '#fff07a';
+        g.fillRect(x + 1, y + 1, 1, 2);
+        g.fillStyle = flicker > 0.85 ? '#fffff0' : '#ffac2a';
+        g.fillRect(x + 1, y + 4, 1, 1);
+      }
+    }
+
     function drawEffects(engine, now) {
       const tier = layout.tier;
-      if (tier >= 4 && now >= fx.nextFirework) { fx.nextFirework = now + 900 + rng() * 1800; spawnFirework(now); }
+      if (tier >= 4 && now >= fx.nextFirework) {
+        // Depois dos 100 convidados os fogos ficam cada vez mais seguidos (até o dobro).
+        const busy = Math.max(0.5, 1 - (engine.state.size - 100) / 200);
+        fx.nextFirework = now + (900 + rng() * 1800) * busy;
+        spawnFirework(now);
+      }
+      // A plateia puxa uma "ola" de tempos em tempos quando já tem bastante gente.
+      const crowdSize = layout.audience.length + layout.audience2.length + layout.audience3.length;
+      if (fx.wave && now - fx.wave.at > 1800) fx.wave = null;
+      if (crowdSize >= 16) {
+        if (!fx.nextWave) fx.nextWave = now + 5000;
+        else if (now >= fx.nextWave) {
+          fx.wave = { at: now, dir: rng() < 0.5 ? 1 : -1 };
+          fx.nextWave = now + Math.max(9000, 26000 - crowdSize * 90) * (0.7 + rng() * 0.6);
+        }
+      }
+      drawLanterns(engine, now);
       const r = engine.state.runtime;
       if (!r.dancing && now >= fx.nextSweat) {
         fx.nextSweat = now + 750;
@@ -1425,15 +1611,79 @@
       }
     }
 
+    // Pares novos (das duas filas da quadrilha) chegam andando da borda mais perto.
     function trackArrivals(now) {
-      const shown = layout.couples.length + layout.audience.length;
-      if (fx.guestsShown !== null && shown > fx.guestsShown) {
-        for (const couple of layout.couples.slice(-(shown - fx.guestsShown))) {
-          fx.arrivals.set(`${bundle.crowd.dancers.image}:${couple.index}`,
-            { at: now, from: couple.x < layout.host.x ? layout.L - 30 : layout.R + 10 });
+      for (const [key, sheet] of [['couples', bundle.crowd.dancers], ['backCouples', bundle.crowd.dancersBack]]) {
+        const list = layout[key];
+        const before = fx.shown[key];
+        if (before !== undefined && list.length > before) {
+          for (const couple of list.slice(before)) {
+            fx.arrivals.set(`${sheet.image}:${couple.index}`,
+              { at: now, from: couple.x < layout.host.x ? layout.L - 30 : layout.R + 10 });
+          }
         }
+        fx.shown[key] = list.length;
       }
-      fx.guestsShown = shown;
+    }
+
+    // Ilhas flutuantes no céu (festas enormes): cada uma balança no seu tempo, presa ao topo do mastro por uma corda
+    // com lanternas. Na da quadrilha, dois pares dançam em volta de uma fogueirinha; na dos balões, gente aplaude
+    // embaixo de um varal e os balões de São João sobem de lá.
+    function drawIslands(engine, now, poleTop) {
+      fx.islands = {};
+      layout.islands.forEach((id, i) => {
+        const land = islandTerrains[i];
+        if (!land) return;
+        const left = id === 'ilha-quadrilha';
+        const x0 = left ? layout.L + 2 : layout.R - 2 - ISLAND_W;
+        const surface = poleTop - 26 + Math.round(Math.sin(now / 1700 + i * 2.1) * 2);
+        fx.islands[id] = { x0, surface };
+        const [ax, ay] = left ? [x0 + 8, surface + 6] : [x0 + ISLAND_W - 8, surface + 6];
+        const [bx, by] = left ? [layout.L - 2, poleTop] : [layout.R + 2, poleTop];
+        for (let k = 0; k <= 24; k++) {
+          const t = k / 24;
+          const x = Math.round(ax + (bx - ax) * t);
+          const y = Math.round(ay + (by - ay) * t + Math.sin(t * Math.PI) * 5);
+          g.fillStyle = '#4a2418';
+          g.fillRect(x, y, 1, 1);
+          if (k % 6 === 3) {
+            const color = FLAGS[(k + i) % FLAGS.length];
+            halo(x, y + 2, 3, color, 0.35);
+            g.fillStyle = color;
+            g.fillRect(x, y + 1, 1, 2);
+          }
+        }
+        g.drawImage(land.image, x0 - 1, surface - land.top);
+        const baby = bundle.scenery.mandioquinha;
+        for (const [k, col] of [[0, 0.3], [1, 0.7]]) {
+          const cx = Math.round(x0 + ISLAND_W * col);
+          const under = surface + land.bottoms[Math.round((ISLAND_W - 1) * col)] + 1;
+          g.fillStyle = '#4a2418';
+          g.fillRect(cx, under, 1, 2);
+          const swing = Math.round(Math.sin(now / 900 + k + i) * 0.8);
+          sprite(baby, frameAt(baby, now, k + i), cx - Math.floor(baby.w / 2) + swing, under + 2);
+        }
+        if (left) {
+          const fire = bundle.fires['0'];
+          const fx0 = Math.round(x0 + ISLAND_W / 2 - fire.w / 2);
+          halo(fx0 + fire.w / 2, surface - 6, 14, FIRE_LIGHT, 0.22);
+          drawCrowd(engine, now, [{ x: x0 + 3, index: 900 }], bundle.crowd.dancers, surface, true);
+          sprite(fire, frameAt(fire, now), fx0, surface - fire.h + 1);
+          drawCrowd(engine, now, [{ x: x0 + ISLAND_W - 30, index: 901 }], bundle.crowd.dancers, surface, true);
+          if (rng() < 0.08) {
+            fx.particles.push({ x: fx0 + fire.w * (0.3 + rng() * 0.4), y: surface - fire.h + 3, vx: (rng() - 0.5) * 0.01,
+              vy: -0.012 - rng() * 0.01, born: now, ttl: 600 + rng() * 600, colors: SPARK, ember: true });
+          }
+        } else {
+          g.fillStyle = '#7c421e';
+          g.fillRect(x0 + 5, surface - 24, 1, 24);
+          g.fillRect(x0 + ISLAND_W - 6, surface - 24, 1, 24);
+          drawBunting(x0 + 5, x0 + ISLAND_W - 6, surface - 23, 5, i * 2, true, now);
+          const people = [8, 22, 36, 50, 64].map((dx, k) => ({ x: x0 + dx, index: 950 + k }));
+          drawCrowd(engine, now, people, bundle.crowd.audience, surface, false);
+        }
+        spots.set(id, { x: x0 + ISLAND_W / 2, y: surface - 10 });
+      });
     }
 
     // Tudo o que aparece num quadro, de trás para frente.
@@ -1442,14 +1692,19 @@
       const tier = layout.tier;
       const poleTop = GROUND - POLE_H[tier];
       drawSky(now, poleTop);
+      drawIslands(engine, now, poleTop);
       drawBack(now);
       drawBackdrop(now);
       drawStage(engine, now);
+      drawCrowd(engine, now, layout.audience3, bundle.crowd.audience3, GROUND - 19, false);
+      drawCrowd(engine, now, layout.audience2, bundle.crowd.audience2, GROUND - 14, false);
       drawCrowd(engine, now, layout.audience, bundle.crowd.audience, GROUND - 9, false);
       drawPole(layout.L - 3, poleTop);
       drawPole(layout.R + 1, poleTop);
-      for (let i = 0; i < STRINGS[tier]; i++) {
-        const lamps = tier >= 4 && i === 1;
+      // No Maior São João do Mundo, a cada 40 convidados a mais entra outro varal (até 5), com lâmpadas.
+      const strings = STRINGS[tier] + (tier >= 4 ? Math.min(2, Math.floor((s.size - 100) / 40)) : 0);
+      for (let i = 0; i < strings; i++) {
+        const lamps = tier >= 4 && (i === 1 || i >= 3);
         drawBunting(layout.L - 1, layout.R + 1, poleTop + 2 + i * 9, 8 + tier * 3 - i * 2, i * 3, lamps, now);
       }
       drawHanging(now, poleTop, tier);
@@ -1458,7 +1713,9 @@
       regions.push({ id: 'terreiro', x: layout.L, y: GROUND, w: layout.width, h: terrain.bottom - terrain.top });
       if (tier >= 2) drawDanceFloor(layout.danceLeft, layout.danceRight);
       drawSide(engine, layout.leftSide, now, 'lado-esquerda');
-      drawCrowd(engine, now, layout.couples, bundle.crowd.dancers, GROUND - 3 * (tier >= 2 ? 1 : 0), true);
+      const floor = GROUND - 3 * (tier >= 2 ? 1 : 0);
+      drawCrowd(engine, now, layout.backCouples, bundle.crowd.dancersBack, floor - 4, true);
+      drawCrowd(engine, now, layout.couples, bundle.crowd.dancers, floor, true);
       const dance = tier >= 2 ? -3 : 0;
       drawHost(engine, now, dance, eq);
       if (preview) write(tr('fx.preview'), layout.host.x + 12, GROUND + dance - 60, '#9fc8ff');
@@ -1475,6 +1732,7 @@
       drawCaller(engine, now);
       drawFire(engine, now);
       drawSide(engine, layout.rightSide, now, 'lado-direita');
+      drawKids(engine, now);
       drawCrasher(engine, now);
       drawRequest(engine, now);
       drawLights(engine, now);
@@ -1491,11 +1749,19 @@
       if (next.key !== layoutKey) {
         layout = next;
         layoutKey = next.key;
+        const extra = next.islands.length ? ISLAND_SKY : 0;
+        if (extra !== sky) {
+          sky = extra;
+          H = BASE_H + sky;
+          GROUND = BASE_GROUND + sky;
+          view.width = 0;
+        }
         const width = next.width + MARGIN * 2;
         if (width !== view.width) resize(width);
         else applyScale();
         const palette = bundle.terrains[eq.terreiro] || bundle.terrains['terra-batida'];
         terrain = buildTerrain(next.width, palette, (s.seed || 1) + next.width);
+        islandTerrains = next.islands.map((id, i) => buildTerrain(ISLAND_W, palette, (s.seed || 1) + 311 * (i + 1)));
         ridge = next.tier >= 1 && next.back.length ? buildRidge(next.width) : null;
         trackArrivals(now);
       }
@@ -1510,7 +1776,7 @@
       g.save();
       g.translate(0, view.float);
       // Um erro no meio do quadro não deixa o pincel torto (deslocamento, transparência, modo de mistura) para os
-      // próximos: o quadro quebrado não vai para a tela e o seguinte começa limpo.
+      // próximos: o quadro seguinte começa limpo e desenha tudo de novo.
       try {
         paint(engine, now, preview, eq);
       } finally {
@@ -1518,9 +1784,6 @@
         g.globalAlpha = 1;
         g.globalCompositeOperation = 'source-over';
       }
-      out.clearRect(0, 0, canvas.width, canvas.height);
-      out.imageSmoothingEnabled = false;
-      out.drawImage(buffer, 0, 0, canvas.width, canvas.height);
     }
 
     function locate(clientX, clientY) {
@@ -1584,14 +1847,22 @@
     function sizeInfo() {
       const dpr = root.devicePixelRatio || 1;
       const k = view.physical / dpr;
-      const tier = layout ? layout.tier : 0;
       return { width: view.width * k, height: H * k, ground: GROUND, logicalWidth: view.width,
-        top: (H - (GROUND - POLE_H[tier]) + 3) * k, physical: view.physical, base: Math.max(1, Math.round(3 * dpr)),
+        top: (H - contentTop() + 3) * k, physical: view.physical, base: Math.max(1, Math.round(3 * dpr)),
         capped: !!view.capped };
     }
 
-    // Quadros por segundo: 60 com o jogo em foco (alguém olhando e clicando), menos quando ele fica de fundo.
+    // Quadros por segundo: 60 com o jogo em foco (alguém olhando e clicando), menos quando ele fica de fundo. Festa
+    // enorme na tela (mais de 1,8 milhão de pixels da tela a cada quadro) vai a 30 com foco e 24 de fundo: apresentar
+    // tudo isso 60 vezes por segundo pesaria no computador.
     function setRate(fps) {
+      rate = fps;
+      updateRate();
+    }
+
+    function updateRate() {
+      const area = view.width * view.physical * H * view.physical;
+      const fps = area > 1.8e6 ? (rate >= 60 ? 30 : 24) : rate;
       minFrame = Math.max(0, 1000 / fps - 2);
     }
 

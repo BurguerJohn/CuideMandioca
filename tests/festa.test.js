@@ -33,7 +33,12 @@ test('o pacote de arte tem sprite e ícone para todo item, personagem e pedido',
   // Animações: cada pessoa da multidão tem os mesmos passos, barracas mexem o toldo e o balcão juntos.
   const crowd = bundle.crowd;
   assert.equal(crowd.dancers.frames, 2 * crowd.fabrics * crowd.steps);
-  assert.equal(crowd.audience.frames, crowd.dancers.frames);
+  assert.equal(crowd.ola, crowd.dancers.frames, 'a "ola" vem depois de todos os passos da plateia');
+  for (const sheet of [crowd.audience, crowd.audience2, crowd.audience3]) {
+    assert.equal(sheet.frames, crowd.dancers.frames + 2 * crowd.fabrics, 'um quadro de "ola" por pessoa');
+  }
+  assert.equal(crowd.dancersBack.frames, crowd.dancers.frames);
+  assert.equal(crowd.kids.frames, 2 * crowd.fabrics);
   for (const [id, side] of Object.entries(bundle.sides)) {
     if (side.front) assert.ok(side.frames > 1 && bundle.images[side.front], `${id} tem toldo e balcão animados`);
   }
@@ -45,7 +50,8 @@ test('o pacote de arte tem sprite e ícone para todo item, personagem e pedido',
   }
   assert.equal(bundle.props['pau-sebo'], undefined, 'o pau de sebo saiu do jogo');
   for (const mark of data.scenery.landmarks) {
-    if (mark.id !== 'estrelas') assert.ok(bundle.scenery[mark.id], `sprite do marco ${mark.id}`);
+    // Céu estrelado e ilhas do céu são desenhados na hora (sem folha própria).
+    if (!['estrelas', 'ilha-quadrilha', 'ilha-baloes'].includes(mark.id)) assert.ok(bundle.scenery[mark.id], `sprite do marco ${mark.id}`);
   }
   for (const id of ['pintinho', 'mandioquinha']) assert.ok(bundle.scenery[id], id);
 });

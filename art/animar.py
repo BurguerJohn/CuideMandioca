@@ -261,6 +261,12 @@ def aipim():
     return [place(blank(16, 17), sprite(grid, 'chita-rosa').crop((0, 0, 16, 16)), 0, 1 - dy) for grid, dy in plan]
 
 
+def crianca(fabric):
+    """Criança correndo: pernas abertas no chão, pernas juntas um pixel acima (o pulinho da corrida)."""
+    return [place(blank(10, 14), sprite(sprites.CRIANCA, fabric), 0, 1),
+            place(blank(10, 14), sprite(sprites.CRIANCA_PASSO, fabric), 0, 0)]
+
+
 def sopinha():
     """Sopinha: sentado (fungando e piscando), no ar do pulinho e deitado. A festa escolhe o quadro pela pose."""
     rows = sprites.SOPINHA

@@ -184,7 +184,14 @@ globalThis.GAME_DATA = {
       { size: 48, id: 'lua', name: 'Lua de São João' },
       { size: 56, id: 'catavento', name: 'Cata-vento' },
       { size: 66, id: 'balao', name: 'Balão de papel' },
-      { size: 78, id: 'estrelas', name: 'Céu estrelado' }
+      { size: 78, id: 'estrelas', name: 'Céu estrelado' },
+      // Festas bem grandes: o arraiá vira parque.
+      { size: 92, id: 'carrossel', name: 'Carrossel' },
+      { size: 108, id: 'balao-grande', name: 'Balão de ar quente' },
+      { size: 125, id: 'boi', name: 'Bumba-meu-boi' },
+      // O mapa cresce para cima: ilhas flutuando no céu, presas aos mastros.
+      { size: 150, id: 'ilha-quadrilha', name: 'Ilha flutuante da quadrilha' },
+      { size: 185, id: 'ilha-baloes', name: 'Ilha flutuante dos balões' }
     ],
     cycle: [
       { id: 'balaozinho', name: 'Balãozinho no varal', max: 40 },

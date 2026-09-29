@@ -268,6 +268,119 @@ def mandioquinha():
     return [outline(sprite('\n'.join(r))) for r in (rows, tip)]
 
 
+# --- Marcos das festas bem grandes (depois dos 78 convidados) ---------------------------------
+
+CAVALINHO = ['......XX', '.....XeX', 'XXXXXXX.', 'X{s}XX..', '.X..X...', 'X....X..']
+
+
+def carrossel():
+    """Carrossel: o toldo listrado gira e os cavalinhos sobem e descem em volta do mastro."""
+    frames = []
+    for step in range(8):
+        layer = Layer(40, 38)
+        layer.line(20, 0, 20, 4, 'd')
+        layer.grid(['RR', 'R.'], 21, 0)
+        for y in range(5, 14):
+            half = 3 + (y - 5) * 2
+            for x in range(20 - half, 20 + half + 1):
+                band = int(((x - 20) / (half + 1) + 1) * 4 + step / 2) % 2
+                layer.put(x, y, 'R' if band else 'X')
+        for x in range(1, 40):
+            layer.put(x, 14, 'A' if (x + step) % 4 == 0 else 'r')
+            if x % 3 != 1:
+                layer.put(x, 15, 'r')
+        for x in (3, 36):
+            layer.rect(x, 16, x, 33, 'l')
+        layer.rect(19, 13, 20, 33, 'S')
+        # Cavalinhos da frente: andam da esquerda para a direita (a volta do carrossel) e sobem e descem.
+        for k, saddle in enumerate('JHG'):
+            phase = (step / 8 + k / 3) % 1
+            x = 5 + round(phase * 26)
+            bob = round(2 * math.sin((phase * 3 + k) * math.pi))
+            layer.line(x + 4, 16, x + 4, 22 + bob, 'S')
+            layer.grid([row.replace('{s}', saddle * 3) for row in CAVALINHO], x, 22 + bob)
+        layer.rect(2, 33, 37, 34, 'D')
+        layer.rect(2, 33, 37, 33, 'l')
+        layer.rect(3, 35, 36, 35, 'd')
+        for x in range(4, 36, 4):
+            layer.put(x, 34, 'A' if (x // 4 + step) % 2 else 'F')
+        frames.append(far(layer.image))
+    return frames
+
+
+def balao_grande():
+    """Balão de ar quente amarrado: gomos coloridos, a cesta e a chama do maçarico piscando."""
+    widths = [8, 12, 16, 18, 20, 22, 22, 22, 22, 22, 20, 20, 18, 16, 14, 12, 10, 8]
+    colors = 'RAJGHK'
+    frames = []
+    for flame in range(2):
+        layer = Layer(24, 32)
+        for y, w in enumerate(widths):
+            left = 12 - w // 2
+            for x in range(left, left + w):
+                gomo = int((x - 12) / (w / 2 + 0.01) * 3 + 3)
+                char = colors[gomo % len(colors)]
+                if y in (6, 7):
+                    char = 'X'
+                layer.put(x, y, char)
+        for x0, x1 in ((8, 10), (15, 13)):
+            layer.line(x0, 18, x1, 23, 'd')
+        layer.grid(['.q.', 'qFq'] if flame else ['.F.', 'FzF'], 10, 18)
+        layer.rect(9, 24, 14, 27, 'D')
+        layer.rect(9, 24, 14, 24, 'l')
+        layer.rect(10, 26, 13, 26, 'd')
+        frames.append(outline(layer.image))
+    return frames
+
+
+def boi():
+    """Bumba-meu-boi: a saia de chita cheia de lantejoulas, chifres, fitas que balançam e o brincante por baixo."""
+    frames = []
+    sequins = 'RAJGHK'
+    for step in range(4):
+        layer = Layer(26, 22)
+        bob = (0, -1, 0, -1)[step]
+        nod = (0, 1, 0, -1)[step]
+        top = 6 + bob
+        # Corpo (a saia de veludo escuro): uma elipse larga, bordada de lantejoulas coloridas.
+        for y in range(top, top + 9):
+            t = (y - top) / 8
+            half = round(10 * math.sqrt(max(0.0, 1 - (2 * t - 1) ** 2 * 0.6)))
+            for x in range(11 - half, 12 + half):
+                char = 'i' if (x + y * 2) % 4 else sequins[(x * 7 + y * 3 + step) % len(sequins)]
+                if y == top + 4 and (x + step) % 2 == 0:
+                    char = 'A'
+                layer.put(x, y, char)
+        # Franja da barra: listra dourada que ondula com o passo.
+        for x in range(2, 21):
+            layer.put(x, top + 9 + ((x + step) % 2), 'A' if x % 2 else 'X')
+        # Rabo.
+        layer.line(0, top + 2, 1, top + 4 + (step % 2), 'd')
+        # Cabeça branca com estrela na testa, focinho escuro e chifres curvados para cima.
+        hx, hy = 19, top - 4 + nod
+        layer.rect(hx, hy + 1, hx + 4, hy + 5, 'X')
+        layer.rect(hx + 1, hy + 5, hx + 5, hy + 6, 'X')
+        layer.rect(hx + 4, hy + 5, hx + 5, hy + 6, 'L')
+        layer.put(hx + 3, hy + 3, 'e')
+        layer.put(hx + 2, hy + 1, 'A')
+        for side, x0 in ((-1, hx), (1, hx + 4)):
+            layer.put(x0 + side, hy, 'x')
+            layer.put(x0 + side * 2, hy - 1, 'x')
+            layer.put(x0 + side * 2, hy - 2, 'W')
+        # Fitas coloridas saindo do pescoço, balançando.
+        for k, color in enumerate('RJA'):
+            sway = (0, 1, 0, -1)[(step + k) % 4]
+            layer.line(hx - 1, hy + 3 + k, hx - 3 + sway, hy + 9 + k, color)
+        # Pernas do brincante (passo de dança: uma perna de cada vez).
+        base = top + 11
+        legs = ((6, 0), (15, 0)) if step % 2 == 0 else ((6, -1), (15, 0)) if step == 1 else ((6, 0), (15, -1))
+        for lx, lift in legs:
+            layer.rect(lx, base + lift, lx + 1, base + 3 + lift, 'u')
+            layer.rect(lx, base + 4 + lift, lx + 2, base + 4 + lift, 'k')
+        frames.append(outline(layer.image))
+    return frames
+
+
 def export(add):
     """Registra as folhas do cenário no manifesto, com o tipo de camada de cada peça."""
     sheets = {
@@ -276,5 +389,6 @@ def export(add):
         'igrejinha': (igrejinha(), 1), 'catavento': (catavento(), 6), 'galinha': (galinha(), 6),
         'pintinho': (pintinho(), 6), 'gato': (gato(), 1), 'bode': (bode(), 4), 'pipa': (pipa(), 4), 'lua': (lua(), 0),
         'balao': (balao(), 5), 'mandioquinha': (mandioquinha(), 2),
+        'carrossel': (carrossel(), 6), 'balao-grande': (balao_grande(), 3), 'boi': (boi(), 6),
     }
     return {name: add(f'cenario-{name}', frames, fps=fps) for name, (frames, fps) in sheets.items()}

@@ -57,9 +57,10 @@ def strip(frames):
 
 # Volume: luz quente na borda de cima/esquerda e sombra arroxeada na de baixo/direita, 1 pixel para dentro do
 # contorno (o contorno não muda). Vale para quem fica na frente da festa: gente, bichos, chapéus, itens e barracas.
-VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'penetra', 'lado-', 'caixote',
+VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'criancas', 'penetra', 'lado-', 'caixote',
           'cenario-galinha', 'cenario-pintinho', 'cenario-gato', 'cenario-bode', 'cenario-balao', 'cenario-mandioquinha',
-          'cenario-milharal', 'cenario-bananeira', 'cenario-coqueiro', 'cenario-mandacaru')
+          'cenario-milharal', 'cenario-bananeira', 'cenario-coqueiro', 'cenario-mandacaru', 'cenario-carrossel',
+          'cenario-balao-grande', 'cenario-boi')
 LUZ_QUENTE = (255, 236, 196)
 
 
@@ -418,15 +419,25 @@ def export_chars():
 
 
 def export_crowd():
-    """Quadrilha (passo com braços e pé levantado) e plateia (palmas e aceno), 4 quadros por pessoa."""
-    normal, faded = [], []
+    """Quadrilha (passo com braços e pé levantado) e plateia (palmas e aceno), 8 quadros por pessoa. Com a festa
+    cheia, a quadrilha ganha a fila de trás e a plateia mais duas fileiras, cada uma mais escura (mais longe)."""
+    normal, cheer, ola = [], [], []
     for grid in (sprites.CAVALHEIRO, sprites.DAMA):
         for fabric in CROWD_FABRICS:
             normal.extend(animar.person(grid, fabric, pose) for pose in animar.DANCE_STEPS)
-            faded.extend(tint(animar.person(grid, fabric, pose), BACK_TINT, 0.38) for pose in animar.CHEER_STEPS)
+            cheer.extend(animar.person(grid, fabric, pose) for pose in animar.CHEER_STEPS)
+            # A "ola" da plateia: os dois braços para o alto num pulinho (fica depois de todos os passos da folha).
+            ola.append(animar.person(grid, fabric, ('alto', 'alto', -2, None)))
+    cheer += ola
     manifest['crowd'] = {
-        'dancers': add('multidao', normal), 'audience': add('plateia', faded),
+        'dancers': add('multidao', normal),
+        'dancersBack': add('multidao-fundo', [tint(image, BACK_TINT, 0.2) for image in normal]),
+        'audience': add('plateia', [tint(image, BACK_TINT, 0.38) for image in cheer]),
+        'audience2': add('plateia-2', [tint(image, BACK_TINT, 0.5) for image in cheer]),
+        'audience3': add('plateia-3', [tint(image, BACK_TINT, 0.6) for image in cheer]),
+        'kids': add('criancas', [frame for fabric in CROWD_FABRICS for frame in animar.crianca(fabric)]),
         'fabrics': len(CROWD_FABRICS), 'steps': len(animar.DANCE_STEPS), 'pad': animar.CROWD_PAD,
+        'ola': len(cheer) - len(ola),
     }
     manifest['crowd']['dancers']['rim'] = luz('multidao')
     manifest['props']['penetra'] = add('penetra', animar.penetra(), fps=8)
