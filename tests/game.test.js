@@ -27,6 +27,22 @@ test('partida nova começa no Arraiá de Quintal com os itens iniciais', () => {
   assert.equal(engine.owned('espiga'), false);
 });
 
+test('o Sopinha aumenta o que a festa rende com o jogo fechado', () => {
+  const away = withBunny => {
+    const { engine, clock } = game();
+    growTo(engine, 10);
+    if (withBunny) engine.state.crew.sopinha = { level: 3 };
+    const saved = engine.exportState();
+    clock.now += 2 * 3600 * 1000;
+    return new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now }).welcome;
+  };
+  const plain = away(false);
+  const bunny = away(true);
+  assert.equal(plain.bunny, 0);
+  assert.ok(Math.abs(bunny.bunny - 0.3) < 1e-9, 'nível 3: +30%');
+  assert.ok(Math.abs(bunny.cheer / plain.cheer - 1.3) < 1e-9);
+});
+
 test('dança, cansa, descansa e recomeça', () => {
   const { engine } = game();
   for (let i = 0; i < 11; i++) engine.tick(0.1);

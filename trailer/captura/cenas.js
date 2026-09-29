@@ -128,6 +128,11 @@ module.exports = {
   'estagio-3': estagio('estagio-3'),
   'estagio-4': estagio('estagio-4'),
   'estagio-5': { ...estagio('estagio-5'), segundos: 6 },
+  // O Sopinha, coelho mascote que vem da pescaria, pulando pela Festa da Cidade.
+  // Em 2 s ganha carinho (binky); em 4 s a Mandioca cansa e ele costuma deitar junto.
+  sopinha: { ...estagio('estagio-3'), segundos: 10,
+    preparar: `const e = __jogo.engine(); e.state.crew.sopinha = { level: 1 };`,
+    acoes: [[2, `__jogo.ui.festa.poke('sopinha');`], [4, `__jogo.engine().state.runtime.stamina = 0;`]] },
 
   // Cada convidado traz uma peça: 14 convidados chegando, um a cada 0,9 s (passa pela Festa da Cidade).
   presentes: {

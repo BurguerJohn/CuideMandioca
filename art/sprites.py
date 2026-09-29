@@ -61,6 +61,11 @@ PALETTE = {
     'W': '#fff6f0',
     'N': '#1e3a8a',  # água funda
     'B': '#48a8ff',  # água
+    'E': '#c9a98e',  # pelo bege-acinzentado do Sopinha
+    'V': '#9a7e6c',  # sombra do bege
+    'M': '#8f807e',  # orelha cinza-taupe
+    'L': '#5f5050',  # dobra da orelha, focinho
+    'w': '#ddd3d6',  # sombra do pelo branco
 }
 
 # Ladrilhos de tecido: cada letra é uma cor da paleta.
@@ -313,6 +318,53 @@ CACHORRO = """
 .....0d0....0d0.....
 ....0dd0....0dd0....
 ....0000....0000....
+"""
+
+# Sopinha, o coelho mini lop (das fotos em sopinha/): branco com manta bege nas costas, orelhas caídas cinza,
+# anel bege no olho, faixa branca da testa ao nariz e a mancha escura no focinho. De perfil, virado para a direita.
+SOPINHA = """
+...............EEEEE....
+..............EEEEEEWW..
+......EEEE...EEMMEEEEWW.
+...EEEEEEEEEEVLMMME9eWW.
+.EEEEEEEEEEEVLMMMMEeeWWW
+WEEEEEEEEEVWWLMMMMWEEWVL
+WWEEEEEEEVWWWLMMMMWWWWVL
+WWWEEEEEVWWWWLMMMMWWWWW.
+.WWWEEWWWWWWWLMMMMWWWW..
+.wWWWWWWEWWWWWLMMMWWWw..
+..wWWWWWWWWWWWWLMWWWW...
+..wwWWWWWWWWWWWWWWWWWW..
+...wwwwwww.....wwwwww...
+"""
+
+# No ar: corpo esticado e inclinado, patas de trás estendidas e a orelha voando para cima.
+SOPINHA_PULO = """
+..........MMMM..EEEEE....
+.........MMMMMMEEEEEEWW..
+......EEELLLLLLEMMEEEEWW.
+...EEEEEEEEEEEEEVEEE9eWW.
+.EEEEEEEEEEEEEEVWWWEeeWWW
+WEEEEEEEEEEEEVWWWWWWEEWVL
+WWEEEEEEEEEVWWWWWWWWWWWVL
+WWWEEEEEEVWWWWWWWWWWWWWW.
+.WWWWEEWWWWWWWWWWWWWWWW..
+.WWwwwwwwwwwwww...WWWW...
+WWWWw...............WWWW.
+ww....................ww.
+"""
+
+# Deitado de lado, de olhos fechados e orelha esparramada no chão: o "flop" de coelho feliz.
+SOPINHA_DEITADO = """
+......EEEEEEE......EEEE...
+...EEEEEEEEEEEE..EEEEEEEW.
+.EEEEEEEEEEEEEEVEMMMEEEEWW
+WEEEEEEEEEEEEVWMMMMMELLEWW
+WWEEEEEEEEEVWWMMMMMMWEEWVL
+WWWEEEEEEVWWWMMMMMMWWWWWVL
+.WWWEEWWWWWWMMMMMMWWWWWWW.
+WWWwwWWWWWWWLMMMMLWWWWWw..
+wwww.wwwwwwwwLLLLwwwwww...
 """
 
 PACOCA = """

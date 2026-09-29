@@ -12,7 +12,7 @@ const IDS = ['#festa', '#festa-canvas', '#placa', '#avisos', '#painel', '#painel
   '#painel-titulo', '#janela', '#janela-corpo', '#importar', '#vitrine', '#argolas', '#argolas-canvas', '#argolas-info',
   '#tela', '#tela-corpo', '#tela-titulo'];
 
-function boot() {
+function boot(extra = {}, desktopExtra = {}) {
   const document = fakeDocument(IDS);
   const calls = [];
   let command = null;
@@ -28,7 +28,8 @@ function boot() {
     setFocusable: value => calls.push(['focusable', value]),
     focusGame: () => calls.push(['focus-game']),
     quit: () => calls.push(['quit']),
-    onCommand: callback => { command = callback; }
+    onCommand: callback => { command = callback; },
+    ...desktopExtra
   };
   const windowListeners = {};
   const sandbox = {
@@ -36,7 +37,7 @@ function boot() {
     addEventListener: (name, callback) => { windowListeners[name] = callback; },
     innerWidth: 1920, innerHeight: 1040, performance: { now: () => 1000 }, Intl, Date, Math, JSON, Promise,
     setInterval() {}, setTimeout() { return 1; }, clearTimeout() {}, localStorage: null, Blob: class {},
-    URL: { createObjectURL: () => 'blob:', revokeObjectURL() {} }, confirm: () => true
+    URL: { createObjectURL: () => 'blob:', revokeObjectURL() {} }, confirm: () => true, ...extra
   };
   sandbox.globalThis = sandbox;
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'src', 'app.js'), 'utf8'), sandbox);
@@ -119,4 +120,58 @@ test('no desktop a festa abre, mostra a placa e vaza o clique fora dela', async 
   assert.deepEqual(calls.slice(-2).map(c => c[0]), ['save', 'quit']);
   windowListeners.beforeunload();
   assert.equal(calls.at(-1)[0], 'save');
+});
+
+test('um quadro com erro não congela a festa, e o vigia do cursor desfaz o desencontro do clique', async () => {
+  const frames = [];
+  const logged = [];
+  let draws = 0;
+  const festa = {
+    draw() { draws++; if (draws === 1) throw new Error('quadro quebrado'); },
+    size: () => ({ width: 480, height: 612, top: 150, physical: 3, base: 3 }),
+    setScale() {}, setRate() {}, hit: () => 'host', onEvents() {}, celebrate() {}, poke() {}, photo: () => ''
+  };
+  const { calls, run } = boot({
+    requestAnimationFrame: fn => frames.push(fn), ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {},
+    console: { ...console, error() {} }
+  }, { logError: text => logged.push(text) });
+  await Promise.resolve();
+  frames.shift()(1000);
+  assert.equal(frames.length, 1, 'o próximo quadro é pedido mesmo com o erro');
+  assert.match(logged[0], /quadro quebrado/, 'o erro vai para o erros.log');
+  frames.shift()(1100);
+  assert.equal(draws, 2, 'a festa continua sendo desenhada');
+
+  // O Electron conta que a janela está pegando o clique, mas não há nada do jogo sob o cursor: a página corrige,
+  // mesmo achando que já tinha pedido para vazar.
+  calls.length = 0;
+  run({ cursor: { x: 5, y: 5, interactive: true } });
+  assert.deepEqual(calls.filter(call => call[0] === 'interactive'), [['interactive', false]]);
+  run({ cursor: { x: 6, y: 5, interactive: false } });
+  assert.deepEqual(calls.filter(call => call[0] === 'interactive'), [['interactive', false]], 'sem desencontro, nada muda');
+});
+
+test('segurar e arrastar uma parte clicável da festa muda a festa de lugar; clicar sem arrastar abre a parte', async () => {
+  const poked = [];
+  const festa = {
+    draw() {}, size: () => ({ width: 480, height: 612, top: 150, physical: 3, base: 3 }), setScale() {}, setRate() {},
+    hit: () => 'sopinha', onEvents() {}, celebrate() {}, poke: id => poked.push(id), photo: () => ''
+  };
+  const { document, calls } = boot({ ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, console });
+  await Promise.resolve();
+  const canvas = { closest: selector => (selector === '#festa-canvas' ? {} : null), matches: () => false };
+  document.elementFromPoint = () => canvas;
+  const saved = () => calls.filter(call => call[0] === 'settings' && 'x' in call[1]);
+
+  document.listeners.pointerdown({ clientX: 400, clientY: 600, target: canvas, preventDefault() {} });
+  document.listeners.pointermove({ clientX: 460, clientY: 580 });
+  document.listeners.pointerup({});
+  assert.equal(saved().length, 1, 'arrastar a partir do Sopinha move a festa');
+  assert.deepEqual(poked, [], 'e não conta como clique');
+
+  document.listeners.pointerdown({ clientX: 400, clientY: 600, target: canvas, preventDefault() {} });
+  document.listeners.pointermove({ clientX: 402, clientY: 601 });
+  document.listeners.pointerup({});
+  assert.deepEqual(poked, ['sopinha'], 'um clique (tremida de poucos pixels) faz carinho');
+  assert.equal(saved().length, 1);
 });

@@ -121,6 +121,8 @@
       }
     },
     // "Olha a cobra!": apito de escorregar, baixinho e raro.
+    // Carinho no Sopinha: um pulinho que sobe (boing) e um brilho no fim.
+    carinho: { gap: 250, play: v => { v.tom(0, 0.14, 320, { to: 900, type: 'sine', gain: 0.1 }); v.tom(0.13, 0.14, nota(31), { type: 'sine', gain: 0.06 }); } },
     cobra: { gap: 4000, play: v => v.tom(0, 0.2, 700, { to: 1500, type: 'sine', gain: 0.05 }) },
     foto: { play: v => { v.ruido(0, 0.02, { type: 'highpass', freq: 3000, gain: 0.2 }); v.ruido(0.06, 0.03, { type: 'highpass', freq: 2000, gain: 0.16 }); } }
   };

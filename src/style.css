@@ -37,6 +37,7 @@ body {
 }
 body.web { background: linear-gradient(180deg, #1c1a3a 0%, #34306a 45%, #7a4a8a 78%, #e28a6e 100%); }
 img.pix { image-rendering: pixelated; vertical-align: middle; flex: none; }
+img { -webkit-user-drag: none; }
 button, input, select, textarea { font-family: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--azul); outline-offset: 1px; }
 
@@ -260,6 +261,9 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
   transform-origin: bottom left;
 }
 .vitrine-topo { padding: 6px 8px 0; background: var(--vermelho); border-bottom: 3px solid var(--tinta); }
+/* A vitrine inteira é alça (desliza para os lados); botões e itens continuam com a mãozinha */
+.vitrine { cursor: ew-resize; }
+.vitrine button, .vitrine [data-action], .vitrine [data-preview], .vitrine [data-hold] { cursor: pointer; }
 .vabas { display: flex; align-items: flex-end; gap: 2px; flex-wrap: nowrap; height: 30px; }
 .vaba {
   flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px 5px; font-size: 15px; font-weight: 700;

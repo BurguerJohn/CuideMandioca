@@ -26,7 +26,7 @@
       'hud.close': 'Cerrar el juego', 'hud.closeAgain': 'Haz clic otra vez para cerrar',
 
       'shop.buyTicket': '+1 ficha', 'shop.close': 'Cerrar la vitrina', 'shop.hold': 'Mantén para comprar varios',
-      'shop.upgrade': 'Mejorar', 'shop.sideLeft': '◀ Izquierdo', 'shop.sideRight': 'Derecho ▶',
+      'shop.upgrade': 'Mejorar', 'shop.drag': 'Arrastra hacia los lados', 'shop.sideLeft': '◀ Izquierdo', 'shop.sideRight': 'Derecho ▶',
       'shop.inUse': 'En uso', 'shop.use': 'Usar', 'shop.place.esquerda': 'Poner a la izquierda', 'shop.place.direita': 'Poner a la derecha',
       'shop.onlyOutings': 'Solo en salidas', 'shop.onlyRings': 'Solo en los Aros',
       'shop.hintUpgrades': 'Mantén el botón para comprar varios niveles de una vez.',
@@ -62,6 +62,8 @@
       'party.perStep': 'Animación por paso', 'party.stepsPerSecond': 'Pasos por segundo', 'party.stamina': 'Aliento',
       'party.staminaValue': '{n} pasos', 'party.rest': 'Descanso', 'party.perSecond': 'Promedio por segundo',
       'party.multipliers': 'Multiplicadores',
+      'party.offline': 'Con el juego cerrado', 'party.offlineValue': '{v}% hasta {h} h',
+      'party.offlineHint': '¿Cerraste el juego? La fiesta sigue rindiendo el {v}% de su promedio por segundo hasta {h} horas. Después te espera hasta que vuelvas.',
       'party.tip': 'Consejo: abre la <b>vitrina</b> (la etiqueta del letrero) y mejora el <b>Meneo</b> y el <b>Ritmo</b>. ' +
         'La fiesta rinde más, y toda la Animación que junta se vuelve fama, que trae invitados.',
 
@@ -174,7 +176,7 @@
       'app.unlocksAt': 'Se desbloquea cuando la fiesta sea {tier}.', 'app.needTickets': 'Faltan fichas: {item} cuesta {n}.',
       'app.yours': '¡{item} es tuyo!', 'app.needCheer': 'Falta Animación.', 'app.levels': '¡+{n} niveles!',
       'app.browserClose': 'En el navegador, solo cierra la pestaña.',
-      'app.closeAgain': 'Haz clic en la X otra vez para cerrar. La fiesta rinde la mitad mientras está cerrada.',
+      'app.closeAgain': 'Haz clic en la X otra vez para cerrar. Cerrada, la fiesta sigue rindiendo un {v}% hasta {h} horas.',
       'app.debug': 'Prueba: {note}.', 'app.needTicket': 'Falta una ficha. Cambia Animación por fichas en la vitrina.',
       'app.ticket': '+1 ficha.', 'app.outingStart': '{name} salió de paseo.', 'app.outingFail': 'No se pudo enviar.',
       'app.recalled': 'Llamado de vuelta.', 'app.woodGot': '+{n} de leña.', 'app.woodAndItem': '¡+{n} de leña y {item}!',
@@ -191,7 +193,10 @@
       'app.importFailed': 'No se pudo importar: el archivo no es una partida válida de este juego.',
       'app.saveIgnored': 'Partida ignorada: el archivo estaba dañado o es de otra versión.',
       'app.welcomeBack': '¡La fiesta siguió sin ti!',
-      'app.welcomeBackText': 'En {time} fuera, la pandilla rindió <b>{n}</b> de Animación.', 'app.welcomeBackOk': 'A bailar',
+      'app.welcomeBackText': 'En {time} fuera, la pandilla rindió <b>{n}</b> de Animación.',
+      'app.welcomeBunny': 'Sopinha cuidó la fiesta: +{v}%.',
+      'app.welcomeRule': 'Con el juego cerrado, la fiesta rinde el {v}% de lo normal hasta {h} horas.',
+      'app.welcomeCapped': 'Estuviste fuera más de {h} horas: la fiesta rinde el {v}% de lo normal solo las primeras {h} y luego te espera.', 'app.welcomeBackOk': 'A bailar',
       'app.firstRun': '<p>Mandioca baila sola: cada paso rinde <b>Animación</b>. Cuando se cansa, descansa y vuelve con todo.' +
         '</p><p>El botón de la <b>tienda</b> en el letrero abre las mejoras, los sombreros, los puestos y más, con vista previa ' +
         'al instante. Toda la Animación que junta la fiesta se vuelve fama, y la fama trae invitados.</p><p class="miudo">' +
@@ -237,7 +242,8 @@
         par: { name: 'Pareja de la cuadrilla' }, sanfona: { name: 'Acordeón del escenario' },
         zabumba: { name: 'Zabumba del escenario' }, triangulo: { name: 'Triángulo del escenario' },
         marcador: { name: 'Cajón de la marcadora' }, foguista: { name: 'Junto a la hoguera' },
-        beijo: { name: 'Puesto de Besos' }, pescaria: { name: 'Puesto de Pesca' }, argolas: { name: 'Puesto de Aros' }
+        beijo: { name: 'Puesto de Besos' }, pescaria: { name: 'Puesto de Pesca' }, argolas: { name: 'Puesto de Aros' },
+        mascote: { name: 'Terreno de la fiesta' }
       },
       chars: {
         milho: { name: 'Maíz', role: 'Pareja de la cuadrilla', text: '+{v}% de Animación por paso' },
@@ -248,7 +254,8 @@
         aipim: { name: 'Aipim', role: 'Encargada del Puesto de Besos', text: 'Los pedidos pagan +{v}%' },
         cachorro: { name: 'Perrito Caliente', role: 'Pescador', text: 'Premios {v}% más rápidos' },
         pacoca: { name: 'Paçoca', role: 'Maestra de Aros', text: 'El precio de los Aros baja {v}% más rápido' },
-        faisca: { name: 'Chispa', role: 'Fogonera', text: 'La Llamarada dura +{v}%' }
+        faisca: { name: 'Chispa', role: 'Fogonera', text: 'La Llamarada dura +{v}%' },
+        sopinha: { name: 'Sopinha', role: 'Mascota de la fiesta', text: 'Con el juego cerrado, la fiesta rinde +{v}%' }
       },
       rarities: ['Común', 'Rara', 'Súper rara', 'Ultra rara'],
       categories: {

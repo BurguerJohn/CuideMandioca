@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('arraiaDesktop', Object.freeze({
   setInteractive: interactive => ipcRenderer.send('desktop:set-interactive', interactive),
   setFocusable: focusable => ipcRenderer.send('desktop:set-focusable', focusable),
   focusGame: () => ipcRenderer.send('desktop:focus-game'),
+  logError: text => ipcRenderer.send('desktop:log-error', String(text).slice(0, 4000)),
   quit: () => ipcRenderer.send('desktop:quit'),
   onCommand: callback => ipcRenderer.on('desktop:command', (_event, command) => callback(command))
 }));

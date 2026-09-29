@@ -129,8 +129,9 @@ def grass_details(layer, x0, x1, rng, ground_y):
             layer.put(x, ground_y - 1, rng.choice('HAX'))
 
 
-def bonfire(width=34, layers=5, flame=27, phase=None, sparks=True):
-    """Fogueira junina: torre de toras cruzadas; cresce com o porte do arraiá."""
+def bonfire(width=34, layers=5, flame=27, phase=None, sparks=True, legendary=False):
+    """Fogueira junina: torre de toras cruzadas; cresce com o porte do arraiá. A lendária tem uma faixa dourada a
+    mais entre o laranja e o amarelo, e o miolo branco só no coração da chama."""
     height = flame + layers * 5
     tower_top = height - layers * 5
     flame_bottom = tower_top + 7
@@ -138,10 +139,14 @@ def bonfire(width=34, layers=5, flame=27, phase=None, sparks=True):
     tongues = [(w * 0.5, 0, w * 0.22), (w * 0.32, flame * 0.33, w * 0.16), (w * 0.68, flame * 0.26, w * 0.16),
                (w * 0.2, flame * 0.62, w * 0.12), (w * 0.8, flame * 0.55, w * 0.12),
                (w * 0.44, flame * 0.14, w * 0.13)]
+    # Chama viva: cada língua sobe e desce, balança de lado e engorda; o fogo todo pende um pouco com o vento
+    # (mais nas pontas que na base).
+    lean = 0.0
     if phase is not None:
-        tongues = [(cx + 0.7 * math.sin(phase * 2 + i * 1.3),
-                    max(0.0, top + flame * 0.13 * math.sin(phase + i * 1.9)),
-                    spread * (1 + 0.1 * math.sin(phase * 1.5 + i))) for i, (cx, top, spread) in enumerate(tongues)]
+        lean = 1.3 * math.sin(phase)
+        tongues = [(cx + 1.0 * math.sin(phase * 2 + i * 1.3),
+                    max(0.0, top + flame * 0.2 * math.sin(phase * 2 + i * 1.9)),
+                    spread * (1 + 0.15 * math.sin(phase * 2 + i))) for i, (cx, top, spread) in enumerate(tongues)]
 
     def flame_char(x, y):
         best = None
@@ -152,12 +157,24 @@ def bonfire(width=34, layers=5, flame=27, phase=None, sparks=True):
             half = spread * max(t, 0.0) ** 0.6
             if half <= 0:
                 continue
-            d = abs(x + 0.5 - cx) / half
+            d = abs(x + 0.5 - (cx + lean * (1 - t))) / half
             if d <= 1 and (best is None or d < best[0]):
                 best = (d, t)
         if best is None:
             return None
         d, t = best
+        if legendary:
+            if t < 0.1:
+                return 'q' if d > 0.4 else 'f'
+            if d > 0.84:
+                return 'Q' if t < 0.3 else 'q'
+            if d > 0.66:
+                return 'q' if t < 0.2 else 'f'
+            if d > 0.45:
+                return 'f' if t < 0.25 else 'A'
+            if d > 0.22 or t < 0.4:
+                return 'A' if t < 0.3 else 'F'
+            return 'z'
         if t < 0.1:
             return 'Q' if d > 0.4 else 'q'
         if d > 0.84:
@@ -174,6 +191,18 @@ def bonfire(width=34, layers=5, flame=27, phase=None, sparks=True):
             char = flame_char(x, y)
             if char:
                 flames.put(x, y, char)
+    # Linguinhas soltas: das três pontas mais altas escapam pedaços de chama que sobem, encolhem e esfriam.
+    if phase is not None:
+        for i, (cx, top, _) in enumerate(sorted(tongues, key=lambda tongue: tongue[1])[:3]):
+            rise = (phase / (2 * math.pi) * 2 + i * 0.37) % 1
+            wx = round(cx + lean + 1.4 * math.sin(phase * 3 + i * 2.2))
+            wy = round(top - 2 - rise * flame * 0.32)
+            color = 'F' if rise < 0.3 else 'f' if rise < 0.6 else 'q'
+            if wy >= 0:
+                flames.put(wx, wy, color)
+                if rise < 0.5:
+                    flames.put(wx, wy + 1, 'q' if color == 'F' else 'Q')
+                    flames.put(wx + (1 if i % 2 else -1), wy + 1, color)
     logs = Layer(width, height)
     for index in range(layers):
         y1 = height - 1 - index * 5
@@ -184,7 +213,8 @@ def bonfire(width=34, layers=5, flame=27, phase=None, sparks=True):
         if index % 2 == 0:
             for x in range(x0 + 1, x1):
                 logs.put(x, y0, '0')
-                logs.put(x, y0 + 1, 'l')
+                # As toras de cima, encostadas na chama, pegam o brilho do fogo no topo.
+                logs.put(x, y0 + 1, 'O' if index >= layers - 2 else 'l')
                 logs.put(x, y0 + 2, 'd' if (x * 7 + index) % 6 == 0 else 'D')
                 logs.put(x, y0 + 3, 'd')
                 logs.put(x, y1, '0')

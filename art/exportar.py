@@ -18,7 +18,7 @@ from pathlib import Path
 from PIL import Image
 
 import sprites
-from render import hex_rgb, outline, sprite, tint
+from render import hex_rgb, outline, shade, sprite, tint
 import animar
 import cenario
 from scene import (BACK_TINT, HEART, Layer, awning, bonfire, booth_back, booth_counter, crate, flag_mast,
@@ -55,10 +55,71 @@ def strip(frames):
     return sheet, width, height
 
 
+# Volume: luz quente na borda de cima/esquerda e sombra arroxeada na de baixo/direita, 1 pixel para dentro do
+# contorno (o contorno não muda). Vale para quem fica na frente da festa: gente, bichos, chapéus, itens e barracas.
+VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'penetra', 'lado-', 'caixote',
+          'cenario-galinha', 'cenario-pintinho', 'cenario-gato', 'cenario-bode', 'cenario-balao', 'cenario-mandioquinha',
+          'cenario-milharal', 'cenario-bananeira', 'cenario-coqueiro', 'cenario-mandacaru')
+LUZ_QUENTE = (255, 236, 196)
+
+
+def volume(image, light=0.16, dark=0.30):
+    out = image.copy()
+    src, px = image.load(), out.load()
+    w, h = image.size
+
+    def empty(x, y):
+        return x < 0 or y < 0 or x >= w or y >= h or src[x, y][3] < 128 or sum(src[x, y][:3]) < 90
+
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = src[x, y]
+            if a < 128 or r + g + b < 90:
+                continue
+            lit = empty(x, y - 1) or empty(x - 1, y)
+            shaded = empty(x, y + 1) or empty(x + 1, y)
+            if shaded and not lit:
+                px[x, y] = shade((r, g, b), -dark) + (a,)
+            elif lit and not shaded:
+                px[x, y] = tuple(round(c + (l - c) * light) for c, l in zip((r, g, b), LUZ_QUENTE)) + (a,)
+    return out
+
+
 def add(name, frames, **meta):
     sheet, width, height = strip(frames if isinstance(frames, list) else [frames])
+    if name.startswith(VOLUME):
+        sheet = volume(sheet)
     images[name] = sheet
     return {'image': name, 'w': width, 'h': height, 'frames': sheet.width // width, **meta}
+
+
+# Luz de contorno: a borda de cada quadro do lado de uma fonte de luz (a fogueira). O jogo desenha por cima do
+# personagem, com a força e o tremor da chama; cada folha tem a versão da direita e a da esquerda.
+RIM = (255, 214, 138)
+
+
+def luz(name):
+    sheet = images[name]
+    px = sheet.load()
+    out = {}
+    for side, dx in (('right', 1), ('left', -1)):
+        rim = Image.new('RGBA', sheet.size, (0, 0, 0, 0))
+        rp = rim.load()
+        for y in range(sheet.height):
+            for x in range(sheet.width):
+                if px[x, y][3] < 128:
+                    continue
+                nx = x + dx
+                outside = nx < 0 or nx >= sheet.width or px[nx, y][3] < 128
+                if outside:
+                    # O contorno só esquenta um pouco (continua lendo como contorno); quem acende é o pixel de dentro.
+                    rp[x, y] = RIM + (90,)
+                    ix = x - dx
+                    if 0 <= ix < sheet.width and px[ix, y][3] >= 128:
+                        rp[ix, y] = RIM + (255,)
+        images[f'{name}-luz-{side}'] = rim
+        out[side] = f'{name}-luz-{side}'
+    return out
 
 
 def fill(text, fabric='xadrez-vermelho'):
@@ -128,21 +189,41 @@ def face(eyes, mouth):
 
 def arm(layer, shoulder, elbow, hand, ox, oy):
     for (x0, y0), (x1, y1) in zip([shoulder, elbow], [elbow, hand]):
-        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
+        steps = max(int(math.ceil(max(abs(x1 - x0), abs(y1 - y0)))), 1)
         for step in range(steps + 1):
             t = step / steps
             layer.put(ox + x0 + (x1 - x0) * t, oy + y0 + (y1 - y0) * t, '3')
     layer.grid(['54', '43'], ox + hand[0], oy + hand[1])
 
 
+def lifts(lifted):
+    """Quanto cada pé sobe: 'ambas' (nenhum), 'esquerda'/'direita' (2 px) ou um dicionário já interpolado."""
+    if isinstance(lifted, dict):
+        return lifted
+    return {side: 2 if lifted == side else 0 for side in ('esquerda', 'direita')}
+
+
 def legs(layer, bob, sway, lifted):
     top = PAD + 8 + 28 + bob
+    up = lifts(lifted)
     for side, x, colors in (('esquerda', PAD + 9 + sway, '43'), ('direita', PAD + 13 + sway, '32')):
-        foot = FRAME_H - 2 - (2 if lifted == side else 0)
+        foot = FRAME_H - 2 - up[side]
         for y in range(top, foot):
             layer.put(x, y, colors[0])
             layer.put(x + 1, y, colors[1])
         layer.grid(['ddD'] if side == 'esquerda' else ['Ddd'], x - 1 if side == 'esquerda' else x, foot)
+
+
+def meio(a, b):
+    """Meio do caminho entre duas poses inteiras, arredondando para cima (0,5 → 1, -0,5 → 0)."""
+    return math.floor((a + b) / 2 + 0.5)
+
+
+def mistura(table, a, b):
+    """Braço no meio do caminho entre duas poses (cotovelo e mão), para o quadro intermediário."""
+    pa = table[a] if isinstance(a, str) else a
+    pb = table[b] if isinstance(b, str) else b
+    return tuple(((p[0] + q[0]) / 2, (p[1] + q[1]) / 2) for p, q in zip(pa, pb))
 
 
 def mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, eyes='abertos', hop=0):
@@ -153,37 +234,67 @@ def mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, eyes='abertos'
     frame.alpha_composite(sprite(face(eyes, mouth), fabric), (PAD + sway, PAD + 8 + bob))
     arms = Layer(FRAME_W, FRAME_H)
     ox, oy = PAD + sway, PAD + bob
-    arm(arms, (4, 22), *LEFT_ARM[left], ox, oy)
-    arm(arms, (19, 22), *RIGHT_ARM[right], ox, oy)
+    left_points = LEFT_ARM[left] if isinstance(left, str) else left
+    right_points = RIGHT_ARM[right] if isinstance(right, str) else right
+    arm(arms, (4, 22), *left_points, ox, oy)
+    arm(arms, (19, 22), *right_points, ox, oy)
     frame.alpha_composite(outline(arms.image).crop((1, 1, FRAME_W + 1, FRAME_H + 1)))
     anchors = {'head': [ox, oy - hop], 'eyes': [ox + 8, oy + 12 - hop],
-               'hand': [ox + LEFT_ARM[left][1][0], oy + LEFT_ARM[left][1][1] - hop]}
+               'hand': [round(ox + left_points[1][0]), round(oy + left_points[1][1] - hop)]}
     if hop:
         frame = shifted(frame, -hop)
     return frame, anchors
 
 
+def dance_poses():
+    """As 8 poses do passo de forró viram 16 quadros: cada pose e um quadro no meio do caminho até a próxima."""
+    poses = []
+    for index, (bob, sway, left, right, lifted, mouth) in enumerate(DANCE):
+        nb, ns, nl, nr, nlift, _ = DANCE[(index + 1) % len(DANCE)]
+        poses.append((bob, sway, left, right, lifted, mouth, 0))
+        a, b = lifts(lifted), lifts(nlift)
+        half = {side: (a[side] + b[side]) // 2 for side in a}
+        poses.append((meio(bob, nb), meio(sway, ns), mistura(LEFT_ARM, left, nl), mistura(RIGHT_ARM, right, nr), half,
+                      mouth, 0))
+    return poses
+
+
+def cheer_poses():
+    """Comemoração com 8 quadros: pulo, braços subindo e descendo, com os quadros do meio."""
+    poses = []
+    for index, (bob, hop, left, right, mouth) in enumerate(CHEER):
+        nb, nh, nl, nr, _ = CHEER[(index + 1) % len(CHEER)]
+        poses.append((bob, 0, left, right, 'ambas', mouth, hop))
+        poses.append((meio(bob, nb), 0, mistura(LEFT_ARM, left, nl), mistura(RIGHT_ARM, right, nr), 'ambas', mouth,
+                      meio(hop, nh)))
+    return poses
+
+
 def export_mandioca():
     anchors = None
+    dance, cheer = dance_poses(), cheer_poses()
     for fabric in FABRICS:
         frames, marks = [], []
-        for bob, sway, left, right, lifted, mouth in DANCE:
-            frame, anchor = mandioca_frame(fabric, bob, sway, left, right, lifted, mouth)
+        for bob, sway, left, right, lifted, mouth, hop in dance:
+            frame, anchor = mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, hop=hop)
             frames.append(frame)
             marks.append(anchor)
         for bob, mouth in REST:
             frame, anchor = mandioca_frame(fabric, bob, 0, 'joelho', 'joelho', 'ambas', mouth, 'cansados')
             frames.append(frame)
             marks.append(anchor)
-        for bob, hop, left, right, mouth in CHEER:
-            frame, anchor = mandioca_frame(fabric, bob, 0, left, right, 'ambas', mouth, hop=hop)
+        for bob, sway, left, right, lifted, mouth, hop in cheer:
+            frame, anchor = mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, hop=hop)
             frames.append(frame)
             marks.append(anchor)
         manifest['mandioca'][fabric] = add(f'mandioca-{fabric}', frames)
+        manifest['mandioca'][fabric]['rim'] = luz(f'mandioca-{fabric}')
         anchors = marks
+    d, r = len(dance), len(REST)
     manifest['mandioca']['meta'] = {
         'w': FRAME_W, 'h': FRAME_H, 'pad': PAD, 'anchors': anchors,
-        'tags': {'danca': list(range(8)), 'descanso': list(range(8, 12)), 'comemora': list(range(12, 16))},
+        'tags': {'danca': list(range(d)), 'descanso': list(range(d, d + r)),
+                 'comemora': list(range(d + r, d + r + len(cheer)))},
     }
     blink = sprite('\n'.join(EYES['fechados']))
     manifest['mandioca']['blink'] = add('piscar', blink)
@@ -277,6 +388,7 @@ def export_hand():
 def export_chars():
     milho = sprite(sprites.MILHO)
     manifest['chars']['milho'] = add('turma-milho', [shifted(milho, dy, 22) for dy in (0, -1, -2, -1)], fps=6)
+    manifest['chars']['milho']['rim'] = luz('turma-milho')
     manifest['chars']['cenoura'] = add('turma-cenoura', animar.cenoura(), fps=8)
     manifest['chars']['inhame'] = add('turma-inhame', animar.inhame(), fps=6)
     manifest['chars']['batata'] = add('turma-batata', animar.batata(), fps=6)
@@ -284,15 +396,19 @@ def export_chars():
     manifest['chars']['faisca'] = add('turma-faisca', animar.faisca(), fps=9)
     # Quem trabalha atrás de balcão tem `top`: quantos pixels do quadro ficam acima da linha do balcão.
     manifest['chars']['pacoca'] = add('turma-pacoca', animar.pacoca(), fps=8, top=11)
-    manifest['chars']['aipim'] = add('turma-aipim', animar.aipim(), fps=3, top=1)
-    manifest['chars']['cachorro'] = add('turma-cachorro', animar.cachorro(), fps=2)
+    manifest['chars']['aipim'] = add('turma-aipim', animar.aipim(), fps=4, top=1)
+    manifest['chars']['cachorro'] = add('turma-cachorro', animar.cachorro(), fps=3)
+    # O Sopinha não roda em laço: a festa escolhe a pose (sentado, fungando, piscando, orelha, no ar, deitado).
+    manifest['chars']['sopinha'] = add('turma-sopinha', animar.sopinha(), fps=1,
+                                       poses={'senta': 0, 'funga': 1, 'pisca': 2, 'orelha': 3, 'pulo': 4, 'deita': 5})
+    manifest['chars']['sopinha']['rim'] = luz('turma-sopinha')
     manifest['chars']['balcao-cavalheiro'] = add('turma-balcao-cavalheiro',
-                                                 animar.keeper(sprites.CAVALHEIRO, 'xadrez-azul', [(4, 5), (7, 5)]), fps=2)
-    manifest['chars']['balcao-dama'] = add('turma-balcao-dama', animar.keeper(sprites.DAMA, 'chita', [(4, 5), (7, 5)]), fps=2)
+                                                 animar.keeper(sprites.CAVALHEIRO, 'xadrez-azul', [(4, 5), (7, 5)]), fps=3)
+    manifest['chars']['balcao-dama'] = add('turma-balcao-dama', animar.keeper(sprites.DAMA, 'chita', [(4, 5), (7, 5)]), fps=3)
 
     full = {'aipim': sprite(sprites.AIPIM, 'chita-rosa'), 'cachorro': sprite(sprites.CACHORRO),
             'pacoca': sprite(sprites.PACOCA)}
-    for char_id in ('milho', 'cenoura', 'inhame', 'batata', 'pamonha', 'faisca', 'pacoca', 'aipim', 'cachorro'):
+    for char_id in ('milho', 'cenoura', 'inhame', 'batata', 'pamonha', 'faisca', 'pacoca', 'aipim', 'cachorro', 'sopinha'):
         if char_id in full:
             icons[f'char:{char_id}'] = full[char_id]
         else:
@@ -312,6 +428,7 @@ def export_crowd():
         'dancers': add('multidao', normal), 'audience': add('plateia', faded),
         'fabrics': len(CROWD_FABRICS), 'steps': len(animar.DANCE_STEPS), 'pad': animar.CROWD_PAD,
     }
+    manifest['crowd']['dancers']['rim'] = luz('multidao')
     manifest['props']['penetra'] = add('penetra', animar.penetra(), fps=8)
 
 
@@ -549,16 +666,15 @@ def fence():
 def export_props():
     stage_image, floor = stage()
     manifest['props']['palco'] = add('palco', tint(stage_image, BACK_TINT, 0.12), floor=floor, slots=[2, 44, 82])
-    manifest['props']['roda'] = add('roda', [wheel(38, i * 45 / 8) for i in range(8)], fps=3)
+    manifest['props']['roda'] = add('roda', [wheel(38, i * 45 / 16) for i in range(16)], fps=6)
     manifest['props']['arco'] = add('arco', arch())
     manifest['props']['cerca'] = add('cerca', fence())
     manifest['props']['caixote'] = add('caixote', crate())
     for index, (w, layers, flame) in enumerate(((18, 2, 13), (24, 3, 17), (30, 4, 22), (38, 5, 30), (46, 6, 38))):
-        frames = [bonfire(w, layers, flame, phase=k * math.pi / 3, sparks=False) for k in range(6)]
-        manifest['fires'][str(index)] = add(f'fogueira-{index}', frames, fps=9)
-    legendary = [recolor(bonfire(46, 6, 38, phase=k * math.pi / 3, sparks=False),
-                         {'Q': 'a', 'q': 'A', 'f': 'F', 'F': 'z'}) for k in range(6)]
-    manifest['fires']['lendaria'] = add('fogueira-lendaria', legendary, fps=10)
+        frames = [bonfire(w, layers, flame, phase=k * math.pi / 6, sparks=False) for k in range(12)]
+        manifest['fires'][str(index)] = add(f'fogueira-{index}', frames, fps=15)
+    legendary = [bonfire(46, 6, 38, phase=k * math.pi / 6, sparks=False, legendary=True) for k in range(12)]
+    manifest['fires']['lendaria'] = add('fogueira-lendaria', legendary, fps=16)
     for kind, text in sprites.REQUEST_ICONS.items():
         manifest['requests'][kind] = add(f'pedido-{kind}', fill(text))
 

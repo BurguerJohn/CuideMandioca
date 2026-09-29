@@ -26,7 +26,7 @@
       'hud.close': 'Close the game', 'hud.closeAgain': 'Click again to close',
 
       'shop.buyTicket': '+1 ticket', 'shop.close': 'Close the shop', 'shop.hold': 'Hold to buy several',
-      'shop.upgrade': 'Upgrade', 'shop.sideLeft': '◀ Left', 'shop.sideRight': 'Right ▶',
+      'shop.upgrade': 'Upgrade', 'shop.drag': 'Drag sideways', 'shop.sideLeft': '◀ Left', 'shop.sideRight': 'Right ▶',
       'shop.inUse': 'In use', 'shop.use': 'Use', 'shop.place.esquerda': 'Place left', 'shop.place.direita': 'Place right',
       'shop.onlyOutings': 'Outings only', 'shop.onlyRings': 'Lucky Rings only',
       'shop.hintUpgrades': 'Hold the button to buy several levels at once.',
@@ -62,6 +62,8 @@
       'party.perStep': 'Cheer per step', 'party.stepsPerSecond': 'Steps per second', 'party.stamina': 'Stamina',
       'party.staminaValue': '{n} steps', 'party.rest': 'Rest', 'party.perSecond': 'Average per second',
       'party.multipliers': 'Multipliers',
+      'party.offline': 'While the game is closed', 'party.offlineValue': '{v}% for up to {h} h',
+      'party.offlineHint': 'Closed the game? The party keeps earning {v}% of its average per second for up to {h} hours. After that it waits for you to come back.',
       'party.tip': 'Tip: open the <b>shop</b> (the tag on the sign) and upgrade <b>Wiggle</b> and <b>Rhythm</b>. ' +
         'The party earns more, and all the Cheer it gathers turns into fame, which brings guests.',
 
@@ -174,7 +176,7 @@
       'app.unlocksAt': 'Unlocks when the party becomes {tier}.', 'app.needTickets': 'Not enough tickets: {item} costs {n}.',
       'app.yours': '{item} is yours!', 'app.needCheer': 'Not enough Cheer.', 'app.levels': '+{n} levels!',
       'app.browserClose': 'In the browser, just close the tab.',
-      'app.closeAgain': 'Click the X again to close. The party earns half while it’s closed.',
+      'app.closeAgain': 'Click the X again to close. While closed, the party keeps earning {v}% for up to {h} hours.',
       'app.debug': 'Test: {note}.', 'app.needTicket': 'Not enough tickets. Trade Cheer for tickets in the shop.',
       'app.ticket': '+1 ticket.', 'app.outingStart': '{name} went on an outing.', 'app.outingFail': 'Couldn’t send them.',
       'app.recalled': 'Called back.', 'app.woodGot': '+{n} firewood.', 'app.woodAndItem': '+{n} firewood and {item}!',
@@ -191,7 +193,10 @@
       'app.importFailed': 'Couldn’t import: the file isn’t a valid save for this game.',
       'app.saveIgnored': 'Save ignored: the file was corrupted or from another version.',
       'app.welcomeBack': 'The party went on without you!',
-      'app.welcomeBackText': 'In {time} away, the crew earned <b>{n}</b> Cheer.', 'app.welcomeBackOk': 'Let’s dance',
+      'app.welcomeBackText': 'In {time} away, the crew earned <b>{n}</b> Cheer.',
+      'app.welcomeBunny': 'Sopinha looked after the party: +{v}%.',
+      'app.welcomeRule': 'While the game is closed, the party earns {v}% of the usual for up to {h} hours.',
+      'app.welcomeCapped': 'You were away for more than {h} hours: the party earns {v}% of the usual only for the first {h}, then waits for you.', 'app.welcomeBackOk': 'Let’s dance',
       'app.firstRun': '<p>Mandioca dances on her own: every step earns <b>Cheer</b>. When she gets tired, she rests and ' +
         'comes back full of energy.</p><p>The <b>shop</b> button on the sign opens upgrades, hats, booths and more, with an ' +
         'instant preview. All the Cheer the party gathers turns into fame, and fame brings guests.</p><p class="miudo">Drag ' +
@@ -236,7 +241,8 @@
       posts: {
         par: { name: 'Square-dance partner' }, sanfona: { name: 'Stage accordion' }, zabumba: { name: 'Stage zabumba drum' },
         triangulo: { name: 'Stage triangle' }, marcador: { name: 'Caller’s crate' }, foguista: { name: 'By the bonfire' },
-        beijo: { name: 'Kissing Booth' }, pescaria: { name: 'Fishing Booth' }, argolas: { name: 'Ring Toss Booth' }
+        beijo: { name: 'Kissing Booth' }, pescaria: { name: 'Fishing Booth' }, argolas: { name: 'Ring Toss Booth' },
+        mascote: { name: 'Party grounds' }
       },
       chars: {
         milho: { name: 'Corn', role: 'Square-dance partner', text: '+{v}% Cheer per step' },
@@ -247,7 +253,8 @@
         aipim: { name: 'Aipim', role: 'Kissing Booth attendant', text: 'Requests pay +{v}%' },
         cachorro: { name: 'Hot Dog', role: 'Fisher', text: 'Prizes {v}% faster' },
         pacoca: { name: 'Paçoca', role: 'Ring Master', text: 'Lucky Rings price drops {v}% faster' },
-        faisca: { name: 'Spark', role: 'Fire Keeper', text: 'Flare lasts +{v}%' }
+        faisca: { name: 'Spark', role: 'Fire Keeper', text: 'Flare lasts +{v}%' },
+        sopinha: { name: 'Sopinha', role: 'Party mascot', text: 'While the game is closed, the party earns +{v}%' }
       },
       rarities: ['Common', 'Rare', 'Super Rare', 'Ultra Rare'],
       categories: {

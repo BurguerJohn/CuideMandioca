@@ -27,7 +27,7 @@
       'hud.close': 'Fechar o jogo', 'hud.closeAgain': 'Clique de novo para fechar',
 
       'shop.buyTicket': '+1 ficha', 'shop.close': 'Fechar a vitrine', 'shop.hold': 'Segure para comprar vários',
-      'shop.upgrade': 'Melhorar', 'shop.sideLeft': '◀ Esquerdo', 'shop.sideRight': 'Direito ▶',
+      'shop.upgrade': 'Melhorar', 'shop.drag': 'Arraste para os lados', 'shop.sideLeft': '◀ Esquerdo', 'shop.sideRight': 'Direito ▶',
       'shop.inUse': 'Em uso', 'shop.use': 'Usar', 'shop.place.esquerda': 'Pôr à esquerda', 'shop.place.direita': 'Pôr à direita',
       'shop.onlyOutings': 'Só em rolês', 'shop.onlyRings': 'Só nas Argolas',
       'shop.hintUpgrades': 'Segure o botão para comprar vários níveis de uma vez.',
@@ -63,6 +63,8 @@
       'party.perStep': 'Animação por passo', 'party.stepsPerSecond': 'Passos por segundo', 'party.stamina': 'Fôlego',
       'party.staminaValue': '{n} passos', 'party.rest': 'Descanso', 'party.perSecond': 'Média por segundo',
       'party.multipliers': 'Multiplicadores',
+      'party.offline': 'Com o jogo fechado', 'party.offlineValue': '{v}% por até {h} h',
+      'party.offlineHint': 'Fechou o jogo? A festa continua rendendo {v}% da média por segundo por até {h} horas. Depois ela espera você voltar.',
       'party.tip': 'Dica: abra a <b>vitrine</b> (a etiqueta na placa) e melhore o <b>Rebolado</b> e o <b>Ritmo</b>. ' +
         'A festa rende mais, e toda Animação que ela junta vira fama, que traz convidados.',
 
@@ -174,7 +176,7 @@
       'app.unlocksAt': 'Libera quando a festa virar {tier}.', 'app.needTickets': 'Faltam fichas: {item} custa {n}.',
       'app.yours': '{item} é seu!', 'app.needCheer': 'Falta Animação.', 'app.levels': '+{n} níveis!',
       'app.browserClose': 'No navegador, é só fechar a aba.',
-      'app.closeAgain': 'Clique no X de novo para fechar. A festa rende metade enquanto estiver fechada.',
+      'app.closeAgain': 'Clique no X de novo para fechar. Fechada, a festa segue rendendo {v}% por até {h} horas.',
       'app.debug': 'Teste: {note}.', 'app.needTicket': 'Falta ficha. Troque Animação por fichas na vitrine.',
       'app.ticket': '+1 ficha.', 'app.outingStart': '{name} saiu para o rolê.', 'app.outingFail': 'Não deu para enviar.',
       'app.recalled': 'Chamou de volta.', 'app.woodGot': '+{n} lenha.', 'app.woodAndItem': '+{n} lenha e {item}!',
@@ -191,7 +193,10 @@
       'app.importFailed': 'Não deu para importar: o arquivo não é um save válido deste jogo.',
       'app.saveIgnored': 'Save ignorado: o arquivo estava corrompido ou é de outra versão.',
       'app.welcomeBack': 'A festa continuou sem você!',
-      'app.welcomeBackText': 'Em {time} fora, a turma rendeu <b>{n}</b> de Animação.', 'app.welcomeBackOk': 'Bora dançar',
+      'app.welcomeBackText': 'Em {time} fora, a turma rendeu <b>{n}</b> de Animação.',
+      'app.welcomeBunny': 'O Sopinha tomou conta da festa: +{v}%.',
+      'app.welcomeRule': 'Com o jogo fechado, a festa rende {v}% do normal por até {h} horas.',
+      'app.welcomeCapped': 'Você ficou fora mais de {h} horas: a festa rende {v}% do normal só nas primeiras {h} e depois espera você voltar.', 'app.welcomeBackOk': 'Bora dançar',
       'app.firstRun': '<p>A Mandioca dança sozinha: cada passo rende <b>Animação</b>. Quando cansa, ela descansa e volta ' +
         'com tudo.</p><p>O botão da <b>loja</b> na placa abre as melhorias, os chapéus, barracas e mais, com prévia na hora. ' +
         'Toda Animação que a festa junta vira fama, e fama traz convidados.</p><p class="miudo">Arraste o terreiro para ' +

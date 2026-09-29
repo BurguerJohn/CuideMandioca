@@ -153,15 +153,20 @@
       return s;
     }
 
-    // Enquanto o jogo esteve fechado, a festa rendeu metade, até 12 horas.
+    // Quanto a festa rende com o jogo fechado: 25% (cfg.offlineRate), mais o que o Sopinha acrescenta.
+    offlineRate() { return this.cfg.offlineRate * (1 + this.effect('offline')); }
+
+    // Enquanto o jogo esteve fechado, a festa rendeu no ritmo de offlineRate(), até 12 horas (cfg.offlineCapHours).
     catchUp(lastSeen) {
-      const seconds = Math.min((this.now() - lastSeen) / 1000, this.cfg.offlineCapHours * 3600);
+      const away = (this.now() - lastSeen) / 1000;
+      const seconds = Math.min(away, this.cfg.offlineCapHours * 3600);
       if (seconds < 60) return;
-      const cheer = this.cheerPerSecond() * seconds * this.cfg.offlineRate;
+      const bunny = this.effect('offline');
+      const cheer = this.cheerPerSecond() * seconds * this.offlineRate();
       this.offline = true;
       this.earn(cheer);
       this.offline = false;
-      this.welcome = { seconds, cheer };
+      this.welcome = { seconds, cheer, bunny, capped: away > seconds };
     }
 
     exportState() {

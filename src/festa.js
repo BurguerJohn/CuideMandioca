@@ -23,7 +23,15 @@
   const FLAGS = ['#ee2f3c', '#ffd21e', '#35a03a', '#3a6cf0', '#ff4f9e', '#ff8a12', '#3fd6f0', '#9d5cf0'];
   const FLAG_DARK = ['#8a1030', '#c07e08', '#155428', '#1c2f8a', '#ad1e66', '#b44a0a', '#3a6cf0', '#44208a'];
   const SPARK = ['#fffff0', '#fff07a', '#ffac2a', '#ff5a1e', '#a8180e'];
+  // Brilho do tecido de cada bandeirinha (o pixel de cima, do lado da luz).
+  const FLAG_LIGHT = ['#ff8a8a', '#fff4a0', '#8ee07a', '#8eb4ff', '#ffa8d4', '#ffc07a', '#a8f4ff', '#cfa2ff'];
   const CONFETTI = ['#ee2f3c', '#ffd21e', '#35a03a', '#3a6cf0', '#ff4f9e', '#fff4e4'];
+  const CONFETTI_BACK = ['#8a1030', '#c07e08', '#155428', '#1c2f8a', '#ad1e66', '#c8b8a0'];
+  const FIRE_LIGHT = '#ff9438';
+  const FIRE_CORE = '#ffd27a';
+  const SMOKE = '#3b3346';
+  // Chapéus de metal ou pedraria: ganham o brilho de joia.
+  const SHINY = new Set(['coroa-milho', 'rei-baiao', 'coroa-flores', 'tiara-chifrinho']);
   const MARGIN = 16;
   const H = 204;
   const GROUND = 160;
@@ -116,8 +124,44 @@
       particles: [], texts: [], arrivals: new Map(), guestsShown: null, celebrateUntil: 0, jumpUntil: 0,
       nextBlink: 0, blinkUntil: 0, nextSpark: 0, nextSweat: 0, nextFirework: 0, nextNote: 0, nextHeart: {}, frame: 0, previous: 0,
       lastDraw: 0, stepSum: 0, stepCrit: false, stepAt: 0, crasherSeen: null, leaving: null,
-      hen: {}, goat: {}, chicks: [], nextZ: 0, nextSmoke: 0, pops: []
+      hen: {}, goat: {}, bunny: {}, chicks: [], nextZ: 0, nextSmoke: 0, pops: [],
+      light: null, nextFireSmoke: 0, dustAt: 0, rockets: [], flashes: [], shooting: null, nextShoot: 0, glintAt: 0
     };
+    // Brilhos em pixel: anéis concêntricos de cor sólida, cada um mais transparente (a luz fica redonda e limpa,
+    // sem o chuvisco do pontilhado). Feito uma vez por raio e cor, e reusado (luz, halo, fumaça).
+    const glows = new Map();
+    function glow(radius, color, falloff = 1.6) {
+      const key = `${radius}|${color}|${falloff}`;
+      if (glows.has(key)) return glows.get(key);
+      const size = radius * 2 + 1;
+      const image = document.createElement('canvas');
+      image.width = size;
+      image.height = size;
+      const t = image.getContext('2d');
+      const [r, gr, b] = [1, 3, 5].map(i => parseInt(color.slice(i, i + 2), 16));
+      const bands = Math.max(2, Math.min(7, Math.round(radius / 2.5)));
+      for (let band = 0; band < bands; band++) {
+        t.fillStyle = `rgba(${r}, ${gr}, ${b}, ${(((bands - band) / bands) ** falloff).toFixed(3)})`;
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            const d = Math.hypot(x - radius, y - radius) / (radius + 0.5);
+            if (d < 1 && Math.floor(d * bands) === band) t.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+      glows.set(key, image);
+      return image;
+    }
+    // Luz: 'source-atop' só pinta onde já tem desenho (terreiro, gente, barracas), nunca a área de trabalho atrás.
+    function light(x, y, radius, color, alpha, mode = 'source-atop', falloff = 1.6) {
+      if (alpha <= 0.01) return;
+      g.globalCompositeOperation = mode;
+      g.globalAlpha = Math.min(1, alpha);
+      g.drawImage(glow(radius, color, falloff), Math.round(x - radius), Math.round(y - radius));
+      g.globalAlpha = 1;
+      g.globalCompositeOperation = 'source-over';
+    }
+    const halo = (x, y, radius, color, alpha) => light(x, y, radius, color, alpha, 'source-over', 2.2);
     let layout = null;
     let layoutKey = '';
     let terrain = null;
@@ -125,6 +169,7 @@
     let regions = [];
     let spots = new Map();
     const rng = Math.random;
+    let minFrame = 15;
 
     function resize(width) {
       view.width = width;
@@ -181,10 +226,38 @@
       g.restore();
     }
 
-    function shadow(cx, width) {
+    // Sombra de contato: miolo escuro, meia-sombra nas pontas e uma segunda linha mais curta (elipse achatada).
+    function shadow(cx, width, strength = 1) {
+      const w = Math.round(width);
+      const x = Math.round(cx - w / 2);
+      g.globalAlpha = strength;
+      g.fillStyle = 'rgba(18, 9, 6, 0.16)';
+      g.fillRect(x - 2, GROUND, w + 4, 1);
       g.fillStyle = SHADOW;
-      g.fillRect(Math.round(cx - width / 2), GROUND, Math.round(width), 1);
-      g.fillRect(Math.round(cx - width / 2 + 2), GROUND + 1, Math.round(width - 4), 1);
+      g.fillRect(x, GROUND, w, 1);
+      g.fillRect(x + 2, GROUND + 1, Math.max(0, w - 4), 1);
+      g.fillStyle = 'rgba(18, 9, 6, 0.14)';
+      g.fillRect(x + 4, GROUND + 2, Math.max(0, w - 8), 1);
+      g.globalAlpha = 1;
+    }
+
+    // Luz de contorno: a fogueira acende a borda do lado dela em quem está perto (com o tremor da chama).
+    const rimMetas = new WeakMap();
+    function rim(meta, frame, x, y, flip, cx) {
+      const source = fx.light;
+      if (!source || !meta.rim) return;
+      const strength = Math.max(0, 1 - Math.abs(source.x - cx) / source.reach) * 0.95 * source.power;
+      if (strength < 0.04) return;
+      let side = source.x > cx ? 'right' : 'left';
+      if (flip) side = side === 'right' ? 'left' : 'right';
+      let metas = rimMetas.get(meta);
+      if (!metas) {
+        metas = { right: { ...meta, image: meta.rim.right }, left: { ...meta, image: meta.rim.left } };
+        rimMetas.set(meta, metas);
+      }
+      g.globalAlpha = Math.min(1, strength);
+      sprite(metas[side], frame, x, y, flip);
+      g.globalAlpha = 1;
     }
 
     const write = (text, cx, y, color, alpha) => pixelText(g, text, cx, y, color, alpha);
@@ -269,6 +342,18 @@
           if (near) { t.fillStyle = INK; t.fillRect(x, y, 1, 1); }
         }
       }
+      // Sombreamento do bloco de terra: a beirada de cima pega luz e a terra escurece em direção à ponta de baixo,
+      // em faixas de 1 pixel (degradê de pixel art), só onde já tem terra.
+      t.globalCompositeOperation = 'source-atop';
+      t.fillStyle = 'rgba(255, 238, 196, 0.22)';
+      t.fillRect(0, top, w, 1);
+      const deepest = Math.max(...bottoms) + top;
+      for (let y = top + 6; y <= deepest + 2; y++) {
+        const k = Math.min(1, (y - top - 6) / Math.max(1, deepest - top - 6));
+        t.fillStyle = `rgba(20, 16, 44, ${(0.08 + 0.5 * k * k).toFixed(3)})`;
+        t.fillRect(0, y, w, 1);
+      }
+      t.globalCompositeOperation = 'source-over';
       if (palette.tuft?.length) {
         for (let x = 3; x < width - 2; x++) {
           const roll = r();
@@ -434,6 +519,7 @@
       const meta = side.meta;
       const y = GROUND - meta.h + 1;
       const frame = frameAt(meta, now, side.x * 0.37);
+      shadow(side.x + meta.w / 2, meta.w - 2, 0.9);
       sprite(meta, frame, side.x, y);
       if (meta.sign) drawSign(meta.sign, side.x, y, tr(`sign.${side.id}`));
       if (meta.front) {
@@ -465,6 +551,7 @@
           const on = Math.sin(now / 300 + i) > -0.6;
           g.fillStyle = '#361a0c';
           g.fillRect(x, y + 1, 1, 1);
+          if (on) halo(x, y + 3, 3, '#ffd21e', 0.4);
           g.fillStyle = on ? '#ffd21e' : '#c07e08';
           g.fillRect(x - 1, y + 2, 2, 2);
           if (on) { g.fillStyle = '#fffff0'; g.fillRect(x - 1, y + 2, 1, 1); }
@@ -480,7 +567,7 @@
           const ox = Math.round(shift * dy / 6);
           for (let dx = -2; dx <= 2; dx++) {
             if ((dy === 5 && dx === 0) || (dy === 6 && Math.abs(dx) <= 1)) continue;
-            g.fillStyle = dx === 2 || dy === 1 ? FLAG_DARK[c] : FLAGS[c];
+            g.fillStyle = dx === 2 || dy === 1 ? FLAG_DARK[c] : dx === -2 && dy === 2 ? FLAG_LIGHT[c] : FLAGS[c];
             g.fillRect(x + dx + ox, y + dy, 1, 1);
           }
         }
@@ -509,14 +596,29 @@
       for (let x = left; x < right; x += 6) g.fillRect(x, GROUND - 2, 1, 2);
     }
 
+    // Brilho de joia: uma estrelinha de 4 pontas que cresce e some, de tempos em tempos, no ponto mais alto do chapéu.
+    function glint(now, x, y) {
+      if (now >= fx.glintAt + 380) { fx.glintAt = now + 1800 + rng() * 2600; }
+      const t = (now - fx.glintAt) / 380;
+      if (t < 0 || t > 1) return;
+      const size = t < 0.5 ? Math.round(t * 6) : Math.round((1 - t) * 6);
+      x = Math.round(x);
+      y = Math.round(y);
+      halo(x, y, 3, '#fff4c0', 0.5 * (1 - Math.abs(t - 0.5) * 2));
+      g.fillStyle = '#fffff0';
+      g.fillRect(x - size, y, size * 2 + 1, 1);
+      g.fillRect(x, y - size, 1, size * 2 + 1);
+    }
+
     function hostFrame(engine, now) {
       const tags = bundle.mandioca.meta.tags;
       const r = engine.state.runtime;
-      if (now < fx.celebrateUntil) return tags.comemora[Math.floor(now / 140) % tags.comemora.length];
+      if (now < fx.celebrateUntil) return tags.comemora[Math.floor(now / 85) % tags.comemora.length];
       if (!r.dancing) return tags.descanso[Math.floor(now / 260) % tags.descanso.length];
       const speed = engine.speed();
       const phase = speed > 2.5 ? now / 1000 * 2.5 % 1 : r.lift;
-      return tags.danca[Math.floor(Math.min(0.999, phase) * 8) % 8];
+      const n = tags.danca.length;
+      return tags.danca[Math.floor(Math.min(0.999, phase) * n) % n];
     }
 
     function drawHost(engine, now, dance, eq) {
@@ -535,6 +637,7 @@
         sprite(item, itemFrame, x + anchors.hand[0] - item.pivot[0], y + anchors.hand[1] - item.pivot[1]);
       }
       sprite(sheet, frame, x, y);
+      rim(sheet, frame, x, y, false, layout.host.x + 12);
       if (now >= fx.nextBlink) { fx.blinkUntil = now + 130; fx.nextBlink = now + 2200 + rng() * 2600; }
       if (now < fx.blinkUntil && s.runtime.dancing && now >= fx.celebrateUntil) {
         sprite(bundle.mandioca.blink, 0, x + anchors.eyes[0], y + anchors.eyes[1]);
@@ -542,7 +645,10 @@
       const hat = bundle.hats[eq.chapeu];
       if (hat) {
         const head = meta.anchors[fx.previous].head;
-        sprite(hat, 0, x + head[0] + hat.ox, y + head[1] + hat.oy);
+        const hx = x + head[0] + hat.ox;
+        const hy = y + head[1] + hat.oy;
+        sprite(hat, 0, hx, hy);
+        if (SHINY.has(eq.chapeu)) glint(now, hx + hat.w * 0.72, hy + 2);
       }
       regions.push({ id: 'host', x: x + 2, y, w: meta.w - 4, h: meta.h });
     }
@@ -568,7 +674,9 @@
             if (t >= 1) fx.arrivals.delete(`${sheet.image}:${guest.index}`);
           }
           if (sheet === crowd.dancers) shadow(x + 6, 8);
-          sprite(sheet, frame, x - (crowd.pad || 0), bottom - sheet.h + 1 + (sheet === crowd.dancers ? jump : 0), flip);
+          const top = bottom - sheet.h + 1 + (sheet === crowd.dancers ? jump : 0);
+          sprite(sheet, frame, x - (crowd.pad || 0), top, flip);
+          rim(sheet, frame, x - (crowd.pad || 0), top, flip, x + 6);
         }
       }
     }
@@ -583,7 +691,18 @@
       } else if (b.kind === 'arco') {
         sprite(props.arco, 0, b.x, GROUND - 6 - props.arco.h + 1);
       } else {
-        sprite(props.roda, frameAt(props.roda, now), b.x, GROUND - 6 - props.roda.h + 1);
+        const meta = props.roda;
+        const frame = frameAt(meta, now);
+        const top = GROUND - 6 - meta.h + 1;
+        sprite(meta, frame, b.x, top);
+        // Mesma geometria do desenho (art/exportar.py, wheel): centro no meio do quadrado, raio 38, uma lâmpada a
+        // cada 15°, girando 45°/16 por quadro.
+        const turn = frame * 45 / meta.frames;
+        for (let k = 0; k < 24; k++) {
+          const a = (k * 15 + turn) * Math.PI / 180;
+          const on = Math.sin(now / 180 - k * 0.9) > 0.2;
+          if (on) halo(b.x + 44 + 38 * Math.cos(a), top + 44 + 38 * Math.sin(a), 2, k % 3 ? '#fff07a' : '#ff8ac8', 0.55);
+        }
       }
     }
 
@@ -594,6 +713,15 @@
       const y = GROUND - 6 - meta.h + 1;
       sprite(meta, 0, x, y);
       const floor = y + meta.floor;
+      for (let k = 0, lx = x + 5; lx < x + meta.w - 4; k++, lx += 7) {
+        const lit = Math.floor(now / 160 - k) % 4 === 0;
+        const color = FLAGS[k % 6];
+        if (lit) halo(lx, floor + 2, 3, color, 0.5);
+        g.fillStyle = INK;
+        g.fillRect(lx - 1, floor + 1, 3, 2);
+        g.fillStyle = lit ? '#fffff0' : color;
+        g.fillRect(lx, floor + 1, 1, 1);
+      }
       const playing = [];
       ['cenoura', 'inhame', 'batata'].forEach((id, i) => {
         if (!engine.charActive(id)) return;
@@ -612,7 +740,19 @@
     function drawFire(engine, now) {
       const f = layout.fire;
       const y = GROUND - f.meta.h + 1;
+      const cx = f.x + f.meta.w / 2;
+      const power = fx.light ? fx.light.power : 1;
+      // Halo quente atrás da chama (no céu também: é a própria luz do fogo).
+      // A lendária já é dourada: com halo forte ela estouraria o branco.
+      const legendary = f.meta.image === 'fogueira-lendaria';
+      halo(cx, y + f.meta.h * 0.45, Math.round(f.meta.w * 0.85), FIRE_LIGHT, (legendary ? 0.14 : 0.3) * power);
+      shadow(cx, f.meta.w + 2, 0.8);
       sprite(f.meta, frameAt(f.meta, now), f.x, y);
+      if (now >= fx.nextFireSmoke) {
+        fx.nextFireSmoke = now + 260 + rng() * 260;
+        fx.particles.push({ x: cx + (rng() - 0.5) * f.meta.w * 0.3, y: y + 2, vx: (rng() - 0.3) * 0.006, vy: -0.012 - rng() * 0.006,
+          born: now, ttl: 1800 + rng() * 900, smoke: true, wobble: rng() * 6 });
+      }
       if (engine.charActive('faisca')) {
         const spark = bundle.chars.faisca;
         sprite(spark, frameAt(spark, now), f.x + f.meta.w - 4, y + 4 + Math.round(Math.sin(now / 500) * 2));
@@ -630,9 +770,10 @@
       }
       const flare = engine.flareActive;
       if (now >= fx.nextSpark) {
-        fx.nextSpark = now + (flare ? 30 : 110) + rng() * 100;
-        fx.particles.push({ x: f.x + f.meta.w * (0.25 + rng() * 0.5), y: y + 3, vx: (rng() - 0.5) * 0.008,
-          vy: -0.014 - rng() * 0.012, born: now, ttl: 700 + rng() * 800, colors: SPARK, wobble: rng() * 6 });
+        fx.nextSpark = now + (flare ? 30 : 90) + rng() * 90;
+        fx.particles.push({ x: f.x + f.meta.w * (0.25 + rng() * 0.5), y: y + 3, vx: (rng() - 0.5) * 0.01,
+          vy: -0.014 - rng() * 0.014, born: now, ttl: 700 + rng() * 900, colors: SPARK, wobble: rng() * 6, ember: true,
+          big: flare && rng() < 0.3 });
       }
     }
 
@@ -705,27 +846,74 @@
       regions.push({ id: 'request', x: x - 3, y: y - 3, w: w + 6, h: h + 10 });
     }
 
-    function spawnFirework(now) {
+    function spawnFirework(now, delay = 0) {
       const x = layout.L + 20 + rng() * (layout.width - 40);
       const y = 12 + rng() * 34;
-      const palette = [FLAGS[Math.floor(rng() * FLAGS.length)], '#fffff0', '#fff07a'];
-      for (let i = 0; i < 18; i++) {
-        const a = i / 18 * Math.PI * 2;
-        const speed = 0.018 + rng() * 0.012;
-        fx.particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, gravity: 0.00002,
-          born: now, ttl: 900 + rng() * 500, colors: [palette[1], palette[0], palette[0], palette[2]] });
+      fx.rockets.push({ x0: x + (rng() - 0.5) * 16, y0: GROUND - 4, x1: x, y1: y, born: now + delay, dur: 520 + rng() * 240,
+        color: FLAGS[Math.floor(rng() * FLAGS.length)] });
+    }
+
+    function burst(rocket, now) {
+      const { x1: x, y1: y, color } = rocket;
+      const palette = ['#fffff0', color, color, '#fff07a'];
+      const count = 20 + Math.floor(rng() * 8);
+      for (let i = 0; i < count; i++) {
+        const a = i / count * Math.PI * 2 + rng() * 0.2;
+        const speed = 0.016 + rng() * 0.014;
+        fx.particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, gravity: 0.000022,
+          born: now, ttl: 900 + rng() * 600, colors: palette, trail: true, twinkle: rng() < 0.35 });
+      }
+      fx.flashes.push({ x, y, born: now, color });
+    }
+
+    // Foguetes subindo (desaceleram até estourar) e o clarão de cada estouro.
+    function drawRockets(now) {
+      for (let i = fx.rockets.length - 1; i >= 0; i--) {
+        const r = fx.rockets[i];
+        const t = (now - r.born) / r.dur;
+        if (t < 0) continue;
+        if (t >= 1) { burst(r, now); fx.rockets.splice(i, 1); continue; }
+        const e = 1 - (1 - t) ** 2;
+        for (let k = 0; k < 6; k++) {
+          const tt = Math.max(0, e - k * 0.035);
+          g.globalAlpha = 1 - k / 6;
+          g.fillStyle = k === 0 ? '#fffff0' : k < 3 ? '#ffd21e' : '#ff8a12';
+          g.fillRect(Math.round(r.x0 + (r.x1 - r.x0) * tt), Math.round(r.y0 + (r.y1 - r.y0) * tt), 1, 1);
+        }
+        g.globalAlpha = 1;
+      }
+      for (let i = fx.flashes.length - 1; i >= 0; i--) {
+        const f = fx.flashes[i];
+        const age = now - f.born;
+        if (age > 320) { fx.flashes.splice(i, 1); continue; }
+        halo(f.x, f.y, 11, f.color, 0.5 * (1 - age / 320));
+        halo(f.x, f.y, 4, '#fffff0', 0.7 * (1 - age / 320));
       }
     }
 
+    // Papel picado: cada pedaço tem frente e verso (vira enquanto cai), balança de lado e cai devagar.
     function confetti(now, x, y, count = 24) {
       for (let i = 0; i < count; i++) {
-        fx.particles.push({ x, y, vx: (rng() - 0.5) * 0.05, vy: -0.03 - rng() * 0.03, gravity: 0.00008,
-          born: now, ttl: 1400 + rng() * 600, colors: [CONFETTI[i % CONFETTI.length]] });
+        const k = i % CONFETTI.length;
+        fx.particles.push({ x, y, vx: (rng() - 0.5) * 0.055, vy: -0.035 - rng() * 0.03, gravity: 0.00005,
+          born: now, ttl: 1800 + rng() * 900, colors: [CONFETTI[k], CONFETTI_BACK[k]], flip: 70 + rng() * 90,
+          wobble: rng() * 6 });
+      }
+    }
+
+    // Poeirinha do chão a cada passo da Mandioca.
+    function dust(x, y, now) {
+      for (let i = 0; i < 3; i++) {
+        fx.particles.push({ x: x + (rng() - 0.5) * 10, y, vx: (rng() - 0.5) * 0.014, vy: -0.004 - rng() * 0.004,
+          gravity: 0.000008, born: now, ttl: 380 + rng() * 220,
+          colors: ['rgba(236, 206, 156, 0.85)', 'rgba(206, 174, 132, 0.55)', 'rgba(180, 150, 120, 0.25)'] });
       }
     }
 
     function say(text, x, y, now, color = '#fff07a', ttl = 1200, rise = 10) {
-      fx.texts.push({ text, x, y, born: now, ttl, color, rise });
+      const item = { text, x, y, born: now, ttl, color, rise };
+      fx.texts.push(item);
+      return item;
     }
 
     // Céu: lua, estrelas e a pipa amarrada no mastro da esquerda.
@@ -751,9 +939,11 @@
         const moon = bundle.scenery.lua;
         const x = R - moon.w - 6;
         const y = 4 + Math.round(Math.sin(now / 3000));
+        halo(x + moon.w / 2, y + moon.h / 2, 13, '#fff4c0', 0.2);
         sprite(moon, 0, x, y);
         spots.set('lua', { x: x + moon.w / 2, y: y + 6 });
       }
+      drawShootingStar(now, poleTop);
       if (has.has('pipa')) {
         const kite = bundle.scenery.pipa;
         const kx = Math.round(L + 22 + Math.sin(now / 1700) * 5);
@@ -767,6 +957,33 @@
         sprite(kite, frameAt(kite, now), kx, ky);
         spots.set('pipa', { x: kx + 6, y: ky + 4 });
       }
+    }
+
+    // Estrela cadente: de vez em quando (da Quermesse em diante) risca o céu acima do varal, com rastro que apaga.
+    function drawShootingStar(now, poleTop) {
+      if (layout.tier < 1) return;
+      if (!fx.nextShoot) fx.nextShoot = now + 6000 + rng() * 10000;
+      if (!fx.shooting && now >= fx.nextShoot) {
+        const dir = rng() < 0.5 ? -1 : 1;
+        fx.shooting = { x: layout.L + layout.width * (dir > 0 ? 0.1 + rng() * 0.4 : 0.5 + rng() * 0.4), y: 3 + rng() * 10,
+          vx: dir * (0.09 + rng() * 0.05), vy: 0.035 + rng() * 0.02, born: now, ttl: 650 };
+        fx.nextShoot = now + 14000 + rng() * 22000;
+      }
+      const star = fx.shooting;
+      if (!star) return;
+      const age = now - star.born;
+      if (age > star.ttl) { fx.shooting = null; return; }
+      const fade = age > star.ttl * 0.7 ? (star.ttl - age) / (star.ttl * 0.3) : 1;
+      for (let k = 0; k < 9; k++) {
+        const t = Math.max(0, age - k * 14);
+        const x = Math.round(star.x + star.vx * t);
+        const y = Math.round(star.y + star.vy * t);
+        if (y > poleTop - 2) continue;
+        g.globalAlpha = fade * (1 - k / 9);
+        g.fillStyle = k === 0 ? '#fffff0' : k < 3 ? '#fff07a' : '#cfe3ff';
+        g.fillRect(x, y, 1, 1);
+      }
+      g.globalAlpha = 1;
     }
 
     // Morrinho verde atrás da plateia, onde os marcos do fundo ficam de pé (da Quermesse em diante).
@@ -828,6 +1045,7 @@
         g.fillRect(lx + 1, ly, 3, 1);
         g.fillRect(lx, ly + 1, 5, 3);
         g.fillRect(lx + 1, ly + 4, 3, 1);
+        halo(lx + 2, ly + 2, 4, FLAGS[i % FLAGS.length], 0.28);
         g.fillStyle = FLAGS[i % FLAGS.length];
         g.fillRect(lx + 1, ly + 1, 3, 3);
         g.fillStyle = Math.sin(now / 400 + i * 2.3) > -0.7 ? '#fff8e8' : '#ffd21e';
@@ -856,7 +1074,9 @@
         const y = Math.min(under + length - 1, H - baby.h);
         g.fillStyle = '#4a2418';
         g.fillRect(layout.L + col, under, 1, Math.max(0, y - under + 1));
-        sprite(baby, frameAt(baby, now, i * 0.5), layout.L + col - Math.floor(baby.w / 2), y);
+        // Penduradas na raiz, balançam devagar (cada uma no seu tempo).
+        const swing = Math.round(Math.sin(now / 900 + i * 1.7) * 0.8);
+        sprite(baby, frameAt(baby, now, i * 0.5), layout.L + col - Math.floor(baby.w / 2) + swing, y);
         spots.set(`mandioquinha:${i + 1}`, { x: layout.L + col, y: y + 4 });
       }
     }
@@ -917,6 +1137,92 @@
       spots.set('galinha', { x: state.x + hen.w / 2, y: GROUND - hen.h });
     }
 
+    // Sopinha, o coelho mascote: anda aos pulinhos pelo terreiro, para para fungar e piscar, deita de lado quando a
+    // Mandioca descansa e dá um binky (pulo de alegria com giro no ar) quando a festa comemora ou ganha carinho.
+    const HOP_MS = 440;
+    const HOP_DX = 9;
+    const BINKY_MS = 760;
+    const HEARTS = ['#ff4f9e', '#ff8a96'];
+    function drawSopinha(engine, now) {
+      if (!engine.charActive('sopinha')) return;
+      const meta = bundle.chars.sopinha;
+      const pose = meta.poses;
+      const b = fx.bunny;
+      const lo = layout.danceLeft + 2;
+      const hi = Math.max(lo + 12, layout.danceRight - meta.w);
+      if (b.x === undefined || b.x < lo - 20 || b.x > hi + 20) {
+        Object.assign(b, { x: lo + (hi - lo) * rng(), dir: rng() < 0.5 ? -1 : 1, mode: 'senta', until: now + 1200,
+          at: now, from: 0, hops: 0, seed: Math.floor(rng() * 5000), party: 0, poke: false });
+      }
+      const hop = () => {
+        if (b.x + b.dir * HOP_DX > hi || b.x + b.dir * HOP_DX < lo) b.dir = -b.dir;
+        Object.assign(b, { mode: 'pula', from: b.x, at: now, until: now + HOP_MS });
+      };
+      if (b.mode === 'pula' && now >= b.until) b.x = Math.max(lo, Math.min(hi, b.from + b.dir * HOP_DX));
+      const party = now < fx.celebrateUntil && b.party !== fx.celebrateUntil;
+      if (b.poke || party) {
+        if (party) b.party = fx.celebrateUntil;
+        b.poke = false;
+        Object.assign(b, { mode: 'binky', at: now, until: now + BINKY_MS });
+        for (let i = 0; i < 3; i++) float('coracao', b.x + meta.w / 2 + (i - 1) * 7, GROUND - meta.h - 16 - i % 2 * 3, now, HEARTS);
+      } else if (now >= b.until) {
+        const resting = !engine.state.runtime.dancing;
+        if (b.mode === 'pula' && b.hops > 1) { b.hops--; hop(); }
+        else if (resting && b.mode !== 'deita' && rng() < 0.6) Object.assign(b, { mode: 'deita', until: now + 3000 + rng() * 4000 });
+        else if (resting && b.mode === 'deita') b.until = now + 1500;
+        else if (b.mode === 'senta' && rng() < 0.65) {
+          if (rng() < 0.35) b.dir = -b.dir;
+          b.hops = 2 + Math.floor(rng() * 4);
+          hop();
+        } else {
+          if (b.mode === 'senta' && rng() < 0.5) b.dir = -b.dir;
+          Object.assign(b, { mode: 'senta', until: now + 1400 + rng() * 2600 });
+        }
+      }
+      let x = b.x;
+      let lift = 0;
+      let frame = pose.senta;
+      let flip = b.dir < 0;
+      if (b.mode === 'pula') {
+        const p = Math.min(1, (now - b.at) / HOP_MS);
+        if (p >= 0.28) {
+          const t = (p - 0.28) / 0.72;
+          x = b.from + b.dir * HOP_DX * t;
+          lift = Math.round(Math.sin(Math.PI * t) * 5);
+          if (t < 0.85) frame = pose.pulo;
+        } else x = b.from;
+        if (p >= 1 && now - fx.dustAt > 170) { fx.dustAt = now; dust(x + meta.w / 2, GROUND - 1, now); }
+      } else if (b.mode === 'binky') {
+        const t = Math.min(1, (now - b.at) / BINKY_MS);
+        lift = Math.round(Math.sin(Math.PI * t) * 11);
+        frame = t < 0.9 ? pose.pulo : pose.senta;
+        // O giro no ar: vira para o outro lado no alto do pulo e volta antes de pousar.
+        if (t > 0.3 && t < 0.7) flip = !flip;
+      } else if (b.mode === 'deita') {
+        frame = pose.deita;
+        if (now >= (fx.nextHeart.sopinha || 0)) {
+          fx.nextHeart.sopinha = now + 2600 + rng() * 2400;
+          float('coracao', x + meta.w / 2 + b.dir * 6, GROUND - 12, now, HEARTS);
+        }
+      } else {
+        const t = now + b.seed;
+        if (t % 2600 < 560) frame = Math.floor(t / 90) % 2 ? pose.funga : pose.senta;
+        if (t % 3700 < 140) frame = pose.pisca;
+        else if (t % 5300 < 220) frame = pose.orelha;
+      }
+      const cx = x + meta.w / 2;
+      const y = GROUND - meta.h + 2 - lift;
+      shadow(cx, Math.max(8, 18 - lift), 0.8);
+      sprite(meta, frame, x, y, flip);
+      rim(meta, frame, x, y, flip, cx);
+      regions.push({ id: 'sopinha', x: Math.round(x), y: Math.round(y), w: meta.w, h: meta.h });
+    }
+
+    // Carinho no Sopinha (clique): ele responde com um binky.
+    function poke(id) {
+      if (id === 'sopinha') fx.bunny.poke = true;
+    }
+
     // Peça nova de cenário: brilho no lugar dela e o nome subindo.
     function popScenery(now) {
       for (const pop of fx.pops.splice(0)) {
@@ -955,20 +1261,62 @@
         fx.particles.push({ x: layout.host.x + 21, y: GROUND - 30, vx: 0.002, vy: 0.012, born: now, ttl: 420,
           colors: ['#9fc8ff'], drop: true });
       }
+      drawRockets(now);
+      const at = (p, age) => [p.x + p.vx * age + (p.wobble ? Math.sin(age / 120 + p.wobble) * (p.flip ? 2 : 0.8) : 0),
+        p.y + p.vy * age + (p.gravity ? p.gravity * age * age : 0)];
       for (let i = fx.particles.length - 1; i >= 0; i--) {
         const p = fx.particles[i];
         const age = now - p.born;
         if (age > p.ttl) { fx.particles.splice(i, 1); continue; }
         const t = age / p.ttl;
-        const x = p.x + p.vx * age + (p.wobble ? Math.sin(age / 120 + p.wobble) * 0.8 : 0);
-        const y = p.y + p.vy * age + (p.gravity ? p.gravity * age * age : 0);
+        const [x, y] = at(p, age);
         if (p.shape) { drawShape(SHAPES[p.shape], Math.round(x), Math.round(y), p.colors[0], t > 0.7 ? (1 - t) / 0.3 : 1); continue; }
+        if (p.smoke) {
+          // Fumaça: um disco pontilhado que cresce e some enquanto sobe.
+          const radius = Math.min(5, 1 + Math.floor(t * 5));
+          g.globalAlpha = 0.3 * (1 - t);
+          g.drawImage(glow(radius, SMOKE, 1.1), Math.round(x - radius), Math.round(y - radius));
+          g.globalAlpha = 1;
+          continue;
+        }
+        if (p.ember) {
+          // Brasa: brilha em volta no começo e esfria do branco ao vermelho escuro.
+          if (t < 0.55) halo(x, y, 2, '#ffac2a', 0.4 * (1 - t / 0.55));
+          g.fillStyle = SPARK[Math.min(SPARK.length - 1, Math.floor(t * SPARK.length))];
+          g.fillRect(Math.round(x), Math.round(y), p.big ? 2 : 1, p.big ? 2 : 1);
+          continue;
+        }
+        if (p.flip) {
+          const face = Math.floor(age / p.flip) % 2;
+          g.globalAlpha = t > 0.8 ? (1 - t) / 0.2 : 1;
+          g.fillStyle = p.colors[face];
+          g.fillRect(Math.round(x), Math.round(y), face ? 1 : 2, face ? 2 : 1);
+          g.globalAlpha = 1;
+          continue;
+        }
+        if (p.twinkle && t > 0.5 && Math.floor(age / 60) % 2) continue;
+        if (p.trail && age > 50) {
+          const [tx, ty] = at(p, age - 50);
+          g.globalAlpha = 0.45 * (1 - t);
+          g.fillStyle = p.colors[Math.min(p.colors.length - 1, Math.floor(t * p.colors.length) + 1)];
+          g.fillRect(Math.round(tx), Math.round(ty), 1, 1);
+          g.globalAlpha = 1;
+        }
         g.fillStyle = p.colors[Math.min(p.colors.length - 1, Math.floor(t * p.colors.length))];
         g.fillRect(Math.round(x), Math.round(y), 1, p.drop ? 2 : 1);
         if (p.drop) { g.fillStyle = '#ffffff'; g.fillRect(Math.round(x), Math.round(y), 1, 1); }
       }
       if (fx.stepSum && now - fx.stepAt > 140) {
-        say(`+${amount(fx.stepSum)}`, layout.host.x + 12, GROUND - 50, now, fx.stepCrit ? '#ff907a' : '#fff07a', 900, 12);
+        // Os números dos passos não se atropelam: o novo empurra os anteriores para cima, em pilha.
+        let top = GROUND - 50;
+        for (let i = fx.texts.length - 1; i >= 0; i--) {
+          const item = fx.texts[i];
+          if (!item.step) continue;
+          const y = item.y - item.rise * Math.min(1, (now - item.born) / item.ttl * 1.6);
+          if (y > top - 8) item.y -= y - (top - 8);
+          top = Math.min(y, top - 8);
+        }
+        say(`+${amount(fx.stepSum)}`, layout.host.x + 12, GROUND - 50, now, fx.stepCrit ? '#ff907a' : '#fff07a', 900, 12).step = true;
         fx.stepSum = 0;
         fx.stepCrit = false;
       }
@@ -989,6 +1337,7 @@
         if (i >= 3) spots.set(`vagalume:${i - 2}`, { x, y });
         const glow = Math.sin(s * 3 + i * 6);
         if (glow < -0.2) continue;
+        halo(x, y, 3, '#fff07a', 0.2 + 0.25 * Math.max(0, glow));
         if (glow > 0.5) {
           g.fillStyle = 'rgba(255,240,122,0.35)';
           g.fillRect(x - 1, y, 3, 1);
@@ -996,6 +1345,36 @@
         }
         g.fillStyle = '#fff07a';
         g.fillRect(x, y, 1, 1);
+      }
+    }
+
+    // Luz da cena: a fogueira pinta de laranja o chão e quem está perto (o miolo mais amarelo); o palco tem a sua
+    // luz quente. Tudo em 'source-atop': a luz cai só no que foi desenhado.
+    function drawLights(engine, now) {
+      const source = fx.light;
+      const reach = Math.round(Math.min(96, 30 + layout.fire.meta.w * 1.4));
+      light(source.x, GROUND - 6, reach, FIRE_LIGHT, 0.34 * source.power);
+      light(source.x, source.y, Math.round(reach * 0.5), FIRE_CORE, 0.22 * source.power);
+      if (layout.stage) {
+        const meta = layout.stage.meta;
+        light(layout.stage.x + meta.w / 2, GROUND - 6 - meta.h * 0.45, Math.round(meta.w * 0.42), '#fff2c6', 0.13);
+        // Canhões de luz do forró (do São João Regional em diante): dois fachos coloridos varrendo o palco.
+        if (layout.tier >= 3) {
+          const top = GROUND - 6 - meta.h + 12;
+          const floor = GROUND - 6 - meta.h + 1 + meta.floor;
+          g.globalCompositeOperation = 'source-atop';
+          for (let k = 0; k < 2; k++) {
+            const cx = layout.stage.x + meta.w * (0.5 + 0.34 * Math.sin(now / 1500 + k * Math.PI));
+            g.fillStyle = FLAGS[(Math.floor(now / 3000) + k * 3) % FLAGS.length];
+            for (let y = top; y <= floor; y++) {
+              const half = 2 + (y - top) * 0.45;
+              g.globalAlpha = 0.14 * (0.5 + 0.5 * (y - top) / (floor - top));
+              g.fillRect(Math.round(cx - half), y, Math.round(half * 2), 1);
+            }
+          }
+          g.globalAlpha = 1;
+          g.globalCompositeOperation = 'source-over';
+        }
       }
     }
 
@@ -1007,6 +1386,10 @@
         if (event.type === 'step') {
           fx.stepSum += event.value;
           fx.stepAt = now;
+          if (now - fx.dustAt > 170) {
+            fx.dustAt = now;
+            dust(hostX, layout.tier >= 2 ? GROUND - 4 : GROUND - 1, now);
+          }
           if (event.crit) {
             fx.stepCrit = true;
             fx.jumpUntil = now + 320;
@@ -1019,6 +1402,7 @@
         } else if (event.type === 'tier-up' || event.type === 'legendary') {
           fx.celebrateUntil = now + 1400;
           confetti(now, hostX, GROUND - 40, 40);
+          for (let k = 0; k < 3; k++) spawnFirework(now, k * 260);
         } else if (event.type === 'size-up') {
           say(tr('fx.guests', { n: event.count }), hostX, GROUND - 70, now, '#9ef05a', 1500, 8);
           for (let size = event.size - event.count + 1; size <= event.size; size++) {
@@ -1052,29 +1436,9 @@
       fx.guestsShown = shown;
     }
 
-    function draw(engine, now, preview = null) {
-      if (pending > 0 || now - fx.lastDraw < 30) return;
-      fx.lastDraw = now;
+    // Tudo o que aparece num quadro, de trás para frente.
+    function paint(engine, now, preview, eq) {
       const s = engine.state;
-      const eq = withPreview(s.equipped, preview);
-      const next = buildLayout(engine, eq);
-      if (next.key !== layoutKey) {
-        layout = next;
-        layoutKey = next.key;
-        const width = next.width + MARGIN * 2;
-        if (width !== view.width) resize(width);
-        else applyScale();
-        const palette = bundle.terrains[eq.terreiro] || bundle.terrains['terra-batida'];
-        terrain = buildTerrain(next.width, palette, (s.seed || 1) + next.width);
-        ridge = next.tier >= 1 && next.back.length ? buildRidge(next.width) : null;
-        trackArrivals(now);
-      }
-      regions = [];
-      spots = new Map();
-      view.float = Math.round(Math.sin(now / 1400));
-      g.clearRect(0, 0, buffer.width, buffer.height);
-      g.save();
-      g.translate(0, view.float);
       const tier = layout.tier;
       const poleTop = GROUND - POLE_H[tier];
       drawSky(now, poleTop);
@@ -1103,17 +1467,57 @@
         const frame = s.runtime.dancing ? Math.floor(s.runtime.lift * 4) % 4 : 0;
         shadow(layout.par.x + 8, 10);
         sprite(milho, frame, layout.par.x, GROUND + dance - milho.h + 1);
+        rim(milho, frame, layout.par.x, GROUND + dance - milho.h + 1, false, layout.par.x + 8);
         regions.push({ id: 'par', x: layout.par.x, y: GROUND + dance - milho.h, w: milho.w, h: milho.h });
       }
       drawCritters(now);
+      drawSopinha(engine, now);
       drawCaller(engine, now);
       drawFire(engine, now);
       drawSide(engine, layout.rightSide, now, 'lado-direita');
       drawCrasher(engine, now);
       drawRequest(engine, now);
+      drawLights(engine, now);
       drawEffects(engine, now);
       popScenery(now);
-      g.restore();
+    }
+
+    function draw(engine, now, preview = null) {
+      if (pending > 0 || now - fx.lastDraw < minFrame) return;
+      fx.lastDraw = now;
+      const s = engine.state;
+      const eq = withPreview(s.equipped, preview);
+      const next = buildLayout(engine, eq);
+      if (next.key !== layoutKey) {
+        layout = next;
+        layoutKey = next.key;
+        const width = next.width + MARGIN * 2;
+        if (width !== view.width) resize(width);
+        else applyScale();
+        const palette = bundle.terrains[eq.terreiro] || bundle.terrains['terra-batida'];
+        terrain = buildTerrain(next.width, palette, (s.seed || 1) + next.width);
+        ridge = next.tier >= 1 && next.back.length ? buildRidge(next.width) : null;
+        trackArrivals(now);
+      }
+      regions = [];
+      spots = new Map();
+      view.float = Math.round(Math.sin(now / 1400));
+      const fire = layout.fire;
+      const flicker = 0.86 + 0.09 * Math.sin(now / 83) + 0.05 * Math.sin(now / 29 + 1.7);
+      fx.light = { x: fire.x + fire.meta.w / 2, y: GROUND - fire.meta.h * 0.4,
+        power: flicker * (engine.flareActive ? 1.3 : 1), reach: 60 + fire.meta.w * 1.8 };
+      g.clearRect(0, 0, buffer.width, buffer.height);
+      g.save();
+      g.translate(0, view.float);
+      // Um erro no meio do quadro não deixa o pincel torto (deslocamento, transparência, modo de mistura) para os
+      // próximos: o quadro quebrado não vai para a tela e o seguinte começa limpo.
+      try {
+        paint(engine, now, preview, eq);
+      } finally {
+        g.restore();
+        g.globalAlpha = 1;
+        g.globalCompositeOperation = 'source-over';
+      }
       out.clearRect(0, 0, canvas.width, canvas.height);
       out.imageSmoothingEnabled = false;
       out.drawImage(buffer, 0, 0, canvas.width, canvas.height);
@@ -1186,7 +1590,12 @@
         capped: !!view.capped };
     }
 
-    return { draw, setScale, hit, onEvents, celebrate, photo, areas, size: sizeInfo };
+    // Quadros por segundo: 60 com o jogo em foco (alguém olhando e clicando), menos quando ele fica de fundo.
+    function setRate(fps) {
+      minFrame = Math.max(0, 1000 / fps - 2);
+    }
+
+    return { draw, setScale, setRate, hit, onEvents, celebrate, poke, photo, areas, size: sizeInfo };
   }
 
   root.ArraiaFesta = { create, terrainWidth, amount, pixelText, withPreview };

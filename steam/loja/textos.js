@@ -33,7 +33,7 @@ All the Cheer you gather slowly turns into fame, and fame brings guests. Every n
 [list]
 [*]Transparent window: click right through it while the rest of your screen keeps working.
 [*]Drag it anywhere, resize it, pin it above your windows or hide it in the tray.
-[*]The party keeps earning at half speed for up to 12 hours while the game is closed.
+[*]The party keeps earning at 25% speed for up to 12 hours while the game is closed.
 [*]Cheeky double-meaning jokes, in the spirit of the festa junina love letters.
 [*]Portuguese, English and Spanish.
 [/list]`
@@ -65,7 +65,7 @@ Toda Animação que a festa junta vira fama aos pouquinhos, e fama traz convidad
 [list]
 [*]Janela transparente: o clique passa por ela e o resto da tela continua funcionando.
 [*]Arraste para onde quiser, mude o tamanho, fixe sobre as janelas ou esconda na bandeja.
-[*]Com o jogo fechado, a festa continua rendendo pela metade por até 12 horas.
+[*]Com o jogo fechado, a festa continua rendendo 25% por até 12 horas.
 [*]Piadas de duplo sentido, no espírito do correio elegante.
 [*]Português, inglês e espanhol.
 [/list]`
@@ -97,7 +97,7 @@ Toda la Animación que junta la fiesta se vuelve fama poco a poco, y la fama tra
 [list]
 [*]Ventana transparente: los clics la atraviesan y el resto de tu pantalla sigue funcionando.
 [*]Arrástrala a donde quieras, cambia su tamaño, fíjala sobre tus ventanas o escóndela en la bandeja.
-[*]Con el juego cerrado, la fiesta sigue rindiendo a mitad de velocidad hasta 12 horas.
+[*]Con el juego cerrado, la fiesta sigue rindiendo al 25% de velocidad hasta 12 horas.
 [*]Chistes de doble sentido, al estilo del correo del amor de las festas juninas.
 [*]Portugués, inglés y español.
 [/list]`

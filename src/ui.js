@@ -136,7 +136,8 @@
     const tabs = DOCK.map(entry => `<button class="vaba ${entry.id === cat ? 'ativa' : ''}" data-action="vitrine-cat" ` +
       `data-cat="${entry.id}">${ctx.icon(entry.icon, 'icone-aba')}<span>${esc(t(`dock.${entry.id}`))}</span></button>`).join('');
     // Em cima, uma linha só com saldo e botões; embaixo, as abas. Nada disso muda de altura com o saldo.
-    const top = `<div class="vitrine-topo"><div class="vitrine-saldo">` +
+    // Arrastar a vitrine por qualquer parte fora dos botões leva ela para os lados (a dica fica na faixa vermelha).
+    const top = `<div class="vitrine-topo" title="${esc(t('shop.drag'))}"><div class="vitrine-saldo">` +
       `<span class="recurso" title="${esc(t('res.cheer'))}">${ctx.icon('ui:animacao')}<b data-live="cheer">${compact(s.cheer)}</b></span>` +
       `<span class="recurso" title="${esc(t('res.tickets'))}">${ctx.icon('ui:fichas')}<b data-live="tickets">${compact(s.tickets)}</b></span>` +
       costButton('ficha', '', engine.ticketCost(), 'cheer', t('shop.buyTicket'), ctx.icon('ui:animacao')) +
@@ -258,9 +259,11 @@
       `<div class="cartao"><div class="rotulo">${esc(t('party.yield'))}</div><div class="numeros">` +
       [[t('party.perStep'), compact(engine.stepValue())], [t('party.stepsPerSecond'), number(engine.speed(), 2)],
         [t('party.stamina'), t('party.staminaValue', { n: number(engine.maxStamina(), 0) })], [t('party.rest'), `${number(rest, 1)} s`],
-        [t('party.perSecond'), compact(engine.cheerPerSecond())]]
+        [t('party.perSecond'), compact(engine.cheerPerSecond())],
+        [t('party.offline'), t('party.offlineValue', { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours })]]
         .map(([label, value]) => `<div><span>${esc(label)}</span><b>${esc(value)}</b></div>`).join('') +
-      `</div><div class="rotulo">${esc(t('party.multipliers'))}</div><div class="numeros">` +
+      `</div><p class="miudo">${esc(t('party.offlineHint', { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
+      `<div class="rotulo">${esc(t('party.multipliers'))}</div><div class="numeros">` +
       pieces.map(([label, value]) => `<div><span>${esc(label)}</span><b>${value}</b></div>`).join('') + `</div></div>` +
       scenery(engine) +
       (tier === 0 ? `<div class="dica">${t('party.tip')}</div>` : '');

@@ -17,6 +17,9 @@ function fakeSteam(order, language = 'spanish') {
 
 function loadMain({ language } = {}) {
   const listeners = new Map();
+  const intervals = [];
+  const appEvents = {};
+  const cursor = { x: 0, y: 0 };
   const handlers = new Map();
   const order = [];
   let windowObject;
@@ -33,6 +36,9 @@ function loadMain({ language } = {}) {
     }
     setAlwaysOnTop(value) { this.onTop = value; }
     setIgnoreMouseEvents(value) { this.ignore = value; }
+    getContentBounds() { return display.workArea; }
+    isMinimized() { return false; }
+    moveTop() { this.top = true; }
     setBounds(bounds) { this.bounds = bounds; }
     setFocusable(value) { this.focusable = value; }
     isFocused() { return !!this.focused; }
@@ -56,12 +62,13 @@ function loadMain({ language } = {}) {
   const electron = {
     app: {
       requestSingleInstanceLock: () => true, whenReady: () => Promise.resolve(), getPath: () => 'C:\\dados',
-      setAppUserModelId() {}, on() {}, quit: () => order.push('quit'), getLocale: () => 'pt-BR', isPackaged: false
+      setAppUserModelId() {}, on: (name, fn) => { appEvents[name] = fn; }, quit: () => order.push('quit'),
+      getLocale: () => 'pt-BR', isPackaged: false
     },
     dialog: { showErrorBox: () => order.push('dialog') },
     BrowserWindow: FakeWindow,
     ipcMain: { on: (channel, fn) => listeners.set(channel, fn), handle: (channel, fn) => handlers.set(channel, fn) },
-    screen: { getPrimaryDisplay: () => display, getAllDisplays: () => [display], on() {} },
+    screen: { getPrimaryDisplay: () => display, getAllDisplays: () => [display], on() {}, getCursorScreenPoint: () => cursor },
     Tray: class { setToolTip() {} on() {} setContextMenu() {} },
     Menu: { buildFromTemplate: template => template },
     nativeImage: { createFromPath: () => ({}) }
@@ -80,8 +87,8 @@ function loadMain({ language } = {}) {
   };
   const source = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'main.js'), 'utf8');
   vm.runInNewContext(source, { require: name => mocks[name], __dirname: path.join(__dirname, '..', 'desktop'),
-    console, setTimeout, clearTimeout });
-  return { listeners, handlers, order, window: () => windowObject, windows };
+    console, setTimeout, clearTimeout, setInterval: fn => intervals.push(fn) });
+  return { listeners, handlers, order, window: () => windowObject, windows, intervals, appEvents, cursor };
 }
 
 test('janela cobre a área útil, vaza cliques e só aceita IPC da própria festa', async () => {
@@ -175,5 +182,29 @@ test('idioma da Steam fora da lista cai para o inglês', async () => {
   Object.defineProperty(event, 'returnValue', { set(v) { value = v; } });
   listeners.get('desktop:info')(event);
   assert.equal(value.language.id, 'en');
+  I18N.setLanguage('pt-BR');
+});
+
+test('o vigia do cursor conta à festa onde o mouse está, e abrir o jogo de novo só traz a festa para a frente', async () => {
+  const { listeners, order, window, intervals, appEvents, cursor } = loadMain();
+  await Promise.resolve();
+  const own = { sender: window().webContents };
+  const sent = () => JSON.parse(JSON.stringify(order.filter(entry => entry[0] === 'send' && entry[2]?.cursor).map(entry => entry[2].cursor)));
+  Object.assign(cursor, { x: 300, y: 200 });
+  intervals.forEach(fn => fn());
+  assert.deepEqual(sent(), [{ x: 300, y: 200, interactive: false }]);
+  intervals.forEach(fn => fn());
+  assert.equal(sent().length, 1, 'cursor parado: nada de novo');
+  listeners.get('desktop:set-interactive')(own, true);
+  intervals.forEach(fn => fn());
+  assert.deepEqual(sent().at(-1), { x: 300, y: 200, interactive: true }, 'conta o estado real da janela');
+  Object.assign(cursor, { x: -5, y: 200 });
+  intervals.forEach(fn => fn());
+  assert.equal(sent().length, 2, 'fora da janela não manda nada');
+
+  window().focused = false;
+  appEvents['second-instance']();
+  assert.equal(window().focused, true, 'abrir o jogo de novo dá foco à festa');
+  assert.equal(order.some(entry => entry[0] === 'send' && entry[2] === 'painel'), false, 'sem abrir o Painel');
   I18N.setLanguage('pt-BR');
 });

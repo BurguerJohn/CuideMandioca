@@ -64,7 +64,7 @@
 
   const ui = {
     tab: 'festa', lastLetter: null, open: false, modal: false, focused: true, logFilter: 'desbloqueios', lastLogRender: 0,
-    dock: { open: false, cat: 'melhorias', side: 'esquerda' }, preview: null,
+    dock: { open: false, cat: 'melhorias', side: 'esquerda', dx: 0 }, preview: null,
     rings: { open: false, playing: false, result: null },
     tela: { open: false, id: 'correio' }, telaPos: null,
     settings: { ...DEFAULTS, ...(desktop ? {} : readJSON(SETTINGS_KEY) || {}) },
@@ -73,6 +73,24 @@
     // Ao abrir, o jogo recupera o tempo fora (convidados, conquistas...): esses sons de uma vez só viram barulho.
     quietUntil: performance.now() + 2000
   };
+
+  // --- Erros ------------------------------------------------------------------------------------------
+  // Um erro nunca para o jogo: vai para o console e, no desktop, para o arquivo erros.log (o mesmo erro, uma vez
+  // por minuto), para um relato de "travou" chegar com a causa.
+  const reported = new Map();
+  function report(error) {
+    const text = String(error?.stack || error?.message || error);
+    console.error(error);
+    const now = Date.now();
+    if (now - (reported.get(text) || 0) < 60000) return;
+    reported.set(text, now);
+    desktop?.logError?.(text);
+  }
+  function safely(fn) {
+    try { fn(); } catch (error) { report(error); }
+  }
+  addEventListener('error', event => report(event.error || event.message));
+  addEventListener('unhandledrejection', event => report(event.reason));
 
   // --- Som ---------------------------------------------------------------------------------------------
   const som = globalThis.ArraiaSom?.create({ enabled: ui.settings.sound !== false, volume: ui.settings.volume }) || null;
@@ -170,7 +188,8 @@
     if (ui.tela.open) placeWindow($('#tela'), 'telaPos');
   }
 
-  // A vitrine fica encaixada logo acima da festa e anda junto com ela.
+  // A vitrine fica encaixada logo acima da festa e anda junto com ela; arrastada pela faixa de cima, desliza para os
+  // lados (ui.dock.dx é o quanto saiu do meio da festa).
   function placeDock() {
     const dock = $('#vitrine');
     if (!ui.dock.open || !ui.anchor) return;
@@ -180,7 +199,10 @@
     const width = Math.min(innerWidth / zoom - 16, Math.max(760, a.width / zoom));
     dock.style.width = `${Math.round(width)}px`;
     const height = (dock.offsetHeight || 220) * zoom;
-    const left = clamp(a.left + a.width / 2 - width * zoom / 2, 8, Math.max(8, innerWidth - width * zoom - 8));
+    const middle = a.left + a.width / 2 - width * zoom / 2;
+    const left = clamp(middle + ui.dock.dx, 8, Math.max(8, innerWidth - width * zoom - 8));
+    // Bateu na borda: o arrasto recomeça dali (voltar o mouse já traz a vitrine, sem trecho morto).
+    ui.dock.dx = left - middle;
     const bottom = Math.min(a.lift + a.top + 6, innerHeight - height - 8);
     dock.style.left = `${Math.round(left)}px`;
     dock.style.bottom = `${Math.round(Math.max(8, bottom))}px`;
@@ -593,7 +615,7 @@
     if (!desktop) { toast(t('app.browserClose')); return; }
     if (now() < ui.closeArmedUntil) { save(); desktop.quit(); return; }
     ui.closeArmedUntil = now() + 3000;
-    toast(t('app.closeAgain'));
+    toast(t('app.closeAgain', { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }));
     renderHud(true);
     setTimeout(() => renderHud(true), 3100);
   }
@@ -734,6 +756,7 @@
       if (result) done(true, t('app.crasherOut', { n: result.tickets }), null, 'expulsar');
     } else if (region === 'fogueira') { if (engine.tierIndex() >= 2) openTela('fogueira', false); }
     else if (region === 'palco') openTela('turma', false);
+    else if (region === 'sopinha') { ui.festa?.poke('sopinha'); tocar('carinho'); }
     else if (region === 'lado-esquerda' || region === 'lado-direita') {
       const side = region === 'lado-esquerda' ? 'esquerda' : 'direita';
       const id = engine.state.equipped[side];
@@ -792,6 +815,8 @@
   function setFocused(value) {
     ui.focused = value;
     document.body.classList.toggle('jogo-desfocado', !value);
+    // Em foco a festa anda a 60 quadros por segundo; de fundo (a pessoa trabalhando em outra janela), a 30.
+    ui.festa?.setRate(value ? 60 : 30);
   }
 
   function focusGame() {
@@ -813,15 +838,23 @@
     return {};
   }
 
-  document.addEventListener('mousemove', event => {
+  // O cursor está em cima de algo do jogo? Só então a janela aceita o clique; fora dele, o clique vaza.
+  // `actual` é o que o Electron diz que a janela está de fato: se os dois lados discordarem, vale o dele.
+  function hover(x, y, actual) {
+    if (typeof actual === 'boolean') ui.interactive = actual;
     // Durante arrasto ou compra segurada a janela segue clicável, para o soltar do botão chegar aqui.
     if (ui.drag || ui.hold) return;
-    const found = hitAt(event.clientX, event.clientY);
+    const found = hitAt(x, y);
     setInteractive(!!(found.ui || found.region));
     const canvas = $('#festa-canvas');
     if (canvas && found.region) canvas.style.cursor = ['terreiro', 'festa'].includes(found.region) ? 'grab' : 'pointer';
     document.body.classList.toggle('sobre-festa', !!found.region || !!found.ui);
-  });
+  }
+
+  document.addEventListener('mousemove', event => hover(event.clientX, event.clientY));
+
+  // Ícones e imagens não se arrastam como arquivo: o arrasto nativo cancelaria o arrasto da janela (pointercancel).
+  document.addEventListener('dragstart', event => event.preventDefault());
 
   document.addEventListener('mouseover', event => {
     const card = event.target.closest?.('[data-preview]');
@@ -873,6 +906,13 @@
       event.preventDefault();
       return;
     }
+    // A vitrine desliza para os lados por qualquer parte que não seja botão ou item: a faixa vermelha, o fundo, o texto.
+    if (event.target.closest?.('#vitrine')) {
+      if (!event.target.closest('button, input, select, a, [data-action], [data-preview], [data-hold]')) {
+        ui.drag = { kind: 'vitrine', x: event.clientX, y: event.clientY, start: ui.dock.dx, moved: false };
+      }
+      return;
+    }
     const handle = event.target.closest?.('[data-arrastar]');
     if (handle && !event.target.closest('button')) {
       const key = { argolas: 'ringsPos', tela: 'telaPos' }[handle.dataset.arrastar] || 'panelPos';
@@ -894,12 +934,15 @@
       const factor = 2 ** ((dx - dy) / 160);
       drag.start = setZoom(drag.start * factor, false) / factor;
     } else if (drag.kind === 'festa') {
-      if (!['terreiro', 'festa', 'host'].includes(drag.region)) return;
+      // Qualquer parte da festa arrasta, até as que abrem algo: só o clique sem arrastar abre (no pointerup).
       const size = festaSize();
       const left = clamp(drag.start.left + dx, 0, maxLeft(size));
       ui.settings.x = (left + size.width / 2) / innerWidth;
       ui.settings.lift = clamp(drag.start.lift - dy, 0, maxLift(size));
       placeFesta();
+    } else if (drag.kind === 'vitrine') {
+      ui.dock.dx = drag.start + dx;
+      placeDock();
     } else if (drag.kind === 'placa') {
       const placa = $('#placa');
       const zoom = uiZoom();
@@ -935,7 +978,11 @@
       else comSom(() => festaClick(drag.region), null);
     }
   });
-  document.addEventListener('pointercancel', stopHold);
+  // O navegador cancelou o ponteiro (começou um arrasto nativo, por exemplo): nada fica preso "arrastando".
+  document.addEventListener('pointercancel', () => {
+    stopHold();
+    ui.drag = null;
+  });
 
   document.addEventListener('wheel', event => {
     if (!event.target.closest?.('[data-action="zoom-alca"]')) return;
@@ -1033,6 +1080,9 @@
       else if (command === 'foto') act({ dataset: { action: 'foto' } });
       else if (command?.settings) applySettings(command.settings);
       else if (typeof command?.foco === 'boolean') setFocused(command.foco);
+      // O Electron conta onde o cursor está de tempos em tempos: se o repasse do mouse do Windows falhar, a festa
+      // continua sabendo quando o cursor passa por cima dela.
+      else if (command?.cursor) hover(command.cursor.x, command.cursor.y, command.cursor.interactive);
     });
   }
 
@@ -1056,15 +1106,18 @@
     refreshLive();
   }
 
+  // O próximo quadro é pedido antes de tudo: um erro num quadro não pode congelar a festa para sempre.
   function animate(t) {
-    frame(t);
-    if (ui.festa) {
-      const before = ui.festa.size().width;
-      ui.festa.draw(engine, t, ui.dock.open ? ui.preview : null);
-      if (ui.festa.size().width !== before) placeFesta();
-    }
-    if (ui.rings.open) ui.game?.draw(t);
     requestAnimationFrame(animate);
+    safely(() => frame(t));
+    if (ui.festa) {
+      safely(() => {
+        const before = ui.festa.size().width;
+        ui.festa.draw(engine, t, ui.dock.open ? ui.preview : null);
+        if (ui.festa.size().width !== before) placeFesta();
+      });
+    }
+    if (ui.rings.open) safely(() => ui.game?.draw(t));
   }
 
   // Varal de bandeirinhas do topo das janelas, desenhado em pixel e usado como fundo repetido.
@@ -1106,7 +1159,7 @@
   placeFesta();
   if (desktop) {
     desktop.getSettings().then(applySettings).catch(error => toast(error.message, 'erro'));
-    setInterval(() => frame(performance.now()), 250);
+    setInterval(() => safely(() => frame(performance.now())), 250);
   }
   if (loadError) toast(t('app.saveIgnored'), 'erro');
   // Depois de trocar o idioma, a festa volta com os Ajustes abertos.
@@ -1117,7 +1170,10 @@
     toast(t('app.languageChanged'));
   } else if (engine.welcome) {
     showModal(`<h2>${UI.esc(t('app.welcomeBack'))}</h2><p>${t('app.welcomeBackText', {
-      time: UI.duration(engine.welcome.seconds * 1000), n: UI.compact(engine.welcome.cheer) })}</p>` +
+      time: UI.duration(engine.welcome.seconds * 1000), n: UI.compact(engine.welcome.cheer) })}` +
+      (engine.welcome.bunny ? ` ${UI.esc(t('app.welcomeBunny', { v: Math.round(engine.welcome.bunny * 100) }))}` : '') + '</p>' +
+      `<p class="miudo">${UI.esc(t(engine.welcome.capped ? 'app.welcomeCapped' : 'app.welcomeRule',
+        { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
       `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('app.welcomeBackOk'))}</button></div>`);
   } else if (firstRun) {
     showModal(`<h2>${UI.esc(t('app.title'))}!</h2>${t('app.firstRun')}` +

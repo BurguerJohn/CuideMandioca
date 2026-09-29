@@ -3,13 +3,13 @@ globalThis.GAME_DATA = {
   // Atributos da anfitriã. Valor no nível L = base + per × (L − 1); preço = price × growth^(L − 1).
   stats: [
     { id: 'rebolado', name: 'Rebolado', unit: 'por passo', desc: 'Animação que cada passo rende.',
-      base: 1, per: 1, price: 12, growth: 1.18 },
+      base: 1, per: 1, price: 36, growth: 1.18 },
     { id: 'folego', name: 'Fôlego', unit: 'passos', desc: 'Quantos passos ela aguenta antes de cansar.',
-      base: 8, per: 2, price: 9, growth: 1.12 },
+      base: 8, per: 2, price: 27, growth: 1.12 },
     { id: 'refresco', name: 'Refresco', unit: '× descanso', desc: 'Quanto mais refresco, mais curto o descanso.',
-      base: 1, per: 0.12, price: 25, growth: 1.15 },
+      base: 1, per: 0.12, price: 75, growth: 1.15 },
     { id: 'ritmo', name: 'Ritmo', unit: 'passos/s', desc: 'Velocidade da dança. A animação acelera junto.',
-      base: 1, per: 0.06, price: 16, growth: 1.17 }
+      base: 1, per: 0.06, price: 48, growth: 1.17 }
   ],
 
   // Porte do arraiá: a lotação (convidados) decide o porte, e cada porte libera coisas novas.
@@ -36,7 +36,8 @@ globalThis.GAME_DATA = {
     foguista: { name: 'Beira da fogueira', tier: 3 },
     beijo: { name: 'Barraca do Beijo', item: 'barraca-beijo' },
     pescaria: { name: 'Barraca de Pescaria', item: 'barraca-pescaria' },
-    argolas: { name: 'Barraca das Argolas', item: 'barraca-argolas' }
+    argolas: { name: 'Barraca das Argolas', item: 'barraca-argolas' },
+    mascote: { name: 'Terreiro', tier: 1 }
   },
 
   // A turma. Vem da pescaria; peixe repetido sobe o nível (até 10).
@@ -58,7 +59,10 @@ globalThis.GAME_DATA = {
     { id: 'pacoca', name: 'Paçoca', rarity: 2, post: 'argolas', role: 'Argoleira',
       effect: 'rings', base: 0.2, per: 0.05, text: 'O preço das Argolas baixa {v}% mais rápido' },
     { id: 'faisca', name: 'Faísca', rarity: 3, post: 'foguista', role: 'Foguista',
-      effect: 'flare', base: 0.5, per: 0.1, text: 'Labareda dura +{v}%' }
+      effect: 'flare', base: 0.5, per: 0.1, text: 'Labareda dura +{v}%' },
+    // O coelho das fotos em sopinha/: pula pelo terreiro e cuida da festa enquanto o jogo está fechado.
+    { id: 'sopinha', name: 'Sopinha', rarity: 1, post: 'mascote', role: 'Mascote da festa',
+      effect: 'offline', base: 0.2, per: 0.05, text: 'Com o jogo fechado, a festa rende +{v}%' }
   ],
   rarities: [
     { name: 'Comum', chance: 0.70, wood: 1 },
@@ -252,7 +256,7 @@ globalThis.GAME_DATA = {
     letterMinutes: 180, letterCap: 3, letterTickets: 3,
     requestEvery: [180, 360], requestSeconds: 60, requestReward: 45,
     crasherEvery: [480, 900], crasherSeconds: 45, crasherTickets: 2,
-    offlineRate: 0.5, offlineCapHours: 12,
+    offlineRate: 0.25, offlineCapHours: 12,
     // Cada rodada dobra o preço da próxima; a cada espera sem jogar, o preço cai pela metade até voltar ao início.
     ringCost: 1, ringCooldownMinutes: 10, ringThrows: 3, ringBottles: 5,
     ringTable: [['fichas', 0.34], ['animacao', 0.3], ['lenha', 0.14], ['x2', 0.13], ['x3', 0.05], ['item', 0.04]],

@@ -32,6 +32,21 @@ if (steamOnly && steam.restartIfNeeded()) {
   let replacing = false;
   // Janela que a festa nova reabre depois de trocar o idioma pelos Ajustes (vai uma vez, junto com o idioma).
   let reopenPanel = null;
+  // A janela está deixando o clique vazar (setIgnoreMouseEvents)? O vigia do cursor conta isso para a festa.
+  let ignoring = true;
+  let cursorKey = '';
+
+  // Diário de erros (erros.log na pasta de dados do jogo): o que a página relatou e quando a festa caiu ou travou.
+  function logLine(text) {
+    try {
+      const file = path.join(app.getPath('userData'), 'erros.log');
+      try { if (fs.statSync(file).size > 256 * 1024) fs.renameSync(file, `${file}.old`); } catch (_) { /* ainda não existe */ }
+      fs.appendFileSync(file, `[${new Date().toISOString()}] ${text}
+`, 'utf8');
+    } catch (error) {
+      console.error('Não foi possível gravar erros.log:', error);
+    }
+  }
 
   function writeSettings() {
     clearTimeout(writeTimer);
@@ -138,6 +153,53 @@ if (steamOnly && steam.restartIfNeeded()) {
     send('painel');
   }
 
+  // Clicar no ícone da bandeja ou abrir o jogo de novo (atalho, Steam): a festa aparece na frente, com foco, sem
+  // abrir janela nenhuma.
+  function showGame() {
+    if (settings.hidden) changeAndTell({ hidden: false });
+    if (!alive()) return;
+    if (win.isMinimized()) win.restore();
+    if (!win.isVisible()) win.show();
+    win.setFocusable(true);
+    win.setSkipTaskbar(false);
+    win.moveTop();
+    win.focus();
+  }
+
+  // Vigia do cursor: com o clique vazando, o Electron só conta à festa onde o mouse está por um gancho do Windows,
+  // que pode parar de funcionar (e a festa não saberia mais quando o cursor passa por cima dela: não dá para
+  // clicar). A cada 120 ms, se o cursor mexeu, a festa recebe a posição e o estado real da janela.
+  function sendCursor() {
+    if (!alive() || !win.isVisible() || win.isMinimized()) return;
+    const point = screen.getCursorScreenPoint();
+    const bounds = win.getContentBounds();
+    const x = point.x - bounds.x;
+    const y = point.y - bounds.y;
+    if (x < 0 || y < 0 || x >= bounds.width || y >= bounds.height) return;
+    const key = `${x},${y},${ignoring}`;
+    if (key === cursorKey) return;
+    cursorKey = key;
+    send({ cursor: { x, y, interactive: !ignoring } });
+  }
+
+  function watchCursor() {
+    setInterval(sendCursor, 120);
+  }
+
+
+  // A página caiu ou travou de vez: abre uma festa nova no lugar (o save é o último que a página gravou).
+  function recoverWindow() {
+    if (!alive()) return;
+    const old = win;
+    replacing = true;
+    keepFocusable = false;
+    old.once('closed', () => {
+      openWindow();
+      replacing = false;
+    });
+    old.destroy();
+  }
+
   function buildMenu() {
     const displays = screen.getAllDisplays();
     const shown = currentDisplay();
@@ -188,11 +250,11 @@ if (steamOnly && steam.restartIfNeeded()) {
       hasShadow: false,
       resizable: false,
       movable: false,
-      minimizable: false,
+      minimizable: true,
       maximizable: false,
       fullscreenable: false,
       focusable: false,
-      skipTaskbar: true,
+      skipTaskbar: false,
       title: t('app.title'),
       icon: path.join(__dirname, 'icon.ico'),
       webPreferences: {
@@ -204,6 +266,7 @@ if (steamOnly && steam.restartIfNeeded()) {
       }
     });
     win = created;
+    ignoring = true;
     created.setIgnoreMouseEvents(true, { forward: true });
     created.setAlwaysOnTop(settings.pinned, 'floating');
     created.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
@@ -218,9 +281,39 @@ if (steamOnly && steam.restartIfNeeded()) {
     created.on('blur', () => {
       if (win !== created) return;
       send({ foco: false });
-      if (!keepFocusable) created.setFocusable(false);
+      // Sem foco, a janela não pode ser ativada por engano (o Windows passaria o foco para ela ao fechar outro
+      // programa); setFocusable mexe no botão da barra de tarefas, então ele volta logo em seguida.
+      if (!keepFocusable) {
+        created.setFocusable(false);
+        created.setSkipTaskbar(false);
+      }
+    });
+    // Botão na barra de tarefas: minimizar esconde a festa; restaurar traz de volta já com foco.
+    created.on('restore', () => {
+      if (win !== created) return;
+      created.setFocusable(true);
+      created.setSkipTaskbar(false);
+      created.focus();
     });
     created.on('closed', () => { if (win === created) win = null; });
+    created.webContents.on('render-process-gone', (_event, details) => {
+      logLine(`a página da festa caiu (${details.reason}, código ${details.exitCode})`);
+      if (win === created && details.reason !== 'clean-exit') recoverWindow();
+    });
+    let hung = null;
+    created.on('unresponsive', () => {
+      logLine('a festa parou de responder');
+      clearTimeout(hung);
+      hung = setTimeout(() => {
+        if (win !== created) return;
+        logLine('a festa ficou 15 s sem responder: abrindo de novo');
+        recoverWindow();
+      }, 15000);
+    });
+    created.on('responsive', () => {
+      clearTimeout(hung);
+      logLine('a festa voltou a responder');
+    });
     created.loadFile(path.join(__dirname, '..', 'index.html'));
   }
 
@@ -253,7 +346,7 @@ if (steamOnly && steam.restartIfNeeded()) {
 
     tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'tray.png')));
     tray.setToolTip(t('app.title'));
-    tray.on('click', openPanel);
+    tray.on('click', showGame);
     updateTray();
     screen.on('display-removed', () => { place(); updateTray(); });
     screen.on('display-added', updateTray);
@@ -301,15 +394,19 @@ if (steamOnly && steam.restartIfNeeded()) {
     });
     ipcMain.on('desktop:set-interactive', (event, interactive) => {
       if (isOwnWindow(event) && typeof interactive === 'boolean') {
+        ignoring = !interactive;
         win.setIgnoreMouseEvents(!interactive, { forward: true });
       }
+    });
+    ipcMain.on('desktop:log-error', (event, text) => {
+      if (isOwnWindow(event) && typeof text === 'string') logLine(text);
     });
     ipcMain.on('desktop:set-focusable', (event, focusable) => {
       if (!isOwnWindow(event) || typeof focusable !== 'boolean') return;
       keepFocusable = focusable;
       if (focusable) {
         win.setFocusable(true);
-        win.setSkipTaskbar(true);
+        win.setSkipTaskbar(false);
         win.focus();
       } else if (!win.isFocused()) win.setFocusable(false);
     });
@@ -317,14 +414,15 @@ if (steamOnly && steam.restartIfNeeded()) {
     ipcMain.on('desktop:focus-game', event => {
       if (!isOwnWindow(event) || win.isFocused()) return;
       win.setFocusable(true);
-      win.setSkipTaskbar(true);
+      win.setSkipTaskbar(false);
       win.focus();
     });
     ipcMain.on('desktop:quit', event => { if (isOwnWindow(event)) app.quit(); });
     createWindow();
+    watchCursor();
   });
 
-  app.on('second-instance', openPanel);
+  app.on('second-instance', showGame);
   app.on('before-quit', () => { if (settings) writeSettings(); });
   app.on('window-all-closed', () => { if (!replacing) app.quit(); });
 }

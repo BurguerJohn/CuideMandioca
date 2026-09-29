@@ -261,6 +261,20 @@ def aipim():
     return [place(blank(16, 17), sprite(grid, 'chita-rosa').crop((0, 0, 16, 16)), 0, 1 - dy) for grid, dy in plan]
 
 
+def sopinha():
+    """Sopinha: sentado (fungando e piscando), no ar do pulinho e deitado. A festa escolhe o quadro pela pose."""
+    rows = sprites.SOPINHA
+    funga = edit(rows, {(23, 5): 'W', (22, 5): 'W', (23, 6): 'L', (22, 6): 'V', (22, 7): 'V'})
+    pisca = edit(rows, {(19, 3): 'E', (20, 3): 'E', (19, 4): 'e', (20, 4): 'e'})
+    orelha = edit(rows, {(14, 9): 'W', (15, 9): 'L', (18, 9): 'M', (15, 10): 'W', (16, 10): 'L', (17, 10): 'M'})
+    poses = [(rows, 1), (funga, 1), (pisca, 1), (orelha, 1), (sprites.SOPINHA_PULO, 0), (sprites.SOPINHA_DEITADO, 0)]
+    frames = []
+    for grid, x in poses:
+        image = outline(sprite(grid))
+        frames.append(place(blank(28, 15), image, x, 15 - image.height))
+    return frames
+
+
 def cachorro():
     """Pescador: balança, pisca e lambe os beiços esperando o peixe."""
     rows = sprites.CACHORRO
@@ -304,10 +318,33 @@ ARMS = {  # braço esquerdo em coordenadas do corpo (o direito é espelhado)
     'aberto': [(0, 9), (-1, 11)],
     'palma': [(1, 10), (4, 9)],
 }
-DANCE_STEPS = [('baixo', 'baixo', 0, None), ('alto', 'alto', -1, 'esquerda'),
-               ('aberto', 'aberto', 0, None), ('alto', 'alto', -1, 'direita')]
-CHEER_STEPS = [('palma', 'palma', 0, None), ('aberto', 'aberto', -1, None),
-               ('palma', 'palma', 0, None), ('alto', 'baixo', -1, None)]
+def _tres(points):
+    """Todo braço com 3 pontos (ombro, cotovelo, mão), para dar para misturar duas poses."""
+    if len(points) == 3:
+        return points
+    (x0, y0), (x1, y1) = points
+    return [(x0, y0), ((x0 + x1) / 2, (y0 + y1) / 2), (x1, y1)]
+
+
+def _meio(a, b):
+    pa, pb = _tres(ARMS[a] if isinstance(a, str) else a), _tres(ARMS[b] if isinstance(b, str) else b)
+    return [((p[0] + q[0]) / 2, (p[1] + q[1]) / 2) for p, q in zip(pa, pb)]
+
+
+def _dobrar(keys):
+    """4 poses viram 8 quadros: cada pose e o quadro no meio do caminho até a próxima (pé no chão, meio pulinho)."""
+    out = []
+    for index, (left, right, bob, foot) in enumerate(keys):
+        nl, nr, nb, _ = keys[(index + 1) % len(keys)]
+        out.append((left, right, bob, foot))
+        out.append((_meio(left, nl), _meio(right, nr), (bob + nb) // 2, None))
+    return out
+
+
+DANCE_STEPS = _dobrar([('baixo', 'baixo', 0, None), ('alto', 'alto', -1, 'esquerda'),
+                       ('aberto', 'aberto', 0, None), ('alto', 'alto', -1, 'direita')])
+CHEER_STEPS = _dobrar([('palma', 'palma', 0, None), ('aberto', 'aberto', -1, None),
+                       ('palma', 'palma', 0, None), ('alto', 'baixo', -1, None)])
 CROWD_W, CROWD_H, CROWD_PAD = 14, 20, 1
 
 
@@ -325,7 +362,7 @@ def person(grid, fabric, pose):
     place(frame, body, ox, top)
     arms, hands = [], []
     for mirror, name in ((False, left), (True, right)):
-        points = [(11 - x if mirror else x, y) for x, y in ARMS[name]]
+        points = [(11 - x if mirror else x, y) for x, y in (ARMS[name] if isinstance(name, str) else name)]
         arms.append(([(ox + x, top + y) for x, y in points], '3'))
         hx, hy = points[-1]
         hands.append((['4'], ox + hx, top + hy))

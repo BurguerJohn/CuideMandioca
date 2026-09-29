@@ -22,7 +22,8 @@ test('o pacote de arte tem sprite e ícone para todo item, personagem e pedido',
   for (const tab of [...UI.TABS, ...UI.TELAS]) assert.ok(bundle.icons[`ui:${tab.icon}`], `ícone da aba ${tab.id}`);
   for (const key of ['0', '1', '2', '3', '4', 'lendaria']) assert.ok(bundle.fires[key]);
   const meta = bundle.mandioca.meta;
-  assert.equal(meta.anchors.length, 16);
+  assert.equal(meta.anchors.length, meta.tags.danca.length + meta.tags.descanso.length + meta.tags.comemora.length);
+  assert.equal(meta.tags.danca.length, 16, "a dança tem 16 quadros");
   for (const tag of Object.values(meta.tags)) for (const frame of tag) assert.ok(meta.anchors[frame].head);
   const sheets = [bundle.mandioca.blink, ...Object.values(bundle.hats), ...Object.values(bundle.hand),
     ...Object.values(bundle.chars), ...Object.values(bundle.sides), ...Object.values(bundle.props),
@@ -38,6 +39,10 @@ test('o pacote de arte tem sprite e ícone para todo item, personagem e pedido',
   }
   for (const id of ['cenoura', 'inhame', 'batata', 'pamonha', 'pacoca']) assert.ok(bundle.chars[id].frames >= 4, id);
   assert.ok(bundle.chars.pamonha.shout < bundle.chars.pamonha.frames);
+  const bunny = bundle.chars.sopinha;
+  for (const pose of ['senta', 'funga', 'pisca', 'orelha', 'pulo', 'deita']) {
+    assert.ok(bunny.poses[pose] < bunny.frames, `pose ${pose} do Sopinha`);
+  }
   assert.equal(bundle.props['pau-sebo'], undefined, 'o pau de sebo saiu do jogo');
   for (const mark of data.scenery.landmarks) {
     if (mark.id !== 'estrelas') assert.ok(bundle.scenery[mark.id], `sprite do marco ${mark.id}`);
