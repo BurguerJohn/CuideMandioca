@@ -105,6 +105,8 @@
     byId(data.stats, override.stats, ['name', 'unit', 'desc']);
     byId(data.tiers, override.tiers, ['name', 'unlocks']);
     byId(data.chars, override.chars, ['name', 'role', 'text']);
+    byId(data.dances, override.dances, ['name']);
+    byId(data.sets, override.sets, ['name']);
     byId(data.categories, override.categories, ['name']);
     byId(data.items, override.items, ['name', 'desc', 'effect']);
     byId(data.outings, override.outings, ['name']);

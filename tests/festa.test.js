@@ -21,10 +21,34 @@ test('o pacote de arte tem sprite e ícone para todo item, personagem e pedido',
   for (const request of data.requests) assert.ok(bundle.requests[request.id], request.id);
   for (const tab of [...UI.TABS, ...UI.TELAS]) assert.ok(bundle.icons[`ui:${tab.icon}`], `ícone da aba ${tab.id}`);
   for (const key of ['0', '1', '2', '3', '4', 'lendaria']) assert.ok(bundle.fires[key]);
+  // A Mandioca em quatro tamanhos: cada um com folhas de todos os tecidos, as mesmas poses e âncoras do mesmo tamanho.
+  const growth = bundle.mandioca.growth;
+  assert.equal(growth.length, data.config.growthAt.length + 1);
+  growth.forEach((kit, stage) => {
+    assert.equal(kit.anchors.length, bundle.mandioca.meta.anchors.length, `âncoras do tamanho ${stage}`);
+    for (const item of data.items.filter(entry => entry.cat === 'tecido')) {
+      assert.ok(kit.sheets[item.id], `tecido ${item.id} no tamanho ${stage}`);
+      assert.equal(kit.sheets[item.id].frames, bundle.mandioca.meta.anchors.length);
+      assert.ok(kit.sheets[item.id].rim, 'luz de contorno');
+    }
+    if (stage) assert.ok(kit.h < growth[stage - 1].h || kit.scale > growth[stage - 1].scale, 'cada tamanho é maior');
+  });
+  for (const item of data.items.filter(entry => entry.cat === 'chapeu' || entry.cat === 'mao')) {
+    const meta = (item.cat === 'chapeu' ? bundle.hats : bundle.hand)[item.id];
+    assert.equal(meta.growth.length, growth.length - 1, `${item.id} nos tamanhos menores`);
+  }
   const meta = bundle.mandioca.meta;
-  assert.equal(meta.anchors.length, meta.tags.danca.length + meta.tags.descanso.length + meta.tags.comemora.length);
+  // Cada passo de dança do repertório tem 16 quadros, e todos os quadros têm âncora para o chapéu e a mão.
+  const dances = Object.values(meta.tags.dancas);
+  const rests = Object.entries(meta.tags.descansos).filter(([id]) => id !== 'ofega').map(([, list]) => list);
+  assert.equal(meta.anchors.length, meta.tags.descanso.length + meta.tags.comemora.length + dances.reduce((n, list) => n + list.length, 0) +
+    rests.reduce((n, list) => n + list.length, 0));
+  assert.deepEqual(meta.tags.descansos.ofega, meta.tags.descanso, 'ofegar é o descanso de sempre');
+  assert.deepEqual(Object.keys(meta.tags.descansos), ['ofega', 'abana', 'alonga', 'bebe', 'milho', 'cochilo']);
+  assert.deepEqual(meta.tags.dancas.forro, meta.tags.danca, 'o forró é o passo de sempre');
   assert.equal(meta.tags.danca.length, 16, "a dança tem 16 quadros");
-  for (const tag of Object.values(meta.tags)) for (const frame of tag) assert.ok(meta.anchors[frame].head);
+  for (const dance of data.dances) assert.equal(meta.tags.dancas[dance.id]?.length, 16, `quadros do passo ${dance.id}`);
+  for (const tag of [...dances, ...rests, meta.tags.descanso, meta.tags.comemora]) for (const frame of tag) assert.ok(meta.anchors[frame].head);
   const sheets = [bundle.mandioca.blink, ...Object.values(bundle.hats), ...Object.values(bundle.hand),
     ...Object.values(bundle.chars), ...Object.values(bundle.sides), ...Object.values(bundle.props),
     ...Object.values(bundle.fires), ...Object.values(bundle.requests), bundle.crowd.dancers, bundle.crowd.audience];
@@ -73,6 +97,135 @@ function lateGame() {
   s.crasher.active = { until: Date.now() + 45000, side: 1 };
   return engine;
 }
+
+test('a Mandioca é desenhada em todos os tamanhos e cresce com um clarão', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  engine.state.equipped.chapeu = 'chapeu-palha';
+  engine.state.equipped.mao = 'bandeirinha';
+  let now = 1000;
+  engine.state.cheer = 1e300;
+  for (let stage = 0; stage <= 3; stage++) {
+    while (engine.growthStage() < stage) engine.buyLevel('rebolado');
+    festa.onEvents(engine, engine.drainEvents(), now);
+    for (let i = 0; i < 80; i++) festa.draw(engine, (now += 17));
+  }
+  assert.equal(engine.growthStage(), 3);
+});
+
+test('os bichos e as crianças da festa são clicáveis e reagem com um pulinho e um grito', () => {
+  const calls = { drawImage: 0 };
+  globalThis.document = fakeDocument([], calls);
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  engine.state.size = 160;
+  let now = 5000;
+  for (let i = 0; i < 30; i++) festa.draw(engine, (now += 17));
+  const critters = festa.areas().map(area => area.id).filter(id => id.startsWith('bicho:'));
+  for (const kind of ['galinha', 'bode', 'gato', 'boi', 'pintinho:0', 'crianca:0', 'igreja', 'caramelo']) {
+    assert.ok(critters.includes(`bicho:${kind}`), `${kind} é clicável`);
+  }
+  const before = calls.drawImage;
+  for (const id of critters) festa.poke(id);
+  for (let i = 0; i < 30; i++) festa.draw(engine, (now += 17));
+  assert.ok(calls.drawImage > before, 'a festa segue sendo desenhada depois dos cliques');
+  festa.poke('bicho:desconhecido:9');
+  festa.poke(undefined);
+});
+
+test('o pote do quebra-pote pendura, balança a cada paulada e some quando quebra', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let now = 5000;
+  for (let i = 0; i < 4; i++) festa.draw(engine, (now += 30));
+  assert.ok(!festa.areas().some(area => area.id === 'pote'), 'sem pote pendurado, nada para clicar');
+  engine.debug('pote');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  for (let i = 0; i < 6; i++) festa.draw(engine, (now += 30));
+  assert.ok(festa.areas().some(area => area.id === 'pote'), 'o pote pendurado é clicável');
+  for (let hit = 0; hit < engine.cfg.poteHits; hit++) {
+    engine.state.pote.active && (engine.state.pote.active.hitAt = 0);
+    engine.hitPote();
+    festa.onEvents(engine, engine.drainEvents(), now);
+    for (let i = 0; i < 12; i++) festa.draw(engine, (now += 30));
+  }
+  assert.equal(engine.state.pote.active, null, 'quebrou');
+  for (let i = 0; i < 60; i++) festa.draw(engine, (now += 30));
+  assert.ok(!festa.areas().some(area => area.id === 'pote'));
+});
+
+test('as crianças fazem uma ciranda em volta da fogueira de tempos em tempos', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  engine.state.size = 160;
+  let now = 5000;
+  let together = 0;
+  let ringed = false;
+  let windy = false;
+  for (let i = 0; i < 2400; i++) {
+    festa.draw(engine, (now += 50));
+    const probe = festa.probe();
+    ringed ||= probe.ring;
+    windy ||= probe.wind !== 0;
+    if (i % 4) continue;
+    const areas = festa.areas();
+    const fire = areas.find(area => area.id === 'fogueira');
+    const near = areas.filter(area => area.id.startsWith('bicho:crianca:') && area.box[0] < fire.box[2] && area.box[2] > fire.box[0]);
+    together = Math.max(together, near.length);
+  }
+  assert.ok(together >= 3, `em dois minutos a criançada se junta em volta da fogueira (viu ${together})`);
+  assert.ok(ringed, 'a ciranda acontece');
+  assert.ok(windy, 'e uma rajada de vento passa pelas bandeirinhas'); 
+});
+
+test('o casamento na roça aparece na pista, some os dois pares e aceita o clique nos noivos', () => {
+  const calls = { drawImage: 0 };
+  globalThis.document = fakeDocument([], calls);
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let now = 5000;
+  for (let i = 0; i < 5; i++) festa.draw(engine, (now += 17));
+  assert.ok(!festa.areas().some(area => area.id === 'casamento'), 'sem casamento os noivos não aparecem');
+  const dancing = calls.drawImage;
+  for (let i = 0; i < 5; i++) festa.draw(engine, (now += 17));
+  const perFrame = (calls.drawImage - dancing) / 5;
+  engine.debug('casamento');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  for (let i = 0; i < 10; i++) festa.draw(engine, (now += 17));
+  const wedding = festa.areas().find(area => area.id === 'casamento');
+  assert.ok(wedding, 'os noivos e o padre são clicáveis');
+  const [x0, y0, x1, y1] = wedding.box;
+  assert.ok(x1 > x0 && y1 > y0);
+  // A cerimônia inteira, com arroz, vivas e o "sim" do final, sem quebrar o desenho.
+  for (let second = 0; second < data.config.weddingSeconds; second++) {
+    engine.tick(1);
+    if (second % 4 === 0) { engine.throwRice(); }
+    festa.onEvents(engine, engine.drainEvents(), now);
+    for (let i = 0; i < 6; i++) festa.draw(engine, (now += 170));
+  }
+  assert.equal(engine.state.runtime.weddingLeft, 0);
+  for (let i = 0; i < 20; i++) festa.draw(engine, (now += 40));
+  assert.ok(!festa.areas().some(area => area.id === 'casamento'), 'acabou o casamento, acabou a festa dos noivos');
+  assert.ok(perFrame > 0);
+});
 
 test('a festa é desenhada do quintal ao Maior São João do Mundo', () => {
   const calls = { drawImage: 0 };
@@ -151,4 +304,177 @@ test('a festa é desenhada do quintal ao Maior São João do Mundo', () => {
   assert.equal(festa.size().capped, false);
   delete globalThis.document;
   delete globalThis.Image;
+});
+
+test('quando a festa ganha largura (ou encolhe), a tela acompanha na mesma escala, sem esticar a arte', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle);
+  festa.setScale(3);
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  let now = 1000;
+  const ratio = () => parseFloat(canvas.style.width) / canvas.width;
+  festa.draw(engine, (now += 50));
+  const small = canvas.width;
+  assert.equal(ratio(), 3);
+  while (engine.state.size < 40) engine.addFame(engine.fameNeed() - engine.state.fame);
+  festa.draw(engine, (now += 50));
+  assert.ok(canvas.width > small, 'a festa cresceu');
+  assert.equal(ratio(), 3, 'a largura na tela cresceu junto (antes ficava a antiga e a arte esticava)');
+  engine.state.cheer = 0;
+  while (engine.state.size < 100) engine.addFame(engine.fameNeed() - engine.state.fame);
+  engine.newYear();
+  festa.draw(engine, (now += 50));
+  assert.equal(canvas.width, small, 'o ano que vem começa do tamanho do quintal');
+  assert.equal(ratio(), 3);
+});
+
+test('as barracas e enfeites dos lados respondem ao clique sem quebrar a festa', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let now = 5000;
+  festa.poke('lado:esquerda');
+  for (const id of ['barraca-beijo', 'barraca-comidas', 'cadeia', 'espantalho', 'fardo', 'mastro', 'carroca']) {
+    engine.addItem(id);
+    engine.equip(id, 'direita');
+    for (let i = 0; i < 3; i++) festa.draw(engine, (now += 30));
+    const before = festa.probe().particles + festa.probe().texts;
+    festa.poke('lado:direita');
+    assert.ok(festa.probe().particles + festa.probe().texts > before, `${id} reage`);
+    for (let i = 0; i < 20; i++) festa.draw(engine, (now += 60));
+  }
+});
+
+test('os balões de São João que sobem da plateia são clicáveis e disparam para o céu', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  engine.state.size = 160;
+  let now = 5000;
+  let lantern = null;
+  for (let i = 0; i < 600 && !lantern; i++) {
+    festa.draw(engine, (now += 50));
+    lantern = festa.areas().find(area => area.id.startsWith('lanterna:'));
+  }
+  assert.ok(lantern, 'saiu um balão clicável');
+  globalThis.performance = globalThis.performance || { now: () => now };
+  festa.poke(lantern.id);
+  festa.poke('lanterna:nao-existe');
+  for (let i = 0; i < 80; i++) festa.draw(engine, (now += 50));
+});
+
+test('o arco-íris cabe em qualquer tamanho de festa (antes a festa estreita travava num laço sem fim)', () => {
+  const vm = require('node:vm');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  let now = 5000;
+  for (const sides of [['fardo', 'mastro'], ['barraca-pescaria', 'barraca-comidas']]) {
+    const clock = { now: 1_000_000 };
+    const engine = new GameEngine(data, null, { rng: () => 0.5, now: () => clock.now });
+    for (const id of sides) engine.addItem(id);
+    for (let size = 1; size <= 40; size++) {
+      while (engine.state.size < size) engine.addFame(engine.fameNeed() - engine.state.fame);
+      engine.equip(sides[0], 'esquerda');
+      engine.equip(sides[1], 'direita');
+      engine.state.weather.rain = null;
+      engine.state.weather.rainbow = { born: clock.now - 10000, until: clock.now + 30000, side: size % 2 };
+      // Desenhado dentro de um vm com tempo limite: um laço sem fim vira erro em vez de travar o teste.
+      vm.runInNewContext('for (let i = 0; i < 3; i++) festa.draw(engine, next())', { festa, engine, next: () => (now += 40) }, { timeout: 4000 });
+    }
+  }
+});
+
+test('a corrida de saco corre na frente da festa: setinha antes da largada, pulos, tombo e a comemoração na chegada', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let clock = engine.now();
+  engine.now = () => clock;
+  let now = 5000;
+  for (let i = 0; i < 4; i++) festa.draw(engine, (now += 30));
+  assert.ok(!festa.areas().some(area => area.id === 'saco'));
+  engine.debug('saco');
+  engine.state.saco.active.rivals = [60000, 60000];
+  festa.onEvents(engine, engine.drainEvents(), now);
+  festa.draw(engine, (now += 30));
+  assert.ok(festa.areas().some(area => area.id === 'saco'), 'o corredor do jogador é clicável');
+  const start = festa.probe().saco;
+  assert.equal(start.rivals[0] - start.rivals[1], 7, 'todo mundo na largada, em raias escalonadas');
+  for (let k = 0; k < 5; k++) {
+    clock += 600;
+    engine.hopSaco();
+    festa.onEvents(engine, engine.drainEvents(), now);
+    for (let i = 0; i < 12; i++) festa.draw(engine, (now += 30));
+  }
+  const mid = festa.probe().saco;
+  assert.ok(mid.x > start.x + 10, 'o corredor andou');
+  assert.ok(mid.rivals[0] > start.rivals[0], 'os rivais também');
+  // Tombo: fica no mesmo lugar.
+  engine.hopSaco();
+  festa.onEvents(engine, engine.drainEvents(), now);
+  for (let i = 0; i < 10; i++) festa.draw(engine, (now += 30));
+  assert.equal(festa.probe().saco.x, mid.x);
+  clock += 2000;
+  while (engine.state.saco.active) {
+    clock += 600;
+    engine.hopSaco();
+    festa.onEvents(engine, engine.drainEvents(), now);
+    festa.draw(engine, (now += 30));
+  }
+  assert.ok(festa.probe().saco.exit, 'cruzou a chegada');
+  assert.ok(!festa.areas().some(area => area.id === 'saco'));
+  for (let i = 0; i < 100; i++) festa.draw(engine, (now += 30));
+  assert.equal(festa.probe().saco, null, 'a corrida saiu de cena');
+});
+
+test('o leiloeiro sobe no palco com a prenda e a plaquinha do lance, e sai depois de vendido', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let clock = engine.now();
+  engine.now = () => clock;
+  let now = 5000;
+  for (let i = 0; i < 4; i++) festa.draw(engine, (now += 30));
+  assert.ok(!festa.areas().some(area => area.id === 'leilao'));
+  engine.debug('leilao');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  festa.draw(engine, (now += 30));
+  const area = festa.areas().find(entry => entry.id === 'leilao');
+  const stage = festa.areas().find(entry => entry.id === 'palco');
+  assert.ok(area, 'o leiloeiro é clicável');
+  assert.ok(area.box[0] >= stage.box[0] && area.box[2] <= stage.box[2] + 4, 'em cima do palco');
+  engine.state.tickets = 100;
+  engine.bidLeilao();
+  festa.onEvents(engine, engine.drainEvents(), now);
+  for (let i = 0; i < 5; i++) festa.draw(engine, (now += 30));
+  engine.state.leilao.active.rivalAt = 0;
+  for (let k = 0; k < 3; k++) {
+    clock += data.config.leilaoCall * 1000 + 1;
+    engine.updateTimers(clock);
+    festa.onEvents(engine, engine.drainEvents(), now);
+    for (let i = 0; i < 5; i++) festa.draw(engine, (now += 30));
+  }
+  assert.equal(engine.state.leilao.active, null);
+  assert.ok(festa.probe().leilao.sold, 'bateu o martelo');
+  assert.ok(!festa.areas().some(entry => entry.id === 'leilao'), 'vendido: não dá mais lance');
+  for (let i = 0; i < 90; i++) festa.draw(engine, (now += 30));
+  assert.equal(festa.probe().leilao, null, 'o leiloeiro desceu do palco');
 });

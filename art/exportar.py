@@ -20,7 +20,11 @@ from PIL import Image
 import sprites
 from render import hex_rgb, outline, shade, sprite, tint
 import animar
+import casamento
 import cenario
+import crescer
+import danca
+import tamanhos
 from scene import (BACK_TINT, HEART, Layer, awning, bonfire, booth_back, booth_counter, crate, flag_mast,
                    sign, stage)
 from sprites import PALETTE
@@ -31,9 +35,28 @@ SHEET = ROOT / 'assets' / 'festa' / 'folha.png'
 
 PAD = 4
 FRAME_W, FRAME_H = 24 + PAD * 2, 40 + PAD
+# Tamanhos da Mandioca que cresce com as melhorias: broto, mudinha, mandioquinha e mandioca inteira. Os menores têm o
+# corpo e o rosto desenhados no próprio tamanho (art/tamanhos.py) e os mesmos braços, pernas e poses em escala, então toda
+# dança nova já vem nos quatro tamanhos. Chapéus e itens de mão dos tamanhos menores saem reduzidos (art/crescer.py).
+GROWTH = [0.62, 0.75, 0.88, 1.0]
 FABRICS = ['xadrez-vermelho', 'xadrez-azul', 'xadrez-verde', 'remendado', 'chita', 'chita-rosa', 'xadrez-ouro']
 CROWD_FABRICS = ['xadrez-azul', 'chita', 'xadrez-vermelho', 'chita-rosa', 'xadrez-verde', 'remendado']
+# Cada pessoa da festa é um tecido com um chapéu: palha (o de sempre), de couro, azul ou lenço vermelho; nas damas, a coroa
+# de flores troca de cor. Quatro "jeitos" por tecido, então a multidão deixa de ser uma fila de gêmeos.
+CROWD_LOOKS = [(fabric, look) for look in range(4) for fabric in CROWD_FABRICS]
+HAT_LOOKS = [{}, {'Y': 'l', 'y': 'D', 'o': 'd'}, {'Y': 'b', 'y': 'J', 'o': 'j'}, {'Y': 'p', 'y': 'R', 'o': 'r'}]
+FLOWER_LOOKS = [{}, {'H': 'J'}, {'H': 'K'}, {'H': 'P'}]
 
+
+def dressed(grid, look):
+    """A grade da pessoa com as cores do chapéu (ou da coroa de flores) do jeito `look`; o resto não muda."""
+    table = (FLOWER_LOOKS if grid is sprites.DAMA else HAT_LOOKS)[look]
+    head = 8 if grid is sprites.DAMA else 4
+    rows = grid.strip('\n').split('\n')
+    return '\n'.join(''.join(table.get(c, c) for c in row) if index < head else row for index, row in enumerate(rows))
+
+
+sprites.FABRICS.update(casamento.FABRICS)
 sprites.FABRICS.update({
     'xadrez-verde': ['vvgg', 'vvgg', 'ggXX', 'ggXX'],
     'remendado': ['RRRJJJ', 'RRRJJJ', 'RRRJJJ', 'AAAPPP', 'AAAPPP', 'AAAPPP'],
@@ -57,10 +80,10 @@ def strip(frames):
 
 # Volume: luz quente na borda de cima/esquerda e sombra arroxeada na de baixo/direita, 1 pixel para dentro do
 # contorno (o contorno não muda). Vale para quem fica na frente da festa: gente, bichos, chapéus, itens e barracas.
-VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'criancas', 'penetra', 'lado-', 'caixote',
+VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'criancas', 'penetra', 'casamento', 'lado-', 'caixote',
           'cenario-galinha', 'cenario-pintinho', 'cenario-gato', 'cenario-bode', 'cenario-balao', 'cenario-mandioquinha',
           'cenario-milharal', 'cenario-bananeira', 'cenario-coqueiro', 'cenario-mandacaru', 'cenario-carrossel',
-          'cenario-balao-grande', 'cenario-boi')
+          'cenario-balao-grande', 'cenario-boi', 'cenario-balao-ouro', 'cenario-pote', 'cenario-caramelo', 'cenario-pombo', 'cenario-trem', 'cenario-sapo', 'cenario-saco', 'cenario-leiloeiro')
 LUZ_QUENTE = (255, 236, 196)
 
 
@@ -86,12 +109,28 @@ def volume(image, light=0.16, dark=0.30):
     return out
 
 
+sources = {}
+
+
 def add(name, frames, **meta):
-    sheet, width, height = strip(frames if isinstance(frames, list) else [frames])
+    frames = frames if isinstance(frames, list) else [frames]
+    sources[name] = frames
+    sheet, width, height = strip(frames)
     if name.startswith(VOLUME):
         sheet = volume(sheet)
     images[name] = sheet
     return {'image': name, 'w': width, 'h': height, 'frames': sheet.width // width, **meta}
+
+
+def add_scaled(name, stage, bias=0.34, **meta):
+    """A mesma folha de `name` no tamanho `stage` da Mandioca (volume e luz de contorno saem do quadro reduzido). `bias` é
+    quanto da área tem que ser contorno para o pixel novo virar contorno (coisa fina, como vara, pede mais)."""
+    frames = [crescer.reduzir(frame, GROWTH[stage], bias) for frame in sources[name]]
+    return add(f'{name}-t{stage}', frames, **meta)
+
+
+def scaled_pair(value, stage):
+    return [round(v * GROWTH[stage], 2) for v in value]
 
 
 # Luz de contorno: a borda de cada quadro do lado de uma fonte de luz (a fogueira). O jogo desenha por cima do
@@ -166,6 +205,13 @@ LEFT_ARM = {'diag': ((2, 19), (1, 15)), 'alto': ((3, 17), (3, 12)), 'lado': ((1,
             'joelho': ((3, 27), (6, 31))}
 RIGHT_ARM = {'baixo': ((21, 24), (22, 27)), 'cintura': ((22, 25), (19, 28)), 'alto': ((21, 19), (21, 14)),
              'joelho': ((21, 27), (17, 31))}
+LEFT_ARM.update(danca.ESQUERDO)
+RIGHT_ARM.update(danca.DIREITO)
+# Toda pose de braço existe nos dois lados (a que faltar vira o espelho da do outro lado).
+for _name, _points in list(RIGHT_ARM.items()):
+    LEFT_ARM.setdefault(_name, tuple((23 - x, y) for x, y in _points))
+for _name, _points in list(LEFT_ARM.items()):
+    RIGHT_ARM.setdefault(_name, tuple((23 - x, y) for x, y in _points))
 DANCE = [(1, 0, 'diag', 'baixo', 'ambas', 'canta'), (0, -1, 'alto', 'baixo', 'esquerda', 'canta'),
          (-1, -1, 'alto', 'cintura', 'esquerda', 'sorri'), (0, 0, 'diag', 'cintura', 'ambas', 'sorri'),
          (1, 0, 'lado', 'baixo', 'ambas', 'canta'), (0, 1, 'diag', 'alto', 'direita', 'canta'),
@@ -173,6 +219,15 @@ DANCE = [(1, 0, 'diag', 'baixo', 'ambas', 'canta'), (0, -1, 'alto', 'baixo', 'es
 REST = [(1, 'ofega'), (2, 'ofega'), (2, 'sorri'), (1, 'ofega')]
 CHEER = [(1, 0, 'diag', 'baixo', 'canta'), (0, 3, 'alto', 'alto', 'canta'), (-1, 4, 'alto', 'alto', 'canta'),
          (0, 2, 'lado', 'alto', 'sorri')]
+
+
+def face_back():
+    """A Mandioca de costas (na volta do giro): o rosto vira casca, sem olho nem boca."""
+    swap = str.maketrans({'6': '3', '7': '3', 'e': '3', '9': '4', 'm': '3', 'n': '3', 'c': '4'})
+    rows = list(CORE)
+    for index in range(3, 11):
+        rows[index] = rows[index][:6] + rows[index][6:18].translate(swap) + rows[index][18:]
+    return '\n'.join(rows)
 
 
 def face(eyes, mouth):
@@ -227,12 +282,21 @@ def mistura(table, a, b):
     return tuple(((p[0] + q[0]) / 2, (p[1] + q[1]) / 2) for p, q in zip(pa, pb))
 
 
-def mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, eyes='abertos', hop=0):
+def squeeze(frame, factor):
+    """Aperta o quadro na horizontal em volta do meio do corpo (a Mandioca de lado, no meio do giro)."""
+    width = max(2, round(frame.width * factor))
+    small = frame.resize((width, frame.height), Image.NEAREST)
+    out = Image.new('RGBA', frame.size, (0, 0, 0, 0))
+    out.alpha_composite(small, ((frame.width - width) // 2, 0))
+    return out
+
+
+def mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, eyes='abertos', hop=0, back=False, squash=1.0):
     frame = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     leg_layer = Layer(FRAME_W, FRAME_H)
     legs(leg_layer, bob, sway, lifted)
     frame.alpha_composite(outline(leg_layer.image).crop((1, 1, FRAME_W + 1, FRAME_H + 1)))
-    frame.alpha_composite(sprite(face(eyes, mouth), fabric), (PAD + sway, PAD + 8 + bob))
+    frame.alpha_composite(sprite(face_back() if back else face(eyes, mouth), fabric), (PAD + sway, PAD + 8 + bob))
     arms = Layer(FRAME_W, FRAME_H)
     ox, oy = PAD + sway, PAD + bob
     left_points = LEFT_ARM[left] if isinstance(left, str) else left
@@ -244,20 +308,87 @@ def mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, eyes='abertos'
                'hand': [round(ox + left_points[1][0]), round(oy + left_points[1][1] - hop)]}
     if hop:
         frame = shifted(frame, -hop)
+    if squash < 1:
+        frame = squeeze(frame, squash)
     return frame, anchors
 
 
-def dance_poses():
-    """As 8 poses do passo de forró viram 16 quadros: cada pose e um quadro no meio do caminho até a próxima."""
+def small_frame(stage, fabric, bob, sway, left, right, lifted, mouth, eyes='abertos', hop=0, back=False, squash=1.0):
+    """Um quadro da Mandioca no tamanho `stage` (0 a 2): a grade do corpo desse tamanho (art/tamanhos.py), com o rosto
+    desenhado nele, e os braços, as pernas, o balanço e o pulo do tamanho inteiro em escala."""
+    s = GROWTH[stage]
+    kit = tamanhos.KITS[stage]
+    width, height = round(FRAME_W * s), round(FRAME_H * s)
+    ox, oy = round((PAD + sway) * s), round((PAD + bob) * s)
+    top = oy + round(8 * s)
+    up = lifts(lifted)
+    frame = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+    leg_layer = Layer(width, height)
+    for side, x, colors in (('esquerda', ox + kit['legs'][0], '43'), ('direita', ox + kit['legs'][1], '32')):
+        foot = height - 2 - round(up[side] * s)
+        for y in range(top + len(kit['core']), foot):
+            leg_layer.put(x, y, colors[0])
+            leg_layer.put(x + 1, y, colors[1])
+        leg_layer.grid(['ddD'] if side == 'esquerda' else ['Ddd'], x - 1 if side == 'esquerda' else x, foot)
+    frame.alpha_composite(outline(leg_layer.image).crop((1, 1, width + 1, height + 1)))
+    frame.alpha_composite(sprite(tamanhos.face(stage, eyes, mouth, back), fabric), (ox, top))
+    arms = Layer(width, height)
+    left_points = LEFT_ARM[left] if isinstance(left, str) else left
+    right_points = RIGHT_ARM[right] if isinstance(right, str) else right
+    scaled = lambda points: tuple((x * s, y * s) for x, y in points)
+    for shoulder, points in (((4, 22), left_points), ((19, 22), right_points)):
+        (sx, sy), (ex, ey), (hx, hy) = (shoulder[0] * s, shoulder[1] * s), *scaled(points)
+        for (x0, y0), (x1, y1) in (((sx, sy), (ex, ey)), ((ex, ey), (hx, hy))):
+            steps = max(int(math.ceil(max(abs(x1 - x0), abs(y1 - y0)))), 1)
+            for step in range(steps + 1):
+                t = step / steps
+                arms.put(ox + x0 + (x1 - x0) * t, oy + y0 + (y1 - y0) * t, '3')
+        arms.grid(['54', '43'], round(ox + hx), round(oy + hy))
+    frame.alpha_composite(outline(arms.image).crop((1, 1, width + 1, height + 1)))
+    lift = round(hop * s)
+    eye_row, eye_col = kit['eyes_at']
+    anchors = {'head': [ox, oy - lift], 'eyes': [ox + eye_col, top + eye_row - lift],
+               'hand': [round(ox + left_points[1][0] * s), round(oy + left_points[1][1] * s - lift)]}
+    if lift:
+        frame = shifted(frame, -lift)
+    if squash < 1:
+        frame = squeeze(frame, squash)
+    return frame, anchors
+
+
+def dance_poses(sequence=None):
+    """As 8 poses de uma dança viram 16 quadros: cada pose e um quadro no meio do caminho até a próxima. Sem
+    argumento, o passo de forró de sempre; as outras vêm de art/danca.py (o sétimo número da pose é o pulo)."""
+    sequence = sequence or DANCE
     poses = []
-    for index, (bob, sway, left, right, lifted, mouth) in enumerate(DANCE):
-        nb, ns, nl, nr, nlift, _ = DANCE[(index + 1) % len(DANCE)]
-        poses.append((bob, sway, left, right, lifted, mouth, 0))
+    for index, pose in enumerate(sequence):
+        bob, sway, left, right, lifted, mouth = pose[:6]
+        hop = pose[6] if len(pose) > 6 else 0
+        following = sequence[(index + 1) % len(sequence)]
+        nb, ns, nl, nr, nlift = following[:5]
+        nhop = following[6] if len(following) > 6 else 0
+        poses.append((bob, sway, left, right, lifted, mouth, hop))
         a, b = lifts(lifted), lifts(nlift)
         half = {side: (a[side] + b[side]) // 2 for side in a}
         poses.append((meio(bob, nb), meio(sway, ns), mistura(LEFT_ARM, left, nl), mistura(RIGHT_ARM, right, nr), half,
-                      mouth, 0))
+                      mouth, meio(hop, nhop)))
     return poses
+
+
+def spin_frames(fabric, build=None):
+    """O giro: uma volta inteira em 16 quadros. De frente aperta até ficar de lado, aparece de costas (sem rosto) e
+    volta a abrir até a frente, com os braços abertos e um pulinho no meio."""
+    build = build or mandioca_frame
+    frames, marks = [], []
+    for index in range(16):
+        angle = index * math.pi / 8
+        squash = max(0.55, abs(math.cos(angle)))
+        hop = round(3 * math.sin(math.pi * index / 16))
+        frame, mark = build(fabric, 0, 0, 'aberto', 'aberto', 'ambas', 'canta', hop=hop,
+                            back=4 <= index <= 12, squash=squash)
+        frames.append(frame)
+        marks.append(mark)
+    return frames, marks
 
 
 def cheer_poses():
@@ -271,34 +402,90 @@ def cheer_poses():
     return poses
 
 
+def mandioca_frames(fabric, build=None):
+    """Todos os quadros da Mandioca num tecido, na ordem das tags: forró, descanso, comemoração, danças novas e
+    descansos novos. `build` desenha cada quadro (o tamanho inteiro por padrão, ou um dos menores)."""
+    build = build or mandioca_frame
+    dance, cheer = dance_poses(), cheer_poses()
+    frames, marks = [], []
+    for bob, sway, left, right, lifted, mouth, hop in dance:
+        frame, anchor = build(fabric, bob, sway, left, right, lifted, mouth, hop=hop)
+        frames.append(frame)
+        marks.append(anchor)
+    for bob, mouth in REST:
+        frame, anchor = build(fabric, bob, 0, 'joelho', 'joelho', 'ambas', mouth, 'cansados')
+        frames.append(frame)
+        marks.append(anchor)
+    for bob, sway, left, right, lifted, mouth, hop in cheer:
+        frame, anchor = build(fabric, bob, sway, left, right, lifted, mouth, hop=hop)
+        frames.append(frame)
+        marks.append(anchor)
+    # Os descansos novos (se abana, se espreguiça e bebe): 4 quadros cada, depois de todas as danças.
+    rest_frames, rest_marks = [], []
+    for name, poses in danca.DESCANSOS.items():
+        for bob, left, right, mouth, eyes in poses:
+            frame, anchor = build(fabric, bob, 0, left, right, 'ambas', mouth, eyes)
+            rest_frames.append(frame)
+            rest_marks.append(anchor)
+    # As danças novas: 16 quadros cada, na ordem de danca.ORDEM (o forró já está lá em cima).
+    for name in danca.ORDEM[1:]:
+        if name == 'giro':
+            new_frames, new_marks = spin_frames(fabric, build)
+        else:
+            new_frames, new_marks = [], []
+            for bob, sway, left, right, lifted, mouth, hop in dance_poses(danca.DANCAS[name]):
+                frame, anchor = build(fabric, bob, sway, left, right, lifted, mouth, hop=hop)
+                new_frames.append(frame)
+                new_marks.append(anchor)
+        frames.extend(new_frames)
+        marks.extend(new_marks)
+    frames.extend(rest_frames)
+    marks.extend(rest_marks)
+    return frames, marks
+
+
 def export_mandioca():
     anchors = None
     dance, cheer = dance_poses(), cheer_poses()
     for fabric in FABRICS:
-        frames, marks = [], []
-        for bob, sway, left, right, lifted, mouth, hop in dance:
-            frame, anchor = mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, hop=hop)
-            frames.append(frame)
-            marks.append(anchor)
-        for bob, mouth in REST:
-            frame, anchor = mandioca_frame(fabric, bob, 0, 'joelho', 'joelho', 'ambas', mouth, 'cansados')
-            frames.append(frame)
-            marks.append(anchor)
-        for bob, sway, left, right, lifted, mouth, hop in cheer:
-            frame, anchor = mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, hop=hop)
-            frames.append(frame)
-            marks.append(anchor)
+        frames, marks = mandioca_frames(fabric)
         manifest['mandioca'][fabric] = add(f'mandioca-{fabric}', frames)
         manifest['mandioca'][fabric]['rim'] = luz(f'mandioca-{fabric}')
         anchors = marks
     d, r = len(dance), len(REST)
-    manifest['mandioca']['meta'] = {
-        'w': FRAME_W, 'h': FRAME_H, 'pad': PAD, 'anchors': anchors,
-        'tags': {'danca': list(range(d)), 'descanso': list(range(d, d + r)),
-                 'comemora': list(range(d + r, d + r + len(cheer)))},
-    }
+    after = d + r + len(cheer)
+    tags = {'danca': list(range(d)), 'descanso': list(range(d, d + r)), 'comemora': list(range(d + r, after)),
+            'dancas': {'forro': list(range(d))}}
+    for offset, name in enumerate(danca.ORDEM[1:]):
+        tags['dancas'][name] = list(range(after + 16 * offset, after + 16 * (offset + 1)))
+    rest_start = after + 16 * len(danca.ORDEM[1:])
+    tags['descansos'] = {'ofega': tags['descanso']}
+    for offset, name in enumerate(danca.DESCANSOS):
+        tags['descansos'][name] = list(range(rest_start + 4 * offset, rest_start + 4 * (offset + 1)))
+    manifest['mandioca']['meta'] = {'w': FRAME_W, 'h': FRAME_H, 'pad': PAD, 'anchors': anchors, 'tags': tags}
     blink = sprite('\n'.join(EYES['fechados']))
     manifest['mandioca']['blink'] = add('piscar', blink)
+    # Os quatro tamanhos: cada um com as suas folhas por tecido, âncoras (fracionárias: o jogo arredonda a soma) e o
+    # ponto do chão (`cx`, o meio do corpo) que fica no mesmo lugar em todos.
+    growth = []
+    for stage, scale in enumerate(GROWTH):
+        if scale == 1.0:
+            sheets = {fabric: manifest['mandioca'][fabric] for fabric in FABRICS}
+            growth.append({'scale': 1, 'w': FRAME_W, 'h': FRAME_H, 'cx': PAD + 12, 'anchors': anchors, 'tags': tags,
+                           'sheets': sheets, 'blink': manifest['mandioca']['blink']})
+            continue
+        sheets = {}
+        small_marks = None
+        build = lambda *args, stage=stage, **kwargs: small_frame(stage, *args, **kwargs)
+        for fabric in FABRICS:
+            frames, small_marks = mandioca_frames(fabric, build)
+            sheets[fabric] = add(f'mandioca-{fabric}-t{stage}', frames)
+            sheets[fabric]['rim'] = luz(f'mandioca-{fabric}-t{stage}')
+        first = sheets[FABRICS[0]]
+        growth.append({'scale': scale, 'w': first['w'], 'h': first['h'], 'cx': round((PAD + 12) * scale, 2),
+                       'anchors': small_marks, 'tags': tags, 'sheets': sheets,
+                       'blink': add(f'piscar-t{stage}', sprite(tamanhos.blink(stage)))})
+    manifest['mandioca']['growth'] = growth
 
 
 # --- Chapéus e itens de mão -------------------------------------------------------------------
@@ -336,6 +523,9 @@ def export_hats():
     for hat_id, meta in manifest['hats'].items():
         image = images[meta['image']]
         icons[f'item:{hat_id}'] = image.crop(image.getbbox())
+        # O mesmo chapéu nos tamanhos menores da Mandioca (o deslocamento também encolhe).
+        meta['growth'] = [add_scaled(meta['image'], stage, ox=round(meta['ox'] * GROWTH[stage], 2),
+                                     oy=round(meta['oy'] * GROWTH[stage], 2)) for stage in range(len(GROWTH) - 1)]
 
 
 def flag_frames():
@@ -367,7 +557,29 @@ def fishing_rod():
     return outline(layer.image), [3, 12]
 
 
+def sparkler_frames():
+    """Estrelinha (a vareta de faísca de São João): o arame de metal e a ponta soltando faíscas diferentes a cada quadro."""
+    width, height = 11, 16
+    rays = [[(0, -4), (3, -3), (4, 0), (-3, 2), (-4, -1)], [(-2, -4), (4, -2), (2, 3), (-4, 1), (1, -5)],
+            [(1, -4), (-3, -3), (4, 1), (-2, 3), (3, -1)], [(-1, -5), (2, -3), (-4, -2), (3, 2), (-3, 1)]]
+    frames = []
+    for k, sparks in enumerate(rays):
+        layer = Layer(width, height)
+        layer.rect(5, 6, 5, 13, 'S')
+        layer.rect(5, 12, 5, 15, 'D')
+        cx, cy = 5, 5
+        layer.rect(cx - 1, cy - 1, cx + 1, cy + 1, 'F')
+        layer.put(cx, cy, 'z')
+        for dx, dy in sparks:
+            layer.line(cx, cy, cx + dx, cy + dy, 'A' if (dx + dy + k) % 2 else 'F')
+            layer.put(cx + dx, cy + dy, 'z')
+        frames.append(outline(layer.image))
+    return frames, [6, 13]
+
+
 def export_hand():
+    sparkler, spark_pivot = sparkler_frames()
+    manifest['hand']['estrelinha'] = add('mao-estrelinha', sparkler, pivot=spark_pivot, fps=12)
     frames, pivot = flag_frames()
     manifest['hand']['bandeirinha'] = add('mao-bandeirinha', frames, pivot=pivot, fps=9)
     rod, rod_pivot = fishing_rod()
@@ -382,6 +594,8 @@ def export_hand():
     for item_id, meta in manifest['hand'].items():
         image = images[meta['image']].crop((0, 0, meta['w'], meta['h']))
         icons[f'item:{item_id}'] = image.crop(image.getbbox())
+        meta['growth'] = [add_scaled(meta['image'], stage, bias=0.6, pivot=scaled_pair(meta['pivot'], stage), fps=meta['fps'])
+                          for stage in range(len(GROWTH) - 1)]
 
 
 # --- Turma: cada personagem com a animação do seu papel ---------------------------------------
@@ -403,13 +617,18 @@ def export_chars():
     manifest['chars']['sopinha'] = add('turma-sopinha', animar.sopinha(), fps=1,
                                        poses={'senta': 0, 'funga': 1, 'pisca': 2, 'orelha': 3, 'pulo': 4, 'deita': 5})
     manifest['chars']['sopinha']['rim'] = luz('turma-sopinha')
+    # Pipoca atrás do balcão da Barraca de Comidas (`top`: pixels do quadro acima da linha do balcão) e Amendoim, o
+    # ambulante, que passeia pela frente da festa.
+    manifest['chars']['pipoca'] = add('turma-pipoca', animar.pipoca(), fps=7, top=1)
+    manifest['chars']['amendoim'] = add('turma-amendoim', animar.amendoim(), fps=8)
     manifest['chars']['balcao-cavalheiro'] = add('turma-balcao-cavalheiro',
                                                  animar.keeper(sprites.CAVALHEIRO, 'xadrez-azul', [(4, 5), (7, 5)]), fps=3)
     manifest['chars']['balcao-dama'] = add('turma-balcao-dama', animar.keeper(sprites.DAMA, 'chita', [(4, 5), (7, 5)]), fps=3)
 
     full = {'aipim': sprite(sprites.AIPIM, 'chita-rosa'), 'cachorro': sprite(sprites.CACHORRO),
             'pacoca': sprite(sprites.PACOCA)}
-    for char_id in ('milho', 'cenoura', 'inhame', 'batata', 'pamonha', 'faisca', 'pacoca', 'aipim', 'cachorro', 'sopinha'):
+    for char_id in ('milho', 'cenoura', 'inhame', 'batata', 'pamonha', 'faisca', 'pacoca', 'aipim', 'cachorro', 'sopinha',
+                    'pipoca', 'amendoim'):
         if char_id in full:
             icons[f'char:{char_id}'] = full[char_id]
         else:
@@ -423,11 +642,12 @@ def export_crowd():
     cheia, a quadrilha ganha a fila de trás e a plateia mais duas fileiras, cada uma mais escura (mais longe)."""
     normal, cheer, ola = [], [], []
     for grid in (sprites.CAVALHEIRO, sprites.DAMA):
-        for fabric in CROWD_FABRICS:
-            normal.extend(animar.person(grid, fabric, pose) for pose in animar.DANCE_STEPS)
-            cheer.extend(animar.person(grid, fabric, pose) for pose in animar.CHEER_STEPS)
+        for fabric, look in CROWD_LOOKS:
+            dress = dressed(grid, look)
+            normal.extend(animar.person(dress, fabric, pose) for pose in animar.DANCE_STEPS)
+            cheer.extend(animar.person(dress, fabric, pose) for pose in animar.CHEER_STEPS)
             # A "ola" da plateia: os dois braços para o alto num pulinho (fica depois de todos os passos da folha).
-            ola.append(animar.person(grid, fabric, ('alto', 'alto', -2, None)))
+            ola.append(animar.person(dress, fabric, ('alto', 'alto', -2, None)))
     cheer += ola
     manifest['crowd'] = {
         'dancers': add('multidao', normal),
@@ -435,12 +655,16 @@ def export_crowd():
         'audience': add('plateia', [tint(image, BACK_TINT, 0.38) for image in cheer]),
         'audience2': add('plateia-2', [tint(image, BACK_TINT, 0.5) for image in cheer]),
         'audience3': add('plateia-3', [tint(image, BACK_TINT, 0.6) for image in cheer]),
-        'kids': add('criancas', [frame for fabric in CROWD_FABRICS for frame in animar.crianca(fabric)]),
-        'fabrics': len(CROWD_FABRICS), 'steps': len(animar.DANCE_STEPS), 'pad': animar.CROWD_PAD,
+        'kids': add('criancas', [frame for fabric, look in CROWD_LOOKS
+                                 for frame in animar.crianca(fabric, lambda grid, look=look: dressed(grid, look))]),
+        'fabrics': len(CROWD_LOOKS), 'steps': len(animar.DANCE_STEPS), 'pad': animar.CROWD_PAD,
         'ola': len(cheer) - len(ola),
     }
     manifest['crowd']['dancers']['rim'] = luz('multidao')
     manifest['props']['penetra'] = add('penetra', animar.penetra(), fps=8)
+    # Casamento na roça: noivo, noiva e padre (3 quadros cada: parado, respirando, comemorando) e o caramanchão de flores.
+    manifest['props']['casamento'] = add('casamento', casamento.personagens(), fps=1)
+    manifest['props']['caramanchao'] = add('caramanchao', casamento.caramanchao(), fps=3)
 
 
 # --- Barracas e enfeites -----------------------------------------------------------------------
@@ -560,6 +784,56 @@ def scarecrow():
     return outline(layer.image)
 
 
+def quentao_barrel(step=0):
+    """Barril de quentão: o barril de madeira com aros de ferro, a torneirinha pingando, canecas de barro em cima de um
+    caixote e o vapor subindo (quatro quadros: o vapor ondula e a gota cai)."""
+    layer = Layer(34, 34)
+    # Barril: bojo mais largo no meio, tábuas verticais e dois aros.
+    for y in range(12, 31):
+        t = (y - 21) / 9.5
+        half = round(9 - 2 * t * t)
+        for x in range(12 - half, 12 + half + 1):
+            u = (x - 12) / max(1, half)
+            char = 'l' if u < -0.3 else 'D' if u < 0.55 else 'd'
+            if (x - 12 + half) % 4 == 0:
+                char = 'd'
+            layer.put(x, y, char)
+    for y in (15, 26):
+        t = (y - 21) / 9.5
+        half = round(9 - 2 * t * t)
+        layer.rect(12 - half, y, 12 + half, y, 's')
+        layer.put(12 - half + 1, y, 'S')
+    layer.rect(5, 11, 19, 11, 'd')
+    layer.rect(6, 10, 18, 10, 'u')
+    # Torneirinha e a gota que cai (desce um pixel por quadro e some).
+    layer.rect(21, 23, 23, 23, 'S')
+    layer.put(23, 24, 's')
+    drop = step % 4
+    if drop < 3:
+        layer.put(23, 26 + drop * 2, 'q')
+    # Caixote com duas canecas de barro, a da frente com o quentão escuro.
+    layer.rect(24, 26, 33, 31, 'D')
+    layer.rect(24, 26, 33, 26, 'l')
+    layer.line(24, 31, 33, 26, 'd')
+    for cx in (25, 30):
+        layer.rect(cx, 22, cx + 2, 25, 'k')
+        layer.rect(cx, 22, cx + 2, 22, 'Q')
+        layer.put(cx + 3, 23, 'k')
+    image = outline(layer.image)
+    # Vapor por cima, sem contorno e meio transparente: três fios que ondulam subindo do barril.
+    steam = Layer(image.width, image.height)
+    for k, x0 in enumerate((9, 13, 17)):
+        for y in range(2, 11):
+            wiggle = round(math.sin((y + step * 1.6 + k * 2) * 0.9) * 1.2)
+            if (y + k + step) % 3 != 0:
+                steam.put(x0 + wiggle, y, 'X' if y < 6 else 'x')
+    vapor = steam.image
+    alpha = vapor.getchannel('A').point(lambda a: a * 150 // 255)
+    vapor.putalpha(alpha)
+    image.alpha_composite(vapor)
+    return image
+
+
 def cart(phase=0):
     layer = Layer(42, 26)
     layer.rect(2, 8, 37, 17, 'D')
@@ -593,6 +867,7 @@ def export_sides():
     manifest['sides']['mastro'] = add('lado-mastro', [flag_mast(phase=i * math.pi / 2) for i in range(4)], fps=5)
     manifest['sides']['espantalho'] = add('lado-espantalho', animar.espantalho(scarecrow()), fps=3)
     manifest['sides']['carroca'] = add('lado-carroca', [cart(phase) for phase in range(2)], fps=2)
+    manifest['sides']['barril-quentao'] = add('lado-barril-quentao', [quentao_barrel(step) for step in range(4)], fps=4)
     for kind in ('barraca-pescaria', 'barraca-beijo', 'barraca-comidas', 'cadeia', 'correio', 'barraca-argolas'):
         parts = [booth_parts(kind, frame) for frame in range(BOOTH_FRAMES)]
         _, x0, x1 = BOOTHS[kind]
@@ -752,9 +1027,33 @@ def export_rings():
     manifest['rings']['argola'] = add('argolas-argola', rings, open=11)
 
 
+def rainbow_icon():
+    """O arco-íris pequeno (ícone da conquista do pote de ouro): sete faixas de 2 pixels numa meia elipse."""
+    layer = Layer(30, 16)
+    colors = ['R', 'K', 'A', 'G', 'C', 'J', 'P']
+    for k, color in enumerate(colors):
+        a, b = 14 - 1.4 * k, 13 - 1.4 * k
+        for step in range(0, 181):
+            angle = math.radians(step)
+            layer.put(round(14.5 - a * math.cos(angle)), round(14 - b * math.sin(angle)), color)
+            layer.put(round(14.5 - a * math.cos(angle)), round(15 - b * math.sin(angle)), color)
+    return outline(layer.image)
+
+
 def export_icons():
     for name, text in sprites.UI_ICONS.items():
         icons[f'ui:{name}'] = fill(text)
+    balloon = cenario.balao_ouro()[0]
+    icons['ui:balao'] = balloon.crop(balloon.getbbox())
+    icons['ui:arco'] = rainbow_icon()
+    bride = casamento.personagens()[3]
+    icons['ui:casamento'] = bride.crop(bride.getbbox())
+    pot = cenario.pote()[0]
+    icons['ui:pote'] = pot.crop(pot.getbbox())
+    racer = cenario.saco()[3]
+    icons['ui:saco'] = racer.crop(racer.getbbox())
+    auctioneer = cenario.leiloeiro()[1]
+    icons['ui:leilao'] = auctioneer.crop(auctioneer.getbbox())
     for fabric in FABRICS:
         icons[f'item:{fabric}'] = fill(sprites.SHIRT_ICON, fabric)
 

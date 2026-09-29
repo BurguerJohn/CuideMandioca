@@ -33,6 +33,19 @@ ICONS = {
     'atenciosa': ('item:espiga', '#ff8a12'),
     'seguranca': ('item:cadeia', '#9d5cf0'),
     'mao-boa': ('ui:argolas', '#35a03a'),
+    'crescida': ('ui:melhoria', '#35a03a'),
+    'repertorio': ('ui:folego', '#9d5cf0'),
+    'balao-de-sorte': ('ui:balao', '#3a6cf0'),
+    'dengosa': ('char:sopinha', '#ff4f9e'),
+    'arco-iris': ('ui:arco', '#3fd6f0'),
+    'madrinha': ('ui:casamento', '#ff4f9e'),
+    'bingo': ('ui:bingo', '#3a6cf0'),
+    'ano-que-vem': ('ui:fogueira', '#ffd21e'),
+    'quebra-pote': ('ui:pote', '#ff8a12'),
+    'estilista': ('item:veu-noiva', '#9d5cf0'),
+    'canguru': ('ui:saco', '#35a03a'),
+    'dou-lhe-tres': ('ui:leilao', '#ffd21e'),
+    'metodica': ('ui:conquista', '#ff8a12'),
 }
 INK = (18, 9, 6, 255)
 WOOD = (192, 122, 54, 255)

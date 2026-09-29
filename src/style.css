@@ -410,3 +410,38 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .ferramenta.teste { background: #d8f0c8; }
 .tela.modo-teste .painel-topo { background: #6a4aa8; }
 .tela.modo-teste .painel-topo h1 { text-shadow: 3px 3px 0 #2e1f5a; }
+
+.placa-buffs { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 4px; }
+.selo.ouro { background: #ffd21e; color: var(--tinta); }
+
+/* Metas da festa: o texto e a barra ocupam o cartão, e o botão de resgatar fica na ponta direita */
+.meta .linha { display: flex; align-items: center; gap: 14px; }
+.meta .linha > div { flex: 1; min-width: 0; }
+.meta .linha .btn { flex: none; }
+.meta.feita { background: #e6f7c0; }
+
+/* Bingo da quermesse: cartela 3x3 de papel, as casas sorteadas ganham um grão de milho; do lado, a última bolinha */
+.cartao.bingo { display: flex; gap: 14px; align-items: center; }
+.bingo-cartela { display: grid; grid-template-columns: repeat(3, 44px); grid-auto-rows: 38px; gap: 3px; padding: 4px;
+  background: var(--vermelho); border: 3px solid var(--tinta); }
+.bingo-casa { position: relative; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px;
+  background: #fff4e4; color: var(--tinta); border: 2px solid var(--tinta); }
+.bingo-casa.marcada { background: #d8f5b0; }
+.bingo-casa.marcada::after { content: ''; position: absolute; left: 3px; top: 3px; width: 7px; height: 7px; background: #ffd21e;
+  border: 2px solid var(--tinta); border-radius: 50% 50% 45% 45%; }
+.bingo-casa.nova { background: #fff07a; }
+.bingo-lado { flex: 1; min-width: 0; }
+.bingo-bola { width: 58px; height: 58px; display: flex; align-items: center; justify-content: center; margin: 4px 0 6px; font-size: 26px;
+  font-weight: 800; color: var(--tinta); background: #fffff0; border: 3px solid var(--tinta); border-radius: 50%;
+  box-shadow: inset -4px -4px 0 #efd29a; }
+
+/* O ano do São João (do 2º em diante), miudinho ao lado do porte na placa */
+.placa-porte small { font-size: 10px; font-weight: 700; color: #b44a0a; }
+
+/* Progresso das conquistas de contar: barrinha e o número ao lado */
+.conquista .progresso { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.conquista .progresso .barra { flex: 1; height: 8px; margin: 0; }
+.conquista .progresso small { font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+/* Lista do que dá para clicar na festa (Painel > Festa) */
+.cliques { margin: 4px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }

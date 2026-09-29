@@ -53,6 +53,8 @@ for (let second = 0; second < hours * 3600; second++) {
   data.tiers.forEach(tier => { if (s.size >= tier.size) report(tier.name); });
   if (Object.keys(s.crew).length === data.chars.length) report('turma completa');
   if (game.legendary()) report('fogueira lendária');
+  for (let stage = 1; stage <= data.config.growthAt.length; stage++) if (game.growthStage() >= stage) report(`Mandioca cresce (tamanho ${stage})`);
+  for (const dance of data.dances) if (dance.at > 0 && s.stats.steps >= dance.at) report(`passo novo: ${dance.name}`);
 }
 console.log(`fim: ${hours} h, lotação ${game.state.size}, turma ${Object.keys(game.state.crew).length}/${data.chars.length}, ` +
   `fogueira ${game.bonfireTotal()}, itens ${game.state.inventory.length}`);

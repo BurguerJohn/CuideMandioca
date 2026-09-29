@@ -48,3 +48,41 @@ test('som: sem Web Audio (ou antes do primeiro clique no navegador) o jogo segue
   assert.equal(som.play('moeda'), false, 'áudio suspenso não enfileira som para depois');
   assert.equal(log.resumed, 1, 'mas pede para destravar');
 });
+
+test('música: agenda os passos à frente do relógio do áudio, fica quieta sem som e para ao desligar', () => {
+  const { AudioContext, log } = fakeAudio();
+  let clock = 0;
+  class Clocked extends AudioContext { get currentTime() { return clock; } set currentTime(_) {} }
+  const timers = { active: new Map(), next: 1 };
+  const options = { AudioContext: Clocked, enabled: true, volume: 0.5,
+    setInterval: fn => { timers.active.set(timers.next, fn); return timers.next++; },
+    clearInterval: id => timers.active.delete(id) };
+  const som = Som.create(options);
+  assert.equal(som.music, false, 'a música nasce desligada');
+  assert.equal(som.setMusic(true), true);
+  assert.equal(som.music, true);
+  assert.equal(timers.active.size, 1, 'um relógio só agenda a música');
+  const first = log.oscillators;
+  assert.ok(first > 20, 'já agendou uns 1,4 s de música na hora');
+  // Com o relógio do áudio parado não agenda de novo; andando, agenda os passos seguintes.
+  timers.active.forEach(fn => fn());
+  assert.equal(log.oscillators, first);
+  clock += 5;
+  timers.active.forEach(fn => fn());
+  assert.ok(log.oscillators > first, 'o relógio andou, então vêm mais passos');
+  // Liga de novo sem duplicar o relógio; o som desligado silencia a música e volta com ele.
+  som.setMusic(true);
+  assert.equal(timers.active.size, 1);
+  som.set({ enabled: false });
+  assert.equal(som.music, false, 'sem som não toca música');
+  assert.equal(timers.active.size, 0);
+  som.set({ enabled: true });
+  assert.equal(som.music, true, 'e volta quando o som volta, se ela ainda estava ligada');
+  som.setMusic(false);
+  assert.equal(som.music, false);
+  assert.equal(timers.active.size, 0);
+  // Um laço tem dezesseis compassos (parte A e parte B) de oito colcheias.
+  assert.equal(Som.MUSICA.passos, 128);
+  // Sem relógio injetado nem global disponível, ligar a música não quebra.
+  assert.equal(Som.create({ AudioContext: null }).setMusic(true), false);
+});

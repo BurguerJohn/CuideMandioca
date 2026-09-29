@@ -70,8 +70,33 @@ test('as abas mostram preços, postos e rolês no fim do jogo', () => {
   assert.equal(UI.telaName('teste'), 'Modo de teste');
   assert.doesNotMatch(render('festa'), /data-action="vitrine"/, 'a loja fica só na placa');
   const hats = engine.data.items.filter(item => item.cat === 'chapeu').length;
-  assert.match(UI.vitrine(engine, ctx(engine, { dockCat: 'chapeu' })), new RegExp(`--colunas:${Math.ceil(hats / 3)}`),
-    'itens da loja em 3 fileiras, sem rolagem');
+  assert.match(UI.vitrine(engine, ctx(engine, { dockCat: 'chapeu' })), new RegExp(`--colunas:${Math.ceil(hats / (hats > 12 ? 4 : 3))}`),
+    'itens da loja em 3 fileiras (4 se a categoria passar de 12), sem rolagem');
+  // A aba de conjuntos tem um cartão para cada conjunto, mostrando o que falta e o que está em uso.
+  const sets = UI.vitrine(engine, ctx(engine, { dockCat: 'conjuntos' }));
+  assert.equal((sets.match(/data-action="vitrine-conjunto"/g) || []).length, engine.data.sets.length);
+  assert.match(sets, /data-preview="set:caipira"/);
+  assert.match(sets, /Faltam 2/, 'só o chapéu inicial: faltam a espiga e o tecido do Caipira de Raiz');
+  engine.addItem('espiga');
+  assert.match(UI.vitrine(engine, ctx(engine, { dockCat: 'conjuntos' })), /Falta 1/, 'no singular, falta uma peça só');
+  engine.addItem('remendado');
+  engine.equip('espiga');
+  engine.equip('remendado');
+  assert.match(UI.vitrine(engine, ctx(engine, { dockCat: 'conjuntos' })), /vcard item uso" role="button" tabindex="0" data-action="vitrine-conjunto" data-id="caipira"/);
+  assert.match(UI.panel(engine, ctx(engine, { tab: 'festa' })), /Conjunto/);
+  // Bingo: sem rodada, o botão de comprar; na rodada, a cartela e o botão travado; depois, o resultado.
+  while (engine.state.size < 10) engine.addFame(engine.fameNeed() - engine.state.fame);
+  engine.state.tickets = 50;
+  assert.match(UI.tela(engine, ctx(engine, { tela: 'bingo' })), /data-action="bingo-comprar"/);
+  engine.buyBingo();
+  const playing = UI.tela(engine, ctx(engine, { tela: 'bingo' }));
+  assert.equal((playing.match(/class="bingo-casa/g) || []).length, 9);
+  assert.match(playing, /bingo-casa marcada[^"]*">★/, 'o meio livre já vem marcado');
+  assert.doesNotMatch(playing, /data-action="bingo-comprar"/, 'na rodada não compra outra');
+  assert.match(UI.hud(engine, ctx(engine)), /Bingo 1\/9/);
+  engine.state.bingo.round.rival = 1;
+  engine.drawBingo();
+  assert.match(UI.tela(engine, ctx(engine, { tela: 'bingo' })), /gritou BINGO primeiro/);
   assert.doesNotMatch(render('ajustes'), /placa-auto/);
   assert.match(UI.panel(engine, ctx(engine, { tab: 'ajustes', settings: { placa: { dx: 10, dy: 20 } } })), /placa-auto/);
   assert.match(UI.hud(engine, ctx(engine)), /fechar-jogo/);

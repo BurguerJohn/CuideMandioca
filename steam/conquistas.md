@@ -132,3 +132,106 @@ Nenhuma conquista é secreta. Quem já tinha a conquista no save antes de jogar 
 | English (english) | Steady hand | Land every ring in a round. |
 | Español (spanish) | Buena mano | Encajar todos los aros de una ronda. |
 
+## CRESCIDA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Crescida | A Mandioca chegar ao tamanho máximo. |
+| English (english) | All grown up | Get the Cassava to her full size. |
+| Español (spanish) | Bien crecida | Que la Mandioca llegue a su tamaño máximo. |
+
+## REPERTORIO
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Pé de valsa | Aprender todos os passos de dança. |
+| English (english) | Twinkle toes | Learn every dance move. |
+| Español (spanish) | Pies de seda | Aprender todos los pasos de baile. |
+
+## BALAO_DE_SORTE
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Balão de sorte | Pegar 10 balões dourados. |
+| English (english) | Lucky balloon | Catch 10 golden balloons. |
+| Español (spanish) | Globo de la suerte | Atrapar 10 globos dorados. |
+
+## DENGOSA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Dengosa | Fazer carinho na Mandioca 100 vezes. |
+| English (english) | Cuddle bug | Pet the Cassava 100 times. |
+| Español (spanish) | Mimosa | Hacerle mimos a la Mandioca 100 veces. |
+
+## ARCO_IRIS
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Pote de ouro | Achar o pote de ouro no fim do arco-íris 5 vezes. |
+| English (english) | Pot of gold | Find the pot of gold at the rainbow’s end 5 times. |
+| Español (spanish) | Olla de oro | Encontrar la olla de oro al final del arcoíris 5 veces. |
+
+## METODICA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Metódica | Cumprir 10 metas da festa. |
+| English (english) | By the book | Complete 10 party goals. |
+| Español (spanish) | Metódica | Cumplir 10 metas de la fiesta. |
+
+## MADRINHA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Madrinha de casamento | Ver 5 casamentos na roça. |
+| English (english) | Bridesmaid | Attend 5 country weddings. |
+| Español (spanish) | Madrina de boda | Asistir a 5 bodas campestres. |
+
+## BINGO
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Bingo! | Ganhar 3 bingos na quermesse. |
+| English (english) | Bingo! | Win 3 bingos at the fair. |
+| Español (spanish) | ¡Bingo! | Ganar 3 bingos en la kermés. |
+
+## QUEBRA_POTE
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Quebra-pote | Quebrar 5 potes. |
+| English (english) | Pot smasher | Smash 5 pots. |
+| Español (spanish) | Rompe ollas | Romper 5 ollas. |
+
+## CANGURU
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Canguru da roça | Ganhar 5 corridas de saco. |
+| English (english) | Farm kangaroo | Win 5 sack races. |
+| Español (spanish) | Canguro del campo | Ganar 5 carreras de sacos. |
+
+## DOU_LHE_TRES
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Dou-lhe três! | Arrematar 3 prendas no leilão. |
+| English (english) | Going, going, gone! | Win 3 prizes at the auction. |
+| Español (spanish) | ¡A la una, a las dos, a las tres! | Ganar 3 premios en la subasta. |
+
+## ESTILISTA
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Estilista caipira | Vestir 5 conjuntos diferentes. |
+| English (english) | Country stylist | Wear 5 different outfit sets. |
+| Español (spanish) | Estilista campestre | Vestir 5 conjuntos diferentes. |
+
+## ANO_QUE_VEM
+
+| Idioma (Steam) | Nome | Descrição |
+| --- | --- | --- |
+| Português (Brasil) (brazilian) | Ano que vem tem mais | Encerrar um São João e começar o do ano que vem. |
+| English (english) | See you next year | Close a São João and start next year’s. |
+| Español (spanish) | El año que viene hay más | Cerrar un San Juan y empezar el del año que viene. |

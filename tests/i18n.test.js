@@ -45,13 +45,18 @@ test('todos os idiomas têm as mesmas chaves e as mesmas variáveis', () => {
 test('o conteúdo do jogo (itens, turma, cartas, conquistas...) tem tradução completa', () => {
   const lists = { stats: data.stats, tiers: data.tiers, chars: data.chars, categories: data.categories, items: data.items,
     outings: data.outings, bonfire: data.bonfire, landmarks: data.scenery.landmarks, cycle: data.scenery.cycle,
-    requests: data.requests, achievements: data.achievements };
+    requests: data.requests, achievements: data.achievements, dances: data.dances, sets: data.sets };
   for (const id of ids.filter(lang => lang !== I18N.SOURCE)) {
     const d = langs[id].data;
     for (const [name, list] of Object.entries(lists)) {
       for (const entry of list) assert.ok(d[name]?.[entry.id], `${id}: ${name}.${entry.id}`);
     }
     for (const post of Object.keys(data.posts)) assert.ok(d.posts[post], `${id}: posts.${post}`);
+    for (const goal of data.goals) assert.ok(langs[id].ui[`goal.${goal.id}`], `${id}: texto da meta ${goal.id}`);
+    for (let stage = 0; stage <= data.config.growthAt.length; stage++) {
+      assert.ok(langs[id].ui[`growth.stage.${stage}`], `${id}: nome do tamanho ${stage}`);
+    }
+    for (let call = 0; call < 8; call++) assert.ok(langs[id].ui[`fx.call.${call}`], `${id}: grito ${call} da quadrilha`);
     assert.equal(d.rarities.length, data.rarities.length, `${id}: raridades`);
     assert.equal(d.letters.length, data.letters.length, `${id}: cartas`);
     for (const item of data.items) if (item.effect) assert.ok(d.items[item.id].effect, `${id}: efeito de ${item.id}`);

@@ -261,10 +261,97 @@ def aipim():
     return [place(blank(16, 17), sprite(grid, 'chita-rosa').crop((0, 0, 16, 16)), 0, 1 - dy) for grid, dy in plan]
 
 
-def crianca(fabric):
-    """Criança correndo: pernas abertas no chão, pernas juntas um pixel acima (o pulinho da corrida)."""
-    return [place(blank(10, 14), sprite(sprites.CRIANCA, fabric), 0, 1),
-            place(blank(10, 14), sprite(sprites.CRIANCA_PASSO, fabric), 0, 0)]
+def crianca(fabric, dress=lambda grid: grid):
+    """Criança correndo: pernas abertas no chão, pernas juntas um pixel acima (o pulinho da corrida). `dress` troca
+    as cores do chapéu (art/exportar.py, dressed)."""
+    return [place(blank(10, 14), sprite(dress(sprites.CRIANCA), fabric), 0, 1),
+            place(blank(10, 14), sprite(dress(sprites.CRIANCA_PASSO), fabric), 0, 0)]
+
+
+def pipoca():
+    """Pipoqueira atrás do balcão: uma caixinha listrada de vermelho e creme com rosto, cheia de pipoca que estoura."""
+    frames = []
+    # (pipoca que pula, quanto sobe, piscando)
+    plan = [(None, 0, False), (3, 1, False), (3, 3, False), (4, 3, False), (4, 1, False), (None, 0, False),
+            (5, 2, False), (5, 3, False), (None, 0, True), (None, 0, False)]
+    puffs = [(4, 4, 2), (8, 3, 2), (12, 4, 2), (6, 5, 2), (10, 5, 2), (3, 6, 1), (13, 6, 1), (8, 5, 3)]
+    for jumper, rise, blink in plan:
+        layer = Layer(17, 21)
+        # A caixa: trapézio com listras verticais, borda de cima mais escura.
+        for y in range(7, 20):
+            half = 6 + (y - 7) // 7
+            for x in range(8 - half, 8 + half + 1):
+                layer.put(x, y, 'R' if ((x - (8 - half)) // 3) % 2 == 0 else 'X')
+        layer.rect(1, 7, 15, 7, 'r')
+        # Rosto no painel do meio.
+        layer.rect(5, 9, 11, 15, 'X')
+        eye = '6' if blink else 'e'
+        layer.put(6, 10, eye)
+        layer.put(10, 10, eye)
+        if not blink:
+            layer.put(6, 11, 'e')
+            layer.put(10, 11, 'e')
+        layer.put(5, 12, 'c')
+        layer.put(11, 12, 'c')
+        layer.rect(7, 13, 9, 13, 'm')
+        layer.put(8, 14, 'n')
+        # Pipocas: bolinhas creme com brilho no alto, manteiga embaixo e grãos amarelos; uma dá o pulinho.
+        for index, (px, py, radius) in enumerate(puffs):
+            lift = rise if index == jumper else 0
+            for y in range(-radius, radius + 1):
+                for x in range(-radius, radius + 1):
+                    if x * x + y * y > radius * radius + 1:
+                        continue
+                    if x + y >= radius:
+                        color = 'O'
+                    elif x <= -1 and y <= -1:
+                        color = 'z'
+                    elif (x * 3 + y * 5 + index) % 7 == 0:
+                        color = 'F'
+                    else:
+                        color = 'X'
+                    layer.put(px + x, py + y - lift, color)
+        frames.append(outline(layer.image))
+    return frames
+
+
+def amendoim(step_frames=4):
+    """Ambulante: um amendoim com cesta de pé-de-moleque no braço; anda com um balancinho e às vezes acena."""
+    rows = [
+        '...00000...',
+        '..0TTTTT0..',
+        '.0TxTTTxT0.',
+        '.0T9eTT9eT0',
+        '.0TeeTTeeT0',
+        '.0TcTmmTcT0',
+        '..0TTnnT0..',
+        '..0TxTTx0..',
+        '.0TTTTTTT0.',
+        '.0TxTTTTx0.',
+        '..0TTTTT0..',
+        '...00000...',
+    ]
+    frames = []
+    for index in range(step_frames):
+        bob = (0, 1, 0, 1)[index % 4]
+        layer = Layer(16, 22)
+        layer.grid(rows, 2, 6 + bob)
+        # Pezinhos alternando.
+        left, right = ((2, 0), (0, 0), (0, 2), (0, 0))[index % 4]
+        layer.rect(4, 18 + bob, 5, 19 + bob - left // 2, 'd')
+        layer.rect(9, 18 + bob, 10, 19 + bob - right // 2, 'd')
+        layer.rect(3, 20, 6, 20, 'D')
+        layer.rect(8, 20, 11, 20, 'D')
+        # Chapeuzinho de palha.
+        layer.grid(['..YYYYY..', '.YYyYYyY.', 'YYYYYYYYY'], 3, 3 + bob)
+        # Cesta no braço (direita): alça e pé-de-moleque.
+        layer.line(12, 12 + bob, 14, 13 + bob, 'o')
+        layer.rect(12, 14 + bob, 15, 17 + bob, 'l')
+        layer.rect(12, 14 + bob, 15, 14 + bob, 'D')
+        layer.put(13, 13 + bob, 'K')
+        layer.put(14, 13 + bob, 'A')
+        frames.append(outline(layer.image))
+    return frames
 
 
 def sopinha():
@@ -354,8 +441,9 @@ CHEER_STEPS = _dobrar([('palma', 'palma', 0, None), ('aberto', 'aberto', -1, Non
 CROWD_W, CROWD_H, CROWD_PAD = 14, 20, 1
 
 
-def person(grid, fabric, pose):
-    """Uma pessoa da quadrilha num passo: braços, pé levantado e pulinho."""
+def person(grid, fabric, pose, sleeve='3', extra=()):
+    """Uma pessoa da quadrilha num passo: braços, pé levantado e pulinho. `sleeve` é a cor dos braços e `extra` traz
+    desenhos por cima (buquê, livro), como (linhas, x, y) nas coordenadas do corpo."""
     left, right, bob, foot = pose
     body = sprite(grid, fabric)
     if foot == 'esquerda':
@@ -369,9 +457,10 @@ def person(grid, fabric, pose):
     arms, hands = [], []
     for mirror, name in ((False, left), (True, right)):
         points = [(11 - x if mirror else x, y) for x, y in (ARMS[name] if isinstance(name, str) else name)]
-        arms.append(([(ox + x, top + y) for x, y in points], '3'))
+        arms.append(([(ox + x, top + y) for x, y in points], sleeve))
         hx, hy = points[-1]
         hands.append((['4'], ox + hx, top + hy))
+    hands += [(rows, ox + x, top + y) for rows, x, y in extra]
     frame.alpha_composite(strokes(CROWD_W, CROWD_H, arms, hands))
     return frame
 

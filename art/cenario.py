@@ -6,10 +6,13 @@ com cor cheia. Cada função devolve uma lista de quadros.
 
 import math
 
+from PIL import Image
+
 from render import outline, sprite, tint
 from scene import BACK_TINT, Layer
 
 import animar
+import sprites
 
 FAR = 0.2
 
@@ -308,6 +311,270 @@ def carrossel():
     return frames
 
 
+def pote():
+    """Quebra-pote: pote de barro com as tiras de papel crepom penduradas no pescoço; três quadros, inteiro e cada vez mais trincado."""
+    frames = []
+    for crack in range(3):
+        layer = Layer(16, 19)
+        cx = 8
+        # Bojo redondo com luz na esquerda e sombra na direita.
+        for y in range(7, 18):
+            t = (y - 12.5) / 5.5
+            half = int(7.4 * math.sqrt(max(0.0, 1 - t * t)))
+            for x in range(cx - half, cx + half + 1):
+                u = (x - cx) / max(1, half)
+                char = 'T' if u < -0.45 else 'l' if u < 0.4 else 'D'
+                if y >= 16 and u > -0.2:
+                    char = 'D'
+                layer.put(x, y, char)
+        # Pescoço e boca do pote.
+        layer.rect(5, 4, 10, 6, 'l')
+        layer.rect(5, 4, 6, 6, 'T')
+        layer.rect(10, 4, 10, 6, 'D')
+        layer.rect(4, 2, 11, 3, 'D')
+        layer.rect(4, 2, 9, 2, 'T')
+        # Tiras de papel crepom penduradas em volta do pescoço, cada uma de uma cor.
+        colors = 'HJAGHJAGHJAG'
+        for k, x in enumerate(range(3, 14)):
+            length = 4 + (k * 5) % 4
+            for y in range(6, 6 + length):
+                layer.put(x, y, colors[k])
+        # Rachaduras.
+        if crack >= 1:
+            layer.line(9, 9, 7, 13, 'd')
+            layer.line(7, 13, 9, 16, 'd')
+        if crack >= 2:
+            layer.line(11, 11, 12, 15, 'd')
+            layer.line(5, 12, 4, 15, 'd')
+            layer.put(8, 12, '1')
+        # Argola da corda.
+        layer.grid(['.xx.', 'x..x'], 6, 0)
+        frames.append(outline(layer.image))
+    return frames
+
+
+# Vira-lata caramelo, de perfil olhando para a direita. Cores: l caramelo, O caramelo claro, D orelha e sombra, X peito
+# branco, e olho e nariz, n língua.
+CABECA = [
+    '..DD....',
+    '.DllOl..',
+    '.DlelOO.',
+    '.DllOOOe',
+    '..lXXXn.',
+]
+CABECA_DORME = [
+    '..DD....',
+    '.DllOl..',
+    '.DlDlOO.',
+    '.DllOOOe',
+    '..lXXX..',
+]
+
+
+def caramelo():
+    """Vira-lata caramelo: anda (4 quadros, rabo abanando), senta abanando o rabo (2) e dorme enrolado (2)."""
+    frames = []
+    # Andando: corpo comprido, rabo para cima, quatro pernas alternando.
+    for step in range(4):
+        layer = Layer(18, 13)
+        bob = (0, 1, 0, 1)[step]
+        top = 4 + bob
+        # Corpo.
+        layer.rect(3, top + 1, 12, top + 4, 'l')
+        layer.rect(4, top + 1, 11, top + 1, 'O')
+        layer.rect(4, top + 4, 11, top + 4, 'D')
+        layer.rect(10, top + 2, 12, top + 4, 'X')
+        # Rabo em pé, abanando.
+        wag = (0, 1, 0, -1)[step]
+        layer.line(3, top + 1, 1 + wag, top - 2, 'l')
+        layer.put(1 + wag, top - 3, 'O')
+        # Cabeça.
+        layer.grid(CABECA if step % 2 else CABECA[:4] + ['..lXXX..'], 10, top - 4)
+        # Pernas: dianteiras e traseiras alternando.
+        legs = [(4, 0), (6, 0), (10, 0), (12, 0)] if step % 2 == 0 else [(3, 0), (7, 0), (9, 0), (12, 0)]
+        for x, _ in legs:
+            layer.rect(x, top + 5, x, 11, 'l')
+            layer.put(x, 12, 'O')
+        frames.append(outline(layer.image))
+    # Sentado, abanando o rabo no chão.
+    for wag in range(2):
+        layer = Layer(18, 13)
+        layer.grid(CABECA, 8, 1)
+        layer.rect(5, 5, 10, 10, 'l')
+        layer.rect(8, 5, 10, 9, 'X')
+        layer.rect(5, 10, 11, 11, 'l')
+        layer.rect(4, 8, 6, 11, 'D')
+        layer.rect(9, 10, 9, 12, 'l')
+        layer.rect(11, 10, 11, 12, 'l')
+        layer.put(9, 12, 'O')
+        layer.put(11, 12, 'O')
+        layer.line(4, 11, 1, 12 - wag, 'l')
+        layer.put(1, 12 - wag, 'O')
+        frames.append(outline(layer.image))
+    # Dormindo enrolado, a cabeça deitada na ponta e o rabo em volta (a barriga sobe e desce).
+    sono = ['....lllllll.......',
+            '..llOOOOOOll..D...',
+            '.lOlllllllllDDlO..',
+            '.llllllllllDlllOO.',
+            '.llllllllllDlDDlOe',
+            '.OlllllllllDlXXXX.',
+            '..OOOllllllllll...']
+    for breath in range(2):
+        layer = Layer(18, 13)
+        rows = list(sono)
+        if breath:
+            rows[0] = '.....lllll........'
+        layer.grid(rows, 0, 6)
+        frames.append(outline(layer.image))
+    return frames
+
+
+def pombo():
+    """Pombo-correio gordinho voando para a direita com a cartinha no bico: quatro quadros de asa (alto, meio, baixo,
+    meio). Cinza, pescoço furta-cor, peito rosado."""
+    frames = []
+    for index in range(4):
+        layer = Layer(19, 14)
+        bob = (0, 1, 2, 1)[index]
+        oy = 2 + bob
+        # Rabo em leque.
+        for y, (x0, x1) in enumerate(((0, 2), (0, 3), (1, 3))):
+            layer.rect(x0, oy + 5 + y, x1, oy + 5 + y, 's')
+        # Corpo redondinho: cinza em cima, rosado no peito, mais escuro embaixo.
+        for y, (x0, x1) in enumerate(((5, 9), (3, 11), (2, 12), (2, 12), (3, 11), (5, 9))):
+            for x in range(x0, x1 + 1):
+                char = 'S'
+                if y >= 4:
+                    char = 's'
+                elif y >= 2 and x >= 9:
+                    char = 'p'
+                layer.put(x, oy + 3 + y, char)
+        # Cabeça com pescoço furta-cor, olho e bico, e a cartinha com coração no bico.
+        layer.rect(11, oy + 1, 13, oy + 1, 'S')
+        layer.rect(10, oy + 2, 14, oy + 3, 'S')
+        layer.rect(10, oy + 4, 12, oy + 4, 'G')
+        layer.put(11, oy + 4, 'P')
+        layer.put(13, oy + 2, 'e')
+        layer.put(15, oy + 3, 'A')
+        layer.rect(16, oy + 2, 18, oy + 4, 'X')
+        layer.put(17, oy + 3, 'H')
+        # Asa: lá em cima, aberta de lado ou lá embaixo.
+        if index == 0:
+            for k, (x, y) in enumerate(((8, 3), (7, 2), (6, 1), (5, 0), (4, 0))):
+                layer.rect(x - 2, oy + y - 2, x, oy + y - 1 + (k == 0), 'S')
+            layer.line(3, oy - 2, 7, oy + 1, 's')
+        elif index == 2:
+            layer.rect(5, oy + 8, 8, oy + 9, 'S')
+            layer.rect(6, oy + 10, 7, oy + 10, 's')
+        else:
+            layer.rect(3, oy + 4, 9, oy + 4, 's')
+            layer.rect(4, oy + 5, 8, oy + 5, 'S')
+        frames.append(outline(layer.image))
+    return frames
+
+
+def trem():
+    """Trem da alegria: a locomotiva vermelha com chaminé e dois vagões abertos cheios de criança de chapéu de palha,
+    andando para a direita. Dois quadros (os raios das rodas giram e as crianças balançam)."""
+    frames = []
+    for step in range(2):
+        layer = Layer(58, 20)
+        # Vagões (atrás, à esquerda): caixa aberta com listra e as cabeças das crianças.
+        for vx, body, trim in ((0, 'J', 'b'), (19, 'G', 'g')):
+            layer.rect(vx + 1, 10, vx + 16, 15, body)
+            layer.rect(vx + 1, 10, vx + 16, 10, trim)
+            layer.rect(vx + 1, 13, vx + 16, 13, 'A')
+            for k, hx in enumerate((vx + 3, vx + 8, vx + 13)):
+                bob = (k + step) % 2
+                layer.rect(hx, 6 + bob, hx + 2, 9 + bob, '6')
+                layer.put(hx, 7 + bob, 'e')
+                layer.put(hx + 2, 7 + bob, 'e')
+                layer.rect(hx - 1, 5 + bob, hx + 3, 5 + bob, 'Y')
+                layer.rect(hx, 4 + bob, hx + 2, 4 + bob, 'y')
+            # Engate entre os vagões.
+            layer.rect(vx + 17, 13, vx + 18, 13, 's')
+        # Locomotiva: cabine, caldeira, chaminé, farol e o limpa-trilhos.
+        lx = 38
+        layer.rect(lx, 5, lx + 7, 15, 'R')
+        layer.rect(lx + 1, 6, lx + 6, 9, 'b')
+        layer.rect(lx, 4, lx + 8, 4, 'r')
+        layer.rect(lx + 8, 9, lx + 17, 15, 'R')
+        layer.rect(lx + 8, 9, lx + 17, 9, 'A')
+        layer.rect(lx + 8, 12, lx + 17, 12, 'A')
+        layer.rect(lx + 13, 4, lx + 15, 8, 'e')
+        layer.rect(lx + 12, 3, lx + 16, 3, 'e')
+        layer.put(lx + 18, 11, 'F')
+        layer.line(lx + 17, 15, lx + 19, 17, 's')
+        # Rodas com raios que giram.
+        for wx in (4, 13, 23, 32, 41, 48, 54):
+            for a in range(0, 360, 20):
+                r = math.radians(a)
+                layer.put(wx + 2.4 * math.cos(r), 17 + 2.4 * math.sin(r), 'd')
+            spoke = math.radians(45 * step)
+            layer.line(wx - 1.6 * math.cos(spoke), 17 - 1.6 * math.sin(spoke), wx + 1.6 * math.cos(spoke), 17 + 1.6 * math.sin(spoke), 'S')
+            layer.put(wx, 17, 'S')
+        frames.append(outline(layer.image))
+    return frames
+
+
+def sapo():
+    """Sapinho verde de perfil (olhando para a direita): sentado (dois quadros, a papada infla) e no pulo."""
+    sentado = ['...GG.GG..',
+               '..GeGGeG..',
+               '.GGGGGGGG.',
+               'gGGGGGGGGm',
+               'gGGXXXXGG.',
+               '.gg....gg.']
+    papada = ['...GG.GG..',
+              '..GeGGeG..',
+              '.GGGGGGGG.',
+              'gGGGGGGGGm',
+              'gGXXXXXXG.',
+              '.gg....gg.']
+    pulo = ['...GG.GG...',
+            '..GeGGeGG..',
+            '.GGGGGGGGGm',
+            'gGGXXXXGG..',
+            'g.g.....g..',
+            'g........g.']
+    frames = []
+    for rows in (sentado, papada, pulo):
+        layer = Layer(12, 7)
+        layer.grid(rows, 0, 7 - len(rows))
+        frames.append(outline(layer.image))
+    return frames
+
+
+def balao_ouro():
+    """Balão de sorte: gomos dourados com brilho, a cestinha e a chama do maçarico em três quadros."""
+    widths = [6, 10, 12, 14, 14, 14, 14, 12, 12, 10, 8, 6]
+    frames = []
+    for flame in range(3):
+        layer = Layer(16, 26)
+        for y, w in enumerate(widths):
+            left = 8 - w // 2
+            for x in range(left, left + w):
+                gomo = (x - left) * 4 // w
+                char = 'F' if gomo % 2 == 0 else 'A'
+                if x - left >= w - 2:
+                    char = 'a'
+                if y == 1 and x - left in (2, 3):
+                    char = 'z'
+                if y in (5, 6):
+                    char = 'O' if gomo % 2 == 0 else 'A'
+                layer.put(x, y, char)
+        layer.put(4, 3, 'z')
+        layer.put(4, 4, 'z')
+        layer.line(6, 12, 6, 15, 'd')
+        layer.line(9, 12, 9, 15, 'd')
+        layer.grid([['.q.', '.F.'], ['.F.', 'qFq'], ['.F.', '.q.']][flame], 6, 13)
+        layer.rect(5, 17, 10, 21, 'D')
+        layer.rect(5, 17, 10, 17, 'l')
+        layer.rect(6, 20, 9, 20, 'd')
+        frames.append(outline(layer.image))
+    return frames
+
+
 def balao_grande():
     """Balão de ar quente amarrado: gomos coloridos, a cesta e a chama do maçarico piscando."""
     widths = [8, 12, 16, 18, 20, 22, 22, 22, 22, 22, 20, 20, 18, 16, 14, 12, 10, 8]
@@ -381,6 +648,127 @@ def boi():
     return frames
 
 
+# Corrida de saco: a criança de chapéu de palha dentro de um saco de estopa, segurando a boca do saco. A listra do
+# saco (R) muda de cor para cada corredor; o chapéu também (as cores de HAT_LOOKS).
+SACO_PRONTO = """
+....0000....
+...0YYYy0...
+..0YYYYYo0..
+...000000...
+...046620...
+...0e66e0...
+...04mm20...
+..04xTTl40..
+..0xTTTTl0..
+.0xTTTTTTl0.
+.0xTTTTTTl0.
+.0RRRRRRRR0.
+.0xTTTTTTl0.
+.0TTTTTTTD0.
+.0lTTTTTlD0.
+..0DllllD0..
+...000000...
+"""
+
+SACO_PULO = """
+....0000....
+...0YYYy0...
+..0YYYYYo0..
+...000000...
+...046620...
+...0e66e0...
+...04mm20...
+..04xTTl40..
+..0xTTTTl0..
+.0xTTTTTTl0.
+.0xTTTTTTl0.
+.0RRRRRRRR0.
+.0xTTTTTTl0.
+.0TTTTTTTD0.
+..0TTTTTD0..
+...0DllD0...
+....0000....
+"""
+
+SACO_VENCE = """
+.00......00.
+0440....0440
+.040....040.
+..04000040..
+...0YYYy0...
+..0YYYYYo0..
+...000000...
+...0c66c0...
+...0e66e0...
+...0mnnm0...
+..0xTTTTl0..
+.0xTTTTTTl0.
+.0xTTTTTTl0.
+.0RRRRRRRR0.
+.0xTTTTTTl0.
+.0TTTTTTTD0.
+.0lTTTTTlD0.
+..0DllllD0..
+...000000...
+"""
+
+# Corredores: (cor da listra, cores do chapéu). O primeiro é o do jogador.
+CORREDORES = [('R', {}), ('J', {'Y': 'l', 'y': 'D', 'o': 'd'}), ('g', {'Y': 'b', 'y': 'J', 'o': 'j'})]
+SACO_W, SACO_H = 18, 19
+
+
+def saco():
+    """Corrida de saco: quatro poses por corredor (pronto, no pulo, caído de lado e comemorando), três corredores."""
+    frames = []
+    for stripe, hat in CORREDORES:
+        def look(grid):
+            rows = grid.strip('\n').split('\n')
+            out = []
+            for index, row in enumerate(rows):
+                row = row.replace('R', stripe)
+                if index < 7:
+                    row = ''.join(hat.get(c, c) for c in row)
+                out.append(row)
+            return '\n'.join(out)
+        stand = sprite(look(SACO_PRONTO))
+        hop = sprite(look(SACO_PULO))
+        # Caído: o mesmo corredor tombado para a frente (cabeça para a direita), deitado no chão.
+        fallen = sprite(look(SACO_PRONTO)).rotate(-90, expand=True)
+        win_rows = SACO_VENCE.strip('\n').split('\n')
+        win = sprite(look('\n'.join(win_rows[:3]) + '\n' + '\n'.join(win_rows[3:])))
+        for image, x, y in ((stand, 3, SACO_H - 17), (hop, 3, SACO_H - 17), (fallen, 0, SACO_H - 12), (win, 3, 0)):
+            frame = Image.new('RGBA', (SACO_W, SACO_H), (0, 0, 0, 0))
+            frame.alpha_composite(image, (x, y))
+            frames.append(frame)
+    return frames
+
+
+# Leiloeiro: o cavalheiro da quadrilha de chapéu de couro, bigode e gravata-borboleta vermelha, com o martelo de
+# madeira na mão direita. Quadros: parado, falando (boca aberta, martelo no alto), falando com a boca fechada e batendo
+# o martelo (o braço desce na frente do corpo).
+_LEILOEIRO = animar.edit(sprites.CAVALHEIRO, {
+    (4, 6): 'd', (7, 6): 'd',
+    (5, 8): 'R', (6, 8): 'R',
+})
+LEILOEIRO = '\n'.join(''.join({'Y': 'l', 'y': 'D', 'o': 'd'}.get(c, c) for c in row) if i < 3 else row
+                      for i, row in enumerate(_LEILOEIRO.strip('\n').split('\n')))
+LEILOEIRO_FALA = animar.edit(LEILOEIRO, {(5, 6): 'e', (6, 6): 'n'})
+MARTELO_ALTO = ['DDd', '.l.', '.l.']
+MARTELO_BATE = ['.D.', '.Dl', '.dl']
+
+
+def leiloeiro():
+    frames = []
+    alto = ((0, 9), (-1, 8), (-1, 4))
+    for grid, pose, extra in (
+            (LEILOEIRO, ('baixo', 'baixo', 0, None), [(['DDd', '.l.'], 10, 9)]),
+            (LEILOEIRO_FALA, ('baixo', 'alto', -1, None), [(MARTELO_ALTO, 11, 1)]),
+            (LEILOEIRO, ('baixo', 'alto', 0, None), [(MARTELO_ALTO, 11, 1)]),
+            (LEILOEIRO_FALA, ('baixo', 'palma', 0, None), [(MARTELO_BATE, 6, 7)])):
+        frames.append(animar.person(grid, 'xadrez-azul', pose, sleeve='J', extra=extra))
+    return frames
+
+
 def export(add):
     """Registra as folhas do cenário no manifesto, com o tipo de camada de cada peça."""
     sheets = {
@@ -390,5 +778,6 @@ def export(add):
         'pintinho': (pintinho(), 6), 'gato': (gato(), 1), 'bode': (bode(), 4), 'pipa': (pipa(), 4), 'lua': (lua(), 0),
         'balao': (balao(), 5), 'mandioquinha': (mandioquinha(), 2),
         'carrossel': (carrossel(), 6), 'balao-grande': (balao_grande(), 3), 'boi': (boi(), 6),
+        'balao-ouro': (balao_ouro(), 8), 'pote': (pote(), 0), 'caramelo': (caramelo(), 0), 'pombo': (pombo(), 11), 'trem': (trem(), 0), 'sapo': (sapo(), 0), 'saco': (saco(), 0), 'leiloeiro': (leiloeiro(), 0),
     }
     return {name: add(f'cenario-{name}', frames, fps=fps) for name, (frames, fps) in sheets.items()}

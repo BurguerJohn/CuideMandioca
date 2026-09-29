@@ -22,7 +22,8 @@
     { id: 'pescaria', icon: 'pescaria', tier: 1 },
     { id: 'roles', icon: 'role', tier: 2 },
     { id: 'fogueira', icon: 'fogueira', tier: 2 },
-    { id: 'correio', icon: 'carta' }
+    { id: 'correio', icon: 'carta' },
+    { id: 'bingo', icon: 'bingo', tier: 1 }
   ];
   const STAT_ICONS = { rebolado: 'rebolado', folego: 'folego', refresco: 'refresco', ritmo: 'ritmo' };
   // Categorias da vitrine encaixada na festa.
@@ -32,9 +33,11 @@
     { id: 'mao', icon: 'item:bandeirinha' },
     { id: 'tecido', icon: 'item:xadrez-vermelho' },
     { id: 'terreiro', icon: 'item:terra-batida' },
-    { id: 'lado', icon: 'item:barraca-pescaria' }
+    { id: 'lado', icon: 'item:barraca-pescaria' },
+    { id: 'conjuntos', icon: 'item:coroa-flores' }
   ];
-  const ZOOMS = [50, 75, 100, 150, 200];
+  // Tamanhos prontos em Ajustes (e no menu da bandeja): do menor ao maior que a alça de arrastar alcança (25% a 300%).
+  const ZOOMS = [25, 50, 75, 100, 150, 200, 300];
   const BONFIRE_ICONS = { labareda: 'fogueira', brasa: 'fogueira', calor: 'fogueira' };
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c =>
@@ -102,12 +105,26 @@
         `${count ? `<i class="selo-botao">${count}</i>` : ''}</button>`;
     }).join('');
     const upcoming = engine.sceneryPiece(s.size + 1);
+    // O que está valendo agora: frenesi (do balão de sorte) e quadrilha marcada, cada um com os segundos que faltam.
+    const r = s.runtime;
+    const buffs = [
+      r.frenzyLeft > 0 ? `<span class="selo ouro" title="${esc(t('hud.frenzyTitle'))}">${esc(t('hud.frenzy', { mult: engine.cfg.frenzyMult }))} ` +
+        `<b data-buff="frenzy">${Math.ceil(r.frenzyLeft)}s</b></span>` : '',
+      engine.specialDay() ? `<span class="selo ouro">${esc(t('hud.day', { name: t(`day.${engine.specialDay().id}`),
+        v: Math.round(engine.specialDay().bonus * 100) }))}</span>` : '',
+      s.bingo.round && !s.bingo.round.result ? `<span class="selo verde" title="${esc(t('hud.bingoTitle'))}">` +
+        `${esc(t('hud.bingo', { n: engine.bingoMarks().count, total: 9 }))}</span>` : '',
+      r.weddingLeft > 0 ? `<span class="selo ouro" title="${esc(t('hud.weddingTitle'))}">${esc(t('hud.wedding'))} ` +
+        `<b data-buff="wedding">${Math.ceil(r.weddingLeft)}s</b></span>` : '',
+      r.quadrilhaLeft > 0 ? `<span class="selo verde" title="${esc(t('hud.quadrilhaTitle'))}">${esc(t('hud.quadrilha', { v: Math.round(engine.quadrilhaBonus() * 100) }))} ` +
+        `<b data-buff="quadrilha">${Math.ceil(r.quadrilhaLeft)}s</b></span>` : ''
+    ].join('');
     return `<div class="placa-linha">` +
       `<span class="recurso" title="${esc(t('res.cheer'))}">${ctx.icon('ui:animacao')}<b data-live="cheer">${compact(s.cheer)}</b></span>` +
       `<span class="recurso" title="${esc(t('res.tickets'))}">${ctx.icon('ui:fichas')}<b data-live="tickets">${compact(s.tickets)}</b></span>` +
       (tier >= 2 ? `<span class="recurso" title="${esc(t('res.wood'))}">${ctx.icon('ui:lenha')}<b data-live="wood">${compact(s.wood)}</b></span>` : '') +
-      `</div>` +
-      `<div class="placa-porte"><span>${esc(engine.tier().name)}</span>` +
+      `</div>` + (buffs ? `<div class="placa-buffs">${buffs}</div>` : '') +
+      `<div class="placa-porte"><span>${esc(engine.tier().name)}${s.year > 1 ? ` <small>${esc(t('hud.year', { n: s.year }))}</small>` : ''}</span>` +
       `<span class="convidados">${ctx.icon('ui:lotacao')}${s.size}${next ? `/${next.size}` : ''}</span></div>` +
       bar(s.fame, engine.fameNeed(), 'fama') +
       (upcoming ? `<div class="proximo" title="${esc(t('hud.nextTitle'))}">${t('hud.next', { piece: esc(upcoming.name) })}</div>` : '') +
@@ -155,6 +172,22 @@
           `data-cost="${engine.levelCost(stat.id)}" data-currency="cheer" title="${esc(t('shop.hold'))}">${esc(t('shop.upgrade'))} ` +
           `<span class="preco">${ctx.icon('ui:animacao')}<b data-field="custo">${compact(engine.levelCost(stat.id))}</b></span></button></div>`;
       }).join('');
+    } else if (cat === 'conjuntos') {
+      // Os conjuntos: um cartão cada, com o chapéu dele de rosto; clicar veste as três peças (se a pessoa tem todas).
+      const sets = engine.data.sets;
+      const active = engine.activeSet();
+      const rows = sets.length > 12 ? 4 : 3;
+      body = `<div class="vgrade ${rows === 4 ? 'quatro' : ''}" style="--colunas:${Math.max(1, Math.ceil(sets.length / rows))}">` +
+        sets.map(set => {
+          const pieces = [set.hat, set.hand, set.fabric];
+          const missing = pieces.filter(piece => !engine.owned(piece)).length;
+          const [state, cls] = active?.id === set.id ? [esc(t('shop.inUse')), 'uso']
+            : missing ? [esc(t(missing === 1 ? 'shop.setMissingOne' : 'shop.setMissing', { n: missing })), 'especial'] : [esc(t('shop.use')), 'tem'];
+          return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-conjunto" data-id="${set.id}" ` +
+            `data-preview="set:${set.id}" title="${esc(pieces.map(piece => engine.items[piece]?.name || piece).join(' + '))}">` +
+            `<div class="vcard-img">${ctx.icon(`item:${set.hat}`, 'icone-mini')}</div>` +
+            `<b class="nome">${esc(set.name)} +${Math.round(set.bonus * 100)}%</b><span class="estado">${state}</span></div>`;
+        }).join('') + `</div>`;
     } else {
       const items = engine.data.items.filter(item => item.cat === cat);
       const side = ctx.dockSide || 'esquerda';
@@ -173,6 +206,8 @@
         else if (owned) { state = esc(t(cat === 'lado' ? `shop.place.${side}` : 'shop.use')); cls = 'tem'; }
         else if (item.source === 'role') { state = esc(t('shop.onlyOutings')); cls = 'especial'; }
         else if (item.source === 'argolas') { state = esc(t('shop.onlyRings')); cls = 'especial'; }
+        else if (item.source === 'casamento') { state = esc(t('shop.onlyWedding')); cls = 'especial'; }
+        else if (item.source === 'leilao') { state = esc(t('shop.onlyAuction')); cls = 'especial'; }
         else if (engine.itemLocked(item.id)) { state = `🔒 ${esc(engine.data.tiers[item.tier].name)}`; cls = 'especial'; }
         else state = `<span class="preco" data-cost="${item.price}" data-currency="tickets">${ctx.icon('ui:fichas')}${item.price}</span>`;
         return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-item" data-id="${item.id}" ` +
@@ -180,7 +215,7 @@
           `<b class="nome">${esc(item.name)}</b><span class="estado">${state}</span></div>`;
       }).join('') + `</div>`;
     }
-    const hint = t(cat === 'melhorias' ? 'shop.hintUpgrades' : 'shop.hintItems');
+    const hint = t(cat === 'melhorias' ? 'shop.hintUpgrades' : cat === 'conjuntos' ? 'shop.hintSets' : 'shop.hintItems');
     return top + `<div class="vitrine-corpo">${body}</div><div class="vitrine-detalhe" id="vitrine-detalhe">${esc(hint)}</div>`;
   }
 
@@ -233,16 +268,34 @@
     }).join('');
   }
 
+  // O tamanho da Mandioca: o nome do tamanho, a barra até o próximo e o que falta.
+  function growthBlock(engine, growth) {
+    const name = t(`growth.stage.${growth.stage}`);
+    const first = engine.cfg.growthAt[growth.stage - 1] ?? 4;
+    const body = growth.last
+      ? `<p class="miudo">${esc(t('growth.max'))}</p>`
+      : bar(growth.total - first, growth.goal - first, 'fama') +
+        `<p class="miudo">${esc(t('growth.next', { n: growth.goal - growth.total, total: growth.total, goal: growth.goal }))}</p>`;
+    const golden = engine.goldenHost() ? `<p class="miudo">✨ ${esc(t('growth.golden'))}</p>` : '';
+    return `<div class="rotulo">${esc(t('growth.title'))}: <b>${esc(engine.goldenHost() ? t('growth.goldenName') : name)}</b></div>${body}${golden}`;
+  }
+
   function festa(engine, ctx) {
     const s = engine.state;
     const tier = engine.tierIndex();
     const next = engine.nextTier();
     const b = s.bonfire;
+    const growth = engine.growthInfo();
     const pieces = [
       [t('party.guests'), `+${percent(engine.cfg.sizeBonus * s.size)}`],
       [t('party.collection'), `+${percent(engine.collection())}`],
       [t('party.partner'), engine.effect('cheer') ? `+${percent(engine.effect('cheer'))}` : '—'],
       [t('party.heat'), b.calor ? `+${percent(engine.cfg.heatPerLevel * b.calor)}` : '—'],
+      [t('party.growth'), growth.bonus ? `+${percent(growth.bonus)}` : '—'],
+      [t('party.dances'), engine.danceBonus() ? `+${percent(engine.danceBonus())}` : '—'],
+      [t('party.set'), engine.activeSet() ? `+${percent(engine.setBonus())}` : '—'],
+      [t('party.tradition'), engine.tradition() ? `+${percent(engine.tradition())}` : '—'],
+      [t('party.trio'), engine.trioBonus() ? `+${percent(engine.trioBonus())}` : '—'],
       [t('party.legendary'), engine.legendary() ? '×2' : '—']
     ];
     const rest = engine.maxStamina() / engine.recovery();
@@ -251,10 +304,15 @@
       `<h3>${esc(engine.tier().name)}</h3>${bar(s.fame, engine.fameNeed(), 'fama')}` +
       `<p>${t('party.fame', { fame: `<b data-live="fame">${compact(s.fame)}</b>`, need: compact(engine.fameNeed()) })}</p>` +
       (next ? `<p class="miudo">${t('party.nextTier', { n: next.size, tier: esc(next.name), unlocks: esc(next.unlocks) })}</p>`
-        : `<p class="miudo">${esc(t('party.biggest'))}</p>`) +
+        : `<p class="miudo">${esc(t('party.biggest'))}</p>` +
+          `<p class="miudo">${esc(t('year.offer', { v: Math.round(engine.cfg.yearBonus * 100) }))}</p>` +
+          `<div class="botoes"><button class="btn" data-action="ano-novo">${esc(t('year.button'))}</button></div>`) +
+      (s.year > 1 ? `<p class="miudo">${esc(t('year.current', { n: s.year, v: Math.round(engine.tradition() * 100) }))}</p>` : '') +
+      (s.records?.maior !== null && s.records?.maior !== undefined ? `<p class="miudo">${esc(t('records.maior', { time: duration(s.records.maior * 1000),
+        size: s.records.size }))}</p>` : '') +
       `</div><div class="cartao"><div class="rotulo">${esc(t('party.host'))}</div>` +
       `<label class="campo">${esc(t('party.name'))}<input id="nome" maxlength="24" value="${esc(s.name)}"></label>` +
-      `<p class="miudo">${esc(t('party.panelHint'))}</p>` +
+      `<p class="miudo">${esc(t('party.panelHint'))}</p>` + growthBlock(engine, growth) +
       `<div class="botoes"><button class="btn claro" data-action="foto">${ctx.icon('ui:foto')} ${esc(t('party.photo'))}</button></div></div></div>` +
       `<div class="cartao"><div class="rotulo">${esc(t('party.yield'))}</div><div class="numeros">` +
       [[t('party.perStep'), compact(engine.stepValue())], [t('party.stepsPerSecond'), number(engine.speed(), 2)],
@@ -265,8 +323,26 @@
       `</div><p class="miudo">${esc(t('party.offlineHint', { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
       `<div class="rotulo">${esc(t('party.multipliers'))}</div><div class="numeros">` +
       pieces.map(([label, value]) => `<div><span>${esc(label)}</span><b>${value}</b></div>`).join('') + `</div></div>` +
-      scenery(engine) +
+      repertoire(engine) + scenery(engine) + clickables() +
       (tier === 0 ? `<div class="dica">${t('party.tip')}</div>` : '');
+  }
+
+  // O que responde ao clique na festa (muita coisa só se descobre clicando).
+  function clickables() {
+    const items = t('clicks.list').split('|');
+    return `<div class="cartao"><div class="rotulo">${esc(t('clicks.title'))}</div><ul class="cliques">` +
+      items.map(item => `<li>${esc(item)}</li>`).join('') + `</ul></div>`;
+  }
+
+  // Repertório: os passos de dança já aprendidos e o que falta para cada um dos outros.
+  function repertoire(engine) {
+    const steps = engine.state.stats.steps;
+    const learned = engine.learnedDances().length;
+    const chips = engine.data.dances.map(dance => steps >= dance.at
+      ? `<span class="selo verde">${esc(dance.name)}</span>`
+      : `<span class="selo" title="${esc(t('dances.locked', { n: number(dance.at) }))}">🔒 ${esc(t('dances.unlockAt', { n: number(dance.at) }))}</span>`).join(' ');
+    return `<div class="cartao"><div class="rotulo">${esc(t('dances.title'))} · ${esc(t('dances.count', { n: learned, total: engine.data.dances.length }))}</div>` +
+      `<p class="miudo">${esc(t('dances.hint', { v: percent(engine.cfg.danceBonus), n: engine.cfg.danceSteps }))}</p><div class="selos">${chips}</div></div>`;
   }
 
   // Cenário: o que os convidados já trouxeram para a festa e o próximo marco.
@@ -300,6 +376,7 @@
     const owned = engine.data.chars.filter(char => engine.hasChar(char.id)).length;
     return header(tabName('turma'), esc(t('crew.subtitle')),
       `<span class="selo">${esc(t('crew.count', { n: owned, total: engine.data.chars.length }))}</span>`) +
+      `<p class="miudo">${esc(t(engine.trioComplete() ? 'crew.trioOn' : 'crew.trioOff', { v: Math.round(engine.cfg.trioBonus * 100) }))}</p>` +
       `<div class="grade-itens">${engine.data.chars.map(char => {
         if (!engine.hasChar(char.id)) {
           return `<div class="cartao item misterio"><div class="mostruario">?</div><h4>???</h4>` +
@@ -389,12 +466,38 @@
       `<p class="miudo">${esc(t('mail.opened', { n: engine.state.stats.letters }))}</p>`;
   }
 
+  // Metas da festa: 3 cartões com a barra de cada uma; a cumprida ganha o botão de resgatar. Os números e as barras
+  // andam sozinhos com o jogo (data-meta, ver refreshLive em app.js).
+  function metas(engine) {
+    const cards = engine.state.goals.map((goal, index) => {
+      const value = engine.goalProgress(goal);
+      const ready = value >= goal.target;
+      const reward = t('goals.reward', { tickets: goal.reward.tickets }) +
+        (goal.reward.wood ? ` + ${t('goals.wood', { wood: goal.reward.wood })}` : '');
+      return `<div class="cartao meta ${ready ? 'feita' : ''}" data-meta="${index}"><div class="linha"><div><h3>${esc(t(`goal.${goal.type}`, { n: goal.target }))}</h3>` +
+        `${bar(value, goal.target, 'fama')}` +
+        `<p class="miudo"><b data-meta-n>${number(value)}/${number(goal.target)}</b> · ${esc(reward)}</p></div>` +
+        `<button class="btn ${ready ? '' : 'claro'}" data-action="meta-resgatar" data-index="${index}"${ready ? '' : ' disabled'}>` +
+        `${esc(t('goals.claim'))}</button></div></div>`;
+    }).join('');
+    return `<div class="rotulo">${esc(t('goals.title'))}</div><p class="miudo">${esc(t('goals.hint'))}</p><div class="lista">${cards}</div>`;
+  }
+
+  // Barrinha de quanto já foi (só nas conquistas de contar que ainda faltam).
+  function progress(engine, id) {
+    const entry = engine.achievementProgress(id);
+    if (!entry || entry[0] <= 0) return '';
+    return `<div class="progresso">${bar(entry[0], entry[1], 'fama')}<small>${compact(entry[0])}/${compact(entry[1])}</small></div>`;
+  }
+
   function conquistas(engine, ctx) {
     const done = engine.state.achievements;
     return header(tabName('conquistas'), esc(t('count.of', { n: done.length, total: engine.data.achievements.length }))) +
+      metas(engine) + `<div class="rotulo">${esc(t('goals.achievements'))}</div>` +
       `<div class="lista">${engine.data.achievements.map(a =>
         `<div class="cartao conquista ${done.includes(a.id) ? 'feita' : ''}"><div class="linha">` +
-        `${ctx.icon('ui:conquista', 'grande')}<div><h3>${esc(a.name)}</h3><p class="miudo">${esc(a.text)}</p></div>` +
+        `${ctx.icon('ui:conquista', 'grande')}<div><h3>${esc(a.name)}</h3><p class="miudo">${esc(a.text)}</p>` +
+        (done.includes(a.id) ? '' : progress(engine, a.id)) + `</div>` +
         `<span class="selo ${done.includes(a.id) ? 'verde' : ''}">${esc(t(done.includes(a.id) ? 'ach.done' : 'ach.todo'))}</span></div></div>`).join('')}</div>`;
   }
 
@@ -424,7 +527,23 @@
       `<label class="volume ${on ? '' : 'apagado'}">${esc(t('settings.volume'))}` +
       `<input type="range" id="volume" min="0" max="100" step="5" value="${volume}"${on ? '' : ' disabled'}>` +
       `<b id="volume-valor">${volume}%</b></label>` +
-      `<p class="miudo">${esc(t('settings.soundHint'))}</p>`;
+      `<p class="miudo">${esc(t('settings.soundHint'))}</p>` +
+      `<div class="rotulo">🎵 ${esc(t('settings.music'))}</div><div class="chips">` +
+      [[true, 'settings.musicOn'], [false, 'settings.musicOff']].map(([value, key]) =>
+        `<button class="chip ${(st.music === true) === value ? 'ativa' : ''}" data-action="musica" data-value="${value ? 'on' : 'off'}">` +
+        `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.musicHint'))}</p>`;
+  }
+
+  // Desempenho: quantos quadros por segundo a festa desenha (menos quadros, menos uso do computador).
+  function perfCard(st) {
+    const mode = st.perf || 'suave';
+    return `<div class="rotulo">⚙ ${esc(t('settings.perf'))}</div><div class="chips">` +
+      ['suave', 'normal', 'economia'].map(id => `<button class="chip ${mode === id ? 'ativa' : ''}" data-action="perf" data-value="${id}">` +
+        `${esc(t(`settings.perf.${id}`))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.perfHint'))}</p>` +
+      `<div class="rotulo">⚡ ${esc(t('settings.flash'))}</div><div class="chips">` +
+      [[true, 'settings.flashOn'], [false, 'settings.flashOff']].map(([value, key]) =>
+        `<button class="chip ${(st.flash !== false) === value ? 'ativa' : ''}" data-action="flash" data-value="${value ? 'on' : 'off'}">` +
+        `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.flashHint'))}</p>`;
   }
 
   function ajustes(engine, ctx) {
@@ -435,7 +554,12 @@
       [t('stats.cheerEarned'), compact(s.stats.cheerEarned)], [t('stats.cheerSpent'), compact(s.stats.cheerSpent)],
       [t('stats.fished'), number(s.stats.fished)], [t('stats.outings'), number(s.stats.outings)],
       [t('stats.requests'), number(s.stats.requests)], [t('stats.crashers'), number(s.stats.crashers)],
-      [t('stats.ringRounds'), number(s.stats.ringRounds)], [t('stats.ringHits'), number(s.stats.ringHits)]
+      [t('stats.ringRounds'), number(s.stats.ringRounds)], [t('stats.ringHits'), number(s.stats.ringHits)],
+      [t('stats.pokes'), number(s.stats.pokes)], [t('stats.balloons'), number(s.stats.balloons)],
+      [t('stats.rainbows'), number(s.stats.rainbows)], [t('stats.goals'), number(s.stats.goals)],
+      [t('stats.weddings'), number(s.stats.weddings)], [t('stats.potes'), number(s.stats.potes)],
+      [t('stats.sacos'), `${number(s.stats.sacoWins)}/${number(s.stats.sacoRaces)}`], [t('stats.leiloes'), number(s.stats.leiloes)],
+      [t('stats.bingos'), number(s.stats.bingos)], [t('stats.contests'), `${number(s.stats.contestWins)}/${number(s.stats.contests)}`]
     ];
     const zoom = Math.round((st.zoom || 1) * 100);
     const scale = ZOOMS.map(value => `<button class="chip ${Math.abs(zoom - value) < 3 ? 'ativa' : ''}" data-action="zoom" ` +
@@ -444,11 +568,15 @@
     return header(tabName('ajustes'), '') +
       `<div class="grade2"><div class="cartao">${languageCard(ctx)}<div class="rotulo">${esc(t('settings.size'))}</div>` +
       `<div class="chips">${scale}</div>` +
-      `<p class="miudo">${esc(t('settings.sizeHint'))}</p>` + soundCard(st) +
+      `<p class="miudo">${esc(t('settings.sizeHint'))}</p>` + soundCard(st) + perfCard(st) +
       (ctx.desktop ? `<div class="rotulo">${esc(t('settings.window'))}</div><div class="botoes">` +
         `<button class="btn ${st.pinned ? 'verde' : 'claro'}" data-action="fixar">${esc(t(st.pinned ? 'settings.pinned' : 'settings.behind'))}</button>` +
         `<button class="btn claro" data-action="esconder">${esc(t('settings.hide'))}</button>` +
-        `<button class="btn vermelho" data-action="sair">${esc(t('settings.quit'))}</button></div>` : '') +
+        `<button class="btn vermelho" data-action="sair">${esc(t('settings.quit'))}</button></div>` +
+        `<div class="rotulo">🚀 ${esc(t('settings.startup'))}</div><div class="chips">` +
+        [[true, 'settings.startupOn'], [false, 'settings.startupOff']].map(([value, key]) =>
+          `<button class="chip ${(st.startup === true) === value ? 'ativa' : ''}" data-action="inicio" data-value="${value ? 'on' : 'off'}">` +
+          `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.startupHint'))}</p>` : '') +
       `<div class="rotulo">${esc(t('settings.sign'))}</div><div class="chips">` +
       ['sempre', 'passar'].map(mode => `<button class="chip ${st.hud === mode ? 'ativa' : ''}" data-action="placa" ` +
         `data-value="${mode}">${esc(t(mode === 'sempre' ? 'settings.signAlways' : 'settings.signHover'))}</button>`).join('') +
@@ -477,7 +605,7 @@
 
   // Qual desbloqueio a linha do diário representa (ou null, se for um acontecimento comum).
   function unlockKind(engine, entry) {
-    if (['tier', 'fishing-open', 'legendary'].includes(entry.type)) return 'porte';
+    if (['tier', 'fishing-open', 'legendary', 'grow', 'learn', 'year'].includes(entry.type)) return 'porte';
     if (entry.type === 'size') return engine.sceneryPiece(entry.size)?.landmark ? 'cenario' : null;
     if (entry.type === 'fished') return entry.isNew ? 'turma' : null;
     if (entry.type === 'item') return 'item';
@@ -523,6 +651,21 @@
       case 'outing': return t('log.outing', { name: char, n: entry.wood });
       case 'bonfire': return t('log.bonfire', { name: named(d.bonfire, entry.id), n: entry.level });
       case 'legendary': return t('log.legendary');
+      case 'goal': return t('log.goal', { tickets: entry.tickets });
+      case 'rainbow': return t('log.rainbow', { n: Math.round(entry.amount || 0), tickets: entry.tickets });
+      case 'daily': return t('log.daily', { n: entry.tickets, streak: entry.streak });
+      case 'contest': return t('log.contest', { place: entry.place, avg: number(entry.average, 1), tickets: entry.tickets });
+      case 'year': return t('log.year', { n: entry.year, v: Math.round((entry.bonus || 0) * 100) });
+      case 'bingo': return t('log.bingo', { draws: entry.draws, tickets: entry.tickets, n: Math.round(entry.amount || 0) });
+      case 'bingo-lost': return t('log.bingoLost', { draws: entry.draws });
+      case 'pote': return t('log.pote', { n: Math.round(entry.amount || 0), tickets: entry.tickets });
+      case 'leilao': return entry.item ? t('log.leilao', { item: engine.items[entry.item]?.name || entry.item, price: entry.price })
+        : t('log.leilaoCheer', { n: Math.round(entry.amount || 0), price: entry.price });
+      case 'saco': return t(`log.saco.${entry.place}`, { n: Math.round(entry.amount || 0), tickets: entry.tickets, s: number(entry.seconds || 0, 1) });
+      case 'wedding': return t('log.wedding', { rice: entry.rice, n: Math.round(entry.amount || 0), tickets: entry.tickets });
+      case 'balloon': return t(`log.balloon.${entry.kind}`, { n: Math.round(entry.amount || 0), mult: entry.mult, s: entry.seconds });
+      case 'grow': return t('log.grow', { stage: t(`growth.stage.${entry.stage}`) });
+      case 'learn': return t('log.learn', { name: named(d.dances, entry.id) });
       case 'fishing-open': return t('log.fishingOpen');
       case 'debug': return t('log.debug', { note: debugText(engine, entry) });
       default: return entry.type;
@@ -631,10 +774,42 @@
       group(t('debug.crewBooths'), [button('prendas', 0, t('debug.prendas')), button('cartas', 0, t('debug.cartas')),
         button('roles', 0, t('debug.roles')), button('turma', 0, t('debug.turma')), button('itens', 0, t('debug.itens'))]) +
       group(t('debug.atParty'), [button('pedido', 0, t('debug.callRequest')), button('penetra', 0, t('debug.callCrasher')),
+        button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
         button('argolas', 0, t('debug.cheapRings'))]);
   }
 
-  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, teste };
+  // Bingo da quermesse: a cartela (o meio é livre, as casas sorteadas ganham um grão de milho), os últimos números e a compra.
+  function bingo(engine, ctx) {
+    if (tabLocked(tabOf('bingo'), engine)) return header(tabName('bingo'), '') + lockNote(engine, 1);
+    const s = engine.state;
+    const round = s.bingo.round;
+    const cost = engine.bingoCost();
+    const playing = round && !round.result;
+    let body = '';
+    if (round) {
+      const marks = engine.bingoMarks(round);
+      const last = round.drawn.at(-1);
+      body += `<div class="cartao bingo"><div class="bingo-cartela">` + round.card.map((n, i) =>
+        `<div class="bingo-casa ${marks.marked[i] ? 'marcada' : ''} ${n && n === last ? 'nova' : ''}">${n ? n : '★'}</div>`).join('') +
+        `</div><div class="bingo-lado"><div class="rotulo">${esc(t('bingo.last'))}</div>` +
+        `<div class="bingo-bola">${last ?? '–'}</div>` +
+        `<p class="miudo">${esc(t('bingo.recent', { list: round.drawn.slice(-6, -1).reverse().join(' · ') || '–' }))}</p>` +
+        `<p class="miudo">${esc(t('bingo.count', { n: round.drawn.length, max: engine.cfg.bingoMax, marked: marks.count }))}</p></div></div>`;
+      if (round.result === 'bingo') {
+        body += `<div class="cartao bilhete"><p><b>${esc(t('bingo.won'))}</b> ${esc(t('bingo.prize', { tickets: round.prize?.tickets ?? 0,
+          n: compact(round.prize?.amount ?? 0) }))}</p></div>`;
+      } else if (round.result === 'rival') {
+        body += `<div class="cartao bilhete"><p>${esc(t('bingo.lost'))}</p></div>`;
+      } else if (round.line) body += `<p class="miudo">${esc(t('bingo.lineDone'))}</p>`;
+    }
+    return header(t('tab.bingo'), esc(t('bingo.subtitle', { s: number(engine.cfg.bingoEvery, 1) }))) + body +
+      `<div class="botoes">` + (playing ? `<button class="btn" disabled>${esc(t('bingo.playing'))}</button>`
+        : costButton('bingo-comprar', '', cost, 'tickets', t(round ? 'bingo.again' : 'bingo.buy'), ctx.icon('ui:fichas'))) + `</div>` +
+      `<p class="miudo">${esc(t('bingo.rules', { line: Math.ceil(cost / 2), prize: cost * engine.cfg.bingoPrize }))}</p>` +
+      `<p class="miudo">${esc(t('bingo.stats', { cards: s.stats.bingoCards, wins: s.stats.bingos }))}</p>`;
+  }
+
+  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, bingo, teste };
   const telaName = id => (id === 'teste' || TELAS.some(entry => entry.id === id) ? tabName(id) : '');
 
   function panel(engine, ctx) {

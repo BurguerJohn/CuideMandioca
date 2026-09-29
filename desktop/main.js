@@ -10,6 +10,8 @@ const I18N = require('../src/i18n.js');
 const GAME_DATA = require('../src/data.js');
 
 const t = (key, vars) => I18N.t(key, vars);
+// Tamanhos prontos do menu da bandeja: os mesmos dos Ajustes, do menor ao maior que a alça de arrastar alcança.
+const ZOOMS = [0.25, 0.5, 0.75, 1, 1.5, 2, 3];
 const steam = createSteam();
 // Na versão da Steam (App ID de verdade e "required"), o jogo só roda aberto por ela. Em desenvolvimento, nunca trava.
 const steamOnly = steam.config.required && app.isPackaged;
@@ -135,10 +137,20 @@ if (steamOnly && steam.restartIfNeeded()) {
     if (alive()) win.webContents.send('desktop:command', command);
   }
 
+  // Abrir com o Windows: o jogo instalado se registra para abrir no login. Aberto assim, o exe pede para a Steam relançar
+  // (restartIfNeeded), então ele sempre roda pela Steam. Em desenvolvimento (electron .) não registra nada.
+  function applyStartup() {
+    if (!app.isPackaged) return;
+    try { app.setLoginItemSettings({ openAtLogin: settings.startup }); }
+    catch (error) { console.warn('Não deu para mudar a abertura com o Windows:', error.message); }
+  }
+
   function change(partial) {
     const before = settings.display;
+    const startup = settings.startup;
     settings = mergeSettings(settings, partial);
     if (settings.display !== before) place();
+    if (settings.startup !== startup) applyStartup();
     applyWindow();
     persistSoon();
     return publicSettings(settings);
@@ -213,7 +225,7 @@ if (steamOnly && steam.restartIfNeeded()) {
       { type: 'separator' },
       { label: t('tray.pin'), type: 'checkbox', checked: settings.pinned,
         click: item => changeAndTell({ pinned: item.checked }) },
-      { label: t('tray.size'), submenu: [0.5, 0.75, 1, 1.5, 2].map(zoom => ({ label: `${Math.round(zoom * 100)}%`,
+      { label: t('tray.size'), submenu: ZOOMS.map(zoom => ({ label: `${Math.round(zoom * 100)}%`,
         type: 'radio', checked: Math.abs(settings.zoom - zoom) < 0.01, click: () => changeAndTell({ zoom }) })) },
       ...(displays.length > 1 ? [{ label: t('tray.display'), submenu: displays.map((display, index) => ({
         label: t('tray.displayItem', { n: index + 1, w: display.size.width, h: display.size.height }), type: 'radio',
@@ -224,6 +236,12 @@ if (steamOnly && steam.restartIfNeeded()) {
         click: () => { if (language.choice !== entry.id) setLanguage(entry.id); } })) },
       { label: t('tray.sound'), type: 'checkbox', checked: settings.sound,
         click: item => changeAndTell({ sound: item.checked }) },
+      { label: t('tray.music'), type: 'checkbox', checked: settings.music,
+        click: item => changeAndTell({ music: item.checked }) },
+      { label: t('settings.startup'), type: 'checkbox', checked: settings.startup,
+        click: item => changeAndTell({ startup: item.checked }) },
+      { label: t('tray.perf'), submenu: ['suave', 'normal', 'economia'].map(perf => ({ label: t(`settings.perf.${perf}`),
+        type: 'radio', checked: settings.perf === perf, click: () => changeAndTell({ perf }) })) },
       { label: t('tray.hide'), type: 'checkbox', checked: settings.hidden,
         click: item => changeAndTell({ hidden: item.checked }) },
       { type: 'separator' },
@@ -341,6 +359,8 @@ if (steamOnly && steam.restartIfNeeded()) {
     try { loaded = JSON.parse(fs.readFileSync(settingsPath, 'utf8')); }
     catch (error) { if (error.code !== 'ENOENT') console.warn('Preferências da janela ignoradas:', error); }
     settings = normalizeSettings(loaded);
+    // Confere o registro a cada abertura: se a biblioteca da Steam mudou de lugar, o caminho do exe é atualizado.
+    applyStartup();
     I18N.setLanguage(languageInfo().id);
     openWindow();
 

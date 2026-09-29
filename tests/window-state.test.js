@@ -5,7 +5,7 @@ const { normalizeSettings, mergeSettings, publicSettings, pickDisplay } = requir
 test('preferências inválidas voltam ao padrão', () => {
   assert.deepEqual(normalizeSettings({ pinned: 'sim', zoom: 9, x: 9, lift: -3, hud: 'x', hidden: 1, display: 'a' }),
     { pinned: true, zoom: 3, x: 1, lift: 0, hud: 'sempre', hidden: false, placa: null, display: null, language: 'auto',
-      sound: true, volume: 0.5 });
+      sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false });
   assert.equal(normalizeSettings({ sound: false }).sound, false, 'som desligado fica desligado');
   assert.equal(normalizeSettings({ sound: 'não' }).sound, true, 'valor estranho: som ligado');
   assert.equal(normalizeSettings({ volume: 7 }).volume, 1, 'volume vai de 0 a 1');
@@ -23,7 +23,16 @@ test('mudanças parciais só alteram as chaves conhecidas', () => {
   assert.equal(next.x, 0.3);
   assert.equal(next.hud, 'passar');
   assert.equal('malicioso' in next, false);
-  assert.deepEqual(Object.keys(publicSettings(next)), ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume']);
+  assert.deepEqual(Object.keys(publicSettings(next)), ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume', 'perf', 'flash', 'music', 'startup']);
+  assert.equal(normalizeSettings({ music: true }).music, true);
+  assert.equal(normalizeSettings({ startup: true }).startup, true);
+  assert.equal(normalizeSettings({ startup: 1 }).startup, false, 'abrir com o Windows só liga com true de verdade');
+  assert.equal(mergeSettings(current, { startup: true }).startup, true, 'dá para mudar pelos Ajustes');
+  assert.equal(normalizeSettings({ music: 'sim' }).music, false, 'a música só liga com true de verdade');
+  assert.equal(normalizeSettings({ flash: false }).flash, false);
+  assert.equal(normalizeSettings({ flash: 'talvez' }).flash, true, 'valor estranho: com clarão');
+  assert.equal(normalizeSettings({ perf: 'economia' }).perf, 'economia');
+  assert.equal(normalizeSettings({ perf: 'turbo' }).perf, 'suave', 'valor estranho: suave');
   assert.equal(mergeSettings(next, { volume: 0.25 }).volume, 0.25, 'a página muda o volume');
   assert.deepEqual(mergeSettings(next, { placa: { dx: -300.4, dy: 20 } }).placa, { dx: -300, dy: 20 }, 'placa arrastada');
   assert.equal(mergeSettings(next, { placa: { dx: 'a', dy: 1 } }).placa, null, 'posição inválida volta ao automático');

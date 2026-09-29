@@ -4,8 +4,10 @@ const { LANGUAGES } = require('../src/i18n.js');
 
 // Preferências da janela da festa, sempre normalizadas antes de usar ou salvar.
 const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null,
-  display: null, language: 'auto', sound: true, volume: 0.5 });
-const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume'];
+  display: null, language: 'auto', sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false });
+const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume', 'perf', 'flash', 'music', 'startup'];
+// Desempenho da festa: quadros por segundo com foco / de fundo (suave 60/30, normal 30/20, economia 20/12).
+const PERFS = ['suave', 'normal', 'economia'];
 // Idioma: "auto" segue o idioma do jogo na Steam (ou o do sistema); senão, um dos idiomas do jogo.
 const language = value => (LANGUAGES.some(entry => entry.id === value) ? value : 'auto');
 
@@ -33,7 +35,14 @@ function normalizeSettings(raw) {
     language: language(r.language),
     // Efeitos sonoros: ligados por padrão, volume de 0 a 1.
     sound: r.sound !== false,
-    volume: bounded(r.volume, 0, 1, DEFAULTS.volume)
+    volume: bounded(r.volume, 0, 1, DEFAULTS.volume),
+    perf: PERFS.includes(r.perf) ? r.perf : DEFAULTS.perf,
+    // Clarão dos relâmpagos na chuva: ligado por padrão (quem prefere sem clarões desliga em Ajustes).
+    flash: r.flash !== false,
+    // Música de fundo: desligada por padrão (o jogo fica aberto enquanto a pessoa trabalha).
+    music: r.music === true,
+    // Abrir com o Windows: desligado por padrão (só liga quem pedir, em Ajustes).
+    startup: r.startup === true
   };
 }
 

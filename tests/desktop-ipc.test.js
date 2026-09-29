@@ -15,7 +15,7 @@ function fakeSteam(order, language = 'spanish') {
   };
 }
 
-function loadMain({ language } = {}) {
+function loadMain({ language, packaged = false } = {}) {
   const listeners = new Map();
   const intervals = [];
   const appEvents = {};
@@ -23,6 +23,7 @@ function loadMain({ language } = {}) {
   const handlers = new Map();
   const order = [];
   let windowObject;
+  let trayMenu = null;
   const windows = [];
   class FakeWindow {
     constructor(options) {
@@ -63,13 +64,13 @@ function loadMain({ language } = {}) {
     app: {
       requestSingleInstanceLock: () => true, whenReady: () => Promise.resolve(), getPath: () => 'C:\\dados',
       setAppUserModelId() {}, on: (name, fn) => { appEvents[name] = fn; }, quit: () => order.push('quit'),
-      getLocale: () => 'pt-BR', isPackaged: false
+      getLocale: () => 'pt-BR', isPackaged: packaged, setLoginItemSettings: value => order.push(['login', value])
     },
     dialog: { showErrorBox: () => order.push('dialog') },
     BrowserWindow: FakeWindow,
     ipcMain: { on: (channel, fn) => listeners.set(channel, fn), handle: (channel, fn) => handlers.set(channel, fn) },
     screen: { getPrimaryDisplay: () => display, getAllDisplays: () => [display], on() {}, getCursorScreenPoint: () => cursor },
-    Tray: class { setToolTip() {} on() {} setContextMenu() {} },
+    Tray: class { setToolTip() {} on() {} setContextMenu(menu) { trayMenu = menu; } },
     Menu: { buildFromTemplate: template => template },
     nativeImage: { createFromPath: () => ({}) }
   };
@@ -88,7 +89,7 @@ function loadMain({ language } = {}) {
   const source = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'main.js'), 'utf8');
   vm.runInNewContext(source, { require: name => mocks[name], __dirname: path.join(__dirname, '..', 'desktop'),
     console, setTimeout, clearTimeout, setInterval: fn => intervals.push(fn) });
-  return { listeners, handlers, order, window: () => windowObject, windows, intervals, appEvents, cursor };
+  return { listeners, handlers, order, window: () => windowObject, windows, intervals, appEvents, cursor, tray: () => trayMenu };
 }
 
 test('janela cobre a área útil, vaza cliques e só aceita IPC da própria festa', async () => {
@@ -113,7 +114,7 @@ test('janela cobre a área útil, vaza cliques e só aceita IPC da própria fest
 
   const settings = await handlers.get('desktop:update-settings')(own, { zoom: 1.5, pinned: false, lixo: 1 });
   assert.deepEqual(settings, { pinned: false, zoom: 1.5, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null,
-    sound: true, volume: 0.5 });
+    sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false });
   assert.equal(win.onTop, false);
   assert.equal(await handlers.get('desktop:update-settings')({ sender: {} }, { zoom: 2 }), null);
 
@@ -207,4 +208,38 @@ test('o vigia do cursor conta à festa onde o mouse está, e abrir o jogo de nov
   assert.equal(window().focused, true, 'abrir o jogo de novo dá foco à festa');
   assert.equal(order.some(entry => entry[0] === 'send' && entry[2] === 'painel'), false, 'sem abrir o Painel');
   I18N.setLanguage('pt-BR');
+});
+
+test('abrir com o Windows: desligado de fábrica, e só o jogo instalado se registra no login', async () => {
+  const dev = loadMain();
+  await Promise.resolve();
+  const devOwn = { sender: dev.window().webContents };
+  await dev.handlers.get('desktop:update-settings')(devOwn, { startup: true });
+  assert.equal(dev.order.some(entry => entry[0] === 'login'), false, 'em desenvolvimento não mexe no login do Windows');
+
+  const { handlers, order, window } = loadMain({ packaged: true });
+  await Promise.resolve();
+  const logins = () => order.filter(entry => entry[0] === 'login').map(entry => JSON.parse(JSON.stringify(entry[1])));
+  assert.deepEqual(logins(), [{ openAtLogin: false }], 'ao abrir, confere o registro: desligado');
+  const own = { sender: window().webContents };
+  const settings = await handlers.get('desktop:update-settings')(own, { startup: true });
+  assert.equal(settings.startup, true);
+  assert.deepEqual(logins().at(-1), { openAtLogin: true });
+  await handlers.get('desktop:update-settings')(own, { zoom: 1.5 });
+  assert.equal(logins().length, 2, 'outras mudanças não mexem no registro');
+  await handlers.get('desktop:update-settings')(own, { startup: false });
+  assert.deepEqual(logins().at(-1), { openAtLogin: false });
+});
+
+test('o menu da bandeja tem os mesmos tamanhos que a alça alcança e liga a abertura com o Windows', async () => {
+  const { tray, order } = loadMain({ packaged: true });
+  await Promise.resolve();
+  const menu = tray();
+  const size = menu.find(item => item.label === I18N.t('tray.size'));
+  assert.deepEqual([...size.submenu.map(item => item.label)], ['25%', '50%', '75%', '100%', '150%', '200%', '300%']);
+  const startup = menu.find(item => item.label === I18N.t('settings.startup'));
+  assert.equal(startup.checked, false, 'desligado de fábrica');
+  startup.click({ checked: true });
+  assert.equal(JSON.parse(JSON.stringify(order.filter(entry => entry[0] === 'login').at(-1)[1])).openAtLogin, true);
+  assert.equal(tray().find(item => item.label === I18N.t('settings.startup')).checked, true, 'o menu refeito mostra ligado');
 });

@@ -11,7 +11,11 @@
   const SETTINGS_KEY = 'arraia-ajustes-v1';
   const LANGUAGE_KEY = 'arraia-idioma';
   const REOPEN_KEY = 'arraia-reabrir';
-  const DEFAULTS = { pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, sound: true, volume: 0.5 };
+  const DEFAULTS = { pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, sound: true, volume: 0.5,
+    perf: 'suave', flash: true, music: false, startup: false };
+  // Quadros por segundo da festa: [com foco, de fundo] em cada perfil de desempenho.
+  const PERF_RATES = { suave: [60, 30], normal: [30, 20], economia: [20, 12] };
+  const rateNow = () => (PERF_RATES[ui.settings.perf] || PERF_RATES.suave)[ui.focused ? 0 : 1];
   const ZOOM_MIN = 0.25;
   const ZOOM_MAX = 3;
 
@@ -94,6 +98,7 @@
 
   // --- Som ---------------------------------------------------------------------------------------------
   const som = globalThis.ArraiaSom?.create({ enabled: ui.settings.sound !== false, volume: ui.settings.volume }) || null;
+  som?.setMusic(ui.settings.music === true && !ui.settings.hidden);
   // Com a festa escondida nada toca. `tocou` avisa quem chamou que a ação já tocou o seu próprio som.
   function tocar(name, options) {
     ui.tocou = true;
@@ -231,6 +236,9 @@
   function applySettings(settings) {
     ui.settings = { ...ui.settings, ...settings };
     som?.set({ enabled: ui.settings.sound !== false, volume: ui.settings.volume });
+    som?.setMusic?.(ui.settings.music === true && !ui.settings.hidden);
+    ui.festa?.setRate(rateNow());
+    ui.festa?.setFlash?.(ui.settings.flash !== false);
     scaleFesta();
     renderHud(true);
     placeFesta();
@@ -278,14 +286,25 @@
   // --- Avisos e janelas --------------------------------------------------------------------------------
   function toast(message, kind = '') {
     const box = $('#avisos');
-    const item = document.createElement('div');
-    item.className = `aviso-item ${kind}`;
-    item.textContent = message;
-    box.appendChild(item);
     if (kind === 'erro') tocar('erro');
-    while (box.children.length > 4) box.firstChild.remove();
-    setTimeout(() => item.classList.add('saindo'), 3600);
-    setTimeout(() => item.remove(), 4200);
+    // O mesmo aviso de novo (duas cartas chegando juntas, cliques repetidos) não empilha: o que está na tela ganha um ×2 e
+    // o relógio dele recomeça.
+    const same = [...box.children].find(child => child.dataset.msg === message && child.dataset.kind === kind && !child.dataset.out);
+    const item = same || document.createElement('div');
+    if (same) {
+      same.dataset.n = String(Number(same.dataset.n || 1) + 1);
+      same.textContent = `${message} (×${same.dataset.n})`;
+      clearTimeout(same.timers?.[0]);
+      clearTimeout(same.timers?.[1]);
+    } else {
+      item.className = `aviso-item ${kind}`;
+      item.textContent = message;
+      item.dataset.msg = message;
+      item.dataset.kind = kind;
+      box.appendChild(item);
+      while (box.children.length > 4) box.firstChild.remove();
+    }
+    item.timers = [setTimeout(() => { item.dataset.out = '1'; item.classList.add('saindo'); }, 3600), setTimeout(() => item.remove(), 4200)];
   }
 
   function showModal(html) {
@@ -374,7 +393,9 @@
     const s = engine.state;
     const ready = s.outings.filter((_, i) => engine.outingState(i) === 'pronto').length;
     const key = [engine.tierIndex(), s.size, s.fishing.unlocked && s.fishing.ready, s.mail.ready, ready,
-      now() < ui.closeArmedUntil, !!desktop].join('|');
+      now() < ui.closeArmedUntil, !!desktop, s.runtime.frenzyLeft > 0, s.runtime.quadrilhaLeft > 0, s.runtime.weddingLeft > 0,
+      s.bingo.round && !s.bingo.round.result ? engine.bingoMarks().count : -1,
+      engine.specialDay()?.id].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
     $('#placa').innerHTML = UI.hud(engine, context());
@@ -395,6 +416,24 @@
       } else if (key === 'fame') node.textContent = UI.compact(s.fame);
       else if (key === 'zoom') node.textContent = zoomLabel();
       else if (key in balances) node.textContent = UI.compact(balances[key]);
+    }
+    for (const node of document.querySelectorAll('[data-buff]')) {
+      const left = { frenzy: s.runtime.frenzyLeft, wedding: s.runtime.weddingLeft }[node.dataset.buff] ?? s.runtime.quadrilhaLeft;
+      node.textContent = `${Math.ceil(left)}s`;
+    }
+    // Metas abertas no Painel: barra, números e o botão de resgatar acompanham o jogo.
+    for (const card of document.querySelectorAll('[data-meta]')) {
+      const goal = s.goals[Number(card.dataset.meta)];
+      if (!goal) continue;
+      const value = engine.goalProgress(goal);
+      const ready = value >= goal.target;
+      const fill = card.querySelector('.barra i');
+      if (fill) fill.style.width = `${Math.min(100, 100 * value / goal.target)}%`;
+      const text = card.querySelector('[data-meta-n]');
+      if (text) text.textContent = `${UI.number ? UI.number(value) : value}/${UI.number ? UI.number(goal.target) : goal.target}`;
+      card.classList.toggle('feita', ready);
+      const button = card.querySelector('button');
+      if (button) { button.disabled = !ready; button.classList.toggle('claro', !ready); }
     }
     for (const node of document.querySelectorAll('.placa .barra.fama i')) {
       node.style.width = `${Math.min(100, 100 * s.fame / Math.max(1, engine.fameNeed()))}%`;
@@ -494,19 +533,41 @@
   }
 
   function previewFor(id) {
+    if (typeof id === 'string' && id.startsWith('set:')) {
+      const set = engine.data.sets.find(entry => entry.id === id.slice(4));
+      return set ? { chapeu: set.hat, mao: set.hand, tecido: set.fabric } : null;
+    }
     const item = engine.items[id];
     if (!item) return null;
     return item.cat === 'lado' ? { [ui.dock.side]: id } : { [item.cat]: id };
   }
 
+  // Clique num conjunto: veste as três peças se a pessoa tem todas; senão, diz quais faltam.
+  function dockSet(id) {
+    const set = engine.data.sets.find(entry => entry.id === id);
+    if (!set) return;
+    const pieces = [set.hat, set.hand, set.fabric];
+    const missing = pieces.filter(piece => !engine.owned(piece));
+    if (missing.length) {
+      toast(t('app.setMissing', { name: set.name, list: missing.map(piece => engine.items[piece]?.name || piece).join(', ') }), 'erro');
+      return;
+    }
+    for (const piece of pieces) engine.equip(piece);
+    tocar('equipar');
+    ui.preview = null;
+    saveLater();
+    renderDock();
+  }
+
+  // Itens que não se compram: de onde cada um vem (rolês, Argolas, casamento, leilão).
+  const ONLY_FROM = { role: 'app.onlyOutings', argolas: 'app.onlyRings', casamento: 'app.onlyWedding', leilao: 'app.onlyAuction' };
   function dockItem(id) {
     const item = engine.items[id];
     const side = ui.dock.side;
     if (engine.owned(id)) {
       engine.equip(id, side);
       tocar('equipar');
-    } else if (item.source === 'role') { toast(t('app.onlyOutings', { item: item.name })); return; }
-    else if (item.source === 'argolas') { toast(t('app.onlyRings', { item: item.name })); return; }
+    } else if (ONLY_FROM[item.source]) { toast(t(ONLY_FROM[item.source], { item: item.name })); return; }
     else if (engine.itemLocked(id)) { toast(t('app.unlocksAt', { tier: engine.data.tiers[item.tier].name })); return; }
     else if (!engine.buyItem(id)) { toast(t('app.needTickets', { item: item.name, n: item.price }), 'erro'); return; }
     else {
@@ -645,6 +706,7 @@
     if (a === 'vitrine-cat') { ui.dock.cat = d.cat; ui.preview = null; renderDock(); return; }
     if (a === 'vitrine-lado') { ui.dock.side = d.side; ui.preview = null; renderDock(); return; }
     if (a === 'vitrine-item') { dockItem(d.id); return; }
+    if (a === 'vitrine-conjunto') { dockSet(d.id); return; }
     if (a === 'argolas') { if (ui.rings.open) closeRings(); else openRings(); return; }
     if (a === 'argolas-fechar') { closeRings(); return; }
     if (a === 'argolas-jogar') {
@@ -680,11 +742,17 @@
       return;
     }
     if (a === 'fogueira') { done(engine.buyBonfire(d.id), t('app.fireGrew'), t('app.needWood'), 'fogo'); return; }
+    if (a === 'meta-resgatar') {
+      const reward = engine.claimGoal(Number(d.index));
+      done(!!reward, reward ? t('app.goalClaimed', { tickets: reward.tickets }) : null, null, 'moeda');
+      return;
+    }
     if (a === 'carta') {
       const letter = engine.openLetter();
       if (letter) {
         ui.lastLetter = letter;
         tocar('carta');
+        ui.festa?.poke('coracoes');
         showModal(`<div class="bilhete grande"><p>${UI.esc(t('quote', { text: letter.text }))}</p></div>` +
           `<p>${UI.esc(t('gain.tickets', { n: letter.tickets }))}</p>` +
           `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('mail.ok'))}</button></div>`);
@@ -692,7 +760,14 @@
       done(!!letter);
       return;
     }
-    if (a === 'foto') { tocar('foto'); download('mandioca-festa.png', ui.festa ? ui.festa.photo(4) : ''); return; }
+    if (a === 'foto') {
+      tocar('foto');
+      const caption = { title: engine.state.name && engine.state.name !== 'Mandioca' ? engine.state.name : t('app.title'),
+        subtitle: (t('party.subtitle', { tier: engine.tier().name, n: engine.state.size }) +
+          (engine.state.year > 1 ? ` · ${t('hud.year', { n: engine.state.year })}` : '')).replace(/\s*·\s*/g, ' - ') };
+      download('mandioca-festa.png', ui.festa ? ui.festa.photo(4, caption) : '');
+      return;
+    }
     if (a === 'som') {
       // Liga na hora (sem esperar o desktop responder), para o próprio clique já soar.
       const on = d.value === 'on';
@@ -701,6 +776,33 @@
       changeSettings({ sound: on });
       if (on) tocar('moeda');
       else ui.tocou = true;
+      return;
+    }
+    if (a === 'perf') { changeSettings({ perf: d.value }); return; }
+    if (a === 'flash') { changeSettings({ flash: d.value === 'on' }); return; }
+    if (a === 'musica') { changeSettings({ music: d.value === 'on' }); return; }
+    if (a === 'inicio') { changeSettings({ startup: d.value === 'on' }); return; }
+    if (a === 'ano-novo') {
+      if (!engine.canNewYear()) return;
+      showModal(`<h2>${UI.esc(t('year.title'))}</h2><p>${UI.esc(t('year.confirm', { v: Math.round(engine.cfg.yearBonus * 100),
+        n: engine.state.year + 1 }))}</p><p class="miudo">${UI.esc(t('year.keeps'))}</p>` +
+        `<div class="botoes"><button class="btn" data-action="ano-novo-sim">${UI.esc(t('year.yes'))}</button>` +
+        `<button class="btn claro" data-action="fechar-janela">${UI.esc(t('year.no'))}</button></div>`);
+      return;
+    }
+    if (a === 'ano-novo-sim') {
+      if (!engine.newYear()) return;
+      closeModal();
+      forgetRound();
+      save();
+      renderHud(true);
+      renderWindows();
+      renderDock();
+      return;
+    }
+    if (a === 'bingo-comprar') {
+      if (engine.buyBingo()) { tocar('moeda'); saveLater(); renderHud(true); renderTela(); }
+      else toast(t('app.needTickets', { item: t('tab.bingo'), n: engine.bingoCost() }), 'erro');
       return;
     }
     if (a === 'fixar') { changeSettings({ pinned: !ui.settings.pinned }); return; }
@@ -751,6 +853,42 @@
     if (region === 'request') {
       const result = engine.claimRequest();
       if (result) done(true, t('app.requestDone', { n: UI.compact(result.reward) }), null, 'moeda');
+    } else if (region === 'balao-sorte') {
+      const result = engine.claimBalloon();
+      if (result) {
+        const message = result.kind === 'frenzy' ? t('app.balloonFrenzy', { mult: result.mult, s: result.seconds })
+          : t(`app.balloon.${result.kind}`, { n: UI.compact(result.amount) });
+        done(true, message, null, result.kind === 'frenzy' ? 'porte' : 'premio');
+      }
+    } else if (typeof region === 'string' && region.startsWith('lanterna:')) {
+      ui.festa?.poke(region);
+      tocar('arremesso');
+    } else if (typeof region === 'string' && region.startsWith('bicho:')) {
+      ui.festa?.poke(region);
+      tocar(BICHO_SONS[region.split(':')[1]] || 'clique');
+    } else if (region === 'pote') {
+      const result = engine.hitPote();
+      if (result.broke) done(true, t('app.poteBreak', { n: UI.compact(result.amount), tickets: result.tickets }), null, 'quebra');
+      else if (result.ready) tocar('pote');
+    } else if (region === 'saco') {
+      const result = engine.hopSaco();
+      if (result.done) {
+        done(true, t(`app.sacoEnd.${result.place}`, { n: UI.compact(result.amount), tickets: result.tickets, s: UI.number(result.seconds, 1) }), null,
+          ['conquista', 'premio', 'errou'][result.place - 1]);
+      } else if (result.fell) tocar('tombo');
+      else if (result.active && !result.down) tocar('pulo', { pitch: result.hops % 2 ? 0 : 3 });
+    } else if (region === 'leilao') {
+      const result = engine.bidLeilao();
+      if (result.broke) toast(t('app.leilaoBroke', { n: result.bid }), 'erro');
+      else if (result.bid) { tocar('lance'); renderHud(true); saveLater(); }
+    } else if (region === 'casamento') {
+      if (engine.throwRice().ready) tocar('arroz');
+    } else if (region === 'pote-ouro') {
+      const result = engine.claimRainbow();
+      if (result) done(true, t('app.rainbowPot', { n: UI.compact(result.amount), tickets: result.tickets }), null, 'premio');
+    } else if (region === 'host') {
+      const result = engine.pokeHost();
+      if (result.ready) { tocar('carinho'); saveLater(); }
     } else if (region === 'crasher') {
       const result = engine.shooCrasher();
       if (result) done(true, t('app.crasherOut', { n: result.tickets }), null, 'expulsar');
@@ -763,18 +901,36 @@
       if (id === 'barraca-argolas') openRings();
       else if (id === 'barraca-pescaria' && engine.tierIndex() >= 1) openTela('pescaria', false);
       else if (id === 'correio') openTela('correio', false);
+      else {
+        // As outras barracas e os enfeites respondem ao clique na própria festa (beijo, pipoca, xô...).
+        ui.festa?.poke(`lado:${side}`);
+        tocar(LADO_SONS[id] || 'clique');
+        if (id === 'barraca-beijo') {
+          const kiss = engine.kiss();
+          if (kiss.ready) { toast(t('app.kiss', { n: kiss.tickets })); renderHud(true); saveLater(); }
+        }
+      }
     }
     // A Mandioca, o par, o chão e os enfeites são cenário: o clique só dá foco ao jogo (a loja abre pelo botão).
   }
 
+  // O som de cada barraca ou enfeite que responde ao clique.
+  const LADO_SONS = { 'barraca-beijo': 'carinho', 'barraca-comidas': 'bola', cadeia: 'penetra', espantalho: 'galinha', fardo: 'pintinho',
+    mastro: 'equipar', carroca: 'lenha', 'barril-quentao': 'bola' };
+  // O som de cada bicho da festa que reage ao clique.
+  const BICHO_SONS = { sapo: 'sapo', trem: 'apito', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca' };
+
   // --- Eventos do motor --------------------------------------------------------------------------------
   // Som de cada acontecimento da festa (os que o jogador não causou com um clique).
-  const EVENT_SOUNDS = { 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso',
-    'prize-ready': 'aviso', 'letter-ready': 'aviso', 'outing-done': 'aviso', crasher: 'penetra', request: 'pedido',
+  const EVENT_SOUNDS = { contest: 'porte', daily: 'premio', 'new-year': 'porte', 'bingo-number': 'bola', 'bingo-line': 'acerto', 'bingo-win': 'conquista', 'bingo-lost': 'errou', 'quadrilha-call': 'grito', pote: 'aviso', saco: 'aviso', 'saco-go': 'juiz', leilao: 'aviso', 'leilao-call': 'martelo', set: 'premio', wedding: 'sinos', 'wedding-end': 'premio', 'special-day': 'quadrilha', quadrilha: 'quadrilha', 'goal-done': 'aviso', rain: 'chuva', thunder: 'trovao', 'rain-end': 'arcoiris', balloon: 'aviso', 'frenzy-start': 'porte', learn: 'crescer', grow: 'crescer', 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso',
+    'prize-ready': 'aviso', 'letter-ready': 'pombo', 'outing-done': 'aviso', crasher: 'penetra', request: 'pedido',
     'size-up': 'convidado', 'flare-start': 'fogo' };
   // Acontecimentos que mudam o que as janelas mostram: prenda pronta, carta chegando, turma voltando do rolê...
-  const REFRESH_EVENTS = new Set(['tier-up', 'fishing-open', 'prize-ready', 'letter-ready', 'outing-done', 'legendary',
+  const REFRESH_EVENTS = new Set(['bingo-win', 'bingo-lost', 'goal-done', 'learn', 'grow', 'tier-up', 'fishing-open', 'prize-ready', 'letter-ready', 'outing-done', 'legendary', 'item',
     'achievement']);
+
+  // Nome da prenda do leilão: o item ou os minutos de Animação.
+  const prizeName = prize => (prize?.item ? engine.items[prize.item]?.name || prize.item : t('app.leilaoPrizeCheer', { n: UI.compact(prize?.cheer || 0) }));
 
   function notify(events) {
     let refresh = false;
@@ -796,7 +952,48 @@
       else if (event.type === 'letter-ready') toast(t('app.letterReady'));
       else if (event.type === 'outing-done') {
         toast(t('app.outingDone', { name: engine.chars[engine.state.outings[event.index].char]?.name || t('app.someone') }));
-      } else if (event.type === 'crasher') toast(t('app.crasher'));
+      } else if (event.type === 'special-day') {
+        toast(t('app.specialDay', { name: t(`day.${event.id}`), v: Math.round(event.bonus * 100) }), 'ouro');
+      } else if (event.type === 'contest') {
+        toast(t(`app.contest.${event.place}`, { avg: UI.number(event.average, 1), tickets: event.tickets, n: UI.compact(event.amount) }),
+          event.place === 1 ? 'ouro' : '');
+      } else if (event.type === 'bingo-line') {
+        toast(t('app.bingoLine', { n: event.tickets }));
+      } else if (event.type === 'bingo-win') {
+        toast(t('app.bingoWin', { tickets: event.tickets, n: UI.compact(event.amount), draws: event.draws }), 'ouro');
+      } else if (event.type === 'bingo-lost') {
+        toast(t('app.bingoLost'));
+      } else if (event.type === 'record') {
+        toast(t('app.record', { time: UI.duration(event.seconds * 1000), before: UI.duration(event.before * 1000) }), 'ouro');
+      } else if (event.type === 'daily') {
+        toast(t(event.streak > 1 ? 'app.dailyStreak' : 'app.daily', { n: event.tickets, streak: event.streak }), 'ouro');
+      } else if (event.type === 'new-year') {
+        toast(t('app.newYear', { n: event.year, v: Math.round(event.bonus * 100) }), 'grande');
+      } else if (event.type === 'hint') {
+        toast(t(`app.hint.${event.id}`));
+      } else if (event.type === 'pote') {
+        toast(t('app.pote'), 'ouro');
+      } else if (event.type === 'saco') {
+        toast(t('app.saco'), 'ouro');
+      } else if (event.type === 'leilao') {
+        toast(t('app.leilao', { prize: prizeName(event.prize), n: event.price }), 'ouro');
+      } else if (event.type === 'leilao-bid' && event.who === 'plateia') {
+        tocar('lance', { pitch: -5 });
+      } else if (event.type === 'leilao-sold') {
+        tocar(event.winner === 'voce' ? 'arremate' : 'martelo');
+        if (event.winner === 'voce') toast(t('app.leilaoWon', { prize: prizeName(event.prize), price: event.price }), 'ouro');
+        else if (event.winner) toast(t('app.leilaoLost', { prize: prizeName(event.prize), price: event.price }));
+        refresh = true;
+      } else if (event.type === 'set') {
+        toast(t('app.setOn', { name: engine.data.sets.find(set => set.id === event.id)?.name || event.id, v: Math.round(event.bonus * 100) }), 'ouro');
+      } else if (event.type === 'wedding') {
+        toast(t('app.wedding'), 'ouro');
+      } else if (event.type === 'wedding-end') {
+        toast(t('app.weddingEnd', { rice: event.rice, n: UI.compact(event.amount), tickets: event.tickets }) +
+          (event.item ? ` ${t('app.weddingGift', { name: engine.items[event.item]?.name || event.item })}` : ''), 'ouro');
+      } else if (event.type === 'quadrilha') toast(t(event.contest ? 'app.contestStart' : 'app.quadrilha', { v: Math.round(event.bonus * 100), s: event.seconds }));
+      else if (event.type === 'goal-done') toast(t('app.goalDone'));
+      else if (event.type === 'crasher') toast(t('app.crasher'));
       else if (event.type === 'legendary') toast(t('app.legendary'), 'ouro');
       else if (event.type === 'size-up' && ui.open && ['festa', 'historico'].includes(ui.tab) &&
         performance.now() - ui.lastLogRender > 1000) {
@@ -809,6 +1006,8 @@
       }
     }
     if (refresh) renderWindows();
+    // Número do bingo: só a janela do bingo muda (as outras não são refeitas a cada número, para não engolir cliques).
+    else if (ui.tela.open && ui.tela.id === 'bingo' && events.some(event => event.type.startsWith('bingo-'))) renderTela();
   }
 
   // --- Foco: a placa só aparece enquanto o jogo tem foco (o último clique foi na festa) -----------------
@@ -816,7 +1015,7 @@
     ui.focused = value;
     document.body.classList.toggle('jogo-desfocado', !value);
     // Em foco a festa anda a 60 quadros por segundo; de fundo (a pessoa trabalhando em outra janela), a 30.
-    ui.festa?.setRate(value ? 60 : 30);
+    ui.festa?.setRate(rateNow());
   }
 
   function focusGame() {
@@ -861,8 +1060,25 @@
     if (!card || !ui.dock.open) return;
     ui.preview = previewFor(card.dataset.preview);
     const item = engine.items[card.dataset.preview];
+    const set = engine.data.sets.find(entry => `set:${entry.id}` === card.dataset.preview);
+    if (set) {
+      const pieces = [set.hat, set.hand, set.fabric];
+      const lacking = pieces.filter(piece => !engine.owned(piece)).map(piece => engine.items[piece]?.name || piece);
+      const box = $('#vitrine-detalhe') || document.querySelector?.('#vitrine-detalhe');
+      if (box) {
+        box.textContent = `${set.name} (+${Math.round(set.bonus * 100)}%): ${pieces.map(piece => engine.items[piece]?.name || piece).join(' + ')}. ` +
+          (lacking.length ? t('shop.setLacks', { list: lacking.join(', ') }) : t('shop.setComplete'));
+      }
+      return;
+    }
     const detail = $('#vitrine-detalhe') || document.querySelector?.('#vitrine-detalhe');
-    if (detail && item) detail.textContent = `${item.name}: ${item.desc}${item.effect ? ` ${item.effect}` : ''}`;
+    // Os conjuntos de que a peça faz parte: um só mostra as três peças; mais de um, só os nomes e bônus (a linha é curta).
+    const sets = engine.data.sets.filter(set => [set.hat, set.hand, set.fabric].includes(item?.id));
+    const setText = sets.length === 1
+      ? ` ${t('shop.set', { name: sets[0].name, v: Math.round(sets[0].bonus * 100),
+        pieces: [sets[0].hat, sets[0].hand, sets[0].fabric].map(id => engine.items[id]?.name || id).join(' + ') })}`
+      : sets.length ? ` ${t('shop.sets', { list: sets.map(set => `${set.name} +${Math.round(set.bonus * 100)}%`).join(', ') })}` : '';
+    if (detail && item) detail.textContent = `${item.name}: ${item.desc}${item.effect ? ` ${item.effect}` : ''}${setText}`;
   });
 
   document.addEventListener('mouseout', event => {
@@ -1176,6 +1392,7 @@
         { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
       `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('app.welcomeBackOk'))}</button></div>`);
   } else if (firstRun) {
+    ui.festa?.sprout?.();
     showModal(`<h2>${UI.esc(t('app.title'))}!</h2>${t('app.firstRun')}` +
       `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('app.firstRunOk'))}</button></div>`);
   }

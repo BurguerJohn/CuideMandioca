@@ -175,3 +175,62 @@ test('segurar e arrastar uma parte clicável da festa muda a festa de lugar; cli
   assert.deepEqual(poked, ['sopinha'], 'um clique (tremida de poucos pixels) faz carinho');
   assert.equal(saved().length, 1);
 });
+
+test('a aba de conjuntos da loja avisa o que falta para vestir o conjunto', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'vitrine' });
+  click({ action: 'vitrine-cat', cat: 'conjuntos' });
+  assert.match(node('#vitrine').innerHTML, /Caipira de Raiz \+3%/);
+  assert.match(node('#vitrine').innerHTML, /Faltam 2/);
+  click({ action: 'vitrine-conjunto', id: 'noiva' });
+  assert.match(node('#avisos').children.map(item => item.textContent).join('|'), /faltam Véu de Noiva, Buquê da Noiva/, 'sem as peças, o aviso diz quais faltam');
+});
+
+test('item que não se compra diz de onde vem (antes o do casamento dizia "custa 0")', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'vitrine' });
+  click({ action: 'vitrine-cat', cat: 'chapeu' });
+  assert.match(node('#vitrine').innerHTML, /Só no leilão/);
+  const toasts = () => node('#avisos').children.map(item => item.textContent).join('|');
+  click({ action: 'vitrine-item', id: 'veu-noiva' });
+  assert.match(toasts(), /Véu de Noiva só vem de presente de casamento/);
+  click({ action: 'vitrine-item', id: 'chapeu-coco' });
+  assert.match(toasts(), /Chapéu-coco só sai no leilão de prendas/);
+  assert.doesNotMatch(toasts(), /custa 0/);
+});
+
+test('o mesmo aviso repetido vira um só com ×2, em vez de empilhar', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'vitrine' });
+  click({ action: 'vitrine-cat', cat: 'chapeu' });
+  const before = node('#avisos').children.length;
+  click({ action: 'vitrine-item', id: 'veu-noiva' });
+  click({ action: 'vitrine-item', id: 'veu-noiva' });
+  const list = node('#avisos').children;
+  assert.equal(list.length, before + 1);
+  assert.match(list.at(-1).textContent, /só vem de presente de casamento\. \(×2\)$/);
+});
+
+test('Ajustes tem "Abrir com o Windows", desligado de fábrica', async () => {
+  const { document, calls } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'abrir' });
+  click({ action: 'tab', tab: 'ajustes' });
+  const html = node('#painel-corpo').innerHTML;
+  assert.match(html, /Abrir com o Windows/);
+  for (const size of [25, 50, 75, 100, 150, 200, 300]) assert.match(html, new RegExp(`>${size}%<`), `tamanho ${size}% nos Ajustes`);
+  assert.match(html, /class="chip ativa" data-action="inicio" data-value="off"/, 'começa desligado');
+  click({ action: 'inicio', value: 'on' });
+  assert.deepEqual(JSON.parse(JSON.stringify(calls.filter(c => c[0] === 'settings').at(-1)[1])), { startup: true });
+});
