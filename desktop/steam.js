@@ -13,6 +13,7 @@ const CONFIG_FILE = path.join(__dirname, 'steam.json');
 function readConfig(file = CONFIG_FILE) {
   let raw = {};
   try { raw = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (_) { raw = {}; }
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) raw = {};
   const appId = Number.isInteger(raw.appId) && raw.appId > 0 ? raw.appId : DEFAULTS.appId;
   return { appId, required: raw.required === true, overlay: raw.overlay === true };
 }
@@ -25,6 +26,7 @@ function createSteam({ config = readConfig(), load = () => require('steamworks.j
   let client = null;
   let name = null;
   const confirmed = new Set();
+  let pendingStore = false;
   let presence = '';
 
   const lib = () => {
@@ -78,19 +80,21 @@ function createSteam({ config = readConfig(), load = () => require('steamworks.j
         const done = safe(c => c.achievement.isActivated(api) || (c.achievement.activate(api) && ++changed > 0), false);
         if (done) confirmed.add(api);
       }
-      if (changed) safe(c => c.stats.store());
+      if (changed) pendingStore = true;
+      if (pendingStore && safe(c => c.stats.store(), false) === true) pendingStore = false;
       return changed;
     },
     // O que os amigos veem na lista da Steam. Os textos ficam no Steamworks (steam/rich_presence.vdf).
     setPresence({ tier, size }) {
       const key = `${tier}|${size}`;
       if (!client || key === presence) return;
-      presence = key;
-      safe(c => {
+      const sent = safe(c => {
         c.localplayer.setRichPresence('porte', String(tier));
         c.localplayer.setRichPresence('convidados', String(size));
         c.localplayer.setRichPresence('steam_display', '#Festa');
-      });
+        return true;
+      }, false);
+      if (sent) presence = key;
     }
   };
 }

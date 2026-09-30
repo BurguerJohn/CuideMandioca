@@ -54,14 +54,22 @@
     // A argola só encaixa se passar pela boca da garrafa: a folga vem do prêmio (garrafa de boca larga, mira fina).
     function throwRing(now) {
       if (!game || game.phase !== 'mirando') return false;
+      const current = game;
       const x = ringX(now);
       const prizes = game.round.prizes;
       const index = BOTTLES.findIndex((bx, i) => Math.abs(bx - x) <= (prizes[i]?.aim ?? HIT_RANGE));
       const bottle = index >= 0 && !game.landed.some(l => l.bottle === index) ? index : null;
       const near = BOTTLES.some(bx => Math.abs(bx - x) <= NEAR);
-      const result = onThrow(bottle);
+      game.phase = 'lancando';
+      let result;
+      try { result = onThrow(bottle); } catch (error) {
+        if (game === current) game.phase = 'mirando';
+        throw error;
+      }
+      if (game !== current) return true;
       game.phase = 'caindo';
-      game.fall = { x, from: now, bottle, near, hit: !!result?.hit, prize: result?.prize, color: game.thrown % 3 };
+      game.fall = { x, from: now, bottle, near, hit: !!result?.hit,
+        prize: result?.prize ?? prizes[bottle], color: game.thrown % 3 };
       return true;
     }
 
@@ -82,31 +90,39 @@
     }
 
     function update(now) {
-      if (game.phase !== 'caindo' || now - game.fall.from < FALL_MS) return;
+      if (!game || game.phase !== 'caindo' || now - game.fall.from < FALL_MS) return;
       const fall = game.fall;
+      const landedAt = fall.from + FALL_MS;
       game.thrown++;
+      let result;
       if (fall.hit) {
         game.landed.push({ bottle: fall.bottle, color: fall.color });
         const p = fall.prize;
         say(p.mult ? tr('fx.ringsMult', { n: p.mult }) : p.kind === 'animacao' ? tr('fx.ringsCheer', { n: p.factor })
-          : p.kind === 'item' ? tr('fx.gift') : tr('fx.ringsHit'), '#9ef05a', now);
-        onLand({ hit: true, prize: p });
+          : p.kind === 'item' ? tr('fx.gift') : tr('fx.ringsHit'), '#9ef05a', landedAt);
+        result = { hit: true, prize: p };
       } else {
-        game.misses = [...(game.misses || []), { x: fall.x, color: fall.color, from: now }];
-        say(tr(fall.near ? 'fx.ringsClose' : 'fx.ringsMiss'), '#ff907a', now);
-        onLand({ hit: false, near: fall.near });
+        game.misses = [...(game.misses || []), { x: fall.x, color: fall.color, from: landedAt }];
+        say(tr(fall.near ? 'fx.ringsClose' : 'fx.ringsMiss'), '#ff907a', landedAt);
+        result = { hit: false, near: fall.near };
       }
       game.fall = null;
       if (game.thrown >= game.round.total) {
         game.phase = 'fim';
-        game.endAt = now + 700;
+        game.endAt = landedAt + 700;
       } else {
         game.phase = 'mirando';
         game.aimFrom = now;
       }
+      onLand(result);
     }
 
     function draw(now) {
+      update(now);
+      if (game?.phase === 'fim' && !game.ended && now >= game.endAt) {
+        game.ended = true;
+        onEnd();
+      }
       if (!images.fundo.complete) return;
       g.clearRect(0, 0, W, H);
       g.drawImage(images.fundo, 0, 0);
@@ -120,7 +136,6 @@
         else text(g, '?', x, COUNTER + 12, '#fff4e4');
       });
       if (game) {
-        update(now);
         for (const landed of game.landed) {
           g.drawImage(images.argola, landed.color * ring.w, 0, ring.w, ring.h, BOTTLES[landed.bottle] - ring.w / 2, NECK_Y + 2, ring.w, ring.h);
         }
@@ -139,7 +154,8 @@
         } else if (game.phase === 'caindo') {
           const f = game.fall;
           const t = Math.min(1, (now - f.from) / FALL_MS);
-          const y = RING_Y + (NECK_Y + 2 - RING_Y) * t * t;
+          const targetY = f.hit ? NECK_Y + 2 : COUNTER - ring.h;
+          const y = RING_Y + (targetY - RING_Y) * t * t;
           g.drawImage(images.argola, f.color * ring.w, 0, ring.w, ring.h, f.x - ring.w / 2, y, ring.w, ring.h);
         }
         for (let i = 0; i < game.round.total; i++) {
@@ -150,10 +166,6 @@
         for (const s of game.says) {
           const t = (now - s.from) / 1100;
           text(g, s.message, W / 2, 34 - t * 8, s.color, t > 0.7 ? (1 - t) * 3 : 1);
-        }
-        if (game.phase === 'fim' && !game.ended && now >= game.endAt) {
-          game.ended = true;
-          onEnd();
         }
       } else {
         text(g, tr('fx.ringsInsert'), W / 2, 36, '#ffd21e');

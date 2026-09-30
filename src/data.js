@@ -254,6 +254,17 @@ globalThis.GAME_DATA = {
   // Cozinha do Fogão a Lenha (Festa da Cidade em diante, com o fogão num dos lados): um prato por vez vai ao fogo, gasta
   // `wood` de lenha, fica `minutes` cozinhando (metade com a Canjica no fogão) e, servido, dá `bonus` a mais em tudo por
   // `buffMinutes`. Servir outro prato troca o que estava valendo.
+  // Comidas da loja (aba Comidas): cada uma enche `fill` da Barriga da Mandioca e custa `share` da melhoria mais barata
+  // do momento (em Animação), então o preço acompanha a festa sem pular com os bônus passageiros.
+  foods: [
+    { id: 'pipoca', name: 'Pipoca', fill: 12, share: 0.05, desc: 'Um saquinho listrado, quentinha da panela.' },
+    { id: 'algodao-doce', name: 'Algodão-doce', fill: 18, share: 0.09, desc: 'Nuvem cor-de-rosa no palito.' },
+    { id: 'milho-cozido', name: 'Milho cozido', fill: 25, share: 0.14, desc: 'Espiga na manteiga, com uma pitada de sal.' },
+    { id: 'cuscuz', name: 'Cuscuz', fill: 35, share: 0.22, desc: 'Cuscuz de milho fofinho, saído do cuscuzeiro.' },
+    { id: 'arroz-doce', name: 'Arroz-doce', fill: 50, share: 0.35, desc: 'Na tigela, com canela por cima.' },
+    { id: 'bolo-milho', name: 'Bolo de milho', fill: 70, share: 0.55, desc: 'Fatia grande, do tabuleiro da vizinha.' }
+  ],
+
   recipes: [
     { id: 'pamonha', name: 'Pamonha', wood: 4, minutes: 3, bonus: 0.2, buffMinutes: 15,
       desc: 'Milho verde ralado, cozido na palha e amarradinho.' },
@@ -507,6 +518,12 @@ globalThis.GAME_DATA = {
     danceSteps: 10, danceBonus: 0.02,
     // Carinho na Mandioca (clique): rende pokeSteps passos, no máximo um a cada pokeCooldown segundos.
     pokeCooldown: 3, pokeSteps: 3,
+    // Felicidade da Mandioca (placa e aba Comidas da loja): Amor (carinho e estalinho no chão) e Barriga (comida), de 0 a
+    // moodMax, que baixam sozinhos (de cheio a vazio em loveHours e bellyHours, com o jogo aberto ou fechado). A média dos
+    // dois mexe no Rebolado: tudo vazio ×moodLow, metade ×1, tudo cheio ×moodHigh, em linha reta entre esses pontos.
+    // Carinho dá lovePet de Amor; estalinho no chão, lovePop (no máximo um a cada popCooldown segundos).
+    moodMax: 100, moodStart: 50, loveHours: 8, bellyHours: 6, moodLow: 0.5, moodHigh: 1.25,
+    lovePet: 5, lovePop: 2, popCooldown: 1, foodMinCost: 5,
     // Balão de sorte: de tempos em tempos (com balloonMin convidados) um balão dourado sobe pela festa e vale um prêmio
     // para quem clica nele antes de sumir. Frenesi: tudo rende frenzyMult vezes por frenzySeconds segundos.
     balloonEvery: [360, 720], balloonSeconds: 22, balloonMin: 15, balloonCheer: 90, frenzySeconds: 30, frenzyMult: 3,

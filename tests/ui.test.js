@@ -42,6 +42,8 @@ test('as abas mostram preços, postos e rolês no fim do jogo', () => {
     : UI.panel(engine, ctx(engine, { tab })));
   const dock = cat => UI.vitrine(engine, ctx(engine, { dockCat: cat, dockSide: 'direita' }));
   assert.match(dock('melhorias'), /data-hold="melhorar"/);
+  assert.match(dock('melhorias'), /data-action="melhorar" data-hold="melhorar" data-stat="rebolado"/,
+    'melhorias também têm ação para a ativação pelo teclado');
   assert.match(dock('lado'), /Em uso/);
   assert.match(dock('chapeu'), /Só nas Argolas/);
   assert.match(dock('chapeu'), /data-preview="vaqueiro"/);
@@ -124,6 +126,19 @@ test('histórico mostra o gráfico dos desbloqueios e o diário filtrável', () 
     'compras seguidas viram uma linha só');
 });
 
+test('o gráfico do histórico volta ao quintal quando começa um novo São João', () => {
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  engine.state.stats.playtime = 120;
+  while (engine.state.size < 100) engine.addFame(engine.fameNeed() - engine.state.fame);
+  engine.state.stats.playtime = 240;
+  assert.equal(engine.newYear(), true);
+  assert.equal(engine.state.size, 1);
+  const html = UI.panel(engine, ctx(engine, { tab: 'historico' }));
+  const curve = html.match(/<path class="curva" d="([^"]+)"/)[1];
+  assert.match(curve, /V214H630$/, 'o fim da curva corresponde a um convidado, sem apagar o ano anterior');
+  assert.match(html, /<text class="rotulo-eixo"[^>]*>100<\/text>/, 'o porte anterior continua no histórico');
+});
+
 test('formatos de número e tempo em português', () => {
   assert.equal(UI.compact(999), '999');
   assert.equal(UI.compact(12345), '12,3 mil');
@@ -175,4 +190,30 @@ test('a placa mostra selos do leilão (lance e de quem), da corrida de saco e do
   engine.bidLeilao();
   html = UI.hud(engine, ctx(engine));
   assert.match(html, /Leilão: \d+ \(seu\)/);
+});
+
+test('a placa mostra o Amor e a Barriga da Mandioca e quanto o Rebolado vale; a aba Comidas vende comida', () => {
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  engine.debug('triste');
+  let hud = UI.hud(engine, ctx(engine));
+  assert.match(hud, /class="placa-humor triste" data-action="comidas"/);
+  assert.match(hud, /data-humor="amor" style="width:0%"/);
+  assert.match(hud, /data-humor="fator">×0,5</);
+  engine.debug('feliz');
+  hud = UI.hud(engine, ctx(engine));
+  assert.match(hud, /placa-humor feliz/);
+  assert.match(hud, /data-humor="barriga" style="width:100%"/);
+  assert.match(hud, /×1,25/);
+  assert.match(hud, /Amor 100% .* Barriga 100%/);
+  // Aba Comidas: barriga cheia, sem preço; vazia, com preço em Animação.
+  const dock = () => UI.vitrine(engine, ctx(engine, { dockCat: 'comidas' }));
+  assert.match(dock(), /data-cat="comidas"/);
+  assert.match(dock(), /Barriga cheia/);
+  engine.debug('triste');
+  const html = dock();
+  for (const food of data.foods) assert.match(html, new RegExp(`data-action="vitrine-comida" data-id="${food.id}"`));
+  assert.match(html, /data-currency="cheer"/);
+  assert.match(html, /\+70 Barriga/);
+  assert.match(html, /Rebolado ×0,5/);
+  assert.match(html, /Tudo cheio: Rebolado ×1,25; tudo vazio: ×0,5/);
 });

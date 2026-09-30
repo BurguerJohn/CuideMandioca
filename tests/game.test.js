@@ -460,6 +460,7 @@ test('as dicas aparecem uma vez só: a música depois de meia hora e os conjunto
   const { engine, clock } = game();
   const s = engine.state;
   s.hints.chao = true; // a dica do chão (aos 10 minutos) não é assunto deste teste
+  s.hints.humor = true; // nem a do Amor e da Barriga (aos 4 minutos)
   engine.updateTimers(clock.now);
   assert.equal(engine.drainEvents().filter(event => event.type === 'hint').length, 0, 'no começo, nenhuma dica');
   s.stats.playtime = 1800;
@@ -897,12 +898,14 @@ test('avançar o tempo (modo de teste) também anda com o balão, a chuva e o qu
   engine.advance(5);
   assert.ok(Math.abs(s.balloon.active.until - (balloon - 5000)) < 1e-6);
   assert.ok(Math.abs(s.weather.rain.until - (rain - 5000)) < 1e-6);
-  engine.advance(120);
+  engine.advance(data.config.rainSeconds - 5);
   engine.updateTimers(clock.now);
   assert.equal(s.balloon.active, null, 'o balão já foi embora');
   assert.equal(s.pote.active, null, 'o pote também');
   assert.equal(s.weather.rain, null, 'a chuva passou');
   assert.ok(s.weather.rainbow, 'e saiu o arco-íris');
+  engine.advance(data.config.rainbowSeconds);
+  assert.equal(s.weather.rainbow, null, 'o arco-íris criado durante o avanço também acaba no seu tempo');
 });
 
 test('bingo da quermesse: cartela com o meio livre, números cantados, linha, BINGO ou a plateia na frente', () => {
@@ -1742,6 +1745,7 @@ test('dica do chão aos 10 minutos e a de menos letreiros depois de 2 horas', ()
   const { engine, clock } = game();
   const s = engine.state;
   s.hints.music = true;
+  s.hints.humor = true;
   s.stats.playtime = 600;
   engine.updateTimers(clock.now);
   assert.deepEqual(engine.drainEvents().filter(event => event.type === 'hint').map(event => event.id), ['chao']);
@@ -1948,4 +1952,329 @@ test('repouso com o jogo aberto: o tempo parado rende como jogo fechado e os eve
   for (let i = 1; i < times.length; i++) assert.ok(times[i] - times[i - 1] >= 40000);
   assert.equal(engine.wake(), null, 'uma vez só');
   assert.equal(engine.exportState().lastSeen, clock.now);
+});
+
+test('ano novo cancela as Argolas em andamento, devolve a entrada e permite outra rodada', () => {
+  const { engine } = game();
+  growTo(engine, 100);
+  engine.state.tickets = 50;
+  const round = engine.startRings();
+  round.prizes[0] = { kind: 'fichas', amount: 100 };
+  engine.ringHit(0);
+  const cost = engine.state.rings.cost / 2;
+  const remaining = engine.state.tickets;
+
+  assert.equal(engine.newYear(), true);
+  assert.equal(engine.round, null, 'a rodada pertence à festa que terminou');
+  assert.equal(engine.state.tickets, remaining + cost, 'a entrada da rodada interrompida volta');
+  assert.equal(engine.finishRings(), null, 'a rodada antiga não paga no ano seguinte');
+  assert.ok(engine.startRings(), 'as Argolas continuam jogáveis no novo ano');
+});
+
+test('o Sanfoneiro expirado não aumenta o rendimento ao acordar nem aceita cumprimento', () => {
+  const { engine, clock } = game();
+  growTo(engine, 30);
+  engine.tick(0.25);
+  engine.startVisitor();
+  assert.equal(engine.visitorBonus(), data.config.visitorBonus);
+  const saved = engine.exportState();
+
+  clock.now += 3 * 3600 * 1000;
+  const again = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now });
+  assert.equal(engine.visitorBonus(), 0, 'o bônus termina mesmo antes do próximo tique');
+  const tickets = engine.state.tickets;
+  assert.equal(engine.greetVisitor(), null, 'o visitante já foi embora');
+  assert.equal(engine.state.tickets, tickets);
+  assert.ok(Math.abs(engine.wake().cheer - again.welcome.cheer) < 1e-9,
+    'repouso e reabertura do mesmo save rendem a mesma Animação');
+});
+
+test('avançar o tempo também cozinha, encerra o prato servido e libera os cliques em espera', () => {
+  const { engine, clock } = game();
+  growTo(engine, 60);
+  engine.addItem('fogao-lenha');
+  engine.addItem('barraca-beijo');
+  engine.equip('fogao-lenha', 'esquerda');
+  engine.equip('barraca-beijo', 'direita');
+  engine.state.wood = 100;
+  engine.cook('pamonha');
+  const recipe = engine.recipe('pamonha');
+  const start = engine.state.cozinha.pot.startAt;
+  engine.advance(recipe.minutes * 60);
+  assert.equal(engine.state.cozinha.pot.startAt, start - recipe.minutes * MINUTE);
+  assert.equal(engine.state.cozinha.pot.ready, true, 'a panela ficou pronta durante o avanço');
+  assert.ok(engine.serve());
+  engine.advance(recipe.buffMinutes * 60);
+  assert.equal(engine.cookBonus(), 0);
+  assert.equal(engine.state.cozinha.buff, null);
+
+  assert.equal(engine.kiss().ready, true);
+  assert.equal(engine.pokeHost().ready, true);
+  assert.ok(engine.cartWood());
+  assert.ok(engine.catchFlag());
+  assert.ok(engine.witnessCompadres());
+  engine.debug('pote');
+  assert.equal(engine.hitPote().ready, true);
+  engine.advance(1);
+  assert.equal(engine.pokeHost().ready, false, 'parte da espera ainda falta');
+  assert.equal(engine.hitPote().ready, true, 'a espera da paulada andou junto');
+  engine.advance(data.config.kissMinutes * 60);
+  assert.equal(engine.kiss().ready, true);
+  assert.equal(engine.pokeHost().ready, true);
+  assert.ok(engine.cartWood());
+  assert.ok(engine.catchFlag());
+  assert.ok(engine.witnessCompadres());
+  assert.equal(clock.now, 1_000_000, 'o avanço não muda o relógio fornecido pelo aplicativo');
+});
+
+for (const [name, setup, action, expired] of [
+  ['pedido', e => { e.state.request.active = { kind: data.requests[0].id, until: e.now() + 1000 }; }, e => e.claimRequest(), null],
+  ['penetra', e => { e.state.crasher.active = { until: e.now() + 1000 }; }, e => e.shooCrasher(), null],
+  ['balão', e => { e.state.balloon.active = { born: e.now(), until: e.now() + 1000 }; }, e => e.claimBalloon(), null],
+  ['arco-íris', e => { e.state.weather.rainbow = { born: e.now(), until: e.now() + 1000 }; }, e => e.claimRainbow(), null],
+  ['pote', e => { e.state.pote.active = { born: e.now(), until: e.now() + 1000, hitAt: 0, hits: data.config.poteHits - 1 }; }, e => e.hitPote(), { ready: false, active: false }],
+  ['saco', e => { e.startSaco(); e.state.saco.active.until = e.now() + 1000; }, e => e.hopSaco(), { active: false }],
+  ['burro', e => { e.startBurro(); e.state.burro.active.until = e.now() + 1000; }, e => e.pinBurro(), null]
+]) test(`${name}: clique após a expiração não paga nem prolonga o evento antes do próximo tique`, () => {
+  const { engine, clock } = game();
+  growTo(engine, 60);
+  setup(engine);
+  const before = engine.exportState();
+  clock.now += 1000;
+  assert.deepEqual(action(engine), expired);
+  assert.equal(engine.state.cheer, before.cheer);
+  assert.equal(engine.state.tickets, before.tickets);
+  assert.equal(engine.state.wood, before.wood);
+  assert.deepEqual(engine.state.stats, before.stats);
+});
+
+test('o frio encerrado não vende quentão quando a festa volta de uma pausa longa', () => {
+  const { engine, clock } = game();
+  growTo(engine, 10);
+  engine.addItem('barril-quentao');
+  engine.equip('barril-quentao', 'direita');
+  engine.startCold();
+  const tickets = engine.state.tickets;
+  clock.now += data.config.coldSeconds * 1000 + 1;
+  engine.updateTimers(clock.now);
+  assert.equal(engine.state.stats.quentao, 0);
+  assert.equal(engine.state.tickets, tickets);
+  assert.equal(engine.state.cold.active, null);
+});
+
+test('ano novo inicia o relógio de repouso da nova festa sem carregar a pausa anterior', () => {
+  const { engine, clock } = game();
+  growTo(engine, 100);
+  engine.tick(0.25);
+  clock.now += 3 * 3600 * 1000;
+  assert.equal(engine.newYear(), true);
+  assert.equal(engine.wake(), null, 'a festa acabou de começar');
+  assert.equal(engine.state.cheer, 0);
+  assert.equal(engine.exportState().lastSeen, clock.now);
+});
+
+test('avanço determinístico equivale a rodar a festa segundo a segundo, inclusive eventos criados no meio', () => {
+  const fast = game();
+  const live = game();
+  for (const { engine } of [fast, live]) {
+    growTo(engine, 30);
+    engine.addItem('fogao-lenha');
+    engine.equip('fogao-lenha', 'esquerda');
+    engine.state.wood = 100;
+    engine.cook('pamonha');
+    engine.startCold();
+  }
+  fast.engine.advance(1200);
+  for (let i = 0; i < 1200; i++) {
+    live.clock.now += 1000;
+    live.engine.tick(1);
+  }
+  const timestamps = new Set(['nextAt', 'until', 'born', 'endsAt', 'judgeAt', 'readyAt', 'startAt', 'saleAt',
+    'leaveAt', 'bidAt', 'rivalAt', 'thunderAt', 'kissAt', 'start', 'at', 'fallUntil', 'pokeAt', 'riceAt',
+    'cartAt', 'flagAt', 'compadreAt', 'announceAt']);
+  const relative = ({ engine, clock }) => JSON.parse(JSON.stringify(engine.state, (key, value) =>
+    timestamps.has(key) && value ? value - clock.now : value));
+  assert.deepEqual(relative(fast), relative(live), 'mesmos saldos, estatísticas, diário e tempos restantes');
+});
+
+for (const [field, corrupt] of [
+  ['levels', saved => { saved.levels = null; }],
+  ['ticketLevel', saved => { saved.ticketLevel = 'alto'; }],
+  ['stats.steps', saved => { saved.stats.steps = 'muitos'; }],
+  ['stats.cheerSpent', saved => { saved.stats.cheerSpent = -1; }],
+  ['stats', saved => { saved.stats = []; }],
+  ['inventory', saved => { saved.inventory = {}; }],
+  ['goals', saved => { saved.goals = {}; }],
+  ['goal.reward', saved => { saved.goals[0].reward.tickets = 'cinco'; }],
+  ['goal.target', saved => { saved.goals[0].target = 0; }],
+  ['weather', saved => { saved.weather = null; }],
+  ['mail', saved => { saved.mail = 3; }],
+  ['crew', saved => { saved.crew = { milho: null }; }]
+]) test(`save com ${field} corrompido é rejeitado antes de travar ou estragar os saldos`, () => {
+  const { engine, clock } = game();
+  engine.updateGoals();
+  const saved = engine.exportState();
+  corrupt(saved);
+  assert.throws(() => new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now }),
+    /save|Save/, 'a persistência consegue usar o backup em vez de abrir uma festa quebrada');
+});
+
+test('save antigo sem campos novos recebe padrões e segue jogável', () => {
+  const { engine, clock } = game();
+  const saved = engine.exportState();
+  for (const key of ['ticketLevel', 'stats', 'goals', 'cozinha', 'weather', 'quadrilha', 'bingo', 'visitor']) delete saved[key];
+  const again = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now });
+  again.tick(0.25);
+  again.state.cheer = 1000;
+  assert.equal(again.buyTicket(), true);
+  assert.ok(Number.isFinite(again.state.cheer));
+  assert.equal(again.state.goals.length, data.config.goalSlots);
+});
+
+test('sequências determinísticas de ações conservam saldos finitos, itens únicos, rolês e saves válidos', () => {
+  for (let seed = 1; seed <= 4; seed++) {
+    let random = seed;
+    const rng = () => ((random = random * 16807 % 2147483647) / 2147483647);
+    let now = new Date(2026, 8, 10, 12).getTime();
+    const engine = new GameEngine(data, null, { rng, now: () => now });
+    engine.state.tickets = 10000;
+    engine.state.wood = 10000;
+    engine.state.cheer = 1000000;
+    growTo(engine, 100);
+    const pick = entries => entries[Math.floor(rng() * entries.length)];
+    const outing = () => Math.floor(rng() * data.outings.length);
+    const goal = () => Math.floor(rng() * data.config.goalSlots);
+    const actions = [
+      () => engine.buyLevel(pick(data.stats).id), () => engine.buyTicket(),
+      () => engine.buyItem(pick(data.items).id), () => engine.equip(pick(data.items).id, pick(['esquerda', 'direita'])),
+      () => engine.fish(), () => engine.openLetter(),
+      () => engine.startOuting(outing(), pick(data.chars).id), () => engine.claimOuting(outing()), () => engine.cancelOuting(outing()),
+      () => engine.buyBonfire(pick(['labareda', 'brasa', 'calor'])),
+      () => engine.cook(pick(data.recipes).id), () => engine.serve(),
+      () => engine.startRings(), () => engine.ringHit(Math.floor(rng() * data.config.ringBottles)), () => engine.finishRings(),
+      () => engine.claimGoal(goal()), () => engine.swapGoal(goal()), () => engine.claimRequest(), () => engine.shooCrasher(),
+      () => engine.claimBalloon(), () => engine.claimRainbow(), () => engine.hitPote(), () => engine.hopSaco(),
+      () => engine.pinBurro(), () => engine.bidLeilao(), () => engine.greetVisitor(), () => engine.shootFoto(),
+      () => engine.pokeHost(), () => engine.kiss(), () => engine.newYear(), () => engine.advance(rng() * 30)
+    ];
+    for (let step = 0; step < 200; step++) {
+      now += 250 + Math.floor(rng() * 600000);
+      engine.updateTimers(now);
+      engine.tick(0.25);
+      pick(actions)();
+      for (const field of ['cheer', 'tickets', 'wood', 'fame']) {
+        assert.ok(Number.isFinite(engine.state[field]) && engine.state[field] >= 0, `semente ${seed}, ação ${step}, ${field}`);
+      }
+      assert.equal(new Set(engine.state.inventory).size, engine.state.inventory.length);
+      const away = engine.state.outings.filter(entry => entry.char).map(entry => entry.char);
+      assert.equal(new Set(away).size, away.length, 'um personagem não pode estar em dois rolês');
+      assert.doesNotThrow(() => new GameEngine(data, engine.exportState(), { rng: () => 0.5, now: () => now }));
+    }
+  }
+});
+
+test('duas garrafas com a mesma prenda dão um só item e um único aviso de prêmio', () => {
+  const { engine } = game();
+  engine.state.tickets = 10;
+  const round = engine.startRings();
+  round.prizes[0] = { kind: 'item', id: 'ursinho' };
+  round.prizes[1] = { kind: 'item', id: 'ursinho' };
+  engine.ringHit(0);
+  engine.ringHit(1);
+  const result = engine.finishRings();
+  assert.deepEqual(result.items.map(item => item.id), ['ursinho']);
+  assert.equal(engine.state.inventory.filter(id => id === 'ursinho').length, 1);
+  assert.equal(engine.drainEvents().filter(event => event.type === 'item' && event.id === 'ursinho').length, 1);
+});
+
+test('save não pode mandar o mesmo personagem para dois rolês ao mesmo tempo', () => {
+  const { engine, clock } = game();
+  growTo(engine, 30);
+  engine.state.crew.milho = { level: 1 };
+  engine.startOuting(0, 'milho');
+  const saved = engine.exportState();
+  saved.outings[1] = { ...saved.outings[0] };
+  assert.throws(() => new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now }), /save/);
+});
+
+test('felicidade da Mandioca: Amor e Barriga baixam com o tempo e mexem no Rebolado (vazio ×0,5, meio ×1, cheio ×1,25)', () => {
+  const { engine, clock } = game();
+  const cfg = data.config;
+  assert.deepEqual(engine.mood(), { amor: cfg.moodStart, barriga: cfg.moodStart }, 'partida nova começa no meio');
+  assert.equal(engine.moodFactor(), 1);
+  const plain = engine.statValue('rebolado') * engine.multiplier();
+  engine.debug('triste');
+  assert.equal(engine.moodFactor(), cfg.moodLow);
+  assert.ok(Math.abs(engine.stepValue() - plain * cfg.moodLow) < 1e-9, 'tudo vazio: metade do Rebolado');
+  engine.debug('feliz');
+  assert.equal(engine.moodFactor(), cfg.moodHigh);
+  assert.ok(Math.abs(engine.stepValue() - plain * cfg.moodHigh) < 1e-9, 'tudo cheio: Rebolado ×1,25');
+  // Um cheio e o outro vazio: no meio (×1); e em linha reta entre os pontos.
+  assert.equal(engine.moodFactor({ amor: cfg.moodMax, barriga: 0 }), 1);
+  assert.ok(Math.abs(engine.moodFactor({ amor: 25, barriga: 25 }) - 0.75) < 1e-9);
+  assert.ok(Math.abs(engine.moodFactor({ amor: 75, barriga: 75 }) - 1.125) < 1e-9);
+  // Uma hora depois, com ou sem o jogo aberto: o Amor baixou 1/8 e a Barriga 1/6.
+  clock.now += 3600000;
+  const later = engine.mood();
+  assert.ok(Math.abs(later.amor - cfg.moodMax * (1 - 1 / cfg.loveHours)) < 1e-6);
+  assert.ok(Math.abs(later.barriga - cfg.moodMax * (1 - 1 / cfg.bellyHours)) < 1e-6);
+  // Nunca abaixo de zero.
+  clock.now += 48 * 3600000;
+  assert.deepEqual(engine.mood(), { amor: 0, barriga: 0 });
+  // O save guarda a conta (e o tempo fora continua baixando).
+  const again = new GameEngine(data, engine.exportState(), { rng: () => 0.5, now: () => clock.now });
+  assert.deepEqual(again.mood(), { amor: 0, barriga: 0 });
+});
+
+test('carinho e estalinho no chão enchem o Amor; comida da loja enche a Barriga e custa Animação', () => {
+  const { engine, clock } = game();
+  const cfg = data.config;
+  engine.debug('triste');
+  engine.pokeHost();
+  assert.equal(engine.mood().amor, cfg.lovePet);
+  engine.pokeHost();
+  assert.equal(engine.mood().amor, cfg.lovePet, 'carinho respeita o intervalo');
+  assert.equal(engine.popLove(), cfg.lovePop);
+  assert.equal(engine.popLove(), 0, 'estalinho também tem intervalo');
+  clock.now += cfg.popCooldown * 1000;
+  assert.ok(Math.abs(engine.popLove() - cfg.lovePop) < 1e-9);
+  // Comida: sem Animação não compra; com, paga o preço e enche a Barriga.
+  engine.state.cheer = 0;
+  assert.equal(engine.feed('pipoca').ok, false);
+  assert.equal(engine.mood().barriga, 0);
+  const cost = engine.foodCost('bolo-milho');
+  assert.ok(cost >= cfg.foodMinCost);
+  engine.state.cheer = cost;
+  const fed = engine.feed('bolo-milho');
+  assert.equal(fed.ok, true);
+  assert.equal(engine.state.cheer, 0);
+  assert.equal(engine.mood().barriga, data.foods.find(food => food.id === 'bolo-milho').fill);
+  assert.ok(engine.drainEvents().some(event => event.type === 'feed' && event.id === 'bolo-milho'));
+  assert.equal(engine.state.stats.foods, 1);
+  // Barriga cheia: não come mais (e não cobra).
+  engine.state.cheer = 1e9;
+  engine.debug('feliz');
+  const full = engine.feed('pipoca');
+  assert.equal(full.full, true);
+  assert.equal(engine.state.cheer, 1e9);
+  // O preço acompanha a melhoria mais barata.
+  const before = engine.foodCost('cuscuz');
+  for (const stat of ['rebolado', 'folego', 'refresco', 'ritmo']) for (let i = 0; i < 20; i++) engine.buyLevel(stat);
+  assert.ok(engine.foodCost('cuscuz') > before);
+});
+
+test('fora do jogo, a festa rende pela média do humor no caminho, não pelo humor da volta', () => {
+  const { engine, clock } = game();
+  const cfg = data.config;
+  engine.debug('feliz');
+  const since = clock.now;
+  clock.now += 10 * 3600000;
+  assert.equal(engine.moodFactor(), cfg.moodLow, 'depois de 10 h fora, tudo vazio');
+  const seconds = Math.min(10 * 3600, cfg.offlineCapHours * 3600);
+  let mood = 0;
+  for (let i = 0; i < 12; i++) mood += engine.moodFactor(engine.mood(since + (i + 0.5) / 12 * seconds * 1000)) / 12;
+  assert.ok(mood > cfg.moodLow + 0.2, `a média do caminho é bem maior que o humor da volta: ${mood}`);
+  const expected = engine.cheerPerSecond() / engine.moodFactor() * mood * seconds * engine.offlineRate();
+  engine.catchUp(since);
+  assert.ok(Math.abs(engine.welcome.cheer - expected) < 1e-6 * expected, `${engine.welcome.cheer} ≈ ${expected}`);
 });

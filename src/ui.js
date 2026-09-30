@@ -31,6 +31,7 @@
   // Categorias da vitrine encaixada na festa.
   const DOCK = [
     { id: 'melhorias', icon: 'ui:melhoria' },
+    { id: 'comidas', icon: 'ui:comida-pipoca' },
     { id: 'chapeu', icon: 'item:chapeu-palha' },
     { id: 'mao', icon: 'item:bandeirinha' },
     { id: 'tecido', icon: 'item:xadrez-vermelho' },
@@ -101,6 +102,27 @@
   const until = (at, now) => `<b data-until="${at}">${duration(at - now)}</b>`;
 
   // Placa sobre a festa: recursos, porte e avisos.
+  // Felicidade da Mandioca: as barrinhas de Amor e Barriga e o quanto o Rebolado vale com elas (atualizadas ao vivo pelo
+  // app em [data-humor]). Clicar abre a aba Comidas da loja.
+  function moodTitle(engine, mood = engine.mood()) {
+    const max = engine.cfg.moodMax;
+    return t('hud.moodTitle', { love: Math.round(100 * mood.amor / max), belly: Math.round(100 * mood.barriga / max),
+      stat: engine.stats.rebolado.name, f: number(engine.moodFactor(mood), 2) });
+  }
+  // `named`: com o nome de cada barra (na aba Comidas; na placa só os ícones).
+  function moodBars(engine, mood, icon, named = false) {
+    const max = engine.cfg.moodMax;
+    const bar = key => `<span class="mini-barra ${key}"><i data-humor="${key}" style="width:${Math.round(100 * mood[key] / max)}%"></i></span>`;
+    const name = key => (named ? `<span class="humor-nome">${esc(t(key === 'amor' ? 'mood.love' : 'mood.belly'))}</span>` : '');
+    return ['amor', 'barriga'].map(key => `<span class="humor-item">${icon(key === 'amor' ? 'ui:amor' : 'ui:barriga')}${name(key)}${bar(key)}</span>`).join('');
+  }
+  function moodRow(engine, ctx) {
+    const mood = engine.mood();
+    const factor = engine.moodFactor(mood);
+    return `<button class="placa-humor ${factor < 1 ? 'triste' : factor > 1 ? 'feliz' : ''}" data-action="comidas" data-humor="linha" ` +
+      `title="${esc(moodTitle(engine, mood))}">${moodBars(engine, mood, ctx.icon)}<b data-humor="fator">×${number(factor, 2)}</b></button>`;
+  }
+
   function hud(engine, ctx) {
     const s = engine.state;
     const tier = engine.tierIndex();
@@ -153,6 +175,7 @@
       `<span class="convidados">${ctx.icon('ui:lotacao')}${s.size}${next ? `/${next.size}` : ''}</span></div>` +
       bar(s.fame, engine.fameNeed(), 'fama') +
       (upcoming ? `<div class="proximo" title="${esc(t('hud.nextTitle'))}">${t('hud.next', { piece: esc(upcoming.name) })}</div>` : '') +
+      moodRow(engine, ctx) +
       // Loja e argolas mais as telas: com mais de 8 botões (a cozinha), a grade ganha a 5ª coluna em vez de outra fileira.
       `<div class="placa-barra"><div class="barra-jogo${shown.length + 2 > 8 ? ' cheia' : ''}">` +
       `<button class="ferramenta" data-action="vitrine" title="${esc(t('hud.shop'))}">${ctx.icon('ui:loja')}</button>` +
@@ -168,7 +191,7 @@
       // Álbum de figurinhas, na janela dele.
       `<button class="ferramenta ${ctx.tela === 'album' ? 'aberta' : ''}" data-action="tela" data-tela="album" ` +
       `title="${esc(tabName('album'))}">${ctx.icon('ui:album')}</button>` +
-      (engine.cfg.debugMenu ? `<button class="ferramenta teste ${ctx.tela === 'teste' ? 'aberta' : ''}" data-action="tela" ` +
+      (engine.cfg.debugMenu || ctx.debug ? `<button class="ferramenta teste ${ctx.tela === 'teste' ? 'aberta' : ''}" data-action="tela" ` +
         `data-tela="teste" title="${esc(t('hud.test'))}">${ctx.icon('ui:teste')}</button>` : '') +
       `<span class="espaco"></span>` +
       // Tamanho num botão só: arrastar aumenta ou diminui; um clique (sem arrastar) volta a 100%.
@@ -202,10 +225,25 @@
         return `<div class="vcard melhoria" data-stat="${stat.id}"><div class="vcard-topo">${ctx.icon(`ui:${STAT_ICONS[stat.id]}`)}` +
           `<b>${esc(stat.name)}</b><small data-field="nivel">${esc(t('level.short', { n: level }))}</small></div>` +
           `<p class="miudo"><span data-field="valor">${fmt(engine.statValue(stat.id))} → ${fmt(engine.statValue(stat.id, level + 1))}</span>` +
-          ` ${esc(stat.unit)}</p><button class="btn" data-hold="melhorar" data-stat="${stat.id}" ` +
+          ` ${esc(stat.unit)}</p><button class="btn" data-action="melhorar" data-hold="melhorar" data-stat="${stat.id}" ` +
           `data-cost="${engine.levelCost(stat.id)}" data-currency="cheer" title="${esc(t('shop.hold'))}">${esc(t('shop.upgrade'))} ` +
           `<span class="preco">${ctx.icon('ui:animacao')}<b data-field="custo">${compact(engine.levelCost(stat.id))}</b></span></button></div>`;
       }).join('');
+    } else if (cat === 'comidas') {
+      const mood = engine.mood();
+      const full = engine.bellyFull();
+      const foods = engine.data.foods || [];
+      const status = `<div class="vhumor">${moodBars(engine, mood, ctx.icon, true)}<b data-humor="fator-loja">` +
+        `${esc(t('shop.moodNow', { stat: engine.stats.rebolado.name, f: number(engine.moodFactor(mood), 2) }))}</b></div>`;
+      // Duas fileiras (as comidas são poucas): cartões mais largos, a grade ocupa a vitrine.
+      body = status + `<div class="vgrade duas" style="--colunas:${Math.max(1, Math.ceil(foods.length / 2))}">` + foods.map(food => {
+        const cost = engine.foodCost(food.id);
+        const state = full ? esc(t('shop.bellyFull'))
+          : `<span class="preco" data-cost="${cost}" data-currency="cheer">${ctx.icon('ui:animacao')}${compact(cost)}</span>`;
+        return `<div class="vcard item comida ${full ? 'especial' : ''}" role="button" tabindex="0" data-action="vitrine-comida" ` +
+          `data-id="${food.id}" title="${esc(food.desc)}"><div class="vcard-img">${ctx.icon(`ui:comida-${food.id}`, 'icone-mini')}</div>` +
+          `<b class="nome">${esc(food.name)} <small>${esc(t('shop.foodFill', { n: food.fill }))}</small></b><span class="estado">${state}</span></div>`;
+      }).join('') + `</div>`;
     } else if (cat === 'conjuntos') {
       // Os conjuntos: um cartão cada, com o chapéu dele de rosto; clicar veste as três peças (se a pessoa tem todas).
       const sets = engine.data.sets;
@@ -250,7 +288,9 @@
           `<b class="nome">${esc(item.name)}</b><span class="estado">${state}</span></div>`;
       }).join('') + `</div>`;
     }
-    const hint = t(cat === 'melhorias' ? 'shop.hintUpgrades' : cat === 'conjuntos' ? 'shop.hintSets' : 'shop.hintItems');
+    const hint = cat === 'comidas'
+      ? t('shop.hintFoods', { stat: engine.stats.rebolado.name, high: number(engine.cfg.moodHigh, 2), low: number(engine.cfg.moodLow, 2) })
+      : t(cat === 'melhorias' ? 'shop.hintUpgrades' : cat === 'conjuntos' ? 'shop.hintSets' : 'shop.hintItems');
     return top + `<div class="vitrine-corpo">${body}</div><div class="vitrine-detalhe" id="vitrine-detalhe">${esc(hint)}</div>`;
   }
 
@@ -646,7 +686,7 @@
       [t('stats.pokes'), number(s.stats.pokes)], [t('stats.balloons'), number(s.stats.balloons)],
       [t('stats.rainbows'), number(s.stats.rainbows)], [t('stats.goals'), number(s.stats.goals)],
       [t('stats.weddings'), number(s.stats.weddings)], [t('stats.potes'), number(s.stats.potes)],
-      [t('stats.sacos'), `${number(s.stats.sacoWins)}/${number(s.stats.sacoRaces)}`], [t('stats.leiloes'), number(s.stats.leiloes)], [t('stats.quentao'), number(s.stats.quentao)], [t('stats.visitors'), number(s.stats.visitors)], [t('stats.cobras'), number(s.stats.cobras)], [t('stats.fotos'), number(s.stats.fotos)], [t('stats.burros'), `${number(s.stats.burroMoscas)}/${number(s.stats.burros)}`], [t('stats.fantasias'), `${number(s.stats.fantasiaWins)}/${number(s.stats.fantasias)}`], [t('stats.compadres'), number(s.stats.compadres)], [t('stats.dishes'), number(s.stats.dishes)],
+      [t('stats.sacos'), `${number(s.stats.sacoWins)}/${number(s.stats.sacoRaces)}`], [t('stats.leiloes'), number(s.stats.leiloes)], [t('stats.quentao'), number(s.stats.quentao)], [t('stats.visitors'), number(s.stats.visitors)], [t('stats.cobras'), number(s.stats.cobras)], [t('stats.fotos'), number(s.stats.fotos)], [t('stats.burros'), `${number(s.stats.burroMoscas)}/${number(s.stats.burros)}`], [t('stats.fantasias'), `${number(s.stats.fantasiaWins)}/${number(s.stats.fantasias)}`], [t('stats.compadres'), number(s.stats.compadres)], [t('stats.dishes'), number(s.stats.dishes)], [t('stats.foods'), number(s.stats.foods)],
       [t('stats.bingos'), number(s.stats.bingos)], [t('stats.contests'), `${number(s.stats.contestWins)}/${number(s.stats.contests)}`]
     ];
     const zoom = Math.round((st.zoom || 1) * 100);
@@ -754,6 +794,7 @@
       case 'bandeirinha': return t('log.flag');
       case 'compadres': return t('log.compadres', { n: compact(entry.amount || 0) });
       case 'cozinha': return t('log.cozinha', { dish: engine.recipe?.(entry.id)?.name || entry.id });
+      case 'comida': return t('log.comida', { food: engine.food?.(entry.id)?.name || entry.id, n: entry.count || 1 });
       case 'fantasia': return t(`log.fantasia.${[1, 2, 3].includes(entry.place) ? entry.place : 3}`, { tickets: entry.tickets || 0 });
       case 'burro': return t(`log.burro.${['mosca', 'perto', 'longe'].includes(entry.grade) ? entry.grade : 'fora'}`,
         { n: compact(entry.amount || 0), tickets: entry.tickets || 0 });
@@ -779,7 +820,10 @@
     const total = Math.max(60, engine.state.stats.playtime);
     const start = log.find(entry => entry.type === 'inicio');
     const points = [[start ? start.t : 0, start ? start.size : 1]];
-    for (const entry of log) if (entry.type === 'size') points.push([entry.t, entry.size]);
+    for (const entry of log) {
+      if (entry.type === 'size') points.push([entry.t, entry.size]);
+      else if (entry.type === 'year') points.push([entry.t, 1]);
+    }
     const top = Math.max(2, engine.state.size, ...points.map(p => p[1]));
     const [L, R, T, B] = [44, 630, 22, 214];
     const fx = t => L + (R - L) * Math.log1p(Math.max(0, t) / 60) / Math.log1p(total / 60);
@@ -872,7 +916,7 @@
       group(t('debug.crewBooths'), [button('prendas', 0, t('debug.prendas')), button('cartas', 0, t('debug.cartas')),
         button('roles', 0, t('debug.roles')), button('turma', 0, t('debug.turma')), button('itens', 0, t('debug.itens'))]) +
       group(t('debug.atParty'), [button('pedido', 0, t('debug.callRequest')), button('penetra', 0, t('debug.callCrasher')),
-        button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('aviso', 0, t('debug.callAnnounce')), button('frio', 0, t('debug.callCold')), button('sanfoneiro', 0, t('debug.callVisitor')), button('cobra', 0, t('debug.callSnake')), button('fotografo', 0, t('debug.callPhotographer')), button('burro', 0, t('debug.callBurro')), button('fantasia', 0, t('debug.callFantasia')), button('cozinha', 0, t('debug.callCook')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
+        button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('aviso', 0, t('debug.callAnnounce')), button('frio', 0, t('debug.callCold')), button('sanfoneiro', 0, t('debug.callVisitor')), button('cobra', 0, t('debug.callSnake')), button('fotografo', 0, t('debug.callPhotographer')), button('burro', 0, t('debug.callBurro')), button('fantasia', 0, t('debug.callFantasia')), button('cozinha', 0, t('debug.callCook')), button('feliz', 0, t('debug.feliz')), button('triste', 0, t('debug.triste')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
         button('argolas', 0, t('debug.cheapRings'))]);
   }
 
@@ -921,6 +965,6 @@
     return RENDER_TELA[id](engine, ctx);
   }
 
-  return { TABS, TELAS, DOCK, hud, tabs, panel, tela, telaName, vitrine, argolas, compact, duration, percent, number, esc,
+  return { TABS, TELAS, DOCK, hud, moodTitle, tabs, panel, tela, telaName, vitrine, argolas, compact, duration, percent, number, esc,
     logText, debugText, t };
 });

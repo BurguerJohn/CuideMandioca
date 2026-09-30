@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Fredoka";
+        src: url("assets/fontes/Fredoka.ttf") format("truetype");
+        font-weight: 300 700;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #1c1a3a; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Fredoka", sans-serif;
+        background: radial-gradient(ellipse 90% 40% at 50% 56%, #3a3470 0%, #1c1a3a 62%, #120f26 100%); }
+
+      /* Câmera: a gravação 4K vertical (2160x3840) dentro de um "mundo" que só escala e translada (origem no canto).
+         Escalas usadas: 2 (close, 12 px por pixel do jogo) e 0,5 (festa inteira, 3 px por pixel do jogo). */
+      .cena { position: absolute; inset: 0; overflow: hidden; }
+      #mundo { position: absolute; left: 0; top: 0; width: 2160px; height: 3840px; transform-origin: 0 0; will-change: transform; }
+      #mundo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+      #escuro { background: rgba(20, 16, 44, 0.78); }
+
+      /* Placa do título (a mesma dos outros vídeos) */
+      .placa { position: absolute; top: 196px; left: 90px; width: 900px; height: 300px; transform-origin: 50% 0;
+        display: flex; align-items: flex-end; gap: 26px; padding: 0 38px 26px; background: #fff4e4; border: 6px solid #2e1812;
+        box-shadow: 0 0 0 9px #c07a36, 0 0 0 18px #7c421e, 0 0 0 24px #2e1812, 16px 20px 0 24px rgba(18, 9, 6, 0.5); }
+      .bandeiras { position: absolute; left: -6px; right: -6px; top: -6px; height: 54px; display: flex; justify-content: space-around; }
+      .bandeiras::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #2e1812; }
+      .bandeiras i { display: block; width: 44px; height: 50px; margin-top: 4px; clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
+      .bandeiras i:nth-child(6n + 1) { background: #ee2f3c; } .bandeiras i:nth-child(6n + 2) { background: #ffd21e; }
+      .bandeiras i:nth-child(6n + 3) { background: #35a03a; } .bandeiras i:nth-child(6n + 4) { background: #3a6cf0; }
+      .bandeiras i:nth-child(6n + 5) { background: #ff4f9e; } .bandeiras i:nth-child(6n + 6) { background: #ff8a12; }
+      .mascote { position: relative; flex: none; width: 160px; height: 220px; }
+      .mascote .corpo { position: absolute; inset: 0; background: url("assets/sprites/mandioca.png") 0 0 / 56960px 220px no-repeat; image-rendering: pixelated; }
+      .mascote img { position: absolute; width: 120px; height: 45px; image-rendering: pixelated; left: 20px; top: 25px; }
+      .letreiro { display: flex; flex-direction: column; padding-bottom: 6px; }
+      .letreiro .l1 { font-weight: 700; font-size: 46px; line-height: 1; color: #2e1812; letter-spacing: 0.02em; }
+      .letreiro .l2 { font-weight: 700; font-size: 124px; line-height: 0.95; color: #ee2f3c; letter-spacing: -0.03em;
+        -webkit-text-stroke: 7px #2e1812; paint-order: stroke fill; text-shadow: 0 8px 0 #8a1030; }
+
+      /* Legendas */
+      .bloco { position: absolute; left: 50px; right: 50px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+      .frase { max-width: 980px; text-align: center; font-weight: 700; font-size: 84px; line-height: 1.04; color: #fff4e4;
+        letter-spacing: -0.01em; -webkit-text-stroke: 16px #1c1a3a; paint-order: stroke fill; text-shadow: 0 12px 0 rgba(18, 9, 6, 0.55); }
+      .frase em { font-style: normal; color: #ffd21e; }
+      .selo { font-family: "Space Mono", monospace; font-weight: 700; font-size: 46px; color: #ffd21e; background: #1c1a3a;
+        border: 5px solid #ffd21e; padding: 12px 30px; border-radius: 999px; white-space: nowrap; }
+
+      /* Medidor de Amor e Barriga, no estilo da placa do jogo */
+      .medidor { position: absolute; left: 70px; top: 1250px; width: 760px; padding: 22px 30px 24px; background: #fff4e4; border: 6px solid #2e1812;
+        box-shadow: 0 0 0 8px #c07a36, 0 0 0 15px #7c421e, 0 0 0 20px #2e1812, 12px 14px 0 20px rgba(18, 9, 6, 0.45); transform-origin: 50% 100%; }
+      .linha { display: flex; align-items: center; gap: 18px; height: 64px; }
+      .linha img { display: block; width: 63px; height: auto; image-rendering: pixelated; }
+      .linha .nome { width: 190px; font-weight: 700; font-size: 44px; color: #2e1812; }
+      .barra { position: relative; flex: 1; height: 34px; border: 5px solid #2e1812; background: #efd29a; overflow: hidden; }
+      .barra i { position: absolute; left: 0; top: 0; display: block; width: 100%; height: 100%; transform-origin: 0 50%; transform: scaleX(0); }
+      .barra.amor i { background: repeating-linear-gradient(90deg, #ff4f9e 0 16px, #ad1e66 16px 22px); }
+      .barra.barriga i { background: repeating-linear-gradient(90deg, #ffac2a 0 16px, #b44a0a 16px 22px); }
+      .fator { position: absolute; right: -16px; top: -48px; font-weight: 700; font-size: 40px; padding: 6px 22px 8px; border-radius: 999px;
+        border: 5px solid #2e1812; white-space: nowrap; background: #ee2f3c; color: #fff4e4; transform: rotate(3deg); }
+      .fator.meio { background: #fff4e4; color: #2e1812; }
+      .fator.feliz { background: #ffd21e; color: #2e1812; }
+      .fator-grande { position: absolute; left: 0; right: 0; top: 1250px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
+      .fator-grande b { font-weight: 700; font-size: 84px; padding: 10px 44px 16px; border-radius: 999px; border: 7px solid #2e1812;
+        background: #ffd21e; color: #2e1812; box-shadow: 0 12px 0 #2e1812; white-space: nowrap; }
+
+      /* Placa final */
+      .fim-tagline { position: absolute; left: 100px; right: 100px; top: 1000px; text-align: center; font-weight: 700; font-size: 60px;
+        line-height: 1.12; color: #fff4e4; -webkit-text-stroke: 12px #1c1a3a; paint-order: stroke fill; }
+      .fim-cta { position: absolute; left: 90px; right: 90px; top: 1250px; text-align: center; font-weight: 700; font-size: 50px; line-height: 1.12;
+        color: #2e1812; background: #ffd21e; border: 6px solid #2e1812; border-radius: 48px; padding: 18px 28px 22px; box-shadow: 0 10px 0 #2e1812; }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-rsle" id="root" data-composition-id="cuidar" data-start="0" data-duration="16" data-width="1080" data-height="1920">
+      <!-- Gameplay: uma tomada só, 4K vertical; a câmera é o #mundo -->
+      <div data-hf-id="hf-owof" class="cena">
+        <div data-hf-id="hf-1zfn" id="mundo" data-layout-allow-overflow="">
+          <video data-hf-id="hf-vodc" id="jogo" src="assets/gameplay/cuidar.mp4" data-start="0" data-duration="16" data-media-start="0" data-track-index="0" muted playsinline></video>
+        </div>
+      </div>
+      <div data-hf-id="hf-neh0" id="escuro" class="clip" data-start="13.4" data-duration="2.6" data-track-index="1"></div>
+
+      <div data-hf-id="hf-aovo" id="titulo" class="clip" data-start="0" data-duration="16" data-track-index="2">
+        <div data-hf-id="hf-aduw" class="placa" id="placa">
+          <div data-hf-id="hf-vdzz" class="bandeiras"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i><i data-hf-id="hf-ylp6"></i><i data-hf-id="hf-0l8b"></i><i data-hf-id="hf-0zjc"></i><i data-hf-id="hf-zsm9"></i><i data-hf-id="hf-06xa"></i><i data-hf-id="hf-26gf"></i><i data-hf-id="hf-2krg"></i><i data-hf-id="hf-oz7w"></i><i data-hf-id="hf-okwv"></i><i data-hf-id="hf-o6lu"></i><i data-hf-id="hf-jqbp"></i></div>
+          <div data-hf-id="hf-bv2e" class="mascote"><div data-hf-id="hf-a3dk" class="corpo" id="corpo"></div><img data-hf-id="hf-xcdt" id="chapeu" src="assets/sprites/chapeu-palha.png" alt=""></div>
+          <div data-hf-id="hf-fl10" class="letreiro"><span data-hf-id="hf-w9r0" class="l1">CUIDE BEM DA SUA</span><span data-hf-id="hf-cwoz" class="l2">MANDIOCA</span></div>
+        </div>
+      </div>
+
+      <!-- Legendas -->
+      <div data-hf-id="hf-cup3" id="c1" class="clip" data-start="0.25" data-duration="2.5" data-track-index="3">
+        <div data-hf-id="hf-usbg" class="bloco" id="c1bloco" style="top: 548px"><div data-hf-id="hf-xc6a" class="frase" id="c1a">se você não cuidar da sua mandioca…</div>
+          <div data-hf-id="hf-zj4h" class="frase" id="c1b">ela fica <em data-hf-id="hf-u2u6">TRISTE</em> 😢</div></div>
+      </div>
+      <div data-hf-id="hf-sgnx" id="c2" class="clip" data-start="2.85" data-duration="3.05" data-track-index="3">
+        <div data-hf-id="hf-vm9f" class="bloco" style="top: 380px"><div data-hf-id="hf-jhq9" class="frase" id="c2f">dei <em data-hf-id="hf-jzql">comidinha</em> 🍿</div></div>
+      </div>
+      <div data-hf-id="hf-gik1" id="c3" class="clip" data-start="5.9" data-duration="2.6" data-track-index="3">
+        <div data-hf-id="hf-mwur" class="bloco" style="top: 380px"><div data-hf-id="hf-gqrk" class="frase" id="c3f">fiz <em data-hf-id="hf-z24h">carinho</em> 🥰</div></div>
+      </div>
+      <div data-hf-id="hf-9put" id="c4" class="clip" data-start="8.5" data-duration="1.9" data-track-index="3">
+        <div data-hf-id="hf-mijq" class="bloco" style="top: 380px"><div data-hf-id="hf-lery" class="frase" id="c4f">e joguei uns <em data-hf-id="hf-mjoj">estalinhos</em> 💥</div></div>
+      </div>
+      <div data-hf-id="hf-zpvg" id="c5" class="clip" data-start="10.5" data-duration="2.9" data-track-index="3">
+        <div data-hf-id="hf-f7dm" class="bloco" style="top: 420px"><div data-hf-id="hf-3c94" class="frase" id="c5f">agora ela tá <em data-hf-id="hf-74p5">FELIZ</em> 💃</div></div>
+      </div>
+
+      <!-- Medidor: aparece no gancho e se recolhe na virada -->
+      <div data-hf-id="hf-454x" id="med" class="clip" data-start="0" data-duration="10.8" data-track-index="4">
+        <div data-hf-id="hf-0nte" class="medidor" id="medidor">
+          <div data-hf-id="hf-3wni" class="fator" id="fator">REBOLADO ×0,5</div>
+          <div data-hf-id="hf-n2zk" class="linha"><img data-hf-id="hf-px7u" src="assets/sprites/ui-amor.png" alt=""><span data-hf-id="hf-y66l" class="nome">Amor</span><div data-hf-id="hf-jfxt" class="barra amor"><i data-hf-id="hf-pzwr" id="fillA"></i></div></div>
+          <div data-hf-id="hf-g0yg" class="linha"><img data-hf-id="hf-wv5z" src="assets/sprites/ui-barriga.png" alt=""><span data-hf-id="hf-ydzu" class="nome">Barriga</span><div data-hf-id="hf-3gek" class="barra barriga"><i data-hf-id="hf-hc0w" id="fillB"></i></div></div>
+        </div>
+      </div>
+      <div data-hf-id="hf-6s0g" id="grande" class="clip" data-start="10.5" data-duration="2.9" data-track-index="4">
+        <div data-hf-id="hf-p198" class="fator-grande"><b data-hf-id="hf-7bqy" id="fg">REBOLADO ×1,25</b><div data-hf-id="hf-71gk" class="selo" id="sg">2,5× mais animação</div></div>
+      </div>
+
+      <div data-hf-id="hf-ovu1" id="fim" class="clip" data-start="13.4" data-duration="2.6" data-track-index="3">
+        <div data-hf-id="hf-3nqa" class="fim-tagline" id="fimt">o joguinho de festa junina que vive na sua área de trabalho</div>
+        <div data-hf-id="hf-gwur" class="fim-cta" id="fimc">qual nome você daria para sua mandioca? 👇</div>
+      </div>
+
+      <!-- Efeitos (sem trilha: o som em alta entra pelo TikTok) -->
+      <audio data-hf-id="hf-vqu6" id="w1" src="assets/audio/whoosh.wav" data-start="1.05" data-duration="0.45" data-track-index="11" data-volume="0.7"></audio>
+      <audio data-hf-id="hf-ecl3" id="w2" src="assets/audio/whoosh.wav" data-start="10.35" data-duration="0.45" data-track-index="11" data-volume="0.8"></audio>
+      <audio data-hf-id="hf-nmco" id="w3" src="assets/audio/whoosh.wav" data-start="13.35" data-duration="0.45" data-track-index="11" data-volume="0.7"></audio>
+      <audio data-hf-id="hf-yujv" id="d1" src="assets/audio/ding.wav" data-start="3.75" data-duration="0.9" data-track-index="12" data-volume="0.5"></audio>
+      <audio data-hf-id="hf-wakh" id="d2" src="assets/audio/ding.wav" data-start="4.75" data-duration="0.9" data-track-index="12" data-volume="0.5"></audio>
+      <audio data-hf-id="hf-vy4i" id="d3" src="assets/audio/ding.wav" data-start="5.75" data-duration="0.9" data-track-index="12" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-5x7d" id="p1" src="assets/audio/pop.wav" data-start="6.0" data-duration="0.18" data-track-index="13" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-r6d0" id="p2" src="assets/audio/pop.wav" data-start="6.4" data-duration="0.18" data-track-index="13" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-6hpj" id="p3" src="assets/audio/pop.wav" data-start="6.8" data-duration="0.18" data-track-index="13" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-2fkp" id="p4" src="assets/audio/pop.wav" data-start="7.2" data-duration="0.18" data-track-index="13" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-frwm" id="p5" src="assets/audio/pop.wav" data-start="7.6" data-duration="0.18" data-track-index="13" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-urjy" id="p6" src="assets/audio/pop.wav" data-start="8.0" data-duration="0.18" data-track-index="13" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-cnbk" id="p7" src="assets/audio/pop.wav" data-start="8.6" data-duration="0.18" data-track-index="13" data-volume="0.65"></audio>
+      <audio data-hf-id="hf-o6nq" id="p8" src="assets/audio/pop.wav" data-start="9.0" data-duration="0.18" data-track-index="13" data-volume="0.65"></audio>
+      <audio data-hf-id="hf-8zrl" id="p9" src="assets/audio/pop.wav" data-start="9.4" data-duration="0.18" data-track-index="13" data-volume="0.65"></audio>
+      <audio data-hf-id="hf-fv7t" id="p10" src="assets/audio/pop.wav" data-start="9.8" data-duration="0.18" data-track-index="13" data-volume="0.65"></audio>
+      <audio data-hf-id="hf-yurd" id="t1" src="assets/audio/tada.wav" data-start="10.4" data-duration="1.1" data-track-index="14" data-volume="0.6"></audio>
+      <audio data-hf-id="hf-orgu" id="m1" src="assets/audio/moeda.wav" data-start="10.6" data-duration="0.4" data-track-index="15" data-volume="0.5"></audio>
+      <audio data-hf-id="hf-4f0v" id="p11" src="assets/audio/pop.wav" data-start="14.4" data-duration="0.18" data-track-index="13" data-volume="0.6"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const DUR = 16;
+
+      // Mandioca da placa dançando o forró (16 quadros por 2 s), com o chapéu na âncora da cabeça de cada quadro.
+      const CABECA = [[4, 5], [4, 5], [3, 4], [3, 4], [3, 3], [4, 4], [4, 4], [4, 5], [4, 5], [5, 5], [5, 4], [5, 4], [5, 3], [5, 4], [4, 4], [4, 5]];
+      const ESCALA = 5;
+      const corpo = document.getElementById("corpo");
+      const chapeu = document.getElementById("chapeu");
+      const quadro = { f: 0 };
+      const mostrarQuadro = () => {
+        const f = Math.min(15, Math.floor(quadro.f));
+        corpo.style.backgroundPosition = `${-f * 32 * ESCALA}px 0px`;
+        chapeu.style.left = `${CABECA[f][0] * ESCALA}px`;
+        chapeu.style.top = `${CABECA[f][1] * ESCALA}px`;
+      };
+      tl.fromTo(quadro, { f: 0 }, { f: 16, duration: 2, ease: "none", repeat: Math.max(0, Math.floor(DUR / 2) - 1), onUpdate: mostrarQuadro }, 0);
+      mostrarQuadro();
+
+      // Placa: cai no quadro 0, encolhe para o topo no primeiro corte e volta grande para o centro no fim.
+      tl.fromTo("#placa", { scale: 1.1, rotation: -3, y: -24 }, { scale: 1, rotation: 0, y: 0, duration: 0.6, ease: "back.out(1.7)" }, 0);
+      // Encolhe cedo (depois de 1 s bem grande): a legenda do gancho sobe junto e abre espaço para a fala dela.
+      tl.fromTo("#placa", { scale: 1, y: 0 }, { scale: 0.5, y: -30, duration: 0.45, ease: "power3.inOut", immediateRender: false }, 1.1);
+      tl.fromTo("#c1bloco", { y: 0 }, { y: -175, duration: 0.45, ease: "power3.inOut" }, 1.1);
+      tl.fromTo("#placa", { scale: 0.5, y: -30 }, { scale: 1.02, y: 360, duration: 0.7, ease: "expo.out", immediateRender: false }, 13.45);
+
+      // Câmera (viewport-change, origem no canto): ponto p da gravação → S·p + T na tela.
+      // Mandioca na gravação: centro (926, 2452); no close ela fica em (620, 1000), um pouco à direita (a fala dela sai à
+      // esquerda). A festa inteira: centro (1082, 2228) → (540, 915).
+      const mundo = document.getElementById("mundo");
+      const PERTO = { s: 2, x: 620 - 926 * 2, y: 1000 - 2452 * 2 };
+      const LONGE = { s: 0.5, x: 0, y: 915 - 2228 * 0.5 };
+      const cam = { ...PERTO };
+      const aplicarCamera = () => { mundo.style.transform = `translate(${cam.x}px, ${cam.y}px) scale(${cam.s})`; };
+      aplicarCamera();
+      // Uma puxada só, desacelerando até parar (zoom-out-workspace-reveal); depois a câmera não mexe mais.
+      tl.fromTo(cam, { ...PERTO }, { ...LONGE, duration: 1.3, ease: "expo.out", onUpdate: aplicarCamera }, 10.45);
+
+      // Medidor: Amor e Barriga (0 a 100) e o Rebolado que eles dão (vazio ×0,5, metade ×1, cheio ×1,25).
+      const humor = { a: 0, b: 0 };
+      const fator = document.getElementById("fator");
+      const fillA = document.getElementById("fillA");
+      const fillB = document.getElementById("fillB");
+      const numero = v => (Math.round(v * 100) / 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+      const desenharHumor = () => {
+        const nivel = (humor.a + humor.b) / 200;
+        const f = nivel < 0.5 ? 0.5 + nivel : 1 + (nivel - 0.5) * 0.5;
+        fillA.style.transform = `scaleX(${humor.a / 100})`;
+        fillB.style.transform = `scaleX(${humor.b / 100})`;
+        fator.textContent = `REBOLADO ×${numero(f)}`;
+        fator.classList.toggle("meio", Math.abs(f - 1) < 0.005);
+        fator.classList.toggle("feliz", f > 1.005);
+      };
+      desenharHumor();
+      const passo = (chave, de, para, t, dur = 0.25) =>
+        tl.fromTo(humor, { [chave]: de }, { [chave]: para, duration: dur, ease: "power2.out", immediateRender: false, onUpdate: desenharHumor }, t);
+      // Barriga: cada "NHAM!" (pipoca +12, milho +25, bolo até encher).
+      passo("b", 0, 12, 3.75); passo("b", 12, 37, 4.75); passo("b", 37, 100, 5.75, 0.35);
+      // Amor: seis carinhos até a metade, quatro estalinhos até encher.
+      [6.0, 6.4, 6.8, 7.2, 7.6, 8.0].forEach((t, i) => passo("a", (50 / 6) * i, (50 / 6) * (i + 1), t, 0.2));
+      [8.6, 9.0, 9.4, 9.8].forEach((t, i) => passo("a", 50 + 12.5 * i, 50 + 12.5 * (i + 1), t, 0.2));
+
+      tl.fromTo("#medidor", { y: 90, scale: 0.85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.6)" }, 0.45);
+      tl.fromTo("#fator", { scale: 1 }, { scale: 1.12, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 5 }, 0.9);
+      tl.fromTo("#fator", { scale: 1 }, { scale: 1.2, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 9.8);
+      tl.fromTo("#medidor", { y: 0, scale: 1, opacity: 1 }, { y: 70, scale: 0.9, opacity: 0, duration: 0.3, ease: "power2.in", immediateRender: false }, 10.42);
+
+      // Virada: o selo cresce para o centro com um tranco, depois o selo dos 2,5×.
+      tl.fromTo("#fg", { scale: 0, rotation: -12 }, { scale: 1, rotation: -3, duration: 0.5, ease: "back.out(2)" }, 10.55);
+      tl.fromTo("#sg", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.8)" }, 11.05);
+
+      // Legendas
+      tl.fromTo("#c1a", { scale: 1.35, opacity: 0, filter: "blur(10px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "power4.out" }, 0.25);
+      tl.fromTo("#c1b", { scale: 0, opacity: 0, rotation: -4 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.45, ease: "back.out(1.8)" }, 1.55);
+      tl.fromTo("#c2f", { x: -240, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "expo.out" }, 2.85);
+      tl.fromTo("#c3f", { x: 240, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "expo.out" }, 5.9);
+      tl.fromTo("#c4f", { y: 80, rotation: 4, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.45, ease: "circ.out" }, 8.5);
+      tl.fromTo("#c5f", { scale: 1.35, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "power4.out" }, 10.5);
+
+      // Placa final
+      tl.fromTo("#escuro", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 13.4);
+      tl.fromTo("#fimt", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 13.9);
+      tl.fromTo("#fimc", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.8)" }, 14.4);
+      tl.fromTo("#fimc", { scale: 1 }, { scale: 1.05, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1, immediateRender: false }, 14.9);
+
+      window.__timelines["cuidar"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -40,8 +40,6 @@
   const ISLAND_SKY = 50;
   const ISLAND_W = 84;
   const ISLANDS = ['ilha-quadrilha', 'ilha-baloes'];
-  let H = BASE_H;
-  let GROUND = BASE_GROUND;
   const TIER_MIN = [128, 190, 270, 340, 400];
   const MAX_W = 600;
   const POLE_H = [40, 56, 92, 124, 140];
@@ -127,6 +125,8 @@
 
   // `hooks.sound(nome)` toca um som do jogo (a festa só pede; quem toca é o app, que respeita o som desligado).
   function create(canvas, bundle, hooks = {}) {
+    let H = BASE_H;
+    let GROUND = BASE_GROUND;
     const sound = name => { try { hooks.sound?.(name); } catch (_) { /* som é enfeite */ } };
     const images = {};
     let pending = 0;
@@ -167,7 +167,7 @@
     const RING_TURN = 4200;
     const GROW_FLASH = 420;
     const GROW_MS = 950;
-    const fx = {
+    const freshEffects = () => ({
       scale: 1, grow: null, react: {}, restKind: 'ofega', danceSayAt: 0, nextGlitter: 0, wx: { rain: 0, rainbow: 0 }, flashUntil: 0,
       particles: [], texts: [], arrivals: new Map(), shown: {}, celebrateUntil: 0, jumpUntil: 0,
       nextBlink: 0, blinkUntil: 0, nextSpark: 0, nextSweat: 0, nextFirework: 0, nextNote: 0, nextHeart: {}, frame: 0, previous: 0,
@@ -175,7 +175,8 @@
       frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
       nextZ: 0, nextSmoke: 0, pops: [],
       light: null, nextFireSmoke: 0, dustAt: 0, rockets: [], flashes: [], shooting: null, nextShoot: 0, glintAt: 0
-    };
+    });
+    let fx = freshEffects();
     // Brilhos em pixel: anéis concêntricos de cor sólida, cada um mais transparente (a luz fica redonda e limpa,
     // sem o chuvisco do pontilhado). Feito uma vez por raio e cor, e reusado (luz, halo, fumaça).
     const glows = new Map();
@@ -746,7 +747,7 @@
     const DISH_FLY_MS = 900;
     function drawDishFly(now) {
       const fly = fx.dishFly;
-      const dishes = bundle.props.pratos;
+      const dishes = bundle.props[fly?.kind || 'pratos'];
       if (!fly || !dishes) return;
       const t = (now - fly.at) / DISH_FLY_MS;
       if (t >= 1) {
@@ -754,8 +755,10 @@
         const x = layout.host.x + 12;
         const y = GROUND - Math.round(34 * fx.scale);
         float('coracao', x, y - 6, now, ['#ff4f9e', '#ff8a96']);
+        if (fly.kind === 'comidas') sound('carinho');
         // Do lado da Mandioca, para não brigar com os números dos passos que sobem em cima dela.
-        say(tr('fx.cook.yum'), Math.max(layout.L + 14, x - 24), Math.max(10, GROUND - Math.round(46 * fx.scale)), now, '#fff8e8', 1400, 8);
+        say(tr(fly.kind === 'comidas' ? 'fx.food.yum' : 'fx.cook.yum'), Math.max(layout.L + 14, x - 24),
+          Math.max(10, GROUND - Math.round(46 * fx.scale)), now, '#fff8e8', 1400, 8);
         return;
       }
       if (t < 0) return;
@@ -764,6 +767,26 @@
       const x = fly.from.x + (tx - fly.from.x) * t;
       const y = fly.from.y + (ty - fly.from.y) * t - Math.sin(Math.PI * t) * 26;
       sprite(dishes, Math.max(0, dishes.ids.indexOf(fly.id)), Math.round(x - dishes.w / 2), Math.round(y - dishes.h / 2));
+    }
+
+    // A Mandioca pede o que falta (de 1,5 a 3 min, e só com a Barriga ou o Amor abaixo de 20%): comida ou carinho.
+    function moodLines(engine, now) {
+      if (typeof engine.mood !== 'function') return;
+      if (!fx.moodAt) { fx.moodAt = now + 20000 + rng() * 30000; return; }
+      if (now < fx.moodAt) return;
+      fx.moodAt = now + 90000 + rng() * 90000;
+      const m = engine.mood();
+      const low = engine.cfg.moodMax * 0.2;
+      const forced = fx.moodForce && m[fx.moodForce === 'fome' ? 'barriga' : 'amor'] < low ? fx.moodForce : null;
+      const line = forced && Number.isInteger(fx.moodLine) ? fx.moodLine : Math.floor(rng() * 3);
+      fx.moodForce = null;
+      fx.moodLine = null;
+      const kind = forced || (m.barriga < low && (m.amor >= low || rng() < 0.5) ? 'fome' : m.amor < low ? 'carente' : null);
+      if (!kind) return;
+      fx.moodSaid = kind;
+      const x = layout.host.x + 12;
+      say(tr(`fx.${kind}.${line}`), Math.max(layout.L + 30, x - 24), Math.max(10, GROUND - Math.round(46 * fx.scale)),
+        now, kind === 'fome' ? '#ffc460' : '#ff8a96', 2400, 8);
     }
 
     // Dança das fitas: com o Mastro de São João na festa, de vez em quando quatro crianças pegam cada uma uma fita do topo
@@ -3925,6 +3948,7 @@
       for (let i = fx.particles.length - 1; i >= 0; i--) {
         const p = fx.particles[i];
         const age = now - p.born;
+        if (age < 0) continue;
         if (age > p.ttl) { fx.particles.splice(i, 1); continue; }
         const t = age / p.ttl;
         const [x, y] = at(p, age);
@@ -4073,8 +4097,12 @@
     // Eventos do motor viram efeitos na festa.
     const LOOKS = { wedding: 'coracao', 'wedding-end': 'coracao', 'letter-ready': 'coracao', achievement: 'estrela',
       'tier-up': 'estrela', 'bingo-win': 'estrela', 'leilao-sold': 'estrela', 'saco-end': 'estrela', 'pote-break': 'estrela',
-      grow: 'estrela', learn: 'estrela', legendary: 'estrela', contest: 'estrela', poke: 'feliz', equip: 'feliz', 'cobra-caught': 'feliz', foto: 'estrela', 'burro-pin': 'feliz', compadres: 'coracao', 'flag-caught': 'feliz', 'cook-served': 'coracao' };
+      grow: 'estrela', learn: 'estrela', legendary: 'estrela', contest: 'estrela', poke: 'feliz', equip: 'feliz', 'cobra-caught': 'feliz', foto: 'estrela', 'burro-pin': 'feliz', compadres: 'coracao', 'flag-caught': 'feliz', 'cook-served': 'coracao', feed: 'feliz' };
     function onEvents(engine, events, now = root.performance?.now?.() || 0) {
+      if (Array.isArray(events) && events.some(event => event.type === 'new-year')) {
+        reset();
+        draw(engine, now);
+      }
       if (!layout) return;
       const hostX = layout.host.x + 12;
       const up = n => GROUND - Math.round(n * fx.scale);
@@ -4238,6 +4266,9 @@
           if (fx.stovePos) say(tr('fx.cook.ready'), fx.stovePos.x, Math.max(10, fx.stovePos.y - 14), now, '#ffd21e', 1800, 8);
         } else if (event.type === 'cook-served') {
           if (fx.stovePos) fx.dishFly = { at: now, id: event.id, from: { ...fx.stovePos } };
+        } else if (event.type === 'feed') {
+          // Comida da loja: cai do alto, um pouco à esquerda, e faz a curvinha até a boca dela.
+          fx.dishFly = { at: now, id: event.id, kind: 'comidas', from: { x: layout.host.x - 26, y: Math.max(8, GROUND - Math.round(80 * fx.scale)) } };
         } else if (event.type === 'compadres') {
           const c = fx.compadre;
           const mid = layout.fire.x + layout.fire.meta.w / 2;
@@ -4654,6 +4685,7 @@
       drawFishJump(now);
       drawLooseFlag(now, GROUND - POLE_H[layout.tier]);
       drawDishFly(now);
+      moodLines(engine, now);
       if (engine.state.size < 25 && bundle.scenery.sapo) drawFrog(now);
       drawPeddler(engine, now);
       drawCrasher(engine, now);
@@ -4674,7 +4706,7 @@
         const f = fx[key];
         if (f && !f.at && f.next <= now) due.push(at => { f.next = at; });
       }
-      for (const key of ['nextSolo', 'nextWind', 'nextRing', 'nextEstalo']) {
+      for (const key of ['nextSolo', 'nextWind', 'nextRing', 'nextEstalo', 'moodAt']) {
         if (fx[key] && fx[key] <= now) due.push(at => { fx[key] = at; });
       }
       for (let i = due.length - 1; i > 0; i--) {
@@ -4682,6 +4714,25 @@
         [due[i], due[j]] = [due[j], due[i]];
       }
       due.forEach((set, i) => set(now + 20000 + i * 30000 + rng() * 10000));
+    }
+
+    // Outra partida substitui os efeitos e os alvos, mantendo escala, ritmo e opções visuais.
+    function reset() {
+      fx = freshEffects();
+      fx.lastDraw = -Infinity;
+      layout = null;
+      layoutKey = '';
+      terrain = null;
+      ridge = null;
+      sky = 0;
+      H = BASE_H;
+      GROUND = BASE_GROUND;
+      islandTerrains = [];
+      regions = [];
+      spots = new Map();
+      view.float = 0;
+      view.applied = null;
+      g.clearRect(0, 0, buffer.width, buffer.height);
     }
 
     function draw(engine, now, preview = null) {
@@ -4879,7 +4930,7 @@
     function setSleepy(on) { sleepy = on === true; }
 
     // Estado dos enfeites que vêm e vão sozinhos (para os testes e as fotos): vento (-1 a 1) e ciranda das crianças.
-    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
+    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
 
     // A pessoa voltou para a festa depois de um tempo fora: a Mandioca dá um pulinho, faz o olhar felizinho e cumprimenta.
     const GREETINGS = 4;
@@ -4903,11 +4954,15 @@
       else if (kind === 'fitas') fx.fitas = { at, next: 0, said: false };
       else if (kind === 'compadres') fx.compadre = { at, next: 0, said: -1, witnessed: false, ended: false };
       else if (kind === 'carroBoi') fx.carroBoi = { at, next: 0, dir: lado };
+      // A Mandioca pede comida ou carinho no próximo quadro (se a Barriga ou o Amor estiverem baixos).
+      else if (kind === 'fome' || kind === 'carente') { fx.moodAt = 1; fx.moodForce = kind; fx.moodLine = ordem; }
+      // Qual descanso ela faz agora (ofega, abana, alonga...): o sorteio do jogo pode cair num que não combina com a cena.
+      else if (kind === 'descanso') fx.restKind = ordem || 'ofega';
       else return false;
       return true;
     }
 
-    return { draw, setScale, setRate, setFlash, setCalm, setSleepy, hit, onEvents, celebrate, poke, photo, portrait, areas, probe, sprout, greet, moonPhase, estalo: throwEstalo, size: sizeInfo, provocar };
+    return { draw, reset, setScale, setRate, setFlash, setCalm, setSleepy, hit, onEvents, celebrate, poke, photo, portrait, areas, probe, sprout, greet, moonPhase, estalo: throwEstalo, size: sizeInfo, provocar };
   }
 
   root.ArraiaFesta = { create, terrainWidth, amount, pixelText, withPreview };

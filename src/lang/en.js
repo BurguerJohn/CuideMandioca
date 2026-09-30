@@ -5,7 +5,7 @@
       'tab.festa': 'Party', 'tab.historico': 'History', 'tab.conquistas': 'Achievements', 'tab.ajustes': 'Settings',
       'tab.turma': 'Crew', 'tab.pescaria': 'Fishing Pond', 'tab.roles': 'Outings', 'tab.cozinha': 'Kitchen', 'tab.album': 'Album', 'tab.fogueira': 'Bonfire',
       'tab.bingo': 'Fair bingo', 'tab.correio': 'Love Letters', 'tab.teste': 'Test mode',
-      'dock.conjuntos': 'Sets', 'dock.melhorias': 'Upgrades', 'dock.chapeu': 'Hats', 'dock.mao': 'In hand', 'dock.tecido': 'Fabrics',
+      'dock.conjuntos': 'Sets', 'dock.comidas': 'Food', 'mood.love': 'Love', 'mood.belly': 'Tummy', 'hud.moodTitle': 'Cassava’s happiness: Love {love}% (pets and snap pops on the ground) and Tummy {belly}% (Food tab in the shop). {stat} is worth ×{f}. Click to open the Food tab.', 'shop.hintFoods': 'Food fills the Tummy; pets and snap pops on the ground fill Love. Both drop over time. All full: {stat} ×{high}; all empty: ×{low}.', 'shop.foodFill': '+{n} Tummy', 'shop.bellyFull': 'Tummy full', 'shop.moodNow': '{stat} ×{f}', 'app.bellyFull': 'The Cassava’s tummy is full!', 'app.hint.humor': 'Tip: the Cassava has Love and Tummy (the little bars on the sign). Pets and snap pops on the ground fill Love, and the shop’s Food tab fills the Tummy. All full: Wiggle ×1.25; all empty: ×0.5.', 'log.comida': { one: 'The Cassava ate {food}', other: 'The Cassava ate {food} ({n} times)' }, 'stats.foods': 'Food given', 'fx.food.yum': 'YUM!', 'fx.fome.0': 'SO HUNGRY!', 'fx.fome.1': 'RUMBLE... RUMBLE...', 'fx.fome.2': 'FOOD, PLEASE?', 'fx.carente.0': 'PET ME, PLEASE?', 'fx.carente.1': 'SO LONELY...', 'fx.carente.2': 'A LITTLE CUDDLE?', 'debug.feliz': 'Love and Tummy full', 'debug.triste': 'Love and Tummy empty', 'dock.melhorias': 'Upgrades', 'dock.chapeu': 'Hats', 'dock.mao': 'In hand', 'dock.tecido': 'Fabrics',
       'dock.terreiro': 'Grounds', 'dock.lado': 'Booths', 'dock.varal': 'Bunting',
 
       'num.thousand': '{n}K', 'num.million': '{n}M', 'num.billion': '{n}B', 'num.trillion': '{n}T',
@@ -298,7 +298,7 @@
         'the dance floor to move the party. Hold the handle on the sign to change its size. There’s a letter waiting in the ' +
         'Love Letters.</p>',
       'app.firstRunOk': 'To the arraiá!',
-      'app.languageChanged': 'Language changed.',
+      'app.languageChanged': 'Language changed.', 'app.debugOn': 'Test mode on until you close the game (ladybug button on the sign).', 'app.debugOff': 'Test mode off.',
 
       'fx.cobra': 'LOOK, A SNAKE!', 'fx.phew': 'PHEW!', 'fx.ember': 'LIVE EMBERS!', 'fx.flare': 'FLARE!',
       'fx.guests': { one: '+{n} GUEST', other: '+{n} GUESTS' }, 'fx.preview': 'PREVIEW',
@@ -561,6 +561,14 @@
         'Just a few days to Saint John’s Day and zero until I like you.',
         'In the party photo, the prettiest thing in the frame is you.'
       ],
+      foods: {
+        pipoca: { name: 'Popcorn', desc: 'A striped little bag, warm from the pot.' },
+        'algodao-doce': { name: 'Cotton candy', desc: 'A pink cloud on a stick.' },
+        'milho-cozido': { name: 'Boiled corn', desc: 'A buttered cob with a pinch of salt.' },
+        cuscuz: { name: 'Cuscuz', desc: 'Fluffy corn couscous, fresh from the steamer.' },
+        'arroz-doce': { name: 'Rice pudding', desc: 'In a bowl, with cinnamon on top.' },
+        'bolo-milho': { name: 'Corn cake', desc: 'A big slice from the neighbor’s tray.' }
+      },
       recipes: {
         pamonha: { name: 'Pamonha', desc: 'Grated green corn cooked in its husk and tied up.' },
         curau: { name: 'Curau', desc: 'Sweet green corn pudding with cinnamon on top.' },

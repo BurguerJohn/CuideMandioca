@@ -342,8 +342,9 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 }
 .painel-topo.verde { background: var(--verde); }
 .painel-topo.verde h1 { text-shadow: 3px 3px 0 var(--verde-escuro); }
-.minijogo-corpo { padding: 18px 16px 14px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-#argolas-canvas { display: block; image-rendering: pixelated; border: 3px solid var(--tinta); cursor: crosshair; }
+#argolas { max-height: calc(100vh - 32px); }
+.minijogo-corpo { padding: 18px 16px 14px; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+#argolas-canvas { display: block; flex: none; max-width: 100%; height: auto !important; image-rendering: pixelated; border: 3px solid var(--tinta); cursor: crosshair; }
 .minijogo-info { width: 100%; }
 .minijogo-info .botoes { align-items: center; }
 .premios { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; }
@@ -369,6 +370,29 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 /* Placa: o que o próximo convidado traz para o cenário */
 .proximo { margin-top: 3px; font-size: 12px; line-height: 1.2; color: var(--madeira); }
 .proximo b { color: var(--vermelho-escuro); }
+/* Felicidade da Mandioca na placa: Amor e Barriga em barrinhas e o quanto o Rebolado vale (clicar abre as Comidas) */
+.placa-humor {
+  display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 5px; padding: 2px 4px; font: inherit; cursor: pointer;
+  background: var(--papel2); border: 2px solid var(--tinta); box-shadow: inset -2px -2px 0 var(--papel3);
+}
+.placa-humor:hover, .placa-humor:focus-visible { background: #fff3a0; outline: none; }
+.humor-item { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
+.humor-item img { flex: none; height: 14px; width: auto; }
+.mini-barra { flex: 1; min-width: 24px; height: 9px; border: 2px solid var(--tinta); background: var(--papel3); }
+.mini-barra i { display: block; height: 100%; transition: width .4s; }
+.mini-barra.amor i { background: repeating-linear-gradient(90deg, var(--rosa) 0 5px, #ad1e66 5px 7px); }
+.mini-barra.barriga i { background: repeating-linear-gradient(90deg, #ffac2a 0 5px, #b44a0a 5px 7px); }
+.placa-humor b { flex: none; min-width: 3.2em; text-align: right; font-size: 12px; color: var(--madeira); }
+.placa-humor.feliz b { color: var(--verde); }
+.placa-humor.triste b { color: var(--vermelho); }
+/* Aba Comidas: o humor à esquerda, as comidas em grade */
+.vhumor { flex: none; width: 190px; display: flex; flex-direction: column; justify-content: center; gap: 10px; font-size: 13px; }
+.vhumor .humor-item { flex: none; }
+.vhumor .humor-nome { flex: none; width: 4.6em; font-weight: 700; }
+.vhumor .mini-barra { height: 12px; }
+.vhumor b { font-size: 14px; }
+.vgrade.duas { grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.vgrade .vcard.comida .nome small { font-weight: 700; color: #b44a0a; }
 
 /* A placa arrasta pelo fundo; os botões continuam com a mãozinha */
 .placa { cursor: move; }

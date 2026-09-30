@@ -79,6 +79,8 @@ test('configuração da Steam: padrão de desenvolvimento e arquivo inválido', 
   assert.deepEqual(readConfig(file), { appId: 123456, required: true, overlay: false });
   fs.writeFileSync(file, '{ quebrado');
   assert.equal(readConfig(file).appId, 480);
+  fs.writeFileSync(file, 'null');
+  assert.deepEqual(readConfig(file), { appId: 480, required: false, overlay: false });
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -114,4 +116,48 @@ test('envio pelo SteamPipe: acha o SDK mais novo, o steamcmd e confere o build',
   assert.match(found.join('\n'), /nada\.vdf/);
   assert.match(found.join('\n'), /steam_api64\.dll/);
   fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('uma falha ao gravar conquistas tenta novamente no próximo save', () => {
+  const lib = fakeSteamworks();
+  const init = lib.init;
+  let stores = 0;
+  lib.init = appId => {
+    const client = init(appId);
+    client.stats.store = () => ++stores > 1;
+    return client;
+  };
+  const steam = createSteam({ load: () => lib, log: quiet });
+  steam.init();
+  assert.equal(steam.syncAchievements(['cidade']), 1);
+  assert.equal(stores, 1, 'a primeira gravação falhou');
+  assert.equal(steam.syncAchievements(['cidade']), 0, 'não precisa ativar a conquista de novo');
+  assert.equal(stores, 2, 'repete a gravação pendente mesmo sem novas conquistas');
+  steam.syncAchievements(['cidade']);
+  assert.equal(stores, 2, 'uma gravação confirmada não se repete');
+});
+
+test('uma falha transitória na presença permite reenviar o mesmo porte e lotação', () => {
+  const lib = fakeSteamworks();
+  const init = lib.init;
+  let failed = false;
+  lib.init = appId => {
+    const client = init(appId);
+    const set = client.localplayer.setRichPresence;
+    client.localplayer.setRichPresence = (key, value) => {
+      if (key === 'convidados' && !failed) { failed = true; throw new Error('sem conexão'); }
+      return set(key, value);
+    };
+    return client;
+  };
+  const steam = createSteam({ load: () => lib, log: quiet });
+  steam.init();
+  steam.setPresence({ tier: 'cidade', size: 30 });
+  steam.setPresence({ tier: 'cidade', size: 30 });
+  const presence = () => lib.calls.filter(call => call[0] === 'presence');
+  assert.deepEqual(presence().slice(-3),
+    [['presence', 'porte', 'cidade'], ['presence', 'convidados', '30'], ['presence', 'steam_display', '#Festa']]);
+  const count = presence().length;
+  steam.setPresence({ tier: 'cidade', size: 30 });
+  assert.equal(presence().length, count, 'a presença completa confirmada não se repete');
 });

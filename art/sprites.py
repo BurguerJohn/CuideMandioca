@@ -914,6 +914,22 @@ SHIRT_ICON = """
 """
 
 UI_ICONS = {
+    # Felicidade da Mandioca, na placa: o coração do Amor e a tigela da Barriga.
+    'amor': """
+.RR.RR.
+RpRRRRR
+RRRRRRR
+.RRRRR.
+..RRR..
+...R...
+""",
+    'barriga': """
+..FAF..
+.FFFAF.
+KKKKKKK
+.KkKKK.
+..kkk..
+""",
     # Álbum de figurinhas: a página azul com três figurinhas coladas (botão da placa).
     'album': """
 jjjjjjjjjj
@@ -1212,6 +1228,63 @@ DDlDTDDlDD
 DTDDlDTDDD
 DDlDDDDlTD
 dddddddddd
+""",
+}
+
+# Comidas da loja (aba Comidas): enchem a Barriga da Mandioca. Ícones da vitrine e o que voa até ela.
+FOODS = {
+    'pipoca': """
+.X.XX.X.
+XzXzzXzX
+.XzXXzX.
+.RWRWRW.
+.RWRWRW.
+.RWRWRW.
+..WRWR..
+""",
+    'algodao-doce': """
+..HHH..
+.HHIHH.
+HHIHHHH
+HHHHIHH
+.HHHHH.
+..HhH..
+...x...
+...x...
+...x...
+""",
+    'milho-cozido': """
+..AF..
+.AFAF.
+.FAFA.
+.AFAF.
+.FAFA.
+.AFAF.
+gGAFGg
+.gGGg.
+""",
+    'cuscuz': """
+...FFF...
+..FAFAF..
+.FAAFAAF.
+.AAFAAFA.
+XXXXXXXXX
+.xxxxxxx.
+""",
+    'arroz-doce': """
+.XXUXXXX.
+XXXXXUXXX
+JJJJJJJJJ
+.JbJJJJJ.
+..jjjjj..
+""",
+    'bolo-milho': """
+..UUUUUU..
+.UlUUlUUU.
+AAAAAAAAAA
+AFAAAFAAAA
+AAAAFAAAFA
+aaaaaaaaaa
 """,
 }
 

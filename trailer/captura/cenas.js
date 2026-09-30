@@ -276,5 +276,44 @@ Object.assign(module.exports, {
     acoes: [[0, provocar('drones', { idade: 9000, ordem: [4, 4, 4, 4, 4] })]] })
 });
 
+// --- TikTok "Esqueci de cuidar da minha mandioca" (videos/cuidar) ---------------------------------------------------
+// 4K vertical para a montagem dar zoom ×3 na Mandioca em pixel exato e recuar para a festa inteira na virada. Dia comum
+// (sem fogos de dia de santo), Menos letreiros (só as falas dela). Ela começa cansada, ofegando, com Amor e Barriga
+// zerados, e pede comida; come pipoca, milho e bolo; ganha carinho seguido; estalinhos pipocam em volta; a festa comemora.
+// Os segundos das ações casam com as legendas e o medidor da montagem (videos/cuidar/index.html).
+const pertoDela = (dx, dy = -2) => `{ const b = __jogo.ui.festa.areas().find(a => a.id === 'host').box;
+  __jogo.festaClick('terreiro', { x: ${dx} < 0 ? b[0] + ${dx} : b[2] + ${dx}, y: b[3] + ${dy} }); }`;
+const humor = (amor, barriga) => `{ const e = __jogo.engine(); e.state.humor = { amor: ${amor}, barriga: ${barriga}, at: e.now() }; }`;
+const carinho = `{ __jogo.engine().state.runtime.pokeAt = 0; __jogo.festaClick('host'); }`;
+Object.assign(module.exports, {
+  cuidar: { save: save('estagio-3'), largura: 2160, altura: 3840, zoom: 4, segundos: 16.2, aquecer: 1.5,
+    data: '2026-05-20T21:00:00-03:00',
+    ajustes: { zoom: 3, x: 0.5, lift: 250, calm: true }, html: NOITE.html, css: NOITE.css + SEM_PLACA,
+    // Álbum cheio (sem "FIGURINHA NOVA!"), Animação sobrando para as comidas, fôlego no fim (ela para para descansar) e
+    // só o forró: trocar de passo escreve o nome do passo na tela (e "REBOLADO" confundiria com o medidor).
+    preparar: `const e = __jogo.engine(); e.state.album = e.data.album.flatMap(p => p.stickers.map(s => s.id));
+      e.state.cheer = 1e12; e.state.humor = { amor: 0, barriga: 0, at: e.now() }; e.state.runtime.stamina = 0.01;
+      e.state.runtime.dance = 'forro'; e.state.runtime.danceLeft = 9999;`,
+    acoes: [
+      [0, `__jogo.ui.festa.provocar('descanso', { ordem: 'ofega' })`],
+      // A fala dela vem depois da primeira linha da legenda (a legenda sobe com a placa em 1,1 s e abre espaço).
+      [1.35, `__jogo.ui.festa.provocar('fome', { ordem: 0 })`],
+      // Comidinha: três comidas, uma por segundo (a festa voa uma de cada vez e a curvinha leva 0,9 s até a boca;
+      // mais perto que isso, a de trás some antes do "NHAM!").
+      [2.85, `{ const e = __jogo.engine(); e.state.runtime.stamina = e.maxStamina(); e.feed('pipoca'); }`],
+      [3.85, `__jogo.engine().feed('milho-cozido')`],
+      [4.85, `__jogo.engine().feed('bolo-milho')`],
+      // Carinho seguido (o intervalo do carinho zera a cada um, só na gravação).
+      [5.9, humor(0, 100)],
+      ...[6.0, 6.4, 6.8, 7.2, 7.6, 8.0].map(t => [t, carinho]),
+      // Estalinhos em volta dela, alternando os lados, todos dentro do close da montagem (ela fica um pouco à direita do
+      // meio: cabe mais do lado esquerdo).
+      [8.6, pertoDela(-20)], [9.0, pertoDela(15)], [9.4, pertoDela(-48, 4)], [9.8, pertoDela(30, 4)],
+      // Virada: tudo cheio, a festa comemora (confete, fogos, olho de estrela) e ela grita.
+      [10.4, humor(100, 100) + `__acao.evento('tier-up', { tier: 2 }); __jogo.ui.festa.celebrate(performance.now(), 'TÔ FELIZ!');`],
+      [11.7, `__acao.evento('tier-up', { tier: 2 })`]
+    ] }
+});
+
 // Peças para outros roteiros (fotos da loja da Steam em fotos.js). Não enumerável: gravar.js grava só as cenas.
 Object.defineProperty(module.exports, 'pecas', { enumerable: false, value: { save, NOITE, SEM_PLACA, MESA, MIRA, TEXTO } });

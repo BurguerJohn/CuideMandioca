@@ -5,7 +5,7 @@
       'tab.festa': 'Fiesta', 'tab.historico': 'Historial', 'tab.conquistas': 'Logros', 'tab.ajustes': 'Ajustes',
       'tab.turma': 'Pandilla', 'tab.pescaria': 'Pesca', 'tab.roles': 'Salidas', 'tab.cozinha': 'Cocina', 'tab.album': 'Álbum', 'tab.fogueira': 'Hoguera',
       'tab.bingo': 'Bingo de la kermés', 'tab.correio': 'Correo del amor', 'tab.teste': 'Modo de prueba',
-      'dock.conjuntos': 'Conjuntos', 'dock.melhorias': 'Mejoras', 'dock.chapeu': 'Sombreros', 'dock.mao': 'En la mano', 'dock.tecido': 'Telas',
+      'dock.conjuntos': 'Conjuntos', 'dock.comidas': 'Comidas', 'mood.love': 'Amor', 'mood.belly': 'Pancita', 'hud.moodTitle': 'Felicidad de la Mandioca: Amor {love}% (mimos y petarditos en el suelo) y Pancita {belly}% (pestaña Comidas de la tienda). {stat} vale ×{f}. Haz clic para abrir las Comidas.', 'shop.hintFoods': 'La comida llena la Pancita; los mimos y los petarditos en el suelo llenan el Amor. Los dos bajan con el tiempo. Todo lleno: {stat} ×{high}; todo vacío: ×{low}.', 'shop.foodFill': '+{n} Pancita', 'shop.bellyFull': 'Pancita llena', 'shop.moodNow': '{stat} ×{f}', 'app.bellyFull': '¡La Mandioca tiene la pancita llena!', 'app.hint.humor': 'Consejo: la Mandioca tiene Amor y Pancita (las barritas del letrero). Los mimos y los petarditos en el suelo llenan el Amor, y la pestaña Comidas de la tienda llena la Pancita. Todo lleno: Meneo ×1,25; todo vacío: ×0,5.', 'log.comida': { one: 'La Mandioca comió {food}', other: 'La Mandioca comió {food} ({n} veces)' }, 'stats.foods': 'Comidas dadas', 'fx.food.yum': 'NAM NAM!', 'fx.fome.0': 'TENGO HAMBRE!', 'fx.fome.1': 'GRRR... GRRR...', 'fx.fome.2': 'Y LA COMIDA?', 'fx.carente.0': 'UN MIMITO?', 'fx.carente.1': 'ESTOY SOLITA...', 'fx.carente.2': 'Y MIS MIMOS?', 'debug.feliz': 'Amor y Pancita llenos', 'debug.triste': 'Amor y Pancita vacíos', 'dock.melhorias': 'Mejoras', 'dock.chapeu': 'Sombreros', 'dock.mao': 'En la mano', 'dock.tecido': 'Telas',
       'dock.terreiro': 'Suelos', 'dock.lado': 'Puestos', 'dock.varal': 'Banderines',
 
       'num.thousand': '{n} mil', 'num.million': '{n} M', 'num.billion': '{n} mil M', 'num.trillion': '{n} B',
@@ -298,7 +298,7 @@
         'Arrastra la pista para mover la fiesta. Mantén el asa del letrero para cambiar el tamaño. Hay una carta esperando en ' +
         'el Correo del Amor.</p>',
       'app.firstRunOk': '¡Al arraiá!',
-      'app.languageChanged': 'Idioma cambiado.',
+      'app.languageChanged': 'Idioma cambiado.', 'app.debugOn': 'Modo de prueba activado hasta cerrar el juego (botón de la mariquita en el letrero).', 'app.debugOff': 'Modo de prueba desactivado.',
 
       'fx.cobra': 'OJO, LA CULEBRA!', 'fx.phew': 'UF!', 'fx.ember': 'BRASA VIVA!', 'fx.flare': 'LLAMARADA!',
       'fx.guests': { one: '+{n} INVITADO', other: '+{n} INVITADOS' }, 'fx.preview': 'VISTA PREVIA',
@@ -563,6 +563,14 @@
         'Faltan pocos días para San Juan y ninguno para que me gustes.',
         'En la foto de la fiesta, lo más bonito del cuadro eres tú.'
       ],
+      foods: {
+        pipoca: { name: 'Palomitas', desc: 'Una bolsita a rayas, calentita de la olla.' },
+        'algodao-doce': { name: 'Algodón de azúcar', desc: 'Una nube rosada en un palito.' },
+        'milho-cozido': { name: 'Elote cocido', desc: 'Mazorca con mantequilla y una pizca de sal.' },
+        cuscuz: { name: 'Cuscuz', desc: 'Cuscuz de maíz esponjoso, recién salido de la cuscusera.' },
+        'arroz-doce': { name: 'Arroz con leche', desc: 'En el tazón, con canela por encima.' },
+        'bolo-milho': { name: 'Pastel de maíz', desc: 'Una rebanada grande de la bandeja de la vecina.' }
+      },
       recipes: {
         pamonha: { name: 'Pamonha', desc: 'Maíz tierno rallado, cocido en su hoja y atado.' },
         curau: { name: 'Curau', desc: 'Crema dulce de maíz tierno con canela encima.' },

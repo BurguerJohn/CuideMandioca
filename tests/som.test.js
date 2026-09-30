@@ -4,18 +4,23 @@ const Som = require('../src/som.js');
 
 // Web Audio de mentira: guarda quantos osciladores e ruídos cada som agendou e o volume geral.
 function fakeAudio() {
-  const log = { oscillators: 0, noises: 0, contexts: 0, resumed: 0, master: [] };
-  const param = () => ({ value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {},
-    setTargetAtTime(value) { log.master.push(value); } });
+  const log = { oscillators: 0, noises: 0, contexts: 0, resumed: 0, master: [], sources: [], gains: [] };
+  const param = () => ({ value: 0, targets: [], setValueAtTime() {}, exponentialRampToValueAtTime() {},
+    setTargetAtTime(value) { this.targets.push(value); log.master.push(value); } });
   const node = extra => ({ connect() {}, ...extra });
   class AudioContext {
     constructor() { log.contexts++; this.state = 'running'; this.currentTime = 0; this.sampleRate = 8000; this.destination = {}; }
     resume() { log.resumed++; this.state = 'running'; return Promise.resolve(); }
-    createGain() { return node({ gain: param() }); }
+    createGain() { const gain = node({ gain: param() }); log.gains.push(gain); return gain; }
     createDynamicsCompressor() { return node(); }
     createBiquadFilter() { return node({ type: '', frequency: param(), Q: param() }); }
     createOscillator() { log.oscillators++; return node({ type: '', detune: param(), frequency: param(), start() {}, stop() {} }); }
-    createBufferSource() { log.noises++; return node({ start() {}, stop() {} }); }
+    createBufferSource() {
+      log.noises++;
+      const source = node({ loop: false, start() {}, stop() {} });
+      log.sources.push(source);
+      return source;
+    }
     createBuffer(channels, length) { const data = new Float32Array(length); return { getChannelData: () => data }; }
   }
   return { AudioContext, log };
@@ -47,6 +52,27 @@ test('som: sem Web Audio (ou antes do primeiro clique no navegador) o jogo segue
   const som = Som.create({ AudioContext: Suspended });
   assert.equal(som.play('moeda'), false, 'áudio suspenso não enfileira som para depois');
   assert.equal(log.resumed, 1, 'mas pede para destravar');
+});
+
+test('som: desligar silencia efeitos já agendados e religar restaura o volume escolhido', () => {
+  const { AudioContext, log } = fakeAudio();
+  const som = Som.create({ AudioContext, volume: 0.5 });
+  som.play('trovao');
+  som.set({ enabled: false });
+  assert.equal(log.master.at(-1), 0, 'o ganho geral silencia também os sons em andamento');
+  som.set({ volume: 0.8 });
+  assert.equal(log.master.at(-1), 0, 'mudar o volume não liga o áudio desligado');
+  som.set({ enabled: true });
+  assert.equal(log.master.at(-1), 0.8 * 0.8 * 0.9);
+});
+
+test('som: ruídos longos repetem o buffer até o fim do efeito', () => {
+  const { AudioContext, log } = fakeAudio();
+  const som = Som.create({ AudioContext });
+  som.play('trovao');
+  som.play('chuva');
+  assert.ok(log.sources.length >= 4);
+  assert.ok(log.sources.every(source => source.loop), 'o buffer de um segundo não corta o trovão e a chuva antes da hora');
 });
 
 test('música: agenda os passos à frente do relógio do áudio, fica quieta sem som e para ao desligar', () => {
@@ -113,4 +139,18 @@ test('música: depois do laço do forró entra o xote, depois o baião, o arrast
   assert.equal(som.song, 'forro');
   som.setMusic(false);
   assert.equal(som.song, 'forro', 'desligar volta para o começo');
+});
+
+test('música: religar não devolve o som às notas que estavam agendadas antes de desligar', () => {
+  const { AudioContext, log } = fakeAudio();
+  let next = 1;
+  const som = Som.create({ AudioContext, setInterval: () => next++, clearInterval() {} });
+  som.setMusic(true);
+  const oldBus = log.gains[1];
+  som.setMusic(false);
+  assert.equal(oldBus.gain.targets.at(-1), 0);
+  som.setMusic(true);
+  assert.equal(oldBus.gain.targets.at(-1), 0, 'a via das notas antigas permanece silenciosa');
+  assert.equal(som.music, true, 'a nova sequência fica ligada');
+  som.setMusic(false);
 });

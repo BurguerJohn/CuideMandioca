@@ -107,6 +107,7 @@
         burro: { active: null, nextAt: 0 },
         fantasia: { judgeAt: 0, nextAt: 0 },
         cozinha: { pot: null, buff: null },
+        humor: { amor: this.cfg.moodStart, barriga: this.cfg.moodStart, at: now },
         album: [],
         bornAt: now,
         hints: {},
@@ -121,7 +122,7 @@
         quadrilha: { nextAt: 0 },
         rings: { cost: this.cfg.ringCost, nextAt: 0 },
         stats: { playtime: 0, steps: 0, cheerEarned: 0, cheerSpent: 0, fished: 0,
-          outings: 0, letters: 0, requests: 0, crashers: 0, ringRounds: 0, ringHits: 0, pokes: 0, balloons: 0, rainbows: 0, upgrades: 0, goals: 0, weddings: 0, rice: 0, potes: 0, bingoCards: 0, bingos: 0, contests: 0, contestWins: 0, sacoRaces: 0, sacoWins: 0, leiloes: 0, lances: 0, quentao: 0, visitors: 0, cobras: 0, fotos: 0, burros: 0, burroMoscas: 0, fantasias: 0, fantasiaWins: 0, compadres: 0, dishes: 0 },
+          outings: 0, letters: 0, requests: 0, crashers: 0, ringRounds: 0, ringHits: 0, pokes: 0, balloons: 0, rainbows: 0, upgrades: 0, goals: 0, weddings: 0, rice: 0, potes: 0, bingoCards: 0, bingos: 0, contests: 0, contestWins: 0, sacoRaces: 0, sacoWins: 0, leiloes: 0, lances: 0, quentao: 0, visitors: 0, cobras: 0, fotos: 0, burros: 0, burroMoscas: 0, fantasias: 0, fantasiaWins: 0, compadres: 0, dishes: 0, foods: 0 },
         achievements: [],
         log: [{ t: 0, type: 'comeco' }],
         runtime: this.freshRuntime(),
@@ -132,18 +133,27 @@
     freshRuntime() {
       return { stamina: this.stats.folego.base, dancing: true, lift: 0, flareWait: this.cfg.flareEvery,
         flareLeft: 0, emberLeft: 0, lastStep: 0, dance: 'forro', danceLeft: this.cfg.danceSteps, frenzyLeft: 0,
-        pokeAt: 0, quadrilhaLeft: 0, callIn: 0, calls: 0, weddingLeft: 0, rice: 0, riceAt: 0, announceAt: 0, cobraLeft: 0, cobraDir: 1 };
+        pokeAt: 0, popAt: 0, quadrilhaLeft: 0, callIn: 0, calls: 0, weddingLeft: 0, rice: 0, riceAt: 0, announceAt: 0, cobraLeft: 0, cobraDir: 1 };
     }
 
     load(raw) {
-      if (!raw || raw.version !== SAVE_VERSION || typeof raw.levels !== 'object' || !Array.isArray(raw.outings)) {
+      const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+      if (!object(raw) || raw.version !== SAVE_VERSION || !object(raw.levels) || !Array.isArray(raw.outings)) {
         throw new Error('Save incompatível ou corrompido.');
       }
       const base = this.fresh();
       const s = { ...base, ...copy(raw) };
+      const invalid = field => { throw new Error(`Campo inválido no save: ${field}.`); };
+      for (const field of ['crew', 'stats', 'fishing', 'mail', 'request', 'crasher', 'balloon', 'pote', 'weather', 'quadrilha', 'rings']) {
+        if (!object(s[field])) invalid(field);
+      }
+      if (!Array.isArray(s.inventory)) invalid('inventory');
+      if (!Array.isArray(s.goals)) invalid('goals');
+      if (!Number.isInteger(s.ticketLevel) || s.ticketLevel < 1) invalid('ticketLevel');
       for (const id of STATS) {
         if (!Number.isInteger(s.levels[id]) || s.levels[id] < 1) throw new Error('Nível inválido no save.');
       }
+      s.levels = Object.fromEntries(STATS.map(id => [id, s.levels[id]]));
       for (const field of ['cheer', 'tickets', 'wood', 'fame']) {
         if (!Number.isFinite(s[field]) || s[field] < 0) throw new Error('Saldo inválido no save.');
       }
@@ -157,14 +167,40 @@
       }));
       const crew = {};
       for (const [id, entry] of Object.entries(s.crew || {})) {
+        if (this.chars[id] && !object(entry)) invalid(`crew.${id}`);
         if (this.chars[id]) crew[id] = { level: clamp(Math.floor(finite(entry.level, 1)), 1, this.cfg.maxLevel) };
       }
       s.crew = crew;
+      const away = new Set();
       s.outings = this.data.outings.map((_, index) => {
         const entry = raw.outings[index] || {};
-        return { char: this.chars[entry.char] && crew[entry.char] ? entry.char : null, endsAt: finite(entry.endsAt) };
+        const char = this.chars[entry.char] && crew[entry.char] ? entry.char : null;
+        if (char && away.has(char)) invalid('outings');
+        if (char) away.add(char);
+        return { char, endsAt: finite(entry.endsAt) };
       });
       s.stats = { ...base.stats, ...s.stats };
+      for (const field of Object.keys(base.stats)) {
+        const value = s.stats[field];
+        if (!Number.isFinite(value) || value < 0 ||
+          (!['playtime', 'cheerEarned', 'cheerSpent'].includes(field) && !Number.isInteger(value))) invalid(`stats.${field}`);
+      }
+      for (const goal of s.goals) {
+        if (!object(goal) || !this.data.goals.some(entry => entry.id === goal.type) ||
+          !Number.isInteger(goal.target) || goal.target < 1 || !Number.isFinite(goal.from) || !object(goal.reward) ||
+          ['tickets', 'wood'].some(field => !Number.isInteger(goal.reward[field]) || goal.reward[field] < 0)) invalid('goals');
+      }
+      for (const field of ['fishing', 'mail', 'request', 'crasher', 'balloon', 'pote', 'weather', 'quadrilha', 'rings']) {
+        s[field] = { ...base[field], ...s[field] };
+        if (!Number.isFinite(s[field].nextAt)) invalid(`${field}.nextAt`);
+      }
+      for (const [field, cap] of [['fishing', this.cfg.prizeCap], ['mail', this.cfg.letterCap]]) {
+        if (!Number.isInteger(s[field].ready) || s[field].ready < 0 || s[field].ready > cap) invalid(`${field}.ready`);
+      }
+      for (const [clock, active] of [[s.request, 'active'], [s.crasher, 'active'], [s.balloon, 'active'], [s.pote, 'active'],
+        [s.weather, 'rain'], [s.weather, 'rainbow']]) {
+        if (clock[active] != null && (!object(clock[active]) || !Number.isFinite(clock[active].until))) invalid(active);
+      }
       s.hints = s.hints && typeof s.hints === 'object' ? { ...s.hints } : {};
       s.bingo = { round: this.cleanBingo(raw.bingo?.round) };
       s.kissAt = Math.max(0, finite(raw.kissAt));
@@ -189,6 +225,11 @@
         buff: served && recipes.has(served.id) && finite(served.until) > 0
           ? { id: served.id, until: Math.min(finite(served.until), this.now() + longest) } : null
       };
+      const humor = raw.humor || {};
+      const moodAt = finite(humor.at, 0);
+      s.humor = { amor: clamp(finite(humor.amor, this.cfg.moodStart), 0, this.cfg.moodMax),
+        barriga: clamp(finite(humor.barriga, this.cfg.moodStart), 0, this.cfg.moodMax),
+        at: moodAt > 0 ? Math.min(moodAt, this.now()) : this.now() };
       const stickers = new Set((this.data.album || []).flatMap(page => page.stickers.map(sticker => sticker.id)));
       s.album = Array.isArray(raw.album) ? [...new Set(raw.album)].filter(id => stickers.has(id)) : [];
       // Dia em que a festa começou (para o aniversário). Save de antes disso conta a partir de hoje.
@@ -236,7 +277,10 @@
       const seconds = Math.min(away, this.cfg.offlineCapHours * 3600);
       if (seconds < 60) return;
       const bunny = this.effect('offline');
-      const cheer = this.cheerPerSecond() * seconds * this.offlineRate();
+      // Amor e Barriga foram baixando enquanto isso: rende pela média do humor no período, não pelo de agora.
+      let mood = 0;
+      for (let i = 0; i < 12; i++) mood += this.moodFactor(this.mood(lastSeen + (i + 0.5) / 12 * seconds * 1000)) / 12;
+      const cheer = this.cheerPerSecond() / this.moodFactor() * mood * seconds * this.offlineRate();
       const before = this.state.size;
       this.offline = true;
       this.earn(cheer);
@@ -427,6 +471,11 @@
         } else if (op === 'saco') {
           this.startSaco(now);
           note = 'Corrida de saco';
+        } else if (op === 'feliz' || op === 'triste') {
+          // Amor e Barriga lá em cima (feliz) ou zerados (triste).
+          const level = op === 'feliz' ? this.cfg.moodMax : 0;
+          s.humor = { amor: level, barriga: level, at: now };
+          note = op === 'feliz' ? 'Amor e Barriga cheios' : 'Amor e Barriga zerados';
         } else if (op === 'cozinha') {
           // A panela fica pronta agora (vazia, vai uma pamonha já cozida).
           s.cozinha.pot = s.cozinha.pot ? { ...s.cozinha.pot, readyAt: now } : { id: 'pamonha', startAt: now, readyAt: now, ready: false };
@@ -484,8 +533,17 @@
 
     // Avança o tempo de jogo como se a festa tivesse rodado: os relógios de tempo real andam junto.
     advance(seconds) {
+      if (!Number.isFinite(seconds) || seconds <= 0) return;
+      // Desloca e roda um segundo de cada vez: eventos criados durante o avanço também precisam envelhecer.
+      for (let left = seconds; left > 0; left -= 1) {
+        const dt = Math.min(1, left);
+        this.shiftTimers(dt * 1000);
+        this.tick(dt);
+      }
+    }
+
+    shiftTimers(ms) {
       const s = this.state;
-      const ms = seconds * 1000;
       const back = value => (value ? value - ms : value);
       s.fishing.nextAt = back(s.fishing.nextAt);
       s.mail.nextAt = back(s.mail.nextAt);
@@ -494,6 +552,12 @@
       s.rings.nextAt = back(s.rings.nextAt);
       if (s.request.active) s.request.active.until -= ms;
       if (s.crasher.active) s.crasher.active.until -= ms;
+      if (s.pote.active) s.pote.active.hitAt = back(s.pote.active.hitAt);
+      s.kissAt = back(s.kissAt);
+      for (const key of ['pokeAt', 'popAt', 'riceAt', 'cartAt', 'flagAt', 'compadreAt', 'announceAt']) s.runtime[key] = back(s.runtime[key]);
+      s.humor.at = back(s.humor.at);
+      if (s.cozinha.pot) for (const key of ['startAt', 'readyAt']) s.cozinha.pot[key] -= ms;
+      if (s.cozinha.buff) s.cozinha.buff.until = back(s.cozinha.buff.until);
       // Os eventos da festa com relógio de verdade também andam: balão, chuva e arco-íris, quadrilha, quebra-pote e corrida de saco.
       for (const clock of [s.balloon, s.pote, s.saco, s.leilao, s.cold, s.visitor, s.fotografo, s.burro, s.fantasia, s.quadrilha, s.weather]) clock.nextAt = back(clock.nextAt);
       s.fantasia.judgeAt = back(s.fantasia.judgeAt);
@@ -513,7 +577,6 @@
         if (s.burro.active.pinned) s.burro.active.pinned.at = back(s.burro.active.pinned.at);
       }
       s.outings.forEach(entry => { entry.endsAt = back(entry.endsAt); });
-      for (let left = seconds; left > 0; left -= 1) this.tick(Math.min(1, left));
     }
 
     drainEvents() {
@@ -775,7 +838,66 @@
         (1 + this.danceBonus()) * (1 + this.setBonus()) * (1 + this.albumBonus()) * (1 + this.visitorBonus()) * (1 + this.tradition()) * (1 + this.trioBonus()) * (1 + (this.specialDay()?.bonus || 0)) * (this.legendary() ? 2 : 1) *
         (1 + this.cookBonus());
     }
-    stepValue() { return this.statValue('rebolado') * this.multiplier(); }
+    // O Rebolado de cada passo, com a felicidade da Mandioca (×0,5 a ×1,25) e todos os bônus.
+    stepValue() { return this.statValue('rebolado') * this.moodFactor() * this.multiplier(); }
+
+    // --- Felicidade da Mandioca: Amor e Barriga ------------------------------------------------------------------------
+    // Os dois agora (ou na hora `at`): o que está guardado menos o que baixou desde a última conta.
+    mood(at = this.now()) {
+      const h = this.state.humor;
+      const hours = Math.max(0, at - h.at) / 3600000;
+      const max = this.cfg.moodMax;
+      return { amor: clamp(h.amor - hours * max / this.cfg.loveHours, 0, max),
+        barriga: clamp(h.barriga - hours * max / this.cfg.bellyHours, 0, max) };
+    }
+    // Quanto o Rebolado vale com esse humor: tudo vazio ×moodLow, metade ×1, tudo cheio ×moodHigh.
+    moodFactor(m = this.mood()) {
+      const level = (m.amor + m.barriga) / (2 * this.cfg.moodMax);
+      const { moodLow: low, moodHigh: high } = this.cfg;
+      return level < 0.5 ? low + (1 - low) * level * 2 : 1 + (high - 1) * (level - 0.5) * 2;
+    }
+    settleMood(now = this.now()) {
+      const m = this.mood(now);
+      this.state.humor = { amor: m.amor, barriga: m.barriga, at: now };
+    }
+    addLove(amount) {
+      this.settleMood();
+      const h = this.state.humor;
+      const before = h.amor;
+      h.amor = Math.min(this.cfg.moodMax, h.amor + amount);
+      return h.amor - before;
+    }
+    // Estalinho jogado no chão (clique): um pouco de Amor, no máximo um a cada popCooldown segundos.
+    popLove() {
+      const r = this.state.runtime;
+      const now = this.now();
+      if (now < (r.popAt || 0)) return 0;
+      r.popAt = now + this.cfg.popCooldown * 1000;
+      return this.addLove(this.cfg.lovePop);
+    }
+    food(id) { return (this.data.foods || []).find(entry => entry.id === id) || null; }
+    foodCost(id) {
+      const food = this.food(id);
+      if (!food) return Infinity;
+      const cheapest = Math.min(...STATS.map(stat => this.levelCost(stat)));
+      return Math.max(this.cfg.foodMinCost, Math.round(cheapest * food.share));
+    }
+    bellyFull() { return this.mood().barriga >= this.cfg.moodMax - 0.5; }
+    // Dar comida: paga em Animação e enche a Barriga. `full` quando ela já está cheia (nada é cobrado).
+    feed(id) {
+      const food = this.food(id);
+      if (!food) return { ok: false };
+      if (this.bellyFull()) return { ok: false, full: true };
+      const cost = this.foodCost(id);
+      if (!this.spend(cost)) return { ok: false, cost };
+      this.settleMood();
+      const h = this.state.humor;
+      h.barriga = Math.min(this.cfg.moodMax, h.barriga + food.fill);
+      this.state.stats.foods++;
+      this.recordMerged('comida', id, { id, count: 1 }, entry => ({ count: entry.count + 1 }));
+      this.emit('feed', { id });
+      return { ok: true, cost, food };
+    }
     cheerPerSecond() {
       const stamina = this.maxStamina();
       return this.stepValue() * stamina / (stamina / this.speed() + stamina / this.recovery());
@@ -1040,7 +1162,9 @@
         }
       }
       this.checkDaily(now);
+      this.settleMood(now);
       // Dicas de uma vez só para quem ainda não achou uma parte do jogo.
+      if (s.stats.playtime >= 240) this.hint('humor');
       if (s.stats.playtime >= 1800) this.hint('music');
       if (s.inventory.length >= 5 && !this.activeSet()) this.hint('sets');
       if (s.stats.playtime >= 600) this.hint('chao');
@@ -1160,7 +1284,7 @@
       if (tier >= this.cfg.coldMinTier) {
         const c = s.cold;
         if (c.active) {
-          if (this.quentaoOn() && now >= c.active.saleAt) {
+          if (this.quentaoOn() && now >= c.active.saleAt && now <= c.active.until) {
             c.active.saleAt = now + this.cfg.coldSale * 1000;
             c.active.sold++;
             s.tickets += 1;
@@ -1363,7 +1487,7 @@
     }
     claimRequest() {
       const q = this.state.request;
-      if (!q.active) return null;
+      if (!q.active || this.now() >= q.active.until) return null;
       const reward = this.requestReward();
       const kind = q.active.kind;
       q.active = null;
@@ -1376,7 +1500,7 @@
     }
     shooCrasher() {
       const c = this.state.crasher;
-      if (!c.active) return null;
+      if (!c.active || this.now() >= c.active.until) return null;
       c.active = null;
       c.nextAt = 0;
       const tickets = (this.cfg.crasherTickets + this.tierIndex()) * (this.isPlaced('cadeia') ? 2 : 1);
@@ -1498,14 +1622,16 @@
       if (!this.canNewYear()) return false;
       const old = this.state;
       const next = this.fresh();
-      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt']) {
+      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt', 'humor']) {
         next[key] = old[key];
       }
       next.year = (old.year || 1) + 1;
       next.yearStart = old.stats.playtime;
-      // Cartela de bingo no meio da rodada: o preço volta (a rodada acaba com a festa). O lance guardado do leilão também.
+      // Rodadas no meio: a entrada volta (elas acabam com a festa). O lance guardado do leilão também.
       if (old.bingo?.round && !old.bingo.round.result) next.tickets += old.bingo.round.cost;
       if (old.leilao?.active?.held) next.tickets += old.leilao.active.held;
+      if (this.round) next.tickets += this.round.cost;
+      this.round = null;
       const equipped = { ...old.equipped };
       // Barraca que ainda não abriu no quintal volta a ser o enfeite de sempre.
       for (const side of ['esquerda', 'direita']) {
@@ -1514,6 +1640,7 @@
       if (equipped.esquerda === equipped.direita) equipped.direita = this.data.equipped.direita;
       next.equipped = equipped;
       this.state = next;
+      this.lastTick = this.now();
       next.runtime.stamina = this.maxStamina();
       this.record('year', { year: next.year, bonus: this.tradition() });
       this.unlock('ano-que-vem');
@@ -1608,7 +1735,7 @@
     // quebra e dá Animação e fichas. `ready` diz se a paulada contou.
     hitPote() {
       const a = this.state.pote.active;
-      if (!a) return { ready: false, active: false };
+      if (!a || this.now() >= a.until) return { ready: false, active: false };
       const now = this.now();
       if (now - a.hitAt < this.cfg.poteCooldown * 1000) return { ready: false, active: true, hits: a.hits };
       a.hitAt = now;
@@ -1645,7 +1772,7 @@
     hopSaco() {
       const s = this.state;
       const a = s.saco.active;
-      if (!a) return { active: false };
+      if (!a || this.now() >= a.until) return { active: false };
       const now = this.now();
       if (!a.start) {
         a.start = now;
@@ -1710,11 +1837,14 @@
       s.visitor.nextAt = 0;
       this.emit('visitor', { bonus: this.cfg.visitorBonus, seconds: this.cfg.visitorSeconds });
     }
-    visitorBonus() { return this.state.visitor?.active ? this.cfg.visitorBonus : 0; }
+    visitorBonus() {
+      const visitor = this.state.visitor?.active;
+      return visitor && this.now() < visitor.until ? this.cfg.visitorBonus : 0;
+    }
     greetVisitor() {
       const s = this.state;
       const v = s.visitor.active;
-      if (!v || v.greeted) return null;
+      if (!v || v.greeted || this.now() >= v.until) return null;
       v.greeted = true;
       const tickets = this.cfg.visitorTickets + this.tierIndex();
       s.tickets += tickets;
@@ -1886,7 +2016,7 @@
     pinBurro() {
       const s = this.state;
       const b = s.burro.active;
-      if (!b || b.pinned) return null;
+      if (!b || b.pinned || this.now() >= b.until) return null;
       const now = this.now();
       const [dx, dy] = this.burroOffset(now - b.born);
       const d = Math.hypot(dx, dy);
@@ -2011,7 +2141,7 @@
     claimBalloon() {
       const s = this.state;
       const b = s.balloon;
-      if (!b.active) return null;
+      if (!b.active || this.now() >= b.active.until) return null;
       b.active = null;
       b.nextAt = 0;
       s.stats.balloons++;
@@ -2119,7 +2249,7 @@
     claimRainbow() {
       const s = this.state;
       const w = s.weather;
-      if (!w.rainbow) return null;
+      if (!w.rainbow || this.now() >= w.rainbow.until) return null;
       w.rainbow = null;
       w.nextAt = 0;
       const amount = Math.max(100, this.cheerPerSecond() * this.cfg.rainbowCheer);
@@ -2141,6 +2271,7 @@
       let value = 0;
       if (ready) {
         r.pokeAt = now + this.cfg.pokeCooldown * 1000;
+        this.addLove(this.cfg.lovePet);
         value = this.stepValue() * this.cfg.pokeSteps;
         this.earn(value);
         s.stats.pokes++;
@@ -2184,7 +2315,7 @@
         }
         return this.ringPrize('fichas', exclusives);
       });
-      this.round = { prizes, total: this.ringThrows(), left: this.ringThrows(), hits: [] };
+      this.round = { cost, prizes, total: this.ringThrows(), left: this.ringThrows(), hits: [] };
       this.state.stats.ringRounds++;
       return this.round;
     }
@@ -2213,8 +2344,10 @@
       const factor = got.filter(prize => prize.kind === 'animacao').reduce((total, prize) => total * prize.factor, 1);
       const cheer = factor > 1 ? this.state.cheer * (factor - 1) * mult : 0;
       const wood = sum('lenha') * mult;
-      const items = got.filter(prize => prize.kind === 'item' && !this.owned(prize.id))
-        .map(prize => { this.addItem(prize.id); return this.items[prize.id]; });
+      const items = [];
+      for (const prize of got) {
+        if (prize.kind === 'item' && this.addItem(prize.id)) items.push(this.items[prize.id]);
+      }
       this.state.tickets += tickets;
       this.state.wood += wood;
       if (cheer > 0) this.earn(cheer);

@@ -453,7 +453,7 @@
       clear: options.clearInterval || (root.clearInterval && root.clearInterval.bind(root)) };
     const music = { on: false, timer: null, step: 0, song: 0, next: 0 };
     // O ouvido percebe volume em escala de potência: 50% na barra soa como metade.
-    const level = () => volume * volume * 0.9;
+    const level = () => enabled ? volume * volume * 0.9 : 0;
 
     function setup() {
       if (ctx || !AudioContext) return ctx;
@@ -514,6 +514,7 @@
           const end = start + dur;
           const source = ctx.createBufferSource();
           source.buffer = noise;
+          source.loop = true;
           const filter = ctx.createBiquadFilter();
           filter.type = type;
           filter.Q.value = q;
@@ -549,6 +550,10 @@
       const playing = music.on && enabled && volume > 0 && !!setup() && !!timers.set;
       if (playing) {
         if (!music.timer) {
+          if (!bus) {
+            bus = ctx.createGain();
+            bus.connect(master);
+          }
           music.next = 0;
           music.timer = timers.set(musicTick, 250);
           bus.gain.setTargetAtTime(1, ctx.currentTime, 0.05);
@@ -560,6 +565,8 @@
         music.step = 0;
         music.song = 0;
         if (bus) bus.gain.setTargetAtTime(0, ctx.currentTime, 0.08);
+        // As notas já agendadas ficam na via antiga; religar começa outra sequência sem reativá-las.
+        bus = null;
       }
       return playing;
     }

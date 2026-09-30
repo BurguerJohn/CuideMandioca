@@ -16,6 +16,8 @@ const GRAVACOES = {
   argolas: ['argolas'],
   presentes: ['presentes'],
   turma: ['palco'],
+  // "Esqueci de cuidar da minha mandioca" (gravado em 4K vertical para o zoom em pixel exato).
+  cuidar: ['cuidar'],
   // Trailer da Steam (16:9, gravado em 4K): uma gravação por cena (a v3 não usa mais o palco no fim da cena 4).
   steam: ['steam-quintal', 'steam-melhorias', 'steam-quermesse', 'steam-cidade', 'steam-regional', 'steam-maior',
     'steam-final']

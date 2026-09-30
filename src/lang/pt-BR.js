@@ -6,7 +6,7 @@
       'tab.festa': 'Festa', 'tab.historico': 'Histórico', 'tab.conquistas': 'Conquistas', 'tab.ajustes': 'Ajustes',
       'tab.turma': 'Turma', 'tab.pescaria': 'Pescaria', 'tab.roles': 'Rolês', 'tab.cozinha': 'Cozinha', 'tab.album': 'Álbum', 'tab.fogueira': 'Fogueira',
       'tab.bingo': 'Bingo da quermesse', 'tab.correio': 'Correio elegante', 'tab.teste': 'Modo de teste',
-      'dock.conjuntos': 'Conjuntos', 'dock.melhorias': 'Melhorias', 'dock.chapeu': 'Chapéus', 'dock.mao': 'Na mão', 'dock.tecido': 'Tecidos',
+      'dock.conjuntos': 'Conjuntos', 'dock.comidas': 'Comidas', 'mood.love': 'Amor', 'mood.belly': 'Barriga', 'hud.moodTitle': 'Felicidade da Mandioca: Amor {love}% (carinho e estalinhos no chão) e Barriga {belly}% (aba Comidas da loja). {stat} valendo ×{f}. Clique para abrir as Comidas.', 'shop.hintFoods': 'Comida enche a Barriga; carinho e estalinhos no chão enchem o Amor. Os dois baixam com o tempo. Tudo cheio: {stat} ×{high}; tudo vazio: ×{low}.', 'shop.foodFill': '+{n} Barriga', 'shop.bellyFull': 'Barriga cheia', 'shop.moodNow': '{stat} ×{f}', 'app.bellyFull': 'A Mandioca está de barriga cheia!', 'app.hint.humor': 'Dica: a Mandioca tem Amor e Barriga (as barrinhas da placa). Carinho e estalinhos no chão enchem o Amor, e a aba Comidas da loja enche a Barriga. Tudo cheio: Rebolado ×1,25; tudo vazio: ×0,5.', 'log.comida': { one: 'A Mandioca comeu {food}', other: 'A Mandioca comeu {food} ({n} vezes)' }, 'stats.foods': 'Comidas dadas', 'fx.food.yum': 'NHAM!', 'fx.fome.0': 'TÔ COM FOME!', 'fx.fome.1': 'RONC... RONC...', 'fx.fome.2': 'CADÊ A COMIDA?', 'fx.carente.0': 'ME DÁ UM CARINHO?', 'fx.carente.1': 'TÔ CARENTE...', 'fx.carente.2': 'CADÊ MEU CHAMEGO?', 'debug.feliz': 'Amor e Barriga cheios', 'debug.triste': 'Amor e Barriga zerados', 'dock.melhorias': 'Melhorias', 'dock.chapeu': 'Chapéus', 'dock.mao': 'Na mão', 'dock.tecido': 'Tecidos',
       'dock.terreiro': 'Terreiros', 'dock.lado': 'Barracas', 'dock.varal': 'Varais',
 
       'num.thousand': '{n} mil', 'num.million': '{n} mi', 'num.billion': '{n} bi', 'num.trillion': '{n} tri',
@@ -297,7 +297,7 @@
         'Toda Animação que a festa junta vira fama, e fama traz convidados.</p><p class="miudo">Arraste o terreiro para ' +
         'mudar a festa de lugar. Segure a alça da placa para mudar o tamanho. Tem uma carta esperando no Correio.</p>',
       'app.firstRunOk': 'Bora pro arraiá!',
-      'app.languageChanged': 'Idioma trocado.',
+      'app.languageChanged': 'Idioma trocado.', 'app.debugOn': 'Modo de teste ligado até fechar o jogo (botão da joaninha na placa).', 'app.debugOff': 'Modo de teste desligado.',
 
       'fx.cobra': 'OLHA A COBRA!', 'fx.phew': 'UFA!', 'fx.ember': 'BRASA VIVA!', 'fx.flare': 'LABAREDA!',
       'fx.guests': { one: '+{n} CONVIDADO', other: '+{n} CONVIDADOS' }, 'fx.preview': 'PREVIA',

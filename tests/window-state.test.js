@@ -1,5 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
 const { normalizeSettings, mergeSettings, publicSettings, pickDisplay } = require('../desktop/window-state');
 
 test('preferências inválidas voltam ao padrão', () => {
@@ -45,4 +48,27 @@ test('monitor escolhido some e a festa volta para o principal', () => {
   const primary = { id: 1 };
   assert.equal(pickDisplay([primary, { id: 2 }], 2, primary).id, 2);
   assert.equal(pickDisplay([primary], 2, primary).id, 1);
+});
+
+test('desktop reutiliza o módulo de preferências compartilhado', () => {
+  const shared = require('../src/settings');
+  const desktop = require('../desktop/window-state');
+  for (const key of Object.keys(shared)) assert.equal(desktop[key], shared[key]);
+});
+
+test('navegador normaliza preferências corrompidas com os mesmos limites do desktop', () => {
+  const browser = vm.createContext({});
+  for (const file of ['i18n.js', 'settings.js']) {
+    vm.runInContext(fs.readFileSync(path.join(__dirname, '../src', file), 'utf8'), browser, { filename: file });
+  }
+  const corrupt = { zoom: { valueOf: null, toString: null }, placa: { dx: 'corrompido', dy: 7 }, volume: 7 };
+  const settings = browser.ArraiaSettings.publicSettings(browser.ArraiaSettings.normalizeSettings(corrupt));
+  assert.equal(settings.zoom, 1);
+  assert.equal(settings.placa, null);
+  assert.equal(settings.volume, 1);
+  assert.deepEqual(JSON.parse(JSON.stringify(settings)), publicSettings(normalizeSettings(corrupt)));
+  const next = browser.ArraiaSettings.mergeSettings(settings, { zoom: 'corrompido', volume: 'alto', placa: { dx: 20, dy: 30 } });
+  assert.equal(next.zoom, 1);
+  assert.equal(next.volume, 0.5);
+  assert.deepEqual(JSON.parse(JSON.stringify(next.placa)), { dx: 20, dy: 30 });
 });

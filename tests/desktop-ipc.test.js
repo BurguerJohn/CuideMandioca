@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const vm = require('node:vm');
 const I18N = require('../src/i18n.js');
 
@@ -15,7 +16,7 @@ function fakeSteam(order, language = 'spanish') {
   };
 }
 
-function loadMain({ language, packaged = false, timeout = setTimeout, clear = clearTimeout } = {}) {
+function loadMain({ language, packaged = false, timeout = setTimeout, clear = clearTimeout, deferClose = false, saveStore } = {}) {
   const listeners = new Map();
   const power = {};
   const intervals = [];
@@ -29,6 +30,8 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
   class FakeWindow {
     constructor(options) {
       this.options = options;
+      this.focusable = options.focusable;
+      this.focusableCalls = [];
       this.webContents = { setWindowOpenHandler() {}, on() {}, send: (...args) => order.push(['send', ...args]),
         reload: () => order.push('reload') };
       this.ignore = null;
@@ -42,7 +45,7 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
     isMinimized() { return false; }
     moveTop() { this.top = true; }
     setBounds(bounds) { this.bounds = bounds; }
-    setFocusable(value) { this.focusable = value; }
+    setFocusable(value) { this.focusableCalls.push(value); this.focusable = value; }
     isFocused() { return !!this.focused; }
     focus() { this.focused = true; }
     show() { this.visible = true; }
@@ -54,9 +57,14 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
     once(name, fn) { this.on(name, fn); }
     close() {
       order.push('close');
+      if (!deferClose) this.finishClose();
+    }
+    finishClose() {
+      if (this.destroyed) return;
       this.destroyed = true;
       for (const fn of this.events.closed || []) fn();
     }
+    destroy() { this.finishClose(); }
     loadFile() {}
     isDestroyed() { return !!this.destroyed; }
   }
@@ -83,10 +91,11 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
       renameSync() {}, statSync: missing, appendFileSync: (_file, text) => order.push(['log', text.trim().slice(27)]) },
     'node:path': path,
     './window-state': require('../desktop/window-state'),
-    './save-store': { loadSave: () => null, writeSave: () => { order.push('write'); return true; } },
+    './save-store': saveStore || { loadSave: () => null, writeSave: () => { order.push('write'); return true; } },
     './steam': { createSteam: () => fakeSteam(order, language) },
     '../src/i18n.js': I18N,
-    '../src/data.js': require('../src/data.js')
+    '../src/data.js': require('../src/data.js'),
+    '../src/core.js': require('../src/core.js')
   };
   const source = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'main.js'), 'utf8');
   vm.runInNewContext(source, { require: name => mocks[name], __dirname: path.join(__dirname, '..', 'desktop'),
@@ -100,6 +109,7 @@ test('janela cobre a área útil, vaza cliques e só aceita IPC da própria fest
   const win = window();
   assert.deepEqual({ ...win.options, webPreferences: undefined, icon: undefined, title: undefined }.width, 1920);
   assert.equal(win.options.transparent, true);
+  assert.equal(win.options.focusable, true, 'a janela já nasce focável, sem trocar estilos durante cliques');
   assert.equal(win.ignore, true);
   const own = { sender: win.webContents };
 
@@ -125,7 +135,6 @@ test('janela cobre a área útil, vaza cliques e só aceita IPC da própria fest
   listeners.get('desktop:set-focusable')(own, false);
   assert.equal(win.focusable, true, 'com o jogo em foco, fechar o painel não tira o foco');
   win.focused = false;
-  win.focusable = false;
   listeners.get('desktop:focus-game')(own);
   assert.equal(win.focusable, true, 'clique na festa dá foco ao jogo');
   assert.equal(win.focused, true);
@@ -204,12 +213,97 @@ test('o vigia do cursor conta à festa onde o mouse está, e abrir o jogo de nov
   Object.assign(cursor, { x: -5, y: 200 });
   intervals.forEach(fn => fn());
   assert.equal(sent().length, 2, 'fora da janela não manda nada');
+  Object.assign(cursor, { x: 300, y: 200 });
+  intervals.forEach(fn => fn());
+  assert.equal(sent().length, 3, 'voltar para o mesmo ponto da janela atualiza o hover');
 
   window().focused = false;
   appEvents['second-instance']();
   assert.equal(window().focused, true, 'abrir o jogo de novo dá foco à festa');
   assert.equal(order.some(entry => entry[0] === 'send' && entry[2] === 'painel'), false, 'sem abrir o Painel');
   I18N.setLanguage('pt-BR');
+});
+
+test('uma janela nova recebe o cursor mesmo sem ele ter mudado de posição', async () => {
+  const { listeners, order, window, intervals, cursor } = loadMain({ timeout: () => 0 });
+  await Promise.resolve();
+  Object.assign(cursor, { x: 300, y: 200 });
+  intervals.forEach(fn => fn());
+  listeners.get('desktop:repair')({ sender: window().webContents });
+  intervals.forEach(fn => fn());
+  assert.equal(order.filter(entry => entry[0] === 'send' && entry[2]?.cursor).length, 2,
+    'a janela substituta recebe seu primeiro hover');
+  I18N.setLanguage('pt-BR');
+});
+
+test('trocas de idioma antes do fechamento terminar abrem somente uma janela substituta', async () => {
+  const { listeners, window, windows } = loadMain({ deferClose: true, timeout: () => 0 });
+  await Promise.resolve();
+  const old = window();
+  const own = { sender: old.webContents };
+  listeners.get('desktop:set-language')(own, 'en');
+  listeners.get('desktop:set-language')(own, 'pt-BR');
+  old.finishClose();
+  assert.equal(windows.length, 2, 'somente uma janela nova fica aberta');
+  let info;
+  const event = { sender: window().webContents };
+  Object.defineProperty(event, 'returnValue', { set(value) { info = value; } });
+  listeners.get('desktop:info')(event);
+  assert.equal(info.language.id, 'pt-BR', 'a última escolha já vale para a nova janela');
+  I18N.setLanguage('pt-BR');
+});
+
+test('sair enquanto a janela está sendo substituída não abre outra festa', async () => {
+  const { listeners, window, windows, appEvents } = loadMain({ deferClose: true, timeout: () => 0 });
+  await Promise.resolve();
+  const old = window();
+  listeners.get('desktop:set-language')({ sender: old.webContents }, 'en');
+  appEvents['before-quit']();
+  old.finishClose();
+  assert.equal(windows.length, 1, 'o fechamento final não abre a substituta');
+  I18N.setLanguage('pt-BR');
+});
+
+test('abrir uma segunda instância antes de a primeira estar pronta não falha', async () => {
+  const { appEvents, window } = loadMain({ timeout: () => 0 });
+  assert.doesNotThrow(() => appEvents['second-instance']());
+  await Promise.resolve();
+  assert.ok(window(), 'a abertura inicial termina normalmente');
+  I18N.setLanguage('pt-BR');
+});
+
+test('IPC carrega o backup que o jogo aceita e recusa gravar um save incompatível', async () => {
+  const { GameEngine } = require('../src/core.js');
+  const storage = require('../desktop/save-store.js');
+  const data = require('../src/data.js');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'arraia-ipc-save-'));
+  const filename = path.join(directory, 'save.json');
+  const saved = new GameEngine(data, null, { now: () => 1000, rng: () => 0.5 }).exportState();
+  try {
+    fs.writeFileSync(filename, '{}');
+    fs.writeFileSync(`${filename}.bak`, JSON.stringify(saved));
+    const { listeners, window, order } = loadMain({ timeout: () => 0, saveStore: {
+      loadSave: (_file, validate) => storage.loadSave(filename, validate),
+      writeSave: (_file, state, validate) => storage.writeSave(filename, state, validate)
+    } });
+    await Promise.resolve();
+    let reply;
+    const event = { sender: window().webContents };
+    Object.defineProperty(event, 'returnValue', { set(value) { reply = value; } });
+    listeners.get('game:load')(event);
+    assert.deepEqual(reply, saved, 'a corrupção semântica do principal usa o backup');
+    const notified = order.filter(entry => entry[0] === 'steam-achievements').length;
+    listeners.get('game:save')(event, {});
+    assert.equal(reply, false);
+    assert.equal(order.filter(entry => entry[0] === 'steam-achievements').length, notified, 'save recusado não muda a Steam');
+    assert.deepEqual(JSON.parse(fs.readFileSync(`${filename}.bak`, 'utf8')), saved);
+    listeners.get('game:save')(event, { ...saved, size: 2 });
+    assert.equal(reply, true);
+    assert.equal(storage.loadSave(filename).size, 2, 'o save normal continua funcionando');
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+    I18N.setLanguage('pt-BR');
+  }
 });
 
 test('abrir com o Windows: desligado de fábrica, e só o jogo instalado se registra no login', async () => {
@@ -250,6 +344,23 @@ test('o menu da bandeja tem os mesmos tamanhos que a alça alcança e liga a abe
   assert.equal(tray().find(item => item.label === I18N.t('settings.calmOn')).checked, true, 'menos letreiros ligado pela bandeja');
 });
 
+test('comandos da bandeja mostram a festa escondida antes de abrir argolas, foto ou retrato', async () => {
+  const { tray, handlers, window, order } = loadMain({ timeout: () => 0 });
+  await Promise.resolve();
+  for (const [key, command] of [['rings.title', 'argolas'], ['tray.photo', 'foto'], ['tray.portrait', 'retrato']]) {
+    const own = { sender: window().webContents };
+    await handlers.get('desktop:update-settings')(own, { hidden: true });
+    const start = order.length;
+    tray().find(item => item.label === I18N.t(key)).click();
+    const settings = await handlers.get('desktop:get-settings')(own);
+    assert.equal(settings.hidden, false, `${command}: a janela volta a aparecer`);
+    const sent = order.slice(start).filter(entry => entry[0] === 'send').map(entry => entry[2]);
+    assert.equal(sent[0].settings.hidden, false, 'a página sabe que voltou a aparecer antes de abrir a tela');
+    assert.equal(sent.at(-1), command);
+  }
+  I18N.setLanguage('pt-BR');
+});
+
 test('repouso: salva antes de dormir e, ao acordar com a tela desbloqueada, a festa ganha uma janela nova (o clique volta)', async () => {
   // Relógio falso: o que foi cancelado não dispara.
   const timers = new Map();
@@ -269,6 +380,9 @@ test('repouso: salva antes de dormir e, ao acordar com a tela desbloqueada, a fe
   assert.equal(power['lock-screen'], undefined, 'não depende do aviso de bloqueio');
   assert.ok(first.destroyed, 'a velha fechou (e salvou) antes');
   assert.equal(window().ignore, true, 'a nova começa deixando o clique vazar, como sempre');
+  for (const fn of window().events['ready-to-show'] || []) fn();
+  assert.equal(window().focusable, true, 'a janela quieta também mantém a capacidade de receber o próximo clique');
+  assert.equal(!!window().focused, false, 'showInactive não toma o foco ao acordar');
   // Acordar sem bloqueio também troca.
   power.resume();
   pending.splice(0).forEach(fn => fn());
@@ -290,7 +404,7 @@ test('autocura: a página pede janela nova quando o mouse não chega nela, mas s
   I18N.setLanguage('pt-BR');
 });
 
-test('perder e ganhar o foco não derruba o clique: a janela reaplica o estado de clique depois de mudar o foco', async () => {
+test('perder e ganhar o foco mantém a janela focável e preserva os cliques sem alterar estilos nativos', async () => {
   const { listeners, window } = loadMain();
   await Promise.resolve();
   const win = window();
@@ -300,13 +414,59 @@ test('perder e ganhar o foco não derruba o clique: a janela reaplica o estado d
   win.setIgnoreMouseEvents = value => { calls.push(value); original(value); };
   listeners.get('desktop:set-interactive')(own, true);
   calls.length = 0;
-  // Clicou fora: a janela perde o foco e fica sem poder ser ativada, mas continua pegando o clique em cima da festa.
-  for (const fn of win.events.blur || []) fn();
-  assert.equal(win.focusable, false);
-  assert.deepEqual(calls, [false], 'reaplicou "pega o clique" depois do setFocusable');
-  // Clique na festa: volta a ter foco e o estado de clique é reaplicado de novo.
+  // Clicou fora: a placa some, mas a janela continua aceitando o próximo clique na festa.
   win.focused = false;
+  for (const fn of win.events.blur || []) fn();
+  assert.equal(win.focusable, true);
+  assert.equal(win.ignore, false);
+  assert.deepEqual(win.focusableCalls, [], 'blur não muda a capacidade de foco');
+  assert.deepEqual(calls, [], 'blur não recria o estado nativo de clique');
+  // Clique na festa: volta a ter foco, mantendo a entrega de pointermove e pointerup do arrasto.
   listeners.get('desktop:focus-game')(own);
-  assert.deepEqual(calls, [false, false]);
+  assert.equal(win.focused, true);
+  assert.equal(win.ignore, false);
+  assert.deepEqual(win.focusableCalls, []);
+  assert.deepEqual(calls, []);
+  listeners.get('desktop:set-focusable')(own, false);
+  assert.equal(win.focusable, true, 'fechar uma UI não muda a capacidade de foco');
+  win.focused = false;
+  listeners.get('desktop:set-focusable')(own, true);
+  assert.equal(win.focused, true, 'abrir uma UI ainda dá foco para digitar');
+  assert.deepEqual(win.focusableCalls, []);
+  I18N.setLanguage('pt-BR');
+});
+
+test('trocar o foco reenvia o cursor parado para atualizar o hit da placa que apareceu ou sumiu', async () => {
+  const { order, window, intervals, cursor } = loadMain({ timeout: () => 0 });
+  await Promise.resolve();
+  const win = window();
+  Object.assign(cursor, { x: 300, y: 200 });
+  const cursors = () => order.filter(entry => entry[0] === 'send' && entry[2]?.cursor);
+  intervals.forEach(fn => fn());
+  assert.equal(cursors().length, 1);
+  for (const fn of win.events.blur || []) fn();
+  intervals.forEach(fn => fn());
+  assert.equal(cursors().length, 2, 'a placa sumiu: a página recalcula o pass-through no mesmo ponto');
+  for (const fn of win.events.focus || []) fn();
+  intervals.forEach(fn => fn());
+  assert.equal(cursors().length, 3, 'a placa voltou: a página recalcula o hit no mesmo ponto');
+  assert.deepEqual(win.focusableCalls, []);
+  I18N.setLanguage('pt-BR');
+});
+
+test('o vigia confirma pedidos de pass-through mesmo quando repetem o estado anterior', async () => {
+  const { listeners, order, window, intervals, cursor } = loadMain({ timeout: () => 0 });
+  await Promise.resolve();
+  Object.assign(cursor, { x: 300, y: 200 });
+  const cursors = () => order.filter(entry => entry[0] === 'send' && entry[2]?.cursor);
+  intervals.forEach(fn => fn());
+  assert.equal(cursors().length, 1);
+  listeners.get('desktop:set-interactive')({ sender: window().webContents }, false);
+  intervals.forEach(fn => fn());
+  assert.equal(cursors().length, 2, 'a página recebe confirmação no mesmo ponto e estado');
+  assert.equal(cursors().at(-1)[2].cursor.interactive, false);
+  listeners.get('desktop:set-interactive')({ sender: {} }, false);
+  intervals.forEach(fn => fn());
+  assert.equal(cursors().length, 2, 'outra origem não invalida o estado do cursor');
   I18N.setLanguage('pt-BR');
 });

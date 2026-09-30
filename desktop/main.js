@@ -8,6 +8,7 @@ const { loadSave, writeSave } = require('./save-store');
 const { createSteam } = require('./steam');
 const I18N = require('../src/i18n.js');
 const GAME_DATA = require('../src/data.js');
+const { GameEngine } = require('../src/core.js');
 
 const t = (key, vars) => I18N.t(key, vars);
 // Tamanhos prontos do menu da bandeja: os mesmos dos Ajustes, do menor ao maior que a alça de arrastar alcança.
@@ -28,10 +29,9 @@ if (steamOnly && steam.restartIfNeeded()) {
   let settingsPath;
   let savePath;
   let writeTimer;
-  // Janelas do jogo que pedem teclado (painel, telas): enquanto abertas, a janela continua focável.
-  let keepFocusable = false;
   // Troca de idioma: a janela velha fecha (e salva) antes da nova abrir; sem isso o app fecharia junto.
   let replacing = false;
+  let quitting = false;
   // Janela que a festa nova reabre depois de trocar o idioma pelos Ajustes (vai uma vez, junto com o idioma).
   let reopenPanel = null;
   // A janela está deixando o clique vazar (setIgnoreMouseEvents)? O vigia do cursor conta isso para a festa.
@@ -96,6 +96,13 @@ if (steamOnly && steam.restartIfNeeded()) {
   }
 
   // Conquistas e presença na Steam acompanham o save.
+  function validSave(state) {
+    // Reutiliza o loader do jogo sem contabilizar tempo fora nem alterar o save original.
+    const stamp = Number.isFinite(state.lastSeen) ? state.lastSeen : Date.now();
+    new GameEngine(GAME_DATA, state, { now: () => stamp, rng: () => 0.5 });
+    return true;
+  }
+
   function syncSteam(state) {
     if (!steam.available || !state || typeof state !== 'object') return;
     steam.syncAchievements(state.achievements);
@@ -164,28 +171,21 @@ if (steamOnly && steam.restartIfNeeded()) {
     send({ settings: change(partial) });
   }
 
-  function openPanel() {
+  function openFromTray(command) {
     if (settings.hidden) changeAndTell({ hidden: false });
-    send('painel');
+    send(command);
   }
 
-  // Mudar se a janela pode ter foco mexe nos estilos dela no Windows (e o setFocusable ainda some com o botão da barra
-  // de tarefas). Depois disso a janela volta a deixar, ou não, o clique vazar do jeito que estava: sem isso, às vezes a
-  // festa parava de pegar o clique quando perdia o foco, até alguém clicar no ícone dela na barra de tarefas.
-  function setFocusable(target, focusable) {
-    target.setFocusable(focusable);
-    target.setSkipTaskbar(false);
-    if (target === win) target.setIgnoreMouseEvents(ignoring, { forward: true });
-  }
+  function openPanel() { openFromTray('painel'); }
 
   // Clicar no ícone da bandeja ou abrir o jogo de novo (atalho, Steam): a festa aparece na frente, com foco, sem
   // abrir janela nenhuma.
   function showGame() {
+    if (!settings || quitting) return;
     if (settings.hidden) changeAndTell({ hidden: false });
     if (!alive()) return;
     if (win.isMinimized()) win.restore();
     if (!win.isVisible()) win.show();
-    setFocusable(win, true);
     win.moveTop();
     win.focus();
   }
@@ -194,12 +194,12 @@ if (steamOnly && steam.restartIfNeeded()) {
   // que pode parar de funcionar (e a festa não saberia mais quando o cursor passa por cima dela: não dá para
   // clicar). A cada 120 ms, se o cursor mexeu, a festa recebe a posição e o estado real da janela.
   function sendCursor() {
-    if (!alive() || !win.isVisible() || win.isMinimized()) return;
+    if (!alive() || !win.isVisible() || win.isMinimized()) { cursorKey = ''; return; }
     const point = screen.getCursorScreenPoint();
     const bounds = win.getContentBounds();
     const x = point.x - bounds.x;
     const y = point.y - bounds.y;
-    if (x < 0 || y < 0 || x >= bounds.width || y >= bounds.height) return;
+    if (x < 0 || y < 0 || x >= bounds.width || y >= bounds.height) { cursorKey = ''; return; }
     const key = `${x},${y},${ignoring}`;
     if (key === cursorKey) return;
     cursorKey = key;
@@ -213,12 +213,11 @@ if (steamOnly && steam.restartIfNeeded()) {
 
   // A página caiu ou travou de vez: abre uma festa nova no lugar (o save é o último que a página gravou).
   function recoverWindow() {
-    if (!alive()) return;
+    if (!alive() || replacing || quitting) return;
     const old = win;
     replacing = true;
-    keepFocusable = false;
     old.once('closed', () => {
-      openWindow({ quiet: true });
+      if (!quitting) openWindow({ quiet: true });
       replacing = false;
     });
     old.destroy();
@@ -230,9 +229,10 @@ if (steamOnly && steam.restartIfNeeded()) {
   // uma janela nova, como na troca de idioma: a velha salva ao fechar e a nova carrega o save. Não depende do aviso de
   // bloqueio: se ele se perdesse, a festa nunca mais trocaria de janela. Dois avisos juntos viram uma troca só.
   function wakeUp() {
+    if (quitting) return;
     clearTimeout(wakeTimer);
     wakeTimer = setTimeout(() => {
-      if (!alive() || replacing) return;
+      if (!alive() || replacing || quitting) return;
       logLine('o computador acordou: janela nova para a festa');
       place();
       replaceWindow({ quiet: true });
@@ -255,9 +255,9 @@ if (steamOnly && steam.restartIfNeeded()) {
     return Menu.buildFromTemplate([
       { label: t('tray.panel'), click: openPanel },
       { label: t('tray.shop'), click: () => { openPanel(); send('vitrine'); } },
-      { label: t('rings.title'), click: () => send('argolas') },
-      { label: t('tray.photo'), click: () => send('foto') },
-      { label: t('tray.portrait'), click: () => send('retrato') },
+      { label: t('rings.title'), click: () => openFromTray('argolas') },
+      { label: t('tray.photo'), click: () => openFromTray('foto') },
+      { label: t('tray.portrait'), click: () => openFromTray('retrato') },
       { type: 'separator' },
       { label: t('tray.pin'), type: 'checkbox', checked: settings.pinned,
         click: item => changeAndTell({ pinned: item.checked }) },
@@ -310,7 +310,9 @@ if (steamOnly && steam.restartIfNeeded()) {
       minimizable: true,
       maximizable: false,
       fullscreenable: false,
-      focusable: false,
+      // A janela continua focável: alternar setFocusable no Windows pode interromper os eventos de mouse.
+      // Fora da festa os cliques passam pelo setIgnoreMouseEvents, sem alterar os estilos nativos de foco.
+      focusable: true,
       skipTaskbar: false,
       title: t('app.title'),
       icon: path.join(__dirname, 'icon.ico'),
@@ -324,6 +326,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     });
     win = created;
     ignoring = true;
+    cursorKey = '';
     created.setIgnoreMouseEvents(true, { forward: true });
     created.setAlwaysOnTop(settings.pinned, 'floating');
     created.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
@@ -339,21 +342,21 @@ if (steamOnly && steam.restartIfNeeded()) {
     created.once('ready-to-show', () => {
       if (settings.hidden || win !== created) return;
       if (quiet) { created.showInactive(); return; }
-      setFocusable(created, true);
       created.show();
     });
-    created.on('focus', () => { if (win === created) send({ foco: true }); });
+    created.on('focus', () => {
+      if (win !== created) return;
+      cursorKey = '';
+      send({ foco: true });
+    });
     created.on('blur', () => {
       if (win !== created) return;
+      cursorKey = '';
       send({ foco: false });
-      // Sem foco, a janela não pode ser ativada por engano (o Windows passaria o foco para ela ao fechar outro
-      // programa); o botão da barra de tarefas e o clique voltam logo em seguida (setFocusable acima).
-      if (!keepFocusable) setFocusable(created, false);
     });
     // Botão na barra de tarefas: minimizar esconde a festa; restaurar traz de volta já com foco.
     created.on('restore', () => {
       if (win !== created) return;
-      setFocusable(created, true);
       created.focus();
     });
     created.on('closed', () => { if (win === created) win = null; });
@@ -383,12 +386,11 @@ if (steamOnly && steam.restartIfNeeded()) {
   // o cursor e os cliques no menu passam direto para o que está atrás. Por isso a troca é de janela: a velha fecha
   // (a página salva ao sair) e só então a nova abre e carrega o save.
   function replaceWindow(options = {}) {
-    if (!alive()) return;
+    if (!alive() || replacing || quitting) return;
     const old = win;
     replacing = true;
-    keepFocusable = false;
     old.once('closed', () => {
-      openWindow(options);
+      if (!quitting) openWindow(options);
       replacing = false;
     });
     old.close();
@@ -420,6 +422,7 @@ if (steamOnly && steam.restartIfNeeded()) {
   }
 
   app.whenReady().then(() => {
+    if (quitting) return;
     app.setAppUserModelId('com.gabriel.mandioca');
     // Com App ID de verdade e "required", sem a Steam aberta o jogo avisa e fecha.
     if (!steam.init() && steamOnly) {
@@ -429,14 +432,14 @@ if (steamOnly && steam.restartIfNeeded()) {
       return;
     }
     ipcMain.on('game:load', event => {
-      const state = isOwnWindow(event) ? loadSave(savePath) : null;
+      const state = isOwnWindow(event) ? loadSave(savePath, validSave) : null;
       event.returnValue = state;
       syncSteam(state);
     });
     ipcMain.on('game:save', (event, state) => {
       let saved = false;
       if (isOwnWindow(event)) {
-        try { saved = writeSave(savePath, state); }
+        try { saved = writeSave(savePath, state, validSave); }
         catch (error) { console.error('Save não pôde ser gravado:', error); }
       }
       // A página espera a resposta: a Steam só é avisada depois.
@@ -462,6 +465,7 @@ if (steamOnly && steam.restartIfNeeded()) {
       if (isOwnWindow(event) && typeof interactive === 'boolean') {
         ignoring = !interactive;
         win.setIgnoreMouseEvents(!interactive, { forward: true });
+        cursorKey = '';
       }
     });
     // A página percebeu que o mouse não chega mais nela (a janela quebrou depois do repouso): janela nova.
@@ -477,16 +481,12 @@ if (steamOnly && steam.restartIfNeeded()) {
     });
     ipcMain.on('desktop:set-focusable', (event, focusable) => {
       if (!isOwnWindow(event) || typeof focusable !== 'boolean') return;
-      keepFocusable = focusable;
-      if (focusable) {
-        setFocusable(win, true);
-        win.focus();
-      } else if (!win.isFocused()) setFocusable(win, false);
+      // Painéis pedem foco para digitar; fechar um painel preserva a capacidade de receber o próximo clique.
+      if (focusable) win.focus();
     });
     // Clique na festa: o jogo pega o foco (e passa a saber quando o jogador clicou fora dele).
     ipcMain.on('desktop:focus-game', event => {
       if (!isOwnWindow(event) || win.isFocused()) return;
-      setFocusable(win, true);
       win.focus();
     });
     ipcMain.on('desktop:quit', event => { if (isOwnWindow(event)) app.quit(); });
@@ -496,6 +496,10 @@ if (steamOnly && steam.restartIfNeeded()) {
   });
 
   app.on('second-instance', showGame);
-  app.on('before-quit', () => { if (settings) writeSettings(); });
+  app.on('before-quit', () => {
+    quitting = true;
+    clearTimeout(wakeTimer);
+    if (settings) writeSettings();
+  });
   app.on('window-all-closed', () => { if (!replacing) app.quit(); });
 }

@@ -1,8 +1,8 @@
 # Vídeos de divulgação — Cuide bem da sua mandioca
 
-Cinco vídeos para o TikTok e o trailer da página da Steam (seção [Trailer da Steam](#trailer-da-steam)).
+Seis vídeos para o TikTok e o trailer da página da Steam (seção [Trailer da Steam](#trailer-da-steam)).
 
-Cinco vídeos verticais (1080×1920, 30 fps) montados com [HyperFrames](https://www.hyperframes.dev/) em cima de
+Seis vídeos verticais (1080×1920, 30 fps) montados com [HyperFrames](https://www.hyperframes.dev/) em cima de
 gameplay gravada do próprio jogo, em **português, inglês e espanhol**. Os MP4 prontos ficam em
 `renders/<idioma>/<nome>.mp4`. Eles não têm trilha, só os efeitos (pop, ding, whoosh, tada): a música entra pelo
 TikTok (veja abaixo).
@@ -14,10 +14,15 @@ TikTok (veja abaixo).
 | `argolas` | 20,25 s | a garrafa com 1 pixel de folga · this bottle has 1 pixel of wiggle room · esta botella tiene 1 píxel de margen |
 | `presentes` | 18,5 s | cada convidado traz um presente · every guest brings a gift · cada invitado trae un regalo |
 | `turma` | 20 s | conheça a turma · meet the party crew · conoce a la pandilla |
+| `cuidar` | 16 s | se você não cuidar da sua mandioca… ela fica triste (só em pt-BR) |
 
 Em todos, a placa com o nome do jogo aparece desde o primeiro quadro, com o nome no idioma do vídeo (o mesmo da
 Steam): "Cuide bem da sua mandioca", "Take Good Care of Your Cassava" e "Cuida bien tu mandioca". O texto
 importante fica fora das áreas que o TikTok cobre (topo, rodapé e a coluna de botões à direita).
+
+O `cuidar` ("Esqueci de cuidar da minha mandioca", só em português) mostra o medidor de Amor e Barriga: a gameplay é
+gravada em 4K vertical (`gravar.js cuidar`) para a câmera da montagem dar zoom na Mandioca em escala exata do pixel
+(×2 no close, ×0,5 na festa inteira), e o medidor da tela é um painel da montagem sincronizado com as ações da gravação.
 
 ## Música em alta
 

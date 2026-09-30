@@ -718,6 +718,12 @@ def export_crowd():
     manifest['props']['pratos'] = add('pratos', [animar.place(animar.blank(dish_w, dish_h), d, (dish_w - d.width) // 2,
                                                               dish_h - d.height) for d in dishes])
     manifest['props']['pratos']['ids'] = list(sprites.DISHES)
+    # As comidas da loja, do mesmo jeito: voam até a Mandioca quando ela come.
+    foods = [fill(text) for text in sprites.FOODS.values()]
+    food_w, food_h = max(f.width for f in foods), max(f.height for f in foods)
+    manifest['props']['comidas'] = add('comidas', [animar.place(animar.blank(food_w, food_h), f, (food_w - f.width) // 2,
+                                                                food_h - f.height) for f in foods])
+    manifest['props']['comidas']['ids'] = list(sprites.FOODS)
     manifest['props']['penetra'] = add('penetra', animar.penetra(), fps=8)
     # Casamento na roça: noivo, noiva e padre (3 quadros cada: parado, respirando, comemorando) e o caramanchão de flores.
     manifest['props']['casamento'] = add('casamento', casamento.personagens(), fps=1)
@@ -1357,6 +1363,8 @@ def export_icons():
     icons['ui:compadres'] = album_compadres()
     for dish, text in sprites.DISHES.items():
         icons[f'ui:prato-{dish}'] = fill(text)
+    for food, text in sprites.FOODS.items():
+        icons[f'ui:comida-{food}'] = fill(text)
     icons['ui:carro-boi'] = crop(cenario.carro_de_boi()[0])
     legendary = images['fogueira-lendaria'].crop((0, 0, manifest['fires']['lendaria']['w'], manifest['fires']['lendaria']['h']))
     icons['ui:lendaria'] = crop(legendary)

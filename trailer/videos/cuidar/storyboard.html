@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Storyboard v1 — Esqueci de cuidar da minha mandioca</title>
+<style>
+  @font-face { font-family: "Fredoka"; src: url("assets/fontes/Fredoka.ttf") format("truetype"); font-weight: 300 700; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #120f26; color: #fff4e4; font-family: "Fredoka", system-ui, sans-serif; padding: 36px 40px 60px; }
+  header { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
+  header h1 { font-size: 34px; font-weight: 700; }
+  header .versao { font-size: 18px; color: #1c1a3a; background: #ffd21e; border-radius: 999px; padding: 2px 12px; font-weight: 700; }
+  header .tag { font-size: 15px; color: #cfc6ff; border: 1px solid #4a4380; border-radius: 999px; padding: 3px 12px; }
+  .dek { color: #cfc6ff; font-size: 17px; margin-bottom: 26px; max-width: 1100px; }
+  .grade { display: grid; grid-template-columns: repeat(3, 372px); gap: 34px 30px; }
+  .celula { width: 372px; }
+  .quadro { position: relative; width: 360px; height: 640px; overflow: hidden; border-radius: 10px; border: 6px solid #2c2a48;
+    background: #1c1a3a; box-sizing: content-box; }
+  .palco { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform: scale(0.33333); transform-origin: 0 0;
+    background: radial-gradient(ellipse 90% 40% at 50% 56%, #3a3470 0%, #1c1a3a 62%, #120f26 100%); }
+  .jogo { position: absolute; inset: 0; background-size: cover; background-position: center; image-rendering: pixelated; }
+  .jogo.largo { background-size: 1080px auto; background-repeat: no-repeat; background-position: 0 640px; }
+  .escuro { position: absolute; inset: 0; background: rgba(20, 16, 44, 0.78); }
+  .rotulo { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+  .rotulo span:last-child { color: #9c93d8; font-weight: 500; }
+  .nota { font-size: 14px; line-height: 1.35; color: #d8d2ff; margin-top: 6px; }
+  .nota b { color: #ffd21e; }
+  .chip { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 700; color: #1c1a3a; background: #9ef05a; border-radius: 999px; padding: 2px 10px; }
+
+  /* Placa do título (igual aos outros vídeos) */
+  .placa { position: absolute; left: 90px; width: 900px; height: 300px; transform-origin: 50% 0;
+    display: flex; align-items: flex-end; gap: 26px; padding: 0 38px 26px; background: #fff4e4; border: 6px solid #2e1812;
+    box-shadow: 0 0 0 9px #c07a36, 0 0 0 18px #7c421e, 0 0 0 24px #2e1812, 16px 20px 0 24px rgba(18, 9, 6, 0.5); }
+  .bandeiras { position: absolute; left: -6px; right: -6px; top: -6px; height: 54px; display: flex; justify-content: space-around; }
+  .bandeiras::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #2e1812; }
+  .bandeiras i { display: block; width: 44px; height: 50px; margin-top: 4px; clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
+  .bandeiras i:nth-child(6n + 1) { background: #ee2f3c; } .bandeiras i:nth-child(6n + 2) { background: #ffd21e; }
+  .bandeiras i:nth-child(6n + 3) { background: #35a03a; } .bandeiras i:nth-child(6n + 4) { background: #3a6cf0; }
+  .bandeiras i:nth-child(6n + 5) { background: #ff4f9e; } .bandeiras i:nth-child(6n + 6) { background: #ff8a12; }
+  .mascote { position: relative; flex: none; width: 160px; height: 220px; background: url("assets/sprites/mandioca.png") 0 0 / auto 220px no-repeat; image-rendering: pixelated; }
+  .letreiro { display: flex; flex-direction: column; padding-bottom: 6px; }
+  .letreiro .l1 { font-weight: 700; font-size: 46px; line-height: 1; color: #2e1812; }
+  .letreiro .l2 { font-weight: 700; font-size: 124px; line-height: 0.95; color: #ee2f3c; letter-spacing: -0.03em;
+    -webkit-text-stroke: 7px #2e1812; paint-order: stroke fill; text-shadow: 0 8px 0 #8a1030; }
+  .placa.pequena { transform: scale(0.5); top: 176px; }
+  .placa.grande { top: 520px; }
+  .placa.topo { top: 196px; }
+
+  /* Legendas */
+  .frase { position: absolute; left: 50px; right: 50px; text-align: center; font-weight: 700; font-size: 84px; line-height: 1.04; color: #fff4e4;
+    -webkit-text-stroke: 16px #1c1a3a; paint-order: stroke fill; text-shadow: 0 12px 0 rgba(18, 9, 6, 0.55); }
+  .frase em { font-style: normal; color: #ffd21e; }
+  .selo { position: absolute; font-family: "Space Mono", ui-monospace, monospace; font-weight: 700; font-size: 46px; color: #ffd21e; background: #1c1a3a;
+    border: 5px solid #ffd21e; padding: 12px 30px; border-radius: 999px; white-space: nowrap; }
+
+  /* Medidor de Amor e Barriga (placa do jogo) */
+  .medidor { position: absolute; left: 70px; width: 760px; top: 1250px; padding: 22px 30px 24px; background: #fff4e4; border: 6px solid #2e1812;
+    box-shadow: 0 0 0 8px #c07a36, 0 0 0 15px #7c421e, 0 0 0 20px #2e1812, 12px 14px 0 20px rgba(18, 9, 6, 0.45); }
+  .linha { display: flex; align-items: center; gap: 18px; height: 64px; }
+  .linha img { width: 56px; height: auto; image-rendering: pixelated; }
+  .linha .nome { width: 190px; font-weight: 700; font-size: 44px; color: #2e1812; }
+  .barra { flex: 1; height: 34px; border: 5px solid #2e1812; background: #efd29a; }
+  .barra i { display: block; height: 100%; }
+  .barra.amor i { background: repeating-linear-gradient(90deg, #ff4f9e 0 16px, #ad1e66 16px 22px); }
+  .barra.barriga i { background: repeating-linear-gradient(90deg, #ffac2a 0 16px, #b44a0a 16px 22px); }
+  .fator { position: absolute; right: -16px; top: -46px; font-weight: 700; font-size: 40px; padding: 6px 22px 8px; border-radius: 999px;
+    border: 5px solid #2e1812; transform: rotate(3deg); white-space: nowrap; }
+  .fator.triste { background: #ee2f3c; color: #fff4e4; }
+  .fator.meio { background: #fff4e4; color: #2e1812; }
+  .fator.feliz { background: #ffd21e; color: #2e1812; }
+  .fim-tagline { position: absolute; left: 100px; right: 100px; top: 1000px; text-align: center; font-weight: 700; font-size: 60px;
+    line-height: 1.12; color: #fff4e4; -webkit-text-stroke: 12px #1c1a3a; paint-order: stroke fill; }
+  .fim-cta { position: absolute; left: 90px; right: 90px; top: 1250px; text-align: center; font-weight: 700; font-size: 46px; line-height: 1.15;
+    color: #2e1812; background: #ffd21e; border: 6px solid #2e1812; border-radius: 48px; padding: 18px 24px 22px; box-shadow: 0 10px 0 #2e1812; }
+  .seguro { position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(#ff00ff22, #ff00ff22) 0 0 / 100% 170px no-repeat, linear-gradient(#ff00ff22, #ff00ff22) 0 1500px / 100% 420px no-repeat,
+      linear-gradient(#ff00ff22, #ff00ff22) 900px 900px / 180px 600px no-repeat; }
+
+  .extra { background: #1c1a3a; border: 1px solid #3a3470; border-radius: 10px; padding: 18px 20px; font-size: 14px; line-height: 1.45; color: #d8d2ff; }
+  .extra h3 { font-size: 16px; color: #fff4e4; margin-bottom: 8px; }
+  .costuras { display: flex; flex-direction: column; gap: 6px; }
+  .costuras div { display: flex; gap: 8px; align-items: center; }
+  .costuras b { color: #ffd21e; min-width: 70px; }
+  .cores { display: flex; gap: 8px; margin: 8px 0; }
+  .cores i { width: 34px; height: 34px; border-radius: 6px; border: 2px solid #2c2a48; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Esqueci de cuidar da minha mandioca</h1><span class="versao">v1</span>
+  <span class="tag">1080×1920 · 30 fps · ~16 s · 6 cenas · sem música</span>
+</header>
+<p class="dek">TikTok (pt-BR): "se você não cuidar da sua mandioca, ela fica triste". As imagens do jogo aqui são fotos
+de prévia; o vídeo usa a gameplay gravada em 4K vertical, com a câmera em zoom exato no pixel. A faixa rosada marca
+onde o TikTok cobre a tela (topo, rodapé e a coluna de botões).</p>
+
+<div class="grade">
+
+  <div class="celula" id="frame-01">
+    <div class="quadro"><div class="palco">
+      <div class="jogo" style="background-image:url(assets/previa/f1.png)"></div>
+      <div class="placa topo"><div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mascote"></div><div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div></div>
+      <div class="frase" style="top:548px">se você não cuidar da sua mandioca…<br />ela fica <em>TRISTE</em> 😢</div>
+      <div class="medidor"><div class="fator triste">REBOLADO ×0,5</div>
+        <div class="linha"><img src="assets/sprites/ui-amor.png" alt="" /><span class="nome">Amor</span><div class="barra amor"><i style="width:0%"></i></div></div>
+        <div class="linha"><img src="assets/sprites/ui-barriga.png" alt="" /><span class="nome">Barriga</span><div class="barra barriga"><i style="width:0%"></i></div></div>
+      </div>
+      <div class="seguro"></div>
+    </div></div>
+    <div class="rotulo"><span>01 · GANCHO: ELA TÁ TRISTE</span><span>0,0–2,8 s</span></div>
+    <p class="nota"><b>A placa cai do alto no quadro 0</b> e balança; a legenda entra em duas batidas; a Mandioca ofegando diz "TÔ COM FOME!"; o selo vermelho pulsa.</p>
+    <span class="chip">corte seco → 02</span>
+  </div>
+
+  <div class="celula" id="frame-02">
+    <div class="quadro"><div class="palco">
+      <div class="jogo" style="background-image:url(assets/previa/f2.png)"></div>
+      <div class="placa pequena"><div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mascote"></div><div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div></div>
+      <div class="frase" style="top:430px">dei <em>comidinha</em> 🍿</div>
+      <div class="medidor"><div class="fator triste">REBOLADO ×0,85</div>
+        <div class="linha"><img src="assets/sprites/ui-amor.png" alt="" /><span class="nome">Amor</span><div class="barra amor"><i style="width:0%"></i></div></div>
+        <div class="linha"><img src="assets/sprites/ui-barriga.png" alt="" /><span class="nome">Barriga</span><div class="barra barriga"><i style="width:70%"></i></div></div>
+      </div>
+      <div class="seguro"></div>
+    </div></div>
+    <div class="rotulo"><span>02 · COMIDINHA</span><span>2,8–5,6 s</span></div>
+    <p class="nota"><b>A placa encolhe para o topo</b> e a legenda desliza; pipoca, milho e bolo caem até ela ("NHAM!"); a Barriga enche em três degraus e o número do selo sobe junto.</p>
+    <span class="chip">corte seco → 03</span>
+  </div>
+
+  <div class="celula" id="frame-03">
+    <div class="quadro"><div class="palco">
+      <div class="jogo" style="background-image:url(assets/previa/f3.png)"></div>
+      <div class="placa pequena"><div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mascote"></div><div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div></div>
+      <div class="frase" style="top:430px">fiz <em>carinho</em> 🥰</div>
+      <div class="medidor"><div class="fator meio">REBOLADO ×1,13</div>
+        <div class="linha"><img src="assets/sprites/ui-amor.png" alt="" /><span class="nome">Amor</span><div class="barra amor"><i style="width:50%"></i></div></div>
+        <div class="linha"><img src="assets/sprites/ui-barriga.png" alt="" /><span class="nome">Barriga</span><div class="barra barriga"><i style="width:100%"></i></div></div>
+      </div>
+      <div class="seguro"></div>
+    </div></div>
+    <div class="rotulo"><span>03 · CARINHO</span><span>5,6–8,4 s</span></div>
+    <p class="nota"><b>A legenda entra de lado</b>; a Mandioca dá pulinhos a cada carinho, com corações e "HIHI!"; o Amor sobe a cada um (pop).</p>
+    <span class="chip">corte seco → 04</span>
+  </div>
+
+  <div class="celula" id="frame-04">
+    <div class="quadro"><div class="palco">
+      <div class="jogo" style="background-image:url(assets/previa/f4.png)"></div>
+      <div class="placa pequena"><div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mascote"></div><div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div></div>
+      <div class="frase" style="top:430px">e joguei uns <em>estalinhos</em> 💥</div>
+      <div class="medidor"><div class="fator feliz">REBOLADO ×1,25</div>
+        <div class="linha"><img src="assets/sprites/ui-amor.png" alt="" /><span class="nome">Amor</span><div class="barra amor"><i style="width:100%"></i></div></div>
+        <div class="linha"><img src="assets/sprites/ui-barriga.png" alt="" /><span class="nome">Barriga</span><div class="barra barriga"><i style="width:100%"></i></div></div>
+      </div>
+      <div class="seguro"></div>
+    </div></div>
+    <div class="rotulo"><span>04 · ESTALINHO</span><span>8,4–10,4 s</span></div>
+    <p class="nota"><b>"PÁ!" pipoca em volta dela</b> e os vizinhos pulam; o Amor chega ao fim no último estalo e o selo vira amarelo.</p>
+    <span class="chip">corte seco → 05</span>
+  </div>
+
+  <div class="celula" id="frame-05">
+    <div class="quadro"><div class="palco">
+      <div class="jogo largo" style="background-image:url(assets/previa/f5.png)"></div>
+      <div class="placa pequena"><div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mascote"></div><div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div></div>
+      <div class="frase" style="top:420px">agora ela tá <em>FELIZ</em> 💃</div>
+      <div class="selo" style="left:230px; top:1440px">2,5× mais animação</div>
+      <div class="medidor" style="top:1250px; opacity:0"></div>
+      <div class="fator feliz" style="position:absolute; left:260px; top:1300px; right:auto; font-size:72px; transform:rotate(-3deg)">REBOLADO ×1,25</div>
+      <div class="seguro"></div>
+    </div></div>
+    <div class="rotulo"><span>05 · AGORA ELA TÁ FELIZ</span><span>10,4–13,4 s</span></div>
+    <p class="nota"><b>Uma puxada só da câmera</b>, desacelerando (×3 → ×1), revela a festa inteira com confete e fogos; o medidor se recolhe e o selo cresce para o centro com um tranco.</p>
+    <span class="chip">corte seco → 06</span>
+  </div>
+
+  <div class="celula" id="frame-06">
+    <div class="quadro"><div class="palco">
+      <div class="jogo largo" style="background-image:url(assets/previa/f5.png)"></div>
+      <div class="escuro"></div>
+      <div class="placa grande"><div class="bandeiras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mascote"></div><div class="letreiro"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div></div>
+      <div class="fim-tagline">o joguinho de festa junina que vive na sua área de trabalho</div>
+      <div class="fim-cta">qual nome você daria para sua mandioca? 👇</div>
+      <div class="seguro"></div>
+    </div></div>
+    <div class="rotulo"><span>06 · PLACA FINAL</span><span>13,4–16,0 s</span></div>
+    <p class="nota"><b>A placa desce grande para o centro</b> com a festa escurecendo atrás; frase e pergunta entram; o botão da pergunta pulsa. O último quadro emenda no primeiro (loop).</p>
+    <span class="chip">loop → 01</span>
+  </div>
+
+  <div class="celula extra">
+    <h3>Costuras</h3>
+    <div class="costuras">
+      <div><b>01 → 02</b> corte seco + whoosh (a placa encolhe)</div>
+      <div><b>02 → 03</b> corte seco, a câmera segue no close</div>
+      <div><b>03 → 04</b> corte seco</div>
+      <div><b>04 → 05</b> tada + puxada da câmera (×3 → ×1)</div>
+      <div><b>05 → 06</b> escurece + a placa desce</div>
+      <div><b>06 → 01</b> loop: termina na festa, recomeça na Mandioca triste</div>
+    </div>
+    <h3 style="margin-top:14px">Som</h3>
+    Sem trilha (o som em alta entra no TikTok). Pop a cada degrau das barras, ding no "NHAM!", whoosh nos cortes, tada na virada.
+  </div>
+
+  <div class="celula extra">
+    <h3>Tokens</h3>
+    <div class="cores"><i style="background:#1c1a3a"></i><i style="background:#fff4e4"></i><i style="background:#ffd21e"></i><i style="background:#2e1812"></i><i style="background:#7c421e"></i><i style="background:#ee2f3c"></i><i style="background:#ff4f9e"></i><i style="background:#ffac2a"></i></div>
+    Fredoka 700 (legendas, placa, medidor) · Space Mono 700 (selos). Placa e medidor com a moldura de madeira da interface do jogo; barras com as cores do Amor (rosa) e da Barriga (laranja) do jogo.
+    <h3 style="margin-top:14px">Não pode</h3>
+    Botão de teste (joaninha) · música embutida · texto importante nas faixas do TikTok · pixel borrado (zoom só em escala exata) · letreiros da plateia em cima da Mandioca (gravação com "Menos letreiros").
+  </div>
+</div>
+</body>
+</html>

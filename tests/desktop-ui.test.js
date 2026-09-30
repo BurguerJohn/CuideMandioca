@@ -33,7 +33,7 @@ function boot(extra = {}, desktopExtra = {}) {
   };
   const windowListeners = {};
   const sandbox = {
-    ArraiaCore: core, ArraiaUI: UI, ArraiaI18n: require('../src/i18n.js'), GAME_DATA: data, arraiaDesktop: desktop, document,
+    ArraiaCore: core, ArraiaUI: UI, ArraiaI18n: require('../src/i18n.js'), ArraiaSettings: require('../src/settings.js'), GAME_DATA: data, arraiaDesktop: desktop, document,
     addEventListener: (name, callback) => { windowListeners[name] = callback; },
     innerWidth: 1920, innerHeight: 1040, performance: { now: () => 1000 }, Intl, Date, Math, JSON, Promise,
     setInterval() {}, setTimeout() { return 1; }, clearTimeout() {}, localStorage: null, Blob: class {},
@@ -42,6 +42,11 @@ function boot(extra = {}, desktopExtra = {}) {
   sandbox.globalThis = sandbox;
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'src', 'app.js'), 'utf8'), sandbox);
   return { document, calls, run: value => command(value), windowListeners };
+}
+
+function fakeFesta(extra = {}) {
+  return { draw() {}, setScale() {}, setRate() {}, setFlash() {}, setCalm() {}, onEvents() {},
+    size: () => ({ width: 480, height: 612, top: 150, physical: 3, base: 3 }), ...extra };
 }
 
 test('no desktop a festa abre, mostra a placa e vaza o clique fora dela', async () => {
@@ -267,6 +272,44 @@ test('autocura: o cursor passeia em cima do jogo, a janela diz que aceita o cliq
   assert.ok(!calls.some(call => call[0] === 'repair'));
 });
 
+test('voltar o foco recupera um arrasto que parou de receber eventos sem cancelar um arrasto saudável', async () => {
+  for (const nativeMoves of [false, true]) {
+    let clock = 1000;
+    let game;
+    const { calls, run, document } = boot({ performance: { now: () => clock }, __gravador: api => { game = api; } },
+      { repair: () => calls.push(['repair']) });
+    await Promise.resolve();
+    const canvas = { closest: selector => selector === '#festa-canvas' ? {} : null, matches: () => false };
+    document.elementFromPoint = () => canvas;
+    run({ foco: false });
+    run({ cursor: { x: 50, y: 50, interactive: false } });
+    document.listeners.pointerdown({ target: canvas, clientX: 50, clientY: 50, button: 0, preventDefault() {} });
+    assert.equal(document.body.classList.contains('jogo-desfocado'), false);
+    assert.equal(game.ui.drag.kind, 'festa');
+    for (let i = 0; i < 60; i++) {
+      clock += 120;
+      if (nativeMoves) document.listeners.pointermove({ clientX: 60 + i, clientY: 50, buttons: 1 });
+      run({ cursor: { x: 60 + i, y: 50, interactive: true } });
+    }
+    assert.equal(calls.filter(call => call[0] === 'repair').length, nativeMoves ? 0 : 1);
+    if (nativeMoves) assert.equal(game.ui.drag.kind, 'festa');
+    else {
+      assert.equal(game.ui.drag, null, 'o arrasto perdido não bloqueia os próximos cliques');
+      assert.ok(calls.some(call => call[0] === 'save'), 'salva antes de pedir a recuperação');
+    }
+  }
+});
+
+test('reenvios do cursor parado depois de mudar o foco não indicam falha do mouse', async () => {
+  let clock = 1000;
+  const { calls, run, document } = boot({ performance: { now: () => clock } }, { repair: () => calls.push(['repair']) });
+  await Promise.resolve();
+  document.elementFromPoint = () => ({ closest: selector => selector === '.ui' ? {} : null });
+  run({ foco: false });
+  for (let i = 0; i < 60; i++) { clock += 120; run({ cursor: { x: 50, y: 50, interactive: true } }); }
+  assert.equal(calls.filter(call => call[0] === 'repair').length, 0);
+});
+
 test('arrasto que perdeu o soltar do botão (Alt+Tab, repouso) não prende a janela: o clique volta a seguir o cursor', async () => {
   const { calls, run, document } = boot();
   await Promise.resolve();
@@ -341,4 +384,259 @@ test('segurar o botão "+1 ficha" compra várias fichas seguidas; soltar para e 
   assert.equal(engine.state.tickets, before + 4, 'soltou: para de comprar');
   const toasts = [...document.querySelector('#avisos').children].map(child => child.textContent);
   assert.ok(toasts.some(text => /\+4 fichas/.test(text)), toasts.join(' | '));
+});
+
+test('Enter numa melhoria compra um único nível, sem iniciar compra contínua', async () => {
+  let game;
+  const { document } = boot({ __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.cheer = 1e6;
+  const before = engine.level('rebolado');
+  const cost = engine.levelCost('rebolado');
+  const button = { tagName: 'BUTTON', disabled: false,
+    dataset: { action: 'melhorar', hold: 'melhorar', stat: 'rebolado' } };
+  document.listeners.click({ detail: 0, target: { closest: () => button } });
+  assert.equal(engine.level('rebolado'), before + 1);
+  assert.equal(engine.state.cheer, 1e6 - cost);
+  assert.equal(game.ui.hold, null);
+});
+
+test('botões secundários do mouse não compram fichas, lançam argolas ou arrastam a festa', async () => {
+  let game;
+  let throws = 0;
+  const { document } = boot({ __gravador: api => { game = api; } });
+  await Promise.resolve();
+  game.engine().state.cheer = 1e6;
+  game.ui.game = { throwRing() { throws++; return true; } };
+  const tickets = game.engine().state.tickets;
+  const buy = { dataset: { hold: 'ficha' }, disabled: false, querySelector: () => null };
+  buy.closest = selector => selector === '[data-hold]' ? buy : null;
+  const rings = { closest: selector => selector === '#argolas-canvas' ? rings : null };
+  const canvas = { closest: selector => selector === '#festa-canvas' ? canvas : null };
+  for (const button of [1, 2]) {
+    for (const target of [buy, rings, canvas]) {
+      document.elementFromPoint = () => target;
+      document.listeners.pointerdown({ target, button, clientX: 50, clientY: 50, preventDefault() {} });
+      assert.equal(game.ui.hold, null);
+      assert.equal(game.ui.drag, null);
+    }
+  }
+  assert.equal(game.engine().state.tickets, tickets);
+  assert.equal(throws, 0);
+});
+
+test('Espaço respeita campos e botões mesmo com uma rodada de Argolas aberta', async () => {
+  let game;
+  let throws = 0;
+  const { document } = boot({ __gravador: api => { game = api; } });
+  await Promise.resolve();
+  game.ui.rings = { open: true, playing: true, result: null };
+  game.ui.game = { throwRing() { throws++; return true; } };
+  for (const selector of ['input', 'select', 'textarea', 'button', 'a']) {
+    let prevented = false;
+    const target = { closest: query => query.split(',').map(s => s.trim()).includes(selector) ? target : null };
+    document.listeners.keydown({ key: ' ', target, preventDefault() { prevented = true; } });
+    assert.equal(prevented, false, selector);
+    assert.equal(throws, 0, selector);
+  }
+  const editable = { isContentEditable: true, closest: () => null };
+  document.listeners.keydown({ key: ' ', target: editable, preventDefault() { assert.fail('deve permitir digitar'); } });
+  let prevented = false;
+  document.listeners.keydown({ key: ' ', target: document.body, preventDefault() { prevented = true; } });
+  assert.equal(prevented, true, 'fora dos controles, o atalho continua funcionando');
+  assert.equal(throws, 1);
+});
+
+test('soltar o esquerdo durante uma compra para mesmo com o direito ainda apertado', async () => {
+  for (const moved of [true, false]) {
+    let game;
+    const timeouts = [];
+    const intervals = new Map();
+    let nextInterval = 1;
+    const { document } = boot({
+      __gravador: api => { game = api; },
+      setTimeout: fn => { timeouts.push(fn); return timeouts.length; }, clearTimeout() {},
+      setInterval: fn => { const id = nextInterval++; intervals.set(id, fn); return id; },
+      clearInterval: id => intervals.delete(id)
+    });
+    await Promise.resolve();
+    const engine = game.engine();
+    engine.state.cheer = 1e6;
+    const button = { dataset: { hold: 'ficha' }, disabled: false, querySelector: () => null };
+    button.closest = selector => selector === '[data-hold]' ? button : null;
+    document.listeners.pointerdown({ target: button, button: 0, clientX: 10, clientY: 10, preventDefault() {} });
+    timeouts.at(-1)();
+    const holdTimer = [...intervals.keys()].at(-1);
+    const tickets = engine.state.tickets;
+    if (moved) {
+      // Com os dois botões apertados, soltar o primeiro é pointermove; o último é pointerup.
+      document.listeners.pointermove({ button: 0, buttons: 2, clientX: 10, clientY: 10 });
+      assert.equal(game.ui.hold, null, 'a compra termina quando o esquerdo é solto');
+    }
+    document.listeners.pointerup({ button: 2, buttons: 0 });
+    assert.equal(game.ui.hold, null, 'soltar todos os botões também cancela se o movimento se perdeu');
+    intervals.get(holdTimer)?.();
+    assert.equal(engine.state.tickets, tickets, 'nenhuma compra fica rodando depois de soltar');
+  }
+});
+
+test('preferências de desempenho, clarões e letreiros voltam ao abrir no navegador', () => {
+  const applied = [];
+  const festa = fakeFesta({ setRate: value => applied.push(['rate', value]),
+    setFlash: value => applied.push(['flash', value]), setCalm: value => applied.push(['calm', value]) });
+  boot({ arraiaDesktop: null, navigator: { language: 'pt-BR' },
+    localStorage: { getItem: key => key === 'arraia-ajustes-v1'
+      ? JSON.stringify({ perf: 'economia', flash: false, calm: true }) : null },
+    ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {} });
+  assert.deepEqual(applied, [['rate', 20], ['flash', false], ['calm', true]]);
+});
+
+test('preferências corrompidas no navegador não interrompem o jogo nem deixam posições inválidas', () => {
+  for (const raw of [
+    { zoom: 'corrompido', x: 'corrompido', lift: null, volume: 7, placa: { dx: 'corrompido', dy: 7 } },
+    { zoom: { valueOf: null, toString: null }, placa: [], perf: 'desconhecido' }
+  ]) {
+    let game;
+    let scale;
+    const festa = fakeFesta({ setScale: value => { scale = value; } });
+    const { document } = boot({ arraiaDesktop: null, navigator: { language: 'pt-BR' },
+      localStorage: { getItem: key => key === 'arraia-ajustes-v1' ? JSON.stringify(raw) : null },
+      ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+    assert.equal(game.ui.settings.zoom, 1);
+    assert.equal(game.ui.settings.x, 0.72);
+    assert.equal(game.ui.settings.lift, 0);
+    assert.equal(game.ui.settings.placa, null);
+    assert.ok(game.ui.settings.volume >= 0 && game.ui.settings.volume <= 1);
+    assert.equal(game.ui.settings.perf, 'suave');
+    assert.equal(scale, 3);
+    const placa = document.nodes.get('#placa');
+    assert.doesNotMatch(JSON.stringify(placa.style), /NaN|Infinity/);
+  }
+});
+
+test('o primeiro quadro depois do repouso não cobra de novo o tempo já recuperado', async () => {
+  let game;
+  let elapsed = 1000;
+  let wall = Date.now();
+  const frames = [];
+  boot({ performance: { now: () => elapsed }, requestAnimationFrame: fn => frames.push(fn),
+    __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.clock = () => wall;
+  elapsed += 250; wall += 250;
+  frames.shift()(elapsed);
+  const saved = engine.exportState();
+  elapsed += 3 * 3600000; wall += 3 * 3600000;
+  const reopened = new core.GameEngine(data, saved, { now: () => wall, rng: () => 0.5 });
+  frames.shift()(elapsed);
+  assert.equal(engine.state.stats.playtime, saved.stats.playtime, 'tempo fora não vira tempo ativo');
+  assert.equal(engine.state.stats.steps, saved.stats.steps, 'não acrescenta passos ao ganho offline');
+  assert.ok(Math.abs(engine.state.cheer - reopened.state.cheer) < 1e-9);
+});
+
+test('timestamps de quadro anteriores ao último tique não fazem o tempo de jogo andar duas vezes', async () => {
+  let game;
+  let elapsed = 1000;
+  const frames = [];
+  const intervals = [];
+  boot({ performance: { now: () => elapsed }, requestAnimationFrame: fn => frames.push(fn),
+    setInterval: fn => { intervals.push(fn); return intervals.length; }, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  elapsed = 1100;
+  intervals[0]();
+  frames.shift()(1050); // rAF já tinha esse timestamp quando o tique do intervalo rodou.
+  elapsed = 1200;
+  frames.shift()(elapsed);
+  assert.ok(Math.abs(game.engine().state.stats.playtime - 0.2) < 1e-9);
+});
+
+test('reiniciar cancela compras e descarta prévia, foto e efeitos da festa anterior', async () => {
+  let game;
+  let resets = 0;
+  const timeouts = [];
+  const intervals = new Map();
+  let nextInterval = 1;
+  const festa = fakeFesta({ reset() { resets++; } });
+  const { document } = boot({ ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {},
+    __gravador: api => { game = api; },
+    setTimeout: fn => { timeouts.push(fn); return timeouts.length; }, clearTimeout() {},
+    setInterval: fn => { const id = nextInterval++; intervals.set(id, fn); return id; },
+    clearInterval: id => intervals.delete(id) });
+  await Promise.resolve();
+  game.engine().state.cheer = 1e6;
+  const button = { dataset: { hold: 'ficha' }, disabled: false, querySelector: () => null };
+  button.closest = selector => selector === '[data-hold]' ? button : null;
+  document.listeners.pointerdown({ target: button, button: 0, clientX: 10, clientY: 10, preventDefault() {} });
+  timeouts.at(-1)();
+  const holdTimer = [...intervals.keys()].at(-1);
+  game.ui.preview = { mao: 'espiga' };
+  game.ui.lastPhoto = 'foto-da-festa-antiga';
+  const old = game.engine();
+  document.listeners.click({ detail: 0, target: { closest: () => ({ tagName: 'BUTTON', disabled: false,
+    dataset: { action: 'reiniciar' } }) } });
+  const fresh = game.engine();
+  assert.notEqual(fresh, old);
+  fresh.state.cheer = 1e6;
+  const tickets = fresh.state.tickets;
+  intervals.get(holdTimer)?.();
+  assert.equal(fresh.state.tickets, tickets, 'a compra antiga não gasta o saldo da nova festa');
+  assert.equal(game.ui.hold, null);
+  assert.equal(game.ui.preview, null);
+  assert.equal(game.ui.lastPhoto, null);
+  assert.equal(resets, 1);
+});
+
+test('a linha da felicidade abre a aba Comidas, e as barrinhas e o ×Rebolado se atualizam ao vivo', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  // Nós com data-humor, como os que a placa e a aba Comidas desenham.
+  const humor = ['amor', 'barriga', 'fator', 'fator-loja', 'linha'].map(key => ({ dataset: { humor: key }, style: {}, textContent: '', title: '',
+    classList: { toggle() {}, contains: () => false } }));
+  const all = document.querySelectorAll;
+  document.querySelectorAll = selector => (selector === '[data-humor]' ? humor : all.call(document, selector));
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'comidas' });
+  assert.equal(node('#vitrine').hidden, false);
+  assert.match(node('#vitrine').innerHTML, /data-action="vitrine-comida"/);
+  const text = key => humor.find(entry => entry.dataset.humor === key);
+  assert.equal(text('amor').style.width, '50%');
+  assert.equal(text('fator').textContent, '×1');
+  assert.equal(text('fator-loja').textContent, 'Rebolado ×1');
+  assert.match(text('linha').title, /Amor 50% .* Barriga 50%/);
+  click({ action: 'comidas' });
+  assert.equal(node('#vitrine').hidden, true, 'clicar de novo fecha');
+});
+
+test('digitar "banana" na aba Histórico liga o botão de teste só nesta sessão (ao reabrir o jogo ele some)', async () => {
+  const { document, calls } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  const digitar = texto => { for (const key of texto) document.listeners.keydown({ key, target: { closest: () => null }, preventDefault() {} }); };
+  assert.doesNotMatch(node('#placa').innerHTML, /data-tela="teste"/, 'de fábrica o botão fica escondido');
+  // Fora do Histórico (painel fechado ou em outra aba) o código não faz nada.
+  digitar('banana');
+  click({ action: 'tab', tab: 'ajustes' });
+  digitar('banana');
+  assert.doesNotMatch(node('#placa').innerHTML, /data-tela="teste"/);
+  // No Histórico, digitar errado no meio zera o código; certo liga.
+  click({ action: 'tab', tab: 'historico' });
+  digitar('banxana');
+  assert.doesNotMatch(node('#placa').innerHTML, /data-tela="teste"/);
+  digitar('banana');
+  assert.match(node('#placa').innerHTML, /data-tela="teste"/, 'o botão de teste aparece na placa');
+  // O botão abre a tela de teste, e nada disso vai para o save: um jogo novo não tem o botão.
+  click({ action: 'tela', tela: 'teste' });
+  assert.equal(node('#tela').hidden, false);
+  assert.ok(!JSON.stringify(calls).includes('banana'));
+  const reaberto = boot();
+  await Promise.resolve();
+  assert.doesNotMatch(reaberto.document.nodes.get('#placa').innerHTML, /data-tela="teste"/, 'reabrindo o jogo o botão some');
+  // Digitar de novo desliga (e fecha a tela de teste).
+  digitar('banana');
+  assert.doesNotMatch(node('#placa').innerHTML, /data-tela="teste"/);
+  assert.equal(node('#tela').hidden, true);
 });

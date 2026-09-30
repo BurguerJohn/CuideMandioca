@@ -6,13 +6,12 @@
   const sprites = globalThis.FESTA_SPRITES || null;
   const desktop = globalThis.arraiaDesktop || null;
   const I18N = globalThis.ArraiaI18n;
+  const { normalizeSettings, mergeSettings, publicSettings } = globalThis.ArraiaSettings;
   const t = (key, vars) => I18N.t(key, vars);
   const SAVE_KEY = 'arraia-save-v1';
   const SETTINGS_KEY = 'arraia-ajustes-v1';
   const LANGUAGE_KEY = 'arraia-idioma';
   const REOPEN_KEY = 'arraia-reabrir';
-  const DEFAULTS = { pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, sound: true, volume: 0.5,
-    perf: 'suave', flash: true, music: false, startup: false, calm: false };
   // Quadros por segundo da festa: [com foco, de fundo] em cada perfil de desempenho.
   const PERF_RATES = { suave: [60, 30], normal: [30, 20], economia: [20, 12] };
   const rateNow = () => (PERF_RATES[ui.settings.perf] || PERF_RATES.suave)[ui.focused ? 0 : 1];
@@ -71,7 +70,9 @@
     dock: { open: false, cat: 'melhorias', side: 'esquerda', dx: 0 }, preview: null,
     rings: { open: false, playing: false, result: null },
     tela: { open: false, id: 'correio' }, telaPos: null,
-    settings: { ...DEFAULTS, ...(desktop ? {} : readJSON(SETTINGS_KEY) || {}) },
+    settings: publicSettings(normalizeSettings(desktop ? null : readJSON(SETTINGS_KEY))),
+    // Botão de teste ligado pelo código "banana" no Histórico: só vale nesta sessão (não é salvo).
+    debug: false, segredo: '',
     interactive: null, festa: null, game: null, drag: null, hold: null, panelPos: null, ringsPos: null,
     hudKey: '', lastLive: 0, lastSave: 0, saveSoon: 0, closeArmedUntil: 0, tocou: false, redesenhar: false,
     // Ao abrir, o jogo recupera o tempo fora (convidados, conquistas...): esses sons de uma vez só viram barulho.
@@ -289,7 +290,7 @@
 
   // --- Ajustes -----------------------------------------------------------------------------------------
   function applySettings(settings) {
-    ui.settings = { ...ui.settings, ...settings };
+    ui.settings = publicSettings(mergeSettings(ui.settings, settings));
     som?.set({ enabled: ui.settings.sound !== false, volume: ui.settings.volume });
     som?.setMusic?.(ui.settings.music === true && !ui.settings.hidden);
     ui.festa?.setRate(rateNow());
@@ -382,7 +383,7 @@
 
   // --- Renderização ------------------------------------------------------------------------------------
   function context() {
-    return { tab: ui.tab, panelOpen: ui.open, lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
+    return { tab: ui.tab, panelOpen: ui.open, debug: ui.debug, lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
       settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side,
       ringPlaying: ui.rings.playing, ringResult: ui.rings.result, zoomLabel: zoomLabel(),
       closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter };
@@ -430,6 +431,7 @@
 
   function renderDock() {
     if (!ui.dock.open) return;
+    ui.dock.full = engine.bellyFull();
     const dock = $('#vitrine');
     const scroll = dock.querySelector?.('.vitrine-corpo')?.scrollLeft || 0;
     dock.innerHTML = UI.vitrine(engine, context());
@@ -454,7 +456,7 @@
       engine.specialDay()?.id, engine.daysToSaoJoao(), s.leilao?.active ? `${s.leilao.active.leader}:${s.leilao.active.price}` : '', !!s.saco?.active,
       !!s.cold?.active, !!s.visitor?.active, !!(s.fotografo?.active && !s.fotografo.active.shot), !!(s.burro?.active && !s.burro.active.pinned), !!s.fantasia?.judgeAt,
       `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha'),
-      engine.goalsReady(), ui.open && ui.tab].join('|');
+      engine.goalsReady(), ui.open && ui.tab, ui.debug].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
     const placa = $('#placa');
@@ -469,9 +471,9 @@
   }
 
   function refreshLive(force = false) {
-    const t = performance.now();
-    if (!force && t - ui.lastLive < 200) return;
-    ui.lastLive = t;
+    const clock = performance.now();
+    if (!force && clock - ui.lastLive < 200) return;
+    ui.lastLive = clock;
     const s = engine.state;
     const balances = { cheer: s.cheer, tickets: s.tickets, wood: s.wood };
     for (const node of document.querySelectorAll('[data-live]')) {
@@ -483,6 +485,22 @@
       else if (key === 'zoom') node.textContent = zoomLabel();
       else if (key in balances) node.textContent = UI.compact(balances[key]);
     }
+    // Felicidade da Mandioca: barrinhas, o quanto o Rebolado vale e a dica da linha na placa.
+    const mood = engine.mood();
+    const factor = engine.moodFactor(mood);
+    for (const node of document.querySelectorAll('[data-humor]')) {
+      const key = node.dataset.humor;
+      if (key === 'amor' || key === 'barriga') node.style.width = `${Math.round(100 * mood[key] / engine.cfg.moodMax)}%`;
+      else if (key === 'fator') node.textContent = `×${UI.number(factor, 2)}`;
+      else if (key === 'fator-loja') node.textContent = t('shop.moodNow', { stat: engine.stats.rebolado.name, f: UI.number(factor, 2) });
+      else if (key === 'linha') {
+        node.title = UI.moodTitle(engine, mood);
+        node.classList.toggle('triste', factor < 1);
+        node.classList.toggle('feliz', factor > 1);
+      }
+    }
+    // Aba Comidas aberta: quando a Barriga deixa de estar cheia (ou enche), os preços voltam (ou somem).
+    if (ui.dock.open && ui.dock.cat === 'comidas' && engine.bellyFull() !== ui.dock.full) renderDock();
     for (const node of document.querySelectorAll('[data-buff]')) {
       const left = { frenzy: s.runtime.frenzyLeft, wedding: s.runtime.weddingLeft }[node.dataset.buff] ?? s.runtime.quadrilhaLeft;
       node.textContent = `${Math.ceil(left)}s`;
@@ -537,6 +555,16 @@
     placeWindow($('#tela'), 'telaPos');
     renderHud(true);
     focusable();
+  }
+
+  // Código secreto do botão de teste (joaninha na placa): digitar "banana" com a aba Histórico aberta liga e desliga.
+  // Vale só até fechar o jogo; o botão de fábrica continua desligado (config.debugMenu).
+  const SEGREDO = 'banana';
+  function toggleDebug() {
+    ui.debug = !ui.debug;
+    if (!ui.debug && ui.tela.open && ui.tela.id === 'teste') closeTela();
+    toast(t(ui.debug ? 'app.debugOn' : 'app.debugOff'));
+    renderHud(true);
   }
 
   function closeTela() {
@@ -649,6 +677,17 @@
     renderDock();
   }
 
+  // Comida da aba Comidas: paga em Animação, enche a Barriga e voa até a Mandioca (a festa desenha).
+  function feedFood(id) {
+    const result = engine.feed(id);
+    if (result.full) { toast(t('app.bellyFull')); return; }
+    if (!result.ok) { toast(t('app.needCheer'), 'erro'); tocar('erro'); return; }
+    tocar('moeda');
+    saveLater();
+    renderDock();
+    refreshLive(true);
+  }
+
   // Segurar o botão de uma melhoria compra um nível atrás do outro.
   function updateStatCard(button, stat) {
     const card = button.closest('.vcard');
@@ -666,10 +705,12 @@
 
   // Segurar o botão: compra de novo e de novo (melhoria de atributo ou ficha), cada vez um pouco mais agudo.
   function startHold(button) {
+    stopHold();
     const kind = button.dataset.hold;
     const stat = button.dataset.stat;
     const hold = { count: 0, kind, timer: null, interval: null };
     const buy = () => {
+      if (ui.hold !== hold) return;
       if (kind === 'ficha' ? engine.buyTicket() : engine.buyLevel(stat)) {
         hold.count++;
         tocar(kind === 'ficha' ? 'moeda' : 'nivel', { pitch: Math.min(hold.count - 1, 12) });
@@ -796,6 +837,9 @@
     if (a === 'vitrine-lado') { ui.dock.side = d.side; ui.preview = null; renderDock(); return; }
     if (a === 'vitrine-item') { dockItem(d.id); return; }
     if (a === 'vitrine-conjunto') { dockSet(d.id); return; }
+    if (a === 'vitrine-comida') { feedFood(d.id); return; }
+    // A linha da felicidade na placa: abre (ou fecha) a loja na aba Comidas.
+    if (a === 'comidas') { if (ui.dock.open && ui.dock.cat === 'comidas') closeDock(); else openDock('comidas'); return; }
     if (a === 'argolas') { if (ui.rings.open) closeRings(); else openRings(); return; }
     if (a === 'argolas-fechar') { closeRings(); return; }
     if (a === 'argolas-jogar') {
@@ -812,6 +856,7 @@
     if (a === 'zoom') { setZoom(Number(d.value), true); return; }
     if (a === 'fechar-jogo') { quitGame(); return; }
     if (a === 'ficha') { done(engine.buyTicket(), t('app.ticket'), t('app.needCheer'), 'moeda'); renderRings(); return; }
+    if (a === 'melhorar') { done(engine.buyLevel(d.stat), null, t('app.needCheer'), 'nivel'); return; }
     if (a === 'pescar') {
       const result = engine.fish();
       if (result) { fishReveal(result); done(true); }
@@ -947,10 +992,16 @@
 
   // Depois de reiniciar ou importar outra festa, nada da festa anterior fica na tela.
   function forgetRound() {
+    dropPointer();
+    closeModal();
     ui.lastLetter = null;
+    ui.lastPhoto = null;
+    ui.preview = null;
     ui.rings.playing = false;
     ui.rings.result = null;
     ui.game?.reset();
+    ui.festa?.reset?.();
+    lastFrame = performance.now();
   }
 
   // Cliques na própria festa. Clicar numa barraca abre a janela dela (se já está aberta, fica aberta).
@@ -1041,7 +1092,7 @@
       if (result) done(true, t('app.rainbowPot', { n: UI.compact(result.amount), tickets: result.tickets }), null, 'premio');
     } else if (region === 'host') {
       const result = engine.pokeHost();
-      if (result.ready) { tocar('carinho'); saveLater(); }
+      if (result.ready) { tocar('carinho'); saveLater(); refreshLive(true); }
     } else if (region === 'crasher') {
       const result = engine.shooCrasher();
       if (result) done(true, t('app.crasherOut', { n: result.tickets }), null, 'expulsar');
@@ -1050,7 +1101,11 @@
     else if (region === 'sopinha') { ui.festa?.poke('sopinha'); tocar('carinho'); }
     else if (region === 'par') { ui.festa?.poke('par'); tocar('carinho'); }
     // Clique no chão: estalinho ali mesmo (o som vem da festa).
-    else if (region === 'terreiro' && at) ui.festa?.estalo?.(at.x, at.y);
+    else if (region === 'terreiro' && at) {
+      ui.festa?.estalo?.(at.x, at.y);
+      // Estalinho jogado por você deixa a Mandioca contente: um pouco de Amor.
+      if (engine.popLove()) refreshLive(true);
+    }
     else if (region === 'lado-esquerda' || region === 'lado-direita') {
       const side = region === 'lado-esquerda' ? 'esquerda' : 'direita';
       const id = engine.state.equipped[side];
@@ -1201,7 +1256,7 @@
   function setFocused(value) {
     // Perdeu o foco no meio de um arrasto: o soltar do botão não vai chegar aqui.
     if (!value && (ui.drag || ui.hold)) dropPointer();
-    // O foco mudou (o Windows mexe nos estilos da janela): o próximo movimento do mouse reenvia se ela pega o clique.
+    // A placa aparece ou some: o próximo aviso do cursor reavalia a área que recebe cliques.
     if (value !== ui.focused) ui.interactive = null;
     if (value && !ui.focused && ui.blurAt && now() - ui.blurAt >= GREET_AFTER) ui.festa?.greet?.();
     if (!value && ui.focused !== false) ui.blurAt = now();
@@ -1233,11 +1288,22 @@
   // O cursor está em cima de algo do jogo? Só então a janela aceita o clique; fora dele, o clique vaza.
   // `actual` é o que o Electron diz que a janela está de fato: se os dois lados discordarem, vale o dele.
   function hover(x, y, actual) {
-    if (typeof actual === 'boolean') ui.interactive = actual;
+    let moved = false;
+    if (typeof actual === 'boolean') {
+      ui.interactive = actual;
+      moved = x !== ui.cursorX || y !== ui.cursorY;
+      ui.cursorX = x;
+      ui.cursorY = y;
+      // Foco e estado do clique também reenviam o cursor parado: isso não é falta de movimento nativo.
+      if (!moved) ui.deafSince = 0;
+    }
     // Durante arrasto ou compra segurada a janela segue clicável, para o soltar do botão chegar aqui.
-    if (ui.drag || ui.hold) return;
+    if (ui.drag || ui.hold) {
+      if (moved) checkDeaf(actual);
+      return;
+    }
     const found = hitAt(x, y);
-    if (typeof actual === 'boolean') checkDeaf(actual && !!(found.ui || found.region));
+    if (moved) checkDeaf(actual && !!(found.ui || found.region));
     setInteractive(!!(found.ui || found.region));
     const canvas = $('#festa-canvas');
     if (canvas && found.region) canvas.style.cursor = ['terreiro', 'festa'].includes(found.region) ? 'grab' : 'pointer';
@@ -1260,12 +1326,18 @@
     ui.repairAt = at;
     ui.deafSince = 0;
     desktop.logError?.('a festa parou de receber o mouse: pedindo uma janela nova');
+    dropPointer();
     save();
     desktop.repair();
   }
 
-  document.addEventListener('mousemove', event => {
+  function pointerReceived() {
     ui.realMoveAt = performance.now();
+    ui.deafSince = 0;
+  }
+
+  document.addEventListener('mousemove', event => {
+    pointerReceived();
     hover(event.clientX, event.clientY);
   });
 
@@ -1309,6 +1381,8 @@
   }
 
   document.addEventListener('pointerdown', event => {
+    pointerReceived();
+    if (event.button !== undefined && event.button !== 0) return;
     // A janela só recebe clique em cima da festa ou das janelas do jogo: qualquer clique aqui dá foco ao jogo.
     focusGame();
     som?.unlock();
@@ -1364,8 +1438,9 @@
   }
 
   document.addEventListener('pointermove', event => {
-    // Mouse andando sem botão apertado no meio de um arrasto: o botão foi solto longe daqui.
-    if ((ui.drag || ui.hold) && event.buttons === 0) { dropPointer(); return; }
+    pointerReceived();
+    // O esquerdo foi solto, mesmo que outro botão continue apertado ou o pointerup não tenha chegado.
+    if ((ui.drag || ui.hold) && event.buttons !== undefined && !(event.buttons & 1)) { dropPointer(); return; }
     const drag = ui.drag;
     if (!drag || drag.kind === 'barra') return;
     const dx = event.clientX - drag.x;
@@ -1406,7 +1481,12 @@
     }
   });
 
-  document.addEventListener('pointerup', () => {
+  document.addEventListener('pointerup', event => {
+    pointerReceived();
+    if (event.button !== undefined && event.button !== 0) {
+      if (event.buttons === 0) dropPointer();
+      return;
+    }
     stopHold();
     const drag = ui.drag;
     ui.drag = null;
@@ -1475,6 +1555,9 @@
   });
 
   document.addEventListener('keydown', event => {
+    // Os atalhos do jogo não podem consumir a digitação nem a ativação dos controles nativos.
+    const editing = event.target?.isContentEditable || event.target?.closest?.('input, select, textarea, [contenteditable=""], [contenteditable="true"]');
+    if (editing && event.key !== 'Escape') return;
     // Itens da vitrine são cartões (div com role="button"): Enter e espaço funcionam como clique.
     const card = event.target?.closest?.('[role="button"][data-action]');
     if (card && (event.key === 'Enter' || event.key === ' ')) {
@@ -1482,11 +1565,16 @@
       comSom(() => act(card));
       return;
     }
-    if (event.key === ' ' && ui.rings.open && ui.rings.playing) {
+    if (event.key === ' ' && ui.rings.open && ui.rings.playing && !event.target?.closest?.('button, a')) {
       event.preventDefault();
       throwRing();
       return;
     }
+    if (ui.open && ui.tab === 'historico' && !event.ctrlKey && !event.altKey && !event.metaKey && typeof event.key === 'string' &&
+      /^[a-z]$/i.test(event.key)) {
+      ui.segredo = (ui.segredo + event.key.toLowerCase()).slice(-SEGREDO.length);
+      if (ui.segredo === SEGREDO) { ui.segredo = ''; toggleDebug(); return; }
+    } else if (event.key !== 'Shift') ui.segredo = '';
     if (event.key !== 'Escape') return;
     comSom(() => {
       if (ui.modal) closeModal();
@@ -1542,8 +1630,8 @@
   // --- Laço --------------------------------------------------------------------------------------------
   let lastFrame = performance.now();
   function frame(t) {
-    const delta = (t - lastFrame) / 1000;
-    lastFrame = t;
+    const delta = Math.max(0, (t - lastFrame) / 1000);
+    lastFrame = Math.max(lastFrame, t);
     // Voltando do repouso (ou de muito tempo com a festa escondida): o tempo parado rende como jogo fechado.
     const woke = engine.wake();
     if (woke && woke.cheer >= 1) {
@@ -1551,7 +1639,7 @@
         (woke.guests > 0 ? ` ${I18N.t('app.welcomeGuests', { n: woke.guests })}` : ''), 'ouro');
       saveLater();
     }
-    let remaining = Math.min(delta, desktop ? 30 : 1);
+    let remaining = woke ? 0 : Math.min(delta, desktop ? 30 : 1);
     while (remaining > 0) { const step = Math.min(remaining, 0.25); engine.tick(step); remaining -= step; }
     const events = engine.drainEvents();
     if (events.length) {
@@ -1625,8 +1713,7 @@
         { pitch: hit && (prize?.mult || prize?.factor || prize?.kind === 'item') ? 5 : 0 })
     });
   }
-  renderHud(true);
-  placeFesta();
+  applySettings(ui.settings);
   if (desktop) {
     desktop.getSettings().then(applySettings).catch(error => toast(error.message, 'erro'));
     setInterval(() => safely(() => frame(performance.now())), 250);

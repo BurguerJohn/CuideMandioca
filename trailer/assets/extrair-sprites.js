@@ -26,7 +26,8 @@ folha('chapeu-palha', bundle.hats['chapeu-palha']);
 
 // Ícones parados: retratos de corpo inteiro da turma e ícones da interface.
 for (const [chave, icone] of Object.entries(bundle.icons)) {
-  if (!chave.startsWith('char:') && !['ui:animacao', 'ui:fichas', 'ui:lotacao', 'ui:argolas', 'ui:presente'].includes(chave)) continue;
+  if (!chave.startsWith('char:') && !chave.startsWith('ui:comida-') && !['ui:animacao', 'ui:fichas', 'ui:lotacao', 'ui:argolas', 'ui:presente',
+    'ui:amor', 'ui:barriga'].includes(chave)) continue;
   const nome = chave.replace(':', '-');
   png(`${nome}.png`, icone.src);
   manifesto[nome] = { w: icone.w, h: icone.h, frames: 1, fps: 0 };
