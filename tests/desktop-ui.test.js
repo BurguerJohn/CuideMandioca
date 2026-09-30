@@ -235,18 +235,12 @@ test('Ajustes tem "Abrir com o Windows", desligado de fábrica', async () => {
   assert.deepEqual(JSON.parse(JSON.stringify(calls.filter(c => c[0] === 'settings').at(-1)[1])), { startup: true });
 });
 
-test('quem já jogava vê as novidades da versão uma vez; partida nova não', async () => {
+test('abrir o jogo não mostra janela de novidades (nem para quem já jogava)', async () => {
   const { GameEngine } = core;
   const old = new GameEngine(data, null, {}).exportState();
-  delete old.newsSeen;
-  const saves = [];
-  const { document } = boot({}, { loadGame: () => old, saveGame: state => { saves.push(state); return true; } });
+  const { document } = boot({}, { loadGame: () => old, saveGame: () => true });
   await Promise.resolve();
-  assert.match(document.nodes.get('#janela-corpo').innerHTML, /Novidades na festa!/);
-  assert.match(document.nodes.get('#janela-corpo').innerHTML, /Álbum da Festa/);
-  const fresh = boot();
-  await Promise.resolve();
-  assert.doesNotMatch(fresh.document.nodes.get('#janela-corpo').innerHTML, /Novidades na festa!/);
+  assert.doesNotMatch(document.nodes.get('#janela-corpo')?.innerHTML || '', /Novidades na festa!|novidades/);
 });
 
 test('autocura: o cursor passeia em cima do jogo, a janela diz que aceita o clique, mas o mouse não chega: pede janela nova', async () => {
@@ -315,4 +309,36 @@ test('arrastar a alça do zoom mostra a moldura do tamanho pedido, que acompanha
   assert.ok(parseFloat(guide.style.width) > first, 'arrastar para a direita aumenta a moldura, mesmo antes do pulo da festa');
   document.listeners.pointerup({});
   assert.equal(guide.hidden, true, 'soltou: a moldura some');
+});
+
+test('segurar o botão "+1 ficha" compra várias fichas seguidas; soltar para e avisa quantas', async () => {
+  // Relógios falsos: o que foi cancelado não roda mais.
+  const timeouts = [];
+  const intervals = new Map();
+  let game = null;
+  const { document } = boot({
+    setTimeout: fn => { timeouts.push(fn); return timeouts.length; },
+    setInterval: fn => { const id = 100 + intervals.size; intervals.set(id, fn); return id; },
+    clearInterval: id => intervals.delete(id), clearTimeout() {},
+    __gravador: api => { game = api; }
+  });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.cheer = 1e9;
+  const before = engine.state.tickets;
+  const button = { dataset: { hold: 'ficha' }, disabled: false, querySelector: () => null };
+  button.closest = selector => (selector === '[data-hold]' ? button : null);
+  document.listeners.pointerdown({ target: button, clientX: 10, clientY: 10, button: 0, preventDefault() {} });
+  assert.equal(engine.state.tickets, before + 1, 'a primeira sai na hora');
+  // Continuou segurando: depois da pausa, uma a cada tique.
+  timeouts.at(-1)();
+  const id = [...intervals.keys()].at(-1);
+  const tick = () => intervals.get(id)?.();
+  tick(); tick(); tick();
+  assert.equal(engine.state.tickets, before + 4);
+  document.listeners.pointerup({});
+  tick();
+  assert.equal(engine.state.tickets, before + 4, 'soltou: para de comprar');
+  const toasts = [...document.querySelector('#avisos').children].map(child => child.textContent);
+  assert.ok(toasts.some(text => /\+4 fichas/.test(text)), toasts.join(' | '));
 });

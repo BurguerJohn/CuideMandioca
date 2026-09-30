@@ -1130,16 +1130,24 @@
       const reading = resting && fx.restKind === 'carta';
       const base = bundle.hand[eq.mao];
       const item = !drinking && !eating && !reading && !tasting && base && sized(base, stage);
-      if (item) {
+      // O item da mão fica na frente do corpo e atrás da mão que segura (a camada da mão vem por cima); de costas, no giro,
+      // ele fica atrás dela.
+      const front = anchors.frente !== false && kit.hand;
+      const drawItem = () => {
         const itemFrame = item.fps && s.runtime.dancing ? frameAt(item, now) : 0;
         const ix = x + Math.round(anchors.hand[0] - item.pivot[0]);
         const iy = y + Math.round(anchors.hand[1] - item.pivot[1]);
         sprite(item, itemFrame, ix, iy);
         handFx(eq.mao, ix, iy, item, now, s.runtime.dancing);
-      }
+      };
+      if (item && !front) drawItem();
       sprite(sheet, frame, x, y);
       fx.hostShot = { sheet, frame };
       rim(sheet, frame, x, y, false, cx);
+      if (item && front) {
+        drawItem();
+        sprite(kit.hand, frame, x, y);
+      }
       if (drinking) {
         // Copo d'água na mão que sobe até a boca: vidro claro, água azul e um brilho.
         const cupX = x + Math.round(anchors.hand[0]) - 1;
@@ -2996,20 +3004,47 @@
       const state = roam(fx.hen, now, lo, hi, 0.008, 0.6);
       const chick = bundle.scenery.pintinho;
       const count = Math.min(12, layout.scenery.counts.pintinho || 0);
+      // A galinha sumiu e voltou em outro lugar (cenário mudou): os pintinhos aparecem junto dela, já em fila atrás.
+      const henX = state.x + hen.w / 2;
+      if (fx.henX === undefined || Math.abs(henX - fx.henX) > 20) fx.chicks = [];
+      fx.henX = henX;
+      const babies = [];
       for (let i = 0; i < count; i++) {
-        const baby = fx.chicks[i] || (fx.chicks[i] = { x: state.x, dir: state.dir, at: now });
-        const target = state.x + 2 - state.dir * (8 + i * 5);
+        const baby = fx.chicks[i] || (fx.chicks[i] = { x: henX - state.dir * (8 + i * 5) - chick.w / 2, dir: state.dir, at: now, walking: false });
         const dt = Math.min(100, Math.max(0, now - baby.at));
         baby.at = now;
-        const gap = target - baby.x;
-        const moving = Math.abs(gap) > 0.6;
-        if (moving) {
-          baby.x += Math.sign(gap) * Math.min(Math.abs(gap), 0.011 * dt);
-          baby.dir = Math.sign(gap);
+        babies.push({ baby, i, dt, behind: (henX - baby.x - chick.w / 2) * state.dir });
+      }
+      // Fila atrás da mãe: cada pintinho que já ficou para trás segue o da frente (o primeiro segue a galinha). Quem
+      // ainda está na frente dela (ela virou) espera ela passar, em vez de atravessar a fila. Anda até encostar e só volta
+      // a andar quando o da frente se afasta uns pixels: sem isso ele alternava andar/parar a cada quadro e piscava.
+      let leader = henX;
+      let spacing = 8;
+      for (const entry of babies.filter(entry => entry.behind > 0).sort((a, b) => a.behind - b.behind || a.i - b.i)) {
+        const { baby, dt } = entry;
+        const center = baby.x + chick.w / 2;
+        const distance = Math.abs(leader - center);
+        if (!baby.walking && distance > spacing + 3) baby.walking = true;
+        // Andando ou parado, fica virado para quem ele segue.
+        if (distance >= 1) baby.dir = Math.sign(leader - center);
+        if (baby.walking) {
+          const step = Math.min(distance - spacing, 0.013 * dt);
+          baby.x += baby.dir * Math.max(0, step);
+          if (distance - step <= spacing + 0.5) baby.walking = false;
         }
-        const frame = moving ? Math.floor(now / 120 + i) % 2 : (Math.floor(now / 700 + i) % 3 === 0 ? 2 : 0);
+        leader = baby.x + chick.w / 2;
+        spacing = 5;
+      }
+      for (const { baby, i, behind } of babies) {
+        if (behind <= 0) {
+          baby.walking = false;
+          // Parado na frente dela, olha para a mãe chegando.
+          const toward = Math.sign(henX - baby.x - chick.w / 2);
+          if (toward) baby.dir = toward;
+        }
+        const frame = baby.walking ? Math.floor(now / 120 + i) % 2 : (Math.floor(now / 700 + i) % 3 === 0 ? 2 : 0);
         const hop = critter(`pintinho:${i}`, baby.x, GROUND - chick.h + 2, chick.w, chick.h, now);
-        sprite(chick, frame, baby.x, GROUND - chick.h + 2 + hop + beat(i * 0.7), (moving ? baby.dir : state.dir) < 0);
+        sprite(chick, frame, baby.x, GROUND - chick.h + 2 + hop + beat(i * 0.7), baby.dir < 0);
         spots.set(`pintinho:${i + 1}`, { x: baby.x + 3, y: GROUND - 6 });
       }
       const frame = state.mode === 'anda' ? Math.floor(now / 170) % 2 : 2 + Math.floor(now / 150) % 2;
@@ -3960,7 +3995,11 @@
         // Texto marcado para depois (o resultado do concurso, o grito sobre os bichos): ainda não aparece.
         if (age < 0 || fx.hideTexts) continue;
         const t = age / item.ttl;
-        write(item.text, item.x, item.y - item.rise * Math.min(1, t * 1.6), item.color, t > 0.75 ? (1 - t) * 4 : 1);
+        // O letreiro inteiro dentro da festa: perto da borda (o mastro, a barraca do canto), ele desliza para dentro em vez
+        // de sair cortado. Cada letra tem 4 px.
+        const half = (String(item.text).length * 4 + 1) / 2 + 1;
+        const x = view.width > half * 2 ? Math.max(half, Math.min(view.width - half, item.x)) : item.x;
+        write(item.text, x, item.y - item.rise * Math.min(1, t * 1.6), item.color, t > 0.75 ? (1 - t) * 4 : 1);
       }
       const bugs = Math.min(40, 3 + (layout.scenery.counts.vagalume || 0));
       // Vaga-lumes: três desde o começo e mais um a cada vaga-lume que o cenário ganha.
@@ -4840,7 +4879,7 @@
     function setSleepy(on) { sleepy = on === true; }
 
     // Estado dos enfeites que vêm e vão sozinhos (para os testes e as fotos): vento (-1 a 1) e ciranda das crianças.
-    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size }; }
+    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
 
     // A pessoa voltou para a festa depois de um tempo fora: a Mandioca dá um pulinho, faz o olhar felizinho e cumprimenta.
     const GREETINGS = 4;
@@ -4855,7 +4894,20 @@
     // Partida nova: a Mandioca brota da terra (a abertura do jogo).
     function sprout(now = root.performance?.now?.() || 0) { fx.sprout = now; }
 
-    return { draw, setScale, setRate, setFlash, setCalm, setSleepy, hit, onEvents, celebrate, poke, photo, portrait, areas, probe, sprout, greet, moonPhase, estalo: throwEstalo, size: sizeInfo };
+    // Só para o gravador de vídeos (trailer/captura): começa agora um evento que a festa sorteia sozinha (drones, dança
+    // das fitas, compadres, carro de boi), já `idade` ms adiantado, para ele cair no compasso da música. `ordem` escolhe
+    // as cinco formas do show de drones (índices de DRONE_SHAPES).
+    function provocar(kind, { idade = 0, ordem = null, lado = 1 } = {}) {
+      const at = (fx.lastDraw || 0) - idade;
+      if (kind === 'drones') fx.drones = { at, next: 0, said: idade > DRONE_MOVE, viva: false, order: ordem || [0, 1, 2, 3, 4] };
+      else if (kind === 'fitas') fx.fitas = { at, next: 0, said: false };
+      else if (kind === 'compadres') fx.compadre = { at, next: 0, said: -1, witnessed: false, ended: false };
+      else if (kind === 'carroBoi') fx.carroBoi = { at, next: 0, dir: lado };
+      else return false;
+      return true;
+    }
+
+    return { draw, setScale, setRate, setFlash, setCalm, setSleepy, hit, onEvents, celebrate, poke, photo, portrait, areas, probe, sprout, greet, moonPhase, estalo: throwEstalo, size: sizeInfo, provocar };
   }
 
   root.ArraiaFesta = { create, terrainWidth, amount, pixelText, withPreview };

@@ -16,9 +16,9 @@ const GRAVACOES = {
   argolas: ['argolas'],
   presentes: ['presentes'],
   turma: ['palco'],
-  // Trailer da Steam (16:9, gravado em 4K): uma gravação por cena, mais o palco do fim da cena 4.
-  steam: ['steam-quintal', 'steam-melhorias', 'steam-quermesse', 'steam-cidade', 'steam-palco', 'steam-regional',
-    'steam-maior', 'steam-final']
+  // Trailer da Steam (16:9, gravado em 4K): uma gravação por cena (a v3 não usa mais o palco no fim da cena 4).
+  steam: ['steam-quintal', 'steam-melhorias', 'steam-quermesse', 'steam-cidade', 'steam-regional', 'steam-maior',
+    'steam-final']
 };
 
 const copiarPasta = (origem, destino) => {

@@ -116,6 +116,7 @@
         `${count ? `<i class="selo-botao">${count}</i>` : ''}</button>`;
     }).join('');
     const upcoming = engine.sceneryPiece(s.size + 1);
+    const goalsReady = engine.goalsReady();
     // O que está valendo agora: frenesi (do balão de sorte) e quadrilha marcada, cada um com os segundos que faltam.
     const r = s.runtime;
     const buffs = [
@@ -160,6 +161,13 @@
       `${engine.ringCost()}</i></button>` + telas + `</div><div class="barra-sistema">` +
       `<button class="ferramenta" data-action="abrir" title="${esc(t('hud.panel'))}">` +
       `${ctx.icon('ui:painel')}</button>` +
+      // Conquistas: abre o painel nessa aba; o selo conta as metas cumpridas esperando o resgate.
+      `<button class="ferramenta ${goalsReady ? 'chama' : ''} ${ctx.tab === 'conquistas' && ctx.panelOpen ? 'aberta' : ''}" ` +
+      `data-action="tab" data-tab="conquistas" data-alternar="1" title="${esc(goalsReady ? t('hud.goalsReady', { n: goalsReady }) : tabName('conquistas'))}">` +
+      `${ctx.icon('ui:conquista')}${goalsReady ? `<i class="selo-botao">${goalsReady}</i>` : ''}</button>` +
+      // Álbum de figurinhas, na janela dele.
+      `<button class="ferramenta ${ctx.tela === 'album' ? 'aberta' : ''}" data-action="tela" data-tela="album" ` +
+      `title="${esc(tabName('album'))}">${ctx.icon('ui:album')}</button>` +
       (engine.cfg.debugMenu ? `<button class="ferramenta teste ${ctx.tela === 'teste' ? 'aberta' : ''}" data-action="tela" ` +
         `data-tela="teste" title="${esc(t('hud.test'))}">${ctx.icon('ui:teste')}</button>` : '') +
       `<span class="espaco"></span>` +
@@ -182,7 +190,8 @@
     const top = `<div class="vitrine-topo" title="${esc(t('shop.drag'))}"><div class="vitrine-saldo">` +
       `<span class="recurso" title="${esc(t('res.cheer'))}">${ctx.icon('ui:animacao')}<b data-live="cheer">${compact(s.cheer)}</b></span>` +
       `<span class="recurso" title="${esc(t('res.tickets'))}">${ctx.icon('ui:fichas')}<b data-live="tickets">${compact(s.tickets)}</b></span>` +
-      costButton('ficha', '', engine.ticketCost(), 'cheer', t('shop.buyTicket'), ctx.icon('ui:animacao')) +
+      // Segurar compra várias fichas seguidas (como as melhorias); um clique compra uma.
+      costButton('ficha', 'data-hold="ficha"', engine.ticketCost(), 'cheer', t('shop.buyTicket'), ctx.icon('ui:animacao')) +
       `<button class="fechar" data-action="vitrine-fechar" title="${esc(t('shop.close'))}">×</button></div>` +
       `<div class="vabas">${tabs}</div></div>`;
     let body;
@@ -350,15 +359,8 @@
       `</div><p class="miudo">${esc(t('party.offlineHint', { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
       `<div class="rotulo">${esc(t('party.multipliers'))}</div><div class="numeros">` +
       pieces.map(([label, value]) => `<div><span>${esc(label)}</span><b>${value}</b></div>`).join('') + `</div></div>` +
-      repertoire(engine) + scenery(engine) + clickables() +
+      repertoire(engine) + scenery(engine) +
       (tier === 0 ? `<div class="dica">${t('party.tip')}</div>` : '');
-  }
-
-  // O que responde ao clique na festa (muita coisa só se descobre clicando).
-  function clickables() {
-    const items = t('clicks.list').split('|');
-    return `<div class="cartao"><div class="rotulo">${esc(t('clicks.title'))}</div><ul class="cliques">` +
-      items.map(item => `<li>${esc(item)}</li>`).join('') + `</ul></div>`;
   }
 
   // Repertório: os passos de dança já aprendidos e o que falta para cada um dos outros.
@@ -458,7 +460,9 @@
         }
         const prize = outing.item ? t('outing.prize', { chance: percent(outing.chance), item: engine.items[outing.item].name }) : '';
         return `<div class="cartao"><div class="linha">${ctx.icon('ui:role', 'grande')}<div><h3>${esc(outing.name)}</h3>` +
-          `<p class="miudo">${esc(t('outing.info', { time: duration(outing.minutes * 60000), n: outing.wood, prize }))}</p></div></div>${body}</div>`;
+          // Com alguém no rolê, a lenha que essa pessoa traz de verdade (a raridade dela multiplica a lenha do rolê).
+          `<p class="miudo">${esc(t('outing.info', { time: duration(outing.minutes * 60000),
+            n: entry.char && engine.chars[entry.char] ? engine.outingWood(index, entry.char) : outing.wood, prize }))}</p></div></div>${body}</div>`;
       }).join('')}</div>`;
   }
 
@@ -550,13 +554,14 @@
     return `<div class="progresso">${bar(entry[0], entry[1], 'fama')}<small>${compact(entry[0])}/${compact(entry[1])}</small></div>`;
   }
 
-  // Álbum da Festa: uma página por tema, cinco figurinhas cada. A que falta aparece com "?" e o nome, para dar vontade.
+  // Álbum da Festa (tela própria, botão na placa): uma página por tema, cinco figurinhas cada. A que falta aparece com
+  // "?" e o nome, para dar vontade.
   function album(engine, ctx) {
     const have = new Set(engine.state.album || []);
     const pages = engine.data.album || [];
     const full = engine.albumPages();
-    return `<div class="rotulo">${esc(t('album.title'))}</div>` +
-      `<p class="miudo">${esc(t('album.hint', { v: Math.round(engine.cfg.albumBonus * 100), n: engine.cfg.albumTickets, pages: full, total: pages.length }))}</p>` +
+    return header(tabName('album'), esc(t('album.hint', { v: Math.round(engine.cfg.albumBonus * 100), n: engine.cfg.albumTickets,
+      pages: full, total: pages.length })), `<span class="selo">${esc(t('count.of', { n: have.size, total: pages.reduce((sum, page) => sum + page.stickers.length, 0) }))}</span>`) +
       `<div class="album">${pages.map(page => {
         const got = page.stickers.filter(sticker => have.has(sticker.id)).length;
         const done = got === page.stickers.length;
@@ -572,7 +577,7 @@
   function conquistas(engine, ctx) {
     const done = engine.state.achievements;
     return header(tabName('conquistas'), esc(t('count.of', { n: done.length, total: engine.data.achievements.length }))) +
-      metas(engine) + album(engine, ctx) + `<div class="rotulo">${esc(t('goals.achievements'))}</div>` +
+      metas(engine) + `<div class="rotulo">${esc(t('goals.achievements'))}</div>` +
       `<div class="lista">${engine.data.achievements.map(a =>
         `<div class="cartao conquista ${done.includes(a.id) ? 'feita' : ''}"><div class="linha">` +
         `${ctx.icon('ui:conquista', 'grande')}<div><h3>${esc(a.name)}</h3><p class="miudo">${esc(a.text)}</p>` +
@@ -902,8 +907,8 @@
       `<p class="miudo">${esc(t('bingo.stats', { cards: s.stats.bingoCards, wins: s.stats.bingos }))}</p>`;
   }
 
-  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, bingo, cozinha, teste };
-  const telaName = id => (id === 'teste' || TELAS.some(entry => entry.id === id) ? tabName(id) : '');
+  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, bingo, cozinha, album, teste };
+  const telaName = id => (id === 'teste' || id === 'album' || TELAS.some(entry => entry.id === id) ? tabName(id) : '');
 
   function panel(engine, ctx) {
     const tab = RENDER[ctx.tab] ? ctx.tab : 'festa';

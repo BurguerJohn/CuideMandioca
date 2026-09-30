@@ -85,7 +85,14 @@ O gravador desliga o botão de debug (joaninha) e os efeitos sonoros do jogo dur
 `videos/steam/` é o trailer da página da Steam: 1920×1080, 30 fps, **58,7 s**, com a música "Balanço de Pixel" (feita
 no Suno, arquivo na pasta do jogo). A festa começa sem nenhuma melhoria na área de trabalho e sobe um porte por frase
 da música, até o Maior São João do Mundo; fecha na placa do título e na linha "Um jogo idle de festa junina para a sua
-área de trabalho" (sem "lista de desejos": o trailer fica na página depois do lançamento). Os MP4 ficam em
+área de trabalho" (sem "lista de desejos": o trailer fica na página depois do lançamento).
+
+**v3 (2026-09-29):** mesma música, tempos e arco, com a gameplay regravada no jogo de hoje e as novidades: a Mandioca
+começa brotinho e cresce na cena 2; a cena 4 mostra uma brincadeira por compasso (quebra-pote, rabo no burro na mosca,
+casamento na roça e o prato do Fogão a Lenha voando até a Mandioca) no lugar das Argolas; a cena 5 passa pela dança
+das fitas e pelos compadres de fogueira; o clímax tem o show de drones desenhando a Mandioca no céu. Os eventos que a
+festa sorteia sozinha (drones, fitas, compadres) são começados pelo gravador com `__jogo.ui.festa.provocar(...)`, e o
+pote tem posição fixa no roteiro, para as câmeras da montagem saberem onde mirar. Os MP4 ficam em
 `renders/<idioma>/steam.mp4`.
 
 - **Plano:** `STORYBOARD.md` (cenas, tempos na música, o que mudou na montagem), `storyboard.html` (rascunhos

@@ -7,9 +7,25 @@ audience: jogadores da Steam que curtem jogos idle, aconchegantes e em pixel art
 mode: collaborative
 ---
 
-# Trailer da Steam — plano (v2)
+# Trailer da Steam — plano (v3)
 
-## Changes from v1
+## Changes from v2
+
+- Usuário (2026-09-29): "Crie um trailer para a steam do jogo, atualizado com as coisas novas, nas tres linguas".
+  Mesmo arco, música, tempos, selo e final da v2 (travados); o que muda é a gameplay, regravada com o jogo de hoje, e o
+  conteúdo de quatro cenas para mostrar as novidades:
+  - Cena 1: a Mandioca agora começa **brotinho** (antes ela já aparecia inteira).
+  - Cena 2: ela **cresce** diante da câmera (brotinho → mudinha → mandioquinha) enquanto ganha chapéu e roupa; a
+    segunda legenda passa a ser "Melhore a dança e veja a Mandioca **crescer**".
+  - Cena 4: as Argolas saem; entram as **brincadeiras da Festa da Cidade**, uma por compasso: quebra-pote, rabo no
+    burro, casamento na roça e o prato do Fogão a Lenha voando até a Mandioca.
+  - Cena 5: a panorâmica passa pela **dança das fitas** no mastro, pelo palco e para na fogueira com os **compadres de
+    fogueira** (a ponte de fagulhas) antes da labareda.
+  - Cena 6: o clímax ganha o **show de drones** desenhando a Mandioca no céu (e o telão no palco).
+- Técnico: a festa ganha um gancho só para o gravador (`festa.provocar`) que começa os eventos do desenho (drones, fitas,
+  compadres) na hora do compasso; as câmeras são medidas de novo com `--medir`.
+
+## Changes from v1 (histórico)
 
 - Usuário: "Não sei se precisa da mensagem para adicionar na lista de desejos, pois esse trailer vai ficar mesmo depois
   de estar disponivel para jogar". A cena 7 troca o botão da lista de desejos por uma linha que vale para sempre.
@@ -18,9 +34,19 @@ mode: collaborative
 
 - Plano v2 e rascunhos (`storyboard.html` v2) aprovados pelo usuário ("Sim pode gravar"): 7 cenas, tempos da música,
   selo fixo no canto, legendas no terço de cima, final com a placa do título e a linha "Um jogo idle de festa junina
-  para a sua área de trabalho" (sem lista de desejos).
+  para a sua área de trabalho" (sem lista de desejos). A v3 mantém tudo isso; muda só o que está em "Changes from v2".
 
-## Depois da montagem (o que mudou em relação aos rascunhos)
+## Depois da montagem v3 (o que mudou em relação às prévias)
+
+- Cena 4: uma gravação só (9,24 s, do começo); a câmera empurra de leve para o pote (720, 441), o burro (588, 678), o
+  casamento (1122, 684) e o meio do caminho entre o fogão e a Mandioca (1233, 640), limitada para a borda do vídeo não
+  aparecer. O fecho no palco (`steam-palco`) saiu; o selo "Animação ×2!" das Argolas também.
+- Cena 6: a legenda grande desceu para a parte de baixo (sobre a terra da ilha e a barra de tarefas) para o show de
+  drones ficar à vista no céu. A planilha dessa gravação é mais estreita (38%) para os drones ficarem sobre o papel de
+  parede.
+- Jogo: os letreiros flutuantes ficam inteiros dentro da festa (o "DANÇA DAS FITAS!" saía cortado na borda).
+
+## Depois da montagem v2 (o que mudou em relação aos rascunhos)
 
 - Duração final: 58,65 s (igual ao plano). Cortes nos inícios de frase: 9,729 · 18,947 · 28,166 · 37,407 · 46,626 · 53,54.
 - Cenas 2, 3 e 5: a legenda desceu para a parte de baixo (sobre a terra da ilha). Na gravação de perto, a cabeça da
@@ -49,7 +75,7 @@ mode: collaborative
 
 ## Frame 1 — O quintal na área de trabalho
 
-- scene: A Mandioca dança sozinha; a câmera recua e revela que a festa inteira flutua sobre uma planilha
+- scene: A Mandioca, ainda brotinho, dança sozinha; a câmera recua e revela que a festa inteira flutua sobre uma planilha
 - duration: 9.73s
 - poster: 7s
 - transition_in: cut
@@ -59,8 +85,8 @@ mode: collaborative
 - rules: coordinate-target-zoom, spring-pop-entrance
 - voiceover: onscreen — "Uma festa junina que dança na sua área de trabalho"
 
-0,0–9,7 s (compassos em 0,58 · 2,89 · 5,19 · 7,50). Abre fechado na Mandioca dançando sozinha no terreiro de terra,
-sem nenhuma melhoria (1 convidado). No primeiro tempo forte (1,0 s) a **placa do título** cai do alto e balança. No
+0,0–9,7 s (compassos em 0,58 · 2,89 · 5,19 · 7,50). Abre fechado na Mandioca **brotinho** dançando sozinha no terreiro
+de terra, sem nenhuma melhoria (1 convidado). No primeiro tempo forte (1,0 s) a **placa do título** cai do alto e balança. No
 compasso 2 a câmera recua num zoom-out só, desacelerando, até mostrar a festa inteira, pequena, flutuando sobre uma
 planilha de escritório ("Relatorio_trimestral_FINAL_v7_agora_vai.xlsx"), com a barra de tarefas embaixo. No compasso
 3 a placa encolhe para virar o **selo da festa** ("Arraiá de Quintal · 👥 1") no canto; entra a legenda "Uma festa
@@ -69,7 +95,7 @@ Não: sem logo girando, sem texto antes da Mandioca aparecer.
 
 ## Frame 2 — Primeiras melhorias
 
-- scene: De perto, a Mandioca ganha chapéu, roupa e terreiro novos a cada compasso; os primeiros convidados chegam
+- scene: De perto, a Mandioca cresce (brotinho → mudinha → mandioquinha) e ganha chapéu e roupa; os primeiros convidados chegam
 - duration: 9.22s
 - poster: 5s
 - transition_in: zoom-through
@@ -77,12 +103,13 @@ Não: sem logo girando, sem texto antes da Mandioca aparecer.
 - src: compositions/frames/02-melhorias.html
 - blueprint: fixed-anchor-cycle
 - rules: spring-pop-entrance, counting-dynamic-scale
-- voiceover: onscreen — "Cada passo rende Animação. Melhore a dança e vista a Mandioca."
+- voiceover: onscreen — "Cada passo rende Animação. Melhore a dança e veja a Mandioca crescer."
 
 9,7–18,9 s. A câmera mergulha de volta na festa (sobre o céu de São João). O selo fica parado; em volta dele a festa
-muda a cada compasso: 12,0 s (o pico mais forte da música) — **chapéu de vaqueiro** cai na cabeça dela; 14,3 s —
+muda a cada compasso: 12,0 s (o pico mais forte da música) — a Mandioca **cresce** para mudinha (a animação de crescer
+do jogo, com terra e brilho) e o **chapéu de vaqueiro** cai na cabeça dela; 14,3 s — cresce de novo (mandioquinha),
 roupa **xadrez azul** e espiga na mão; 16,6 s — convidados chegam e o selo conta 👥 1 → 9. Números "+1" de Animação
-sobem a cada passo. Legenda: "Cada passo rende **Animação**" → "Melhore a dança e **vista a Mandioca**". Por que: mostra o laço do
+sobem a cada passo. Legenda: "Cada passo rende **Animação**" → "Melhore a dança e veja a Mandioca **crescer**". Por que: mostra o laço do
 jogo (dança → Animação → melhoria) em 9 segundos. Não: sem menu de compra aberto ocupando a tela.
 
 ## Frame 3 — Quermesse do Bairro
@@ -104,24 +131,26 @@ o crescimento é visível — a festa ganha coisas, não só números. Não: sem
 
 ## Frame 4 — Festa da Cidade
 
-- scene: Com 25 convidados a festa vira Festa da Cidade; uma rodada das Argolas acerta a estrela ×2
+- scene: Com 25 convidados a festa vira Festa da Cidade; uma brincadeira por compasso: quebra-pote, rabo no burro, casamento na roça e o prato do fogão
 - duration: 9.24s
-- poster: 6s
+- poster: 5s
 - transition_in: cut
 - status: animated
 - src: compositions/frames/04-cidade.html
-- blueprint: device-surface-showcase
+- blueprint: fixed-anchor-cycle
 - rules: coordinate-target-zoom, spring-pop-entrance
-- voiceover: onscreen — "Argolas da Sorte, pescaria e uma turma inteira"
+- voiceover: onscreen — "Quebra-pote, casamento na roça e muito mais"
 
-28,2–37,4 s. O selo vira "Festa da Cidade · 👥 25". A janela das **Argolas da Sorte** abre sobre a festa e ocupa o
-centro: duas argolas encaixam (fichas, depois a garrafa da estrela: "ANIMAÇÃO X2!") e a Animação do selo dobra. No
-último compasso, corte para a turma no palco. Legenda: "**Argolas da Sorte**, pescaria e uma turma inteira". Por que:
-tem coisa pra fazer quando você quer jogar de verdade. Não: sem explicar regras.
+28,2–37,4 s. O selo vira "Festa da Cidade · 👥 25". A festa inteira fica no quadro (a mesma festa, maior) e cada compasso
+acende uma brincadeira de verdade do jogo, com a câmera dando um leve empurrão na direção dela: 28,2 s — o **pote** se
+quebra e chove bala; 30,5 s — o **rabo no burro** prega na mosca; 32,8 s — os noivos do **casamento na roça** e a
+chuva de arroz; 35,1 s — o **prato do Fogão a Lenha** voa até a Mandioca ("HUMMM!"). Legenda: "**Quebra-pote**,
+casamento na roça e **muito mais**". Por que: a Festa da Cidade é onde as brincadeiras de festa junina viram jogo.
+Não: sem explicar regras, sem janela de menu na frente.
 
 ## Frame 5 — São João Regional
 
-- scene: 50 convidados: forró no palco, roda-gigante e a fogueira crescendo até a labareda
+- scene: 50 convidados: dança das fitas no mastro, forró no palco e os compadres de fogueira antes da labareda
 - duration: 9.22s
 - poster: 5s
 - transition_in: cut
@@ -129,15 +158,16 @@ tem coisa pra fazer quando você quer jogar de verdade. Não: sem explicar regra
 - src: compositions/frames/05-regional.html
 - blueprint: camera-journey
 - rules: viewport-change, particle-burst
-- voiceover: onscreen — "Forró no palco e fogueira acesa"
+- voiceover: onscreen — "Dança das fitas, forró e fogueira acesa"
 
-37,4–46,6 s. O selo vira "São João Regional · 👥 50". A câmera anda pela festa larga numa panorâmica: o palco com a
-turma tocando, a roda-gigante, e para na fogueira, que solta a labareda no último compasso. Legenda: "**Forró** no
-palco e **fogueira** acesa". Por que: é o meio do caminho, a festa já é grande. Não: sem cortar a panorâmica no meio.
+37,4–46,6 s. O selo vira "São João Regional · 👥 50". A câmera anda pela festa larga numa panorâmica: começa no mastro
+com as crianças na **dança das fitas**, passa pelo palco com a turma tocando e para na fogueira, onde os **compadres de
+fogueira** estendem a mão por cima do fogo (a ponte de fagulhas); no último compasso sai a labareda. Legenda: "**Dança
+das fitas**, forró e **fogueira** acesa". Por que: é o meio do caminho, a festa já é grande. Não: sem cortar a panorâmica no meio.
 
 ## Frame 6 — O Maior São João do Mundo
 
-- scene: Clímax: a festa gigante com 101 convidados; a câmera recua até a área de trabalho de novo
+- scene: Clímax: a festa gigante com 101 convidados e o show de drones desenhando a Mandioca no céu; a câmera recua até a área de trabalho
 - duration: 6.91s
 - poster: 3s
 - transition_in: flash-through-white
@@ -148,7 +178,8 @@ palco e **fogueira** acesa". Por que: é o meio do caminho, a festa já é grand
 - voiceover: onscreen — "o MAIOR SÃO JOÃO DO MUNDO"
 
 46,6–53,5 s (a emenda da música: entra a última frase). Flash branco no tempo forte: a Mandioca de coroa de milho no
-meio da maior festa, confete, e o selo conta até "Maior São João do Mundo · 👥 101". A câmera recua, como na cena 1,
+meio da maior festa, confete, o **show de drones** desenhando a Mandioca no céu e o **telão** no palco, e o selo conta até
+"Maior São João do Mundo · 👥 101". A câmera recua, como na cena 1,
 e a festa gigante aparece de novo **em cima da planilha**. Legenda grande: "o **MAIOR SÃO JOÃO** DO MUNDO". Por que:
 responde à cena 1 (mesmo recuo, mesma área de trabalho) — era a mesma festa o tempo todo. Não: sem fogos genéricos
 por cima do jogo.

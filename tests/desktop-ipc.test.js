@@ -289,3 +289,24 @@ test('autocura: a página pede janela nova quando o mouse não chega nela, mas s
   assert.equal(windows.length, 2, 'solta, pode ter outra janela por cima: não é defeito');
   I18N.setLanguage('pt-BR');
 });
+
+test('perder e ganhar o foco não derruba o clique: a janela reaplica o estado de clique depois de mudar o foco', async () => {
+  const { listeners, window } = loadMain();
+  await Promise.resolve();
+  const win = window();
+  const own = { sender: win.webContents };
+  const calls = [];
+  const original = win.setIgnoreMouseEvents.bind(win);
+  win.setIgnoreMouseEvents = value => { calls.push(value); original(value); };
+  listeners.get('desktop:set-interactive')(own, true);
+  calls.length = 0;
+  // Clicou fora: a janela perde o foco e fica sem poder ser ativada, mas continua pegando o clique em cima da festa.
+  for (const fn of win.events.blur || []) fn();
+  assert.equal(win.focusable, false);
+  assert.deepEqual(calls, [false], 'reaplicou "pega o clique" depois do setFocusable');
+  // Clique na festa: volta a ter foco e o estado de clique é reaplicado de novo.
+  win.focused = false;
+  listeners.get('desktop:focus-game')(own);
+  assert.deepEqual(calls, [false, false]);
+  I18N.setLanguage('pt-BR');
+});

@@ -52,6 +52,15 @@ test('o pacote de arte tem sprite e ícone para todo item, personagem e pedido',
     assert.equal(kit.anchors[spin[8]].eyes, null, 'de costas não');
     assert.equal(kit.anchors[spin[2]].eyes, null, 'de lado não');
   }
+  // A mão que segura o item vem numa folha à parte (o jogo desenha corpo, item e mão, nessa ordem). De costas, no giro,
+  // o item fica atrás; e de lado a âncora da mão aperta junto com o corpo (antes o item ficava solto no ar).
+  for (const kit of growth) {
+    assert.ok(kit.hand, 'folha da mão');
+    assert.equal(kit.hand.frames, kit.anchors.length);
+    assert.equal(kit.anchors[spin[0]].frente, true);
+    assert.equal(kit.anchors[spin[8]].frente, false);
+    assert.ok(kit.anchors[spin[4]].hand[0] > kit.anchors[spin[0]].hand[0], 'de lado a mão fica mais perto do meio');
+  }
   const meta = bundle.mandioca.meta;
   // Cada passo de dança do repertório tem 16 quadros, e todos os quadros têm âncora para o chapéu e a mão.
   const dances = Object.values(meta.tags.dancas);
@@ -153,6 +162,39 @@ test('os bichos e as crianças da festa são clicáveis e reagem com um pulinho 
   assert.ok(calls.drawImage > before, 'a festa segue sendo desenhada depois dos cliques');
   festa.poke('bicho:desconhecido:9');
   festa.poke(undefined);
+});
+
+test('os pintinhos seguem a galinha em fila, sem piscar entre andar e parar nem empilhar', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = new GameEngine(data, null, { rng: () => 0.3 });
+  while (engine.state.size < 160) engine.addFame(engine.fameNeed() - engine.state.fame);
+  let now = 5000;
+  let prev = null;
+  const toggledAt = [];
+  let flicker = 0;
+  let walked = 0;
+  for (let f = 0; f < 3000; f++) {
+    festa.draw(engine, (now += 17));
+    const { hen, chicks } = festa.probe();
+    assert.ok(hen && chicks.length > 1, 'galinha com pintinhos');
+    chicks.forEach((chick, i) => {
+      if (chick.walking) walked++;
+      if (prev && prev[i].walking !== chick.walking) {
+        // Antes ele alternava andar/parar quase todo quadro (e o desenho piscava entre andar e bicar).
+        if (f - (toggledAt[i] ?? -99) <= 3) flicker++;
+        toggledAt[i] = f;
+      }
+    });
+    const xs = chicks.map(chick => Math.round(chick.x)).sort((a, b) => a - b);
+    for (let i = 1; i < xs.length; i++) assert.notEqual(xs[i], xs[i - 1], `dois pintinhos no mesmo lugar (quadro ${f})`);
+    prev = chicks;
+  }
+  assert.ok(walked > 0, 'eles andam atrás da mãe');
+  assert.ok(flicker <= 2, `andar/parar trocando a cada quadro: ${flicker}`);
 });
 
 test('o pote do quebra-pote pendura, balança a cada paulada e some quando quebra', () => {
@@ -882,4 +924,28 @@ test('depois de um salto no relógio (repouso), os eventos da festa não começa
   const busy = festa.probe();
   const started = [busy.fitas, busy.drones, busy.carroBoi, busy.flock, !!busy.compadres, busy.phones, busy.ring].filter(Boolean);
   assert.ok(started.length <= 1, `começaram juntos: ${started.length}`);
+});
+
+test('gancho do gravador: provocar começa drones, dança das fitas, compadres e carro de boi na hora', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  engine.state.inventory.push('mastro');
+  engine.equip('mastro', 'esquerda');
+  let now = 5000;
+  festa.draw(engine, now);
+  assert.equal(festa.provocar('nada'), false);
+  assert.ok(festa.provocar('fitas'));
+  assert.ok(festa.provocar('compadres', { idade: 2500 }));
+  assert.ok(festa.provocar('carroBoi', { lado: -1 }));
+  festa.draw(engine, (now += 50));
+  const p = festa.probe();
+  assert.equal(p.fitas, true);
+  assert.equal(p.compadres, 'verse', 'dois segundos e meio depois de começar, estão no primeiro verso');
+  // Drones: só no Maior São João do Mundo (porte 4).
+  assert.ok(festa.provocar('drones', { ordem: [3, 4, 4, 4, 4] }));
+  festa.draw(engine, (now += 50));
+  assert.equal(festa.probe().drones, engine.tierIndex() >= 4);
 });

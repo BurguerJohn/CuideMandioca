@@ -295,6 +295,12 @@ def squeeze(frame, factor):
     return out
 
 
+def squeezed_x(x, frame_width, factor):
+    """Onde a coluna `x` vai parar depois de `squeeze` (a âncora da mão acompanha o corpo apertado no giro)."""
+    width = max(2, round(frame_width * factor))
+    return round((frame_width - width) // 2 + x * width / frame_width)
+
+
 def mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, eyes='abertos', hop=0, back=False, squash=1.0):
     frame = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     leg_layer = Layer(FRAME_W, FRAME_H)
@@ -308,12 +314,21 @@ def mandioca_frame(fabric, bob, sway, left, right, lifted, mouth, eyes='abertos'
     arm(arms, (4, 22), *left_points, ox, oy)
     arm(arms, (19, 22), *right_points, ox, oy)
     frame.alpha_composite(outline(arms.image).crop((1, 1, FRAME_W + 1, FRAME_H + 1)))
+    # A mão que segura o item, sozinha (com o antebraço, para o contorno emendar igual): o jogo desenha o item na frente
+    # do corpo e esta camada por cima dele. De costas, o item fica atrás (`frente` falso).
+    grip = Layer(FRAME_W, FRAME_H)
+    arm(grip, left_points[0], left_points[0], left_points[1], ox, oy)
+    hand = outline(grip.image).crop((1, 1, FRAME_W + 1, FRAME_H + 1))
     anchors = {'head': [ox, oy - hop], 'eyes': [ox + 8, oy + 12 - hop],
-               'hand': [round(ox + left_points[1][0]), round(oy + left_points[1][1] - hop)]}
+               'hand': [round(ox + left_points[1][0]), round(oy + left_points[1][1] - hop)], 'frente': not back}
     if hop:
         frame = shifted(frame, -hop)
+        hand = shifted(hand, -hop)
     if squash < 1:
+        anchors['hand'][0] = squeezed_x(anchors['hand'][0], frame.width, squash)
         frame = squeeze(frame, squash)
+        hand = squeeze(hand, squash)
+    anchors['_mao'] = hand
     return frame, anchors
 
 
@@ -340,23 +355,31 @@ def small_frame(stage, fabric, bob, sway, left, right, lifted, mouth, eyes='aber
     left_points = LEFT_ARM[left] if isinstance(left, str) else left
     right_points = RIGHT_ARM[right] if isinstance(right, str) else right
     scaled = lambda points: tuple((x * s, y * s) for x, y in points)
-    for shoulder, points in (((4, 22), left_points), ((19, 22), right_points)):
+    grip = Layer(width, height)
+    for shoulder, points, layers in (((4, 22), left_points, (arms, grip)), ((19, 22), right_points, (arms,))):
         (sx, sy), (ex, ey), (hx, hy) = (shoulder[0] * s, shoulder[1] * s), *scaled(points)
-        for (x0, y0), (x1, y1) in (((sx, sy), (ex, ey)), ((ex, ey), (hx, hy))):
+        for index, ((x0, y0), (x1, y1)) in enumerate((((sx, sy), (ex, ey)), ((ex, ey), (hx, hy)))):
             steps = max(int(math.ceil(max(abs(x1 - x0), abs(y1 - y0)))), 1)
             for step in range(steps + 1):
                 t = step / steps
-                arms.put(ox + x0 + (x1 - x0) * t, oy + y0 + (y1 - y0) * t, '3')
-        arms.grid(['54', '43'], round(ox + hx), round(oy + hy))
+                for layer in layers if index == 1 else (arms,):
+                    layer.put(ox + x0 + (x1 - x0) * t, oy + y0 + (y1 - y0) * t, '3')
+        for layer in layers:
+            layer.grid(['54', '43'], round(ox + hx), round(oy + hy))
     frame.alpha_composite(outline(arms.image).crop((1, 1, width + 1, height + 1)))
+    hand = outline(grip.image).crop((1, 1, width + 1, height + 1))
     lift = round(hop * s)
     eye_row, eye_col = kit['eyes_at']
     anchors = {'head': [ox, oy - lift], 'eyes': [ox + eye_col, top + eye_row - lift],
-               'hand': [round(ox + left_points[1][0] * s), round(oy + left_points[1][1] * s - lift)]}
+               'hand': [round(ox + left_points[1][0] * s), round(oy + left_points[1][1] * s - lift)], 'frente': not back}
     if lift:
         frame = shifted(frame, -lift)
+        hand = shifted(hand, -lift)
     if squash < 1:
+        anchors['hand'][0] = squeezed_x(anchors['hand'][0], frame.width, squash)
         frame = squeeze(frame, squash)
+        hand = squeeze(hand, squash)
+    anchors['_mao'] = hand
     return frame, anchors
 
 
@@ -448,17 +471,21 @@ def mandioca_frames(fabric, build=None):
         marks.extend(new_marks)
     frames.extend(rest_frames)
     marks.extend(rest_marks)
-    return frames, marks
+    hands = [mark.pop('_mao') for mark in marks]
+    return frames, marks, hands
 
 
 def export_mandioca():
     anchors = None
     dance, cheer = dance_poses(), cheer_poses()
+    hands = None
     for fabric in FABRICS:
-        frames, marks = mandioca_frames(fabric)
+        frames, marks, hands = mandioca_frames(fabric)
         manifest['mandioca'][fabric] = add(f'mandioca-{fabric}', frames)
         manifest['mandioca'][fabric]['rim'] = luz(f'mandioca-{fabric}')
         anchors = marks
+    # A mão que segura o item (igual em todos os tecidos): uma folha por tamanho.
+    full_hand = add('mandioca-mao', hands)
     d, r = len(dance), len(REST)
     after = d + r + len(cheer)
     tags = {'danca': list(range(d)), 'descanso': list(range(d, d + r)), 'comemora': list(range(d + r, after)),
@@ -483,19 +510,22 @@ def export_mandioca():
         if scale == 1.0:
             sheets = {fabric: manifest['mandioca'][fabric] for fabric in FABRICS}
             growth.append({'scale': 1, 'w': FRAME_W, 'h': FRAME_H, 'cx': PAD + 12, 'anchors': anchors, 'tags': tags,
-                           'sheets': sheets, 'blink': manifest['mandioca']['blink'], 'looks': manifest['mandioca']['looks']})
+                           'sheets': sheets, 'blink': manifest['mandioca']['blink'], 'looks': manifest['mandioca']['looks'],
+                           'hand': full_hand})
             continue
         sheets = {}
         small_marks = None
         build = lambda *args, stage=stage, **kwargs: small_frame(stage, *args, **kwargs)
+        small_hands = None
         for fabric in FABRICS:
-            frames, small_marks = mandioca_frames(fabric, build)
+            frames, small_marks, small_hands = mandioca_frames(fabric, build)
             sheets[fabric] = add(f'mandioca-{fabric}-t{stage}', frames)
             sheets[fabric]['rim'] = luz(f'mandioca-{fabric}-t{stage}')
         first = sheets[FABRICS[0]]
         growth.append({'scale': scale, 'w': first['w'], 'h': first['h'], 'cx': round((PAD + 12) * scale, 2),
                        'anchors': small_marks, 'tags': tags, 'sheets': sheets,
-                       'blink': add(f'piscar-t{stage}', sprite(tamanhos.blink(stage))), 'looks': looks(stage)})
+                       'blink': add(f'piscar-t{stage}', sprite(tamanhos.blink(stage))), 'looks': looks(stage),
+                       'hand': add(f'mandioca-mao-t{stage}', small_hands)})
     manifest['mandioca']['growth'] = growth
 
 
@@ -565,7 +595,9 @@ def fishing_rod():
     for y in range(1, 9):
         layer.put(12, y, 'x')
     layer.grid(['.KO', 'kKK'], 11, 9)
-    return outline(layer.image), [3, 12]
+    # Espelhada: a vara aponta para fora do corpo e a linha com o anzol pende longe do rosto (o item fica na frente).
+    image = outline(layer.image).transpose(Image.FLIP_LEFT_RIGHT)
+    return image, [image.width - 1 - 3, 12]
 
 
 def sparkler_frames():

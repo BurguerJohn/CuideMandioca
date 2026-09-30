@@ -169,6 +169,15 @@ if (steamOnly && steam.restartIfNeeded()) {
     send('painel');
   }
 
+  // Mudar se a janela pode ter foco mexe nos estilos dela no Windows (e o setFocusable ainda some com o botão da barra
+  // de tarefas). Depois disso a janela volta a deixar, ou não, o clique vazar do jeito que estava: sem isso, às vezes a
+  // festa parava de pegar o clique quando perdia o foco, até alguém clicar no ícone dela na barra de tarefas.
+  function setFocusable(target, focusable) {
+    target.setFocusable(focusable);
+    target.setSkipTaskbar(false);
+    if (target === win) target.setIgnoreMouseEvents(ignoring, { forward: true });
+  }
+
   // Clicar no ícone da bandeja ou abrir o jogo de novo (atalho, Steam): a festa aparece na frente, com foco, sem
   // abrir janela nenhuma.
   function showGame() {
@@ -176,8 +185,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     if (!alive()) return;
     if (win.isMinimized()) win.restore();
     if (!win.isVisible()) win.show();
-    win.setFocusable(true);
-    win.setSkipTaskbar(false);
+    setFocusable(win, true);
     win.moveTop();
     win.focus();
   }
@@ -331,7 +339,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     created.once('ready-to-show', () => {
       if (settings.hidden || win !== created) return;
       if (quiet) { created.showInactive(); return; }
-      created.setFocusable(true);
+      setFocusable(created, true);
       created.show();
     });
     created.on('focus', () => { if (win === created) send({ foco: true }); });
@@ -339,17 +347,13 @@ if (steamOnly && steam.restartIfNeeded()) {
       if (win !== created) return;
       send({ foco: false });
       // Sem foco, a janela não pode ser ativada por engano (o Windows passaria o foco para ela ao fechar outro
-      // programa); setFocusable mexe no botão da barra de tarefas, então ele volta logo em seguida.
-      if (!keepFocusable) {
-        created.setFocusable(false);
-        created.setSkipTaskbar(false);
-      }
+      // programa); o botão da barra de tarefas e o clique voltam logo em seguida (setFocusable acima).
+      if (!keepFocusable) setFocusable(created, false);
     });
     // Botão na barra de tarefas: minimizar esconde a festa; restaurar traz de volta já com foco.
     created.on('restore', () => {
       if (win !== created) return;
-      created.setFocusable(true);
-      created.setSkipTaskbar(false);
+      setFocusable(created, true);
       created.focus();
     });
     created.on('closed', () => { if (win === created) win = null; });
@@ -475,16 +479,14 @@ if (steamOnly && steam.restartIfNeeded()) {
       if (!isOwnWindow(event) || typeof focusable !== 'boolean') return;
       keepFocusable = focusable;
       if (focusable) {
-        win.setFocusable(true);
-        win.setSkipTaskbar(false);
+        setFocusable(win, true);
         win.focus();
-      } else if (!win.isFocused()) win.setFocusable(false);
+      } else if (!win.isFocused()) setFocusable(win, false);
     });
     // Clique na festa: o jogo pega o foco (e passa a saber quando o jogador clicou fora dele).
     ipcMain.on('desktop:focus-game', event => {
       if (!isOwnWindow(event) || win.isFocused()) return;
-      win.setFocusable(true);
-      win.setSkipTaskbar(false);
+      setFocusable(win, true);
       win.focus();
     });
     ipcMain.on('desktop:quit', event => { if (isOwnWindow(event)) app.quit(); });

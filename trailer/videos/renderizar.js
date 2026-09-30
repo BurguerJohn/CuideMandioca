@@ -23,7 +23,9 @@ for (const video of videos) {
     if (!forcar && fs.existsSync(saida)) { console.log(`${idioma}/${video}.mp4 (já existe)`); continue; }
     fs.mkdirSync(path.dirname(saida), { recursive: true });
     const inicio = Date.now();
-    execFileSync('npx', ['hyperframes', 'render', '--quiet', '--output', saida], {
+    // Pelo script do projeto: ele fixa a versão do HyperFrames (um `npx hyperframes` solto pode pegar uma versão velha
+    // em cache, e a 0.8.81 falhava na extração dos vídeos do trailer da Steam).
+    execFileSync('npm', ['run', 'render', '--', '--quiet', '--output', saida], {
       cwd: projeto, stdio: 'inherit', shell: true, env: { ...process.env, HYPERFRAMES_NO_UPDATE_CHECK: '1' }
     });
     console.log(`${idioma}/${video}.mp4 (${Math.round((Date.now() - inicio) / 1000)} s)`);

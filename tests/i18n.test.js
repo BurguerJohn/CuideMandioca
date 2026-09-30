@@ -42,11 +42,6 @@ test('todos os idiomas têm as mesmas chaves e as mesmas variáveis', () => {
   }
 });
 
-test('a janela de novidades tem texto para cada item, em todos os idiomas', () => {
-  for (const id of ids) {
-    for (let i = 1; i <= data.config.newsItems; i++) assert.ok(`news.${i}` in langs[id].ui, `${id}: falta news.${i}`);
-  }
-});
 
 test('o conteúdo do jogo (itens, turma, cartas, conquistas...) tem tradução completa', () => {
   const lists = { stats: data.stats, tiers: data.tiers, chars: data.chars, categories: data.categories, items: data.items,

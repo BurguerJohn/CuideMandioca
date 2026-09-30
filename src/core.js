@@ -108,7 +108,6 @@
         fantasia: { judgeAt: 0, nextAt: 0 },
         cozinha: { pot: null, buff: null },
         album: [],
-        newsSeen: this.cfg.newsVersion,
         bornAt: now,
         hints: {},
         bingo: { round: null },
@@ -192,8 +191,6 @@
       };
       const stickers = new Set((this.data.album || []).flatMap(page => page.stickers.map(sticker => sticker.id)));
       s.album = Array.isArray(raw.album) ? [...new Set(raw.album)].filter(id => stickers.has(id)) : [];
-      // Save de antes das novidades: vê a janela delas uma vez.
-      s.newsSeen = Math.max(0, Math.floor(finite(raw.newsSeen, 0)));
       // Dia em que a festa começou (para o aniversário). Save de antes disso conta a partir de hoje.
       s.bornAt = finite(raw.bornAt, 0) > 0 ? raw.bornAt : this.now();
       this.albumBackfill(s);
@@ -692,6 +689,11 @@
         default: return 1;
       }
     }
+    // Quantas metas cumpridas esperam o resgate (o selo do botão de Conquistas na placa).
+    goalsReady() {
+      return (this.state.goals || []).filter(goal => this.goalProgress(goal) >= goal.target).length;
+    }
+
     newGoal(taken = []) {
       const tier = this.tierIndex();
       const fits = entry => entry.tier <= tier && (!entry.needs || this.isPlaced(entry.needs));
@@ -1496,7 +1498,7 @@
       if (!this.canNewYear()) return false;
       const old = this.state;
       const next = this.fresh();
-      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'newsSeen', 'bornAt']) {
+      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt']) {
         next[key] = old[key];
       }
       next.year = (old.year || 1) + 1;

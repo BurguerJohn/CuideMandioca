@@ -517,9 +517,6 @@ globalThis.GAME_DATA = {
     goalSlots: 3,
     // Trocar uma meta que ainda não foi cumprida por outra, de outro tipo: custa goalSwapCost fichas.
     goalSwapCost: 1,
-    // Novidades: quem já tinha partida de antes desta versão vê a janela "Novidades na festa!" uma vez (news.* nos idiomas).
-    // Suba o número quando houver novidades novas para contar.
-    newsVersion: 2, newsItems: 8,
     // Dias de santo de verdade (pelo relógio do computador): a festa rende mais o dia todo e solta fogos em qualquer porte.
     // Sem `day`, vale o mês inteiro (as festas julinas de julho); um dia exato sempre ganha de um mês inteiro.
     // 12 de junho é o Dia dos Namorados no Brasil (véspera de Santo Antônio, o casamenteiro): +20% e carta vale 1 ficha a mais.

@@ -82,8 +82,9 @@ async function gravar(nome) {
   if (QUADROS.length) return fotografarQuadros(nome, cena, js, cdp, win, wc);
   const saida = path.join(SAIDA, `${nome}.mp4`);
   const ffmpeg = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-c:v', 'png', '-r', String(FPS), '-i', '-',
+    // Um keyframe por segundo: o HyperFrames busca quadros exatos na montagem e recusa vídeo com keyframes esparsos.
     '-vf', `scale=${W}:${H}:flags=neighbor`, '-c:v', 'libx264', '-preset', 'medium', '-crf', '14', '-pix_fmt', 'yuv420p',
-    '-movflags', '+faststart', saida], { stdio: ['pipe', 'inherit', 'inherit'] });
+    '-g', String(FPS), '-keyint_min', String(FPS), '-movflags', '+faststart', saida], { stdio: ['pipe', 'inherit', 'inherit'] });
   const terminou = new Promise((resolve, reject) =>
     ffmpeg.on('exit', code => (code === 0 ? resolve() : reject(new Error(`ffmpeg saiu com ${code}`)))));
 

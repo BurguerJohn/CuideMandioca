@@ -14,19 +14,36 @@
       </style>
 
       <div data-hf-id="hf-dnxz" id="root" data-composition-id="cidade" data-width="1920" data-height="1080">
-        <div data-hf-id="hf-ywpf" class="c-mundo" id="c-mundo" data-layout-allow-overflow=""><video data-hf-id="hf-3otq" id="c-video" class="clip" src="assets/gameplay/steam-cidade.mp4" data-start="0" data-duration="6.914" data-media-start="1.6" data-track-index="0" muted playsinline></video></div>
-        <div data-hf-id="hf-gm6x" class="c-mundo" id="c-mundo-palco" data-layout-allow-overflow=""><video data-hf-id="hf-elod" id="c-video-palco" class="clip" src="assets/gameplay/steam-palco.mp4" data-start="6.914" data-duration="2.327" data-media-start="0.3" data-track-index="0" muted playsinline></video></div>
+        <div data-hf-id="hf-ywpf" class="c-mundo" id="c-mundo" data-layout-allow-overflow=""><video data-hf-id="hf-3otq" id="c-video" class="clip" src="assets/gameplay/steam-cidade.mp4" data-start="0" data-duration="9.241" data-media-start="0" data-track-index="0" muted playsinline></video></div>
       </div>
 
       <script>
         (() => {
           const tl = gsap.timeline({ paused: true });
 
-          // A janela das Argolas um pouco maior e para a direita/baixo, longe do selo do canto (bordas do vídeo não aparecem).
-          tl.set("#c-mundo", { scale: 1.1, x: 90, y: 50 }, 0);
-          const S = 1.7;
-          const palco = { x: 910 - 960, y: 625 - 540 };
-          tl.set("#c-mundo-palco", { scale: S, x: -palco.x * S, y: -palco.y * S }, 0);
+          // Uma brincadeira por compasso, na festa inteira: a câmera dá um leve empurrão na direção de cada uma (pontos
+          // medidos com gravar.js --medir, em px de 1920x1080 da gravação). O deslocamento é limitado ao que a escala
+          // permite, então a borda do vídeo nunca aparece.
+          const COMPASSO = 2.305;
+          const S = 1.14;
+          const mira = (p, escala) => {
+            const livreX = 960 * escala - 960;
+            const livreY = 540 * escala - 540;
+            return {
+              scale: escala,
+              x: Math.max(-livreX, Math.min(livreX, -(p.x - 960) * escala)),
+              y: Math.max(-livreY, Math.min(livreY, -(p.y - 540) * escala))
+            };
+          };
+          const pote = { x: 720, y: 441 };           // o pote pendurado no varal (quebra no fim do 1º compasso)
+          const burro = { x: 588, y: 678 };          // o cavalete do rabo no burro
+          const casamento = { x: 1122, y: 684 };     // os noivos debaixo do arco de flores
+          const prato = { x: 1233, y: 640 };         // entre o Fogão a Lenha e a Mandioca (o prato voa de um ao outro)
+
+          tl.fromTo("#c-mundo", mira({ x: 960, y: 540 }, 1.04), { ...mira(pote, S), duration: 0.9, ease: "power2.out" }, 0);
+          tl.to("#c-mundo", { ...mira(burro, S), duration: 0.7, ease: "power2.inOut" }, COMPASSO - 0.15);
+          tl.to("#c-mundo", { ...mira(casamento, S), duration: 0.7, ease: "power2.inOut" }, COMPASSO * 2 - 0.15);
+          tl.to("#c-mundo", { ...mira(prato, 1.06), duration: 0.7, ease: "power2.inOut" }, COMPASSO * 3 - 0.15);
           window.__timelines["cidade"] = tl;
         })();
       </script>

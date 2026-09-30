@@ -240,7 +240,12 @@
     const a = ui.anchor;
     const zoom = uiZoom();
     dock.style.transform = `scale(${zoom})`;
-    const width = Math.min(innerWidth / zoom - 16, Math.max(760, a.width / zoom));
+    // Nunca mais estreita que as abas (com os Conjuntos, as abas passaram dos 760 px e a última ficava para fora). Mede a
+    // soma das abas, não a fileira: a fileira estica junto com a vitrine, e medir ela fazia a vitrine crescer a cada
+    // chamada até tomar a tela inteira.
+    const tabs = [...(dock.querySelectorAll?.('.vabas > .vaba') || [])];
+    const needed = tabs.length ? tabs.reduce((sum, tab) => sum + (tab.offsetWidth || 0) + 2, 0) + 40 : 0;
+    const width = Math.min(innerWidth / zoom - 16, Math.max(760, needed, a.width / zoom));
     dock.style.width = `${Math.round(width)}px`;
     const height = (dock.offsetHeight || 220) * zoom;
     const middle = a.left + a.width / 2 - width * zoom / 2;
@@ -377,7 +382,7 @@
 
   // --- Renderização ------------------------------------------------------------------------------------
   function context() {
-    return { tab: ui.tab, lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
+    return { tab: ui.tab, panelOpen: ui.open, lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
       settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side,
       ringPlaying: ui.rings.playing, ringResult: ui.rings.result, zoomLabel: zoomLabel(),
       closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter };
@@ -448,7 +453,8 @@
       s.bingo.round && !s.bingo.round.result ? engine.bingoMarks().count : -1,
       engine.specialDay()?.id, engine.daysToSaoJoao(), s.leilao?.active ? `${s.leilao.active.leader}:${s.leilao.active.price}` : '', !!s.saco?.active,
       !!s.cold?.active, !!s.visitor?.active, !!(s.fotografo?.active && !s.fotografo.active.shot), !!(s.burro?.active && !s.burro.active.pinned), !!s.fantasia?.judgeAt,
-      `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha')].join('|');
+      `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha'),
+      engine.goalsReady(), ui.open && ui.tab].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
     const placa = $('#placa');
@@ -658,14 +664,17 @@
     return unit;
   }
 
+  // Segurar o botão: compra de novo e de novo (melhoria de atributo ou ficha), cada vez um pouco mais agudo.
   function startHold(button) {
+    const kind = button.dataset.hold;
     const stat = button.dataset.stat;
-    const hold = { count: 0, timer: null, interval: null };
+    const hold = { count: 0, kind, timer: null, interval: null };
     const buy = () => {
-      if (engine.buyLevel(stat)) {
+      if (kind === 'ficha' ? engine.buyTicket() : engine.buyLevel(stat)) {
         hold.count++;
-        tocar('nivel', { pitch: Math.min(hold.count - 1, 12) });
-        updateStatCard(button, stat);
+        tocar(kind === 'ficha' ? 'moeda' : 'nivel', { pitch: Math.min(hold.count - 1, 12) });
+        if (kind === 'ficha') updateTicketButton(button);
+        else updateStatCard(button, stat);
         refreshLive(true);
         return;
       }
@@ -677,13 +686,22 @@
     hold.timer = setTimeout(() => { hold.interval = setInterval(buy, 80); }, 380);
   }
 
+  // O preço da próxima ficha no botão, enquanto ele é segurado (a vitrine só é redesenhada ao soltar).
+  function updateTicketButton(button) {
+    const cost = engine.ticketCost();
+    button.dataset.cost = String(cost);
+    const price = button.querySelector?.('.preco');
+    if (price?.lastChild) price.lastChild.textContent = UI.compact(cost);
+  }
+
   function stopHold() {
     const hold = ui.hold;
     if (!hold) return;
     ui.hold = null;
     clearTimeout(hold.timer);
     clearInterval(hold.interval);
-    if (hold.count > 1) toast(t('app.levels', { n: hold.count }));
+    if (hold.count > 1) toast(hold.kind === 'ficha' ? t('gain.tickets', { n: hold.count }) : t('app.levels', { n: hold.count }));
+    if (hold.kind === 'ficha') renderRings();
     saveLater();
     renderDock();
     renderHud(true);
@@ -757,7 +775,8 @@
     if (a === 'abrir') { if (ui.open) closePanel(); else openPanel(); return; }
     if (a === 'fechar') { closePanel(); return; }
     if (a === 'fechar-janela') { closeModal(); return; }
-    if (a === 'tab') { openPanel(d.tab); return; }
+    // O botão de Conquistas da placa alterna: aberto nessa aba, fecha.
+    if (a === 'tab') { if (d.alternar && ui.open && ui.tab === d.tab) closePanel(); else openPanel(d.tab); return; }
     if (a === 'tela') { openTela(d.tela); return; }
     if (a === 'tela-fechar') { closeTela(); return; }
     if (a === 'historico-filtro') { ui.logFilter = d.value; renderWindows(); return; }
@@ -1182,6 +1201,8 @@
   function setFocused(value) {
     // Perdeu o foco no meio de um arrasto: o soltar do botão não vai chegar aqui.
     if (!value && (ui.drag || ui.hold)) dropPointer();
+    // O foco mudou (o Windows mexe nos estilos da janela): o próximo movimento do mouse reenvia se ela pega o clique.
+    if (value !== ui.focused) ui.interactive = null;
     if (value && !ui.focused && ui.blurAt && now() - ui.blurAt >= GREET_AFTER) ui.festa?.greet?.();
     if (!value && ui.focused !== false) ui.blurAt = now();
     ui.focused = value;
@@ -1418,7 +1439,8 @@
 
   document.addEventListener('click', event => {
     const button = event.target.closest?.('[data-action]');
-    if (!button || button.tagName === 'SELECT' || button.disabled || button.dataset.hold) return;
+    // Botão de segurar já comprou no pointerdown; pelo teclado (Enter ou espaço, detail 0) ele age como um clique.
+    if (!button || button.tagName === 'SELECT' || button.disabled || (button.dataset.hold && event.detail !== 0)) return;
     if (button.dataset.action === 'zoom-alca') {
       // O mouse já foi tratado no pointerup; pelo teclado (Enter ou espaço), o botão volta a 100%.
       if (event.detail === 0) comSom(() => setZoom(1, true));
@@ -1613,13 +1635,6 @@
   // Depois de trocar o idioma, a festa volta com os Ajustes abertos.
   let reopen = desktop?.reopen || null;
   try { reopen = reopen || sessionStorage.getItem(REOPEN_KEY); sessionStorage.removeItem(REOPEN_KEY); } catch (_) { /* sem armazenamento */ }
-  // Novidades desta versão para quem já jogava: a lista entra na janela de boas-vindas (ou numa janela só dela).
-  // O gravador de vídeos (trailer/captura) abre saves antigos: nada de janela de novidades no meio do vídeo.
-  const recording = typeof globalThis.__gravador === 'function';
-  const news = !reopen && !recording && engine.state.newsSeen < engine.cfg.newsVersion
-    ? `<h3>${UI.esc(t('news.title'))}</h3><ul class="novidades">${Array.from({ length: engine.cfg.newsItems },
-      (_, i) => `<li>${UI.esc(t(`news.${i + 1}`))}</li>`).join('')}</ul>` : '';
-  if (news) { engine.state.newsSeen = engine.cfg.newsVersion; saveLater(); }
   if (reopen) {
     openPanel(reopen);
     toast(t('app.languageChanged'));
@@ -1629,14 +1644,12 @@
       (engine.welcome.guests > 0 ? ` ${t('app.welcomeGuests', { n: engine.welcome.guests })}` : '') +
       (engine.welcome.bunny ? ` ${UI.esc(t('app.welcomeBunny', { v: Math.round(engine.welcome.bunny * 100) }))}` : '') + '</p>' +
       `<p class="miudo">${UI.esc(t(engine.welcome.capped ? 'app.welcomeCapped' : 'app.welcomeRule',
-        { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` + news +
+        { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
       `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('app.welcomeBackOk'))}</button></div>`);
   } else if (firstRun) {
     ui.festa?.sprout?.();
     showModal(`<h2>${UI.esc(t('app.title'))}!</h2>${t('app.firstRun')}` +
       `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('app.firstRunOk'))}</button></div>`);
-  } else if (news) {
-    showModal(news + `<div class="botoes"><button class="btn" data-action="fechar-janela">${UI.esc(t('news.ok'))}</button></div>`);
   }
   if (typeof requestAnimationFrame === 'function') requestAnimationFrame(animate);
   // Gravador de vídeos (trailer/captura): só existe quando a página foi aberta por ele.

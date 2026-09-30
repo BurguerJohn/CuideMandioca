@@ -283,6 +283,9 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .vitrine { cursor: ew-resize; }
 .vitrine button, .vitrine [data-action], .vitrine [data-preview], .vitrine [data-hold] { cursor: pointer; }
 .vabas { display: flex; align-items: flex-end; gap: 2px; flex-wrap: nowrap; height: 30px; }
+/* Tela estreita demais para todas as abas: a fileira rola de lado em vez de vazar da vitrine. */
+.vabas { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.vabas::-webkit-scrollbar { display: none; }
 .vaba {
   flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px 5px; font-size: 15px; font-weight: 700;
   white-space: nowrap; cursor: pointer; color: var(--tinta); background: var(--papel2); border: 3px solid var(--tinta);
@@ -439,8 +442,6 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .meta .btn.trocar { font-size: 12px; padding: 3px 8px; color: var(--tinta); }
 .meta .botoes { display: flex; gap: 6px; align-items: center; }
 .retrato { display: block; max-width: 100%; height: auto; margin: 8px auto; image-rendering: pixelated; }
-.novidades { margin: 6px auto 0; padding-left: 20px; line-height: 1.45; text-align: left; max-width: 520px; }
-.novidades li { margin-bottom: 4px; }
 .meta.feita { background: #e6f7c0; }
 
 /* Bingo da quermesse: cartela 3x3 de papel, as casas sorteadas ganham um grão de milho; do lado, a última bolinha */
@@ -479,4 +480,3 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
   color: #b08a5a; font-size: 16px; }
 .figurinha.vazia span { opacity: 0.6; }
 
-.cliques { margin: 4px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }

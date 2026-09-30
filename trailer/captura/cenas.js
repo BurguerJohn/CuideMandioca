@@ -192,18 +192,28 @@ const noiteSteam = (nome, ajustes, extra = {}) => ({ ...STEAM, save: save(nome),
 const darItens = ids => `const e = __jogo.engine(); for (const id of ${JSON.stringify(ids)}) if (!e.owned(id)) e.state.inventory.push(id);`;
 const vestir = ids => `const e = __jogo.engine(); for (const id of ${JSON.stringify(ids)}) e.equip(id);`;
 const convidados = n => `__acao.acao('debug', { op: 'convidados', value: '${n}' })`;
+// A Mandioca cresce até o tamanho `n` (0 broto … 3 inteira): compra níveis (sem aparecer compra) até passar do limiar.
+const crescer = n => `{ const e = __jogo.engine(); e.state.cheer = 1e15; const ids = ['rebolado', 'folego', 'refresco', 'ritmo'];
+  for (let i = 0; e.growthStage() < ${n} && i < 2000; i++) e.buyLevel(ids[i % 4]); }`;
+// Eventos que a festa sorteia sozinha (drones, dança das fitas, compadres), começados na hora (`idade` ms adiantados).
+const provocar = (tipo, opcoes = {}) => `__jogo.ui.festa.provocar('${tipo}', ${JSON.stringify(opcoes)})`;
+// Rabo no burro na mosca: acerta o nascimento do cavalete para o rabo passar pelo X daqui a `ms` (quando vem a pregada).
+const burroNaMosca = ms => `const e = __jogo.engine(); const b = e.state.burro.active; let melhor = 0, dist = 1e9;
+  for (let t = ${ms}; t < ${ms} + 6000; t += 10) { const [x, y] = e.burroOffset(t); const d = Math.hypot(x, y); if (d < dist) { dist = d; melhor = t; } }
+  b.born = e.now() - (melhor - ${ms});`;
 
 Object.assign(module.exports, {
   // 1. O quintal na área de trabalho: a festa sem nenhuma melhoria, pequena, sobre a planilha (a câmera recua na montagem).
   'steam-quintal': { ...STEAM, save: save('estagio-1'), zoom: 3, segundos: 11, aquecer: 1.5,
     ajustes: { zoom: 1, x: 0.72, lift: 48, hud: 'sempre' }, html: MESA.html, css: MESA.css },
 
-  // 2. Primeiras melhorias, de perto: chapéu no pico da música, roupa e espiga, e os convidados chegando até 9.
+  // 2. Primeiras melhorias, de perto: no pico da música ela cresce (broto → mudinha) e ganha o chapéu; no compasso
+  // seguinte cresce de novo (mandioquinha) com roupa e espiga; e os convidados chegam até 9.
   'steam-melhorias': noiteSteam('estagio-1', { zoom: 1.5, lift: 40 }, { segundos: 11,
     preparar: darItens(['vaqueiro', 'xadrez-azul', 'espiga']),
     acoes: [
-      [COMPASSO, vestir(['vaqueiro'])],
-      [COMPASSO * 2, vestir(['xadrez-azul', 'espiga'])],
+      [COMPASSO, crescer(1) + vestir(['vaqueiro'])],
+      [COMPASSO * 2, crescer(2) + vestir(['xadrez-azul', 'espiga'])],
       [COMPASSO * 3, convidados(3)], [COMPASSO * 3 + 0.8, convidados(2)], [COMPASSO * 3 + 1.6, convidados(3)]
     ] }),
 
@@ -216,36 +226,54 @@ Object.assign(module.exports, {
       [COMPASSO * 3, `const e = __jogo.engine(); e.state.crew.milho = { level: 1 }; e.emit('fished', { id: 'milho', isNew: true });`]
     ] }),
 
-  // 4. Festa da Cidade: a janela das Argolas no meio da festa; fichas, depois a garrafa da estrela (×2).
-  'steam-cidade': { ...STEAM, save: save('estagio-3'), zoom: 3, segundos: 9.5, aquecer: 1,
-    ajustes: { zoom: 1, x: 0.5, lift: 30, hud: 'sempre' }, html: NOITE.html, css: NOITE.css + SEM_PLACA,
-    preparar: `__jogo.engine().state.tickets = 40; __jogo.engine().state.cheer = 12000;`,
-    cadaQuadro: MIRA,
+  // 4. Festa da Cidade: uma brincadeira por compasso na festa inteira: o pote quebra (chove bala), o rabo prega no
+  // burro na mosca, o casamento na roça com arroz e o prato do Fogão a Lenha voando até a Mandioca.
+  'steam-cidade': noiteSteam('estagio-3', { zoom: 1.2, lift: 30 }, { segundos: 9.5, aquecer: 1,
+    // Álbum cheio: sem "FIGURINHA NOVA!" pipocando por cima das brincadeiras.
+    preparar: `const e = __jogo.engine(); if (!e.owned('fogao-lenha')) e.state.inventory.push('fogao-lenha');
+      e.equip('fogao-lenha', 'direita'); e.state.wood = 50;
+      e.state.album = e.data.album.flatMap(page => page.stickers.map(sticker => sticker.id));`,
     acoes: [
-      [0.2, `__acao.acao('argolas')`],
-      [0.6, `__acao.clicar('[data-action=argolas-jogar]');
-        const aim = window.__jogo.engine().cfg.ringAim;
-        const premio = (kind, extra) => ({ kind, aim: aim[kind], ...extra });
-        __jogo.engine().round.prizes.splice(0, 5, premio('fichas', { amount: 5 }), premio('animacao', { factor: 2 }),
-          premio('x3', { mult: 3 }), premio('lenha', { amount: 12 }), premio('fichas', { amount: 3 }));
-        window.__mira = { alvos: [0, 1, 4], jogada: 0, aimFrom: performance.now(), depois: performance.now() + 1100,
-          esperas: [1500, 900, 900] }`]
-    ] },
+      // O pote aparece num lugar sorteado: fixo aqui, à esquerda do palco, para a câmera da montagem saber onde mirar.
+      [0.1, `__acao.acao('debug', { op: 'pote', value: '0' }); __jogo.engine().state.pote.active.x = 0.3;`],
+      // Uma paulada a cada 0,3 s (o jogo aceita uma a cada 0,25 s; as ações caem em quadros de 1/30 s).
+      ...[0.3, 0.6, 0.9, 1.2, 1.5, 1.8].map(t => [t, `__jogo.engine().hitPote()`]),
+      [COMPASSO + 0.05, `__acao.acao('debug', { op: 'burro', value: '0' })`],
+      [COMPASSO + 0.1, burroNaMosca(1700)],
+      [COMPASSO + 1.8, `__jogo.engine().pinBurro()`],
+      [COMPASSO * 2 + 0.05, `__acao.acao('debug', { op: 'casamento', value: '0' })`],
+      ...[0.6, 1.0, 1.4, 1.8].map(t => [COMPASSO * 2 + t, `__jogo.engine().throwRice()`]),
+      [COMPASSO * 3 + 0.05, `__acao.acao('debug', { op: 'cozinha', value: '0' })`],
+      [COMPASSO * 3 + 0.4, `__jogo.engine().serve()`]
+    ] }),
 
   // 4b. A turma tocando no palco (o fecho da cena 4).
   'steam-palco': noiteSteam('estagio-4', { zoom: 3, lift: 0 }, { segundos: 4 }),
 
-  // 5. São João Regional: a festa larga para a panorâmica; a fogueira solta a labareda no último compasso.
+  // 5. São João Regional: a festa larga para a panorâmica. O mastro de São João na esquerda com as crianças na dança das
+  // fitas (a câmera começa ali), o palco, e na fogueira os compadres no segundo verso (a ponte de fagulhas) quando a
+  // câmera chega; a labareda sai no último compasso.
   'steam-regional': noiteSteam('estagio-4', { zoom: 1.25, lift: 40 }, { segundos: 11,
-    acoes: [[COMPASSO * 3 - 0.3, `__jogo.engine().state.runtime.flareWait = 0.3`]] }),
+    preparar: `const e = __jogo.engine(); if (!e.owned('mastro')) e.state.inventory.push('mastro'); e.equip('mastro', 'esquerda');`,
+    acoes: [
+      [0.05, provocar('fitas', { idade: 1500 })],
+      [0.3, provocar('compadres')],
+      [COMPASSO * 3 - 0.3, `__jogo.engine().state.runtime.flareWait = 0.3`]
+    ] }),
 
-  // 6. O Maior São João do Mundo em cima da planilha: confete no começo (a câmera recua na montagem).
+  // 6. O Maior São João do Mundo em cima da planilha: confete no começo e o show de drones no céu, do VIVA para a
+  // Mandioca (a câmera recua na montagem). O telão no palco já vem com o porte.
   'steam-maior': { ...STEAM, save: save('estagio-5'), zoom: 3, segundos: 8, aquecer: 1.5,
-    ajustes: { zoom: 1.2, x: 0.6, lift: 40 }, html: MESA.html, css: MESA.css + SEM_PLACA,
-    acoes: [[0.1, `__acao.evento('tier-up', { tier: 4 })`]] },
+    // A planilha mais estreita só aqui: o céu acima da festa, onde os drones desenham, fica sobre o papel de parede.
+    ajustes: { zoom: 1.2, x: 0.6, lift: 40 }, html: MESA.html, css: MESA.css + SEM_PLACA + '#mesa .planilha { width: 38%; }',
+    acoes: [
+      [0, provocar('drones', { idade: 3600, ordem: [3, 4, 4, 4, 4] })],
+      [0.1, `__acao.evento('tier-up', { tier: 4 })`]
+    ] },
 
-  // 7. A festa inteira de noite, larga, para o fundo da placa do título.
-  'steam-final': noiteSteam('estagio-5', { zoom: 1.1, lift: 60 }, { segundos: 7 })
+  // 7. A festa inteira de noite, larga, para o fundo da placa do título (com a Mandioca dos drones ainda no céu).
+  'steam-final': noiteSteam('estagio-5', { zoom: 1.1, lift: 60 }, { segundos: 7,
+    acoes: [[0, provocar('drones', { idade: 9000, ordem: [4, 4, 4, 4, 4] })]] })
 });
 
 // Peças para outros roteiros (fotos da loja da Steam em fotos.js). Não enumerável: gravar.js grava só as cenas.

@@ -133,14 +133,31 @@ test('formatos de número e tempo em português', () => {
   assert.equal(UI.esc('<b>'), '&lt;b&gt;');
 });
 
-test('a aba Conquistas mostra o Álbum da Festa: figurinha colada com ícone, a que falta com "?"', () => {
+test('o Álbum da Festa tem janela própria (botão na placa): figurinha colada com ícone, a que falta com "?"', () => {
   const engine = new GameEngine(data, null, { rng: () => 0.5 });
   engine.emit('rain');
-  const html = UI.panel(engine, ctx(engine, { tab: 'conquistas', icon: key => `<i data-icon="${key}"></i>` }));
-  assert.match(html, /Álbum da Festa/);
+  const html = UI.tela(engine, ctx(engine, { tela: 'album', icon: key => `<i data-icon="${key}"></i>` }));
   assert.match(html, /class="figurinha" title="Chuva de São João"><i data-icon="ui:chuva">/);
   assert.match(html, /figurinha vazia[^>]*><b>\?<\/b><span>Quebra-pote<\/span>/);
   assert.match(html, /0 de 7 completas/);
+  assert.equal(UI.telaName('album'), 'Álbum');
+  // A aba Conquistas fica só com as metas e as conquistas.
+  assert.doesNotMatch(UI.panel(engine, ctx(engine, { tab: 'conquistas' })), /class="figurinha/);
+});
+
+test('a placa tem os botões de Conquistas (com o selo das metas prontas para resgatar) e do Álbum', () => {
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  let html = UI.hud(engine, ctx(engine));
+  assert.match(html, /data-action="tab" data-tab="conquistas"/);
+  assert.match(html, /data-action="tela" data-tela="album"/);
+  assert.doesNotMatch(html, /data-tab="conquistas"[^>]*><i[^>]*><\/i><i class="selo-botao">/);
+  // Uma meta cumprida: o botão chama e mostra 1.
+  if (!engine.state.goals.length) engine.state.goals.push(engine.newGoal());
+  const goal = engine.state.goals[0];
+  goal.from -= goal.target;
+  assert.equal(engine.goalsReady(), 1);
+  html = UI.hud(engine, ctx(engine));
+  assert.match(html, /class="ferramenta chama[^"]*" data-action="tab" data-tab="conquistas"[^>]*>.*?<i class="selo-botao">1<\/i>/);
 });
 
 test('a placa mostra selos do leilão (lance e de quem), da corrida de saco e do friozinho', () => {

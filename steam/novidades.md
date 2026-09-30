@@ -15,7 +15,8 @@ Uma atualização cheia de festa!
 [*][b]Casamento na roça:[/b] depois da quadrilha, os noivos e o padre entram na pista. Jogue arroz clicando neles e ganhe presentes (véu, cartola e buquê!).
 [*][b]Quebra-pote:[/b] um pote de barro aparece no varal. Dê pauladas até quebrar e faça chover bala.
 [*][b]Corrida de saco:[/b] três crianças de saco na linha de largada. Clique no seu corredor para ele pular, mas no ritmo: pulo apressado dá tombo!
-[*][b]Álbum da Festa:[/b] 35 figurinhas dos momentos da festa em 7 páginas. Página completa rende +2% para sempre.
+[*][b]Álbum da Festa:[/b] 35 figurinhas dos momentos da festa em 7 páginas, na janela dele (botão do álbum na placa). Página completa rende +2% para sempre.
+[*][b]Placa nova:[/b] o botão de Conquistas abre direto as metas e mostra quantas estão prontas para resgatar. Segure o botão da ficha para comprar várias de uma vez.
 [*][b]O céu de verdade:[/b] a lua da festa segue a fase da lua real, o Cruzeiro do Sul brilha no céu estrelado, chove estrela cadente nas noites de chuva de meteoros, bandos de asa-branca cruzam o céu, julho inteiro é festa julina, 12 de junho é Dia dos Namorados e a festa comemora o próprio aniversário todo ano.
 [*][b]Viagem a Campina Grande[/b] para a turma, a eterna rival de Caruaru.
 [*][b]Sanfoneiro Andarilho:[/b] raro, ele atravessa a festa tocando e tudo rende +50% enquanto dura. Cumprimente e ganhe fichas!
@@ -52,7 +53,7 @@ Uma atualização cheia de festa!
 [*][b]Abrir com o Windows[/b] (Ajustes > Janela ou o menu da bandeja), desligado de fábrica.
 [*][b]18 conquistas novas.[/b]
 [*][b]Desempenho:[/b] escolha o perfil de quadros por segundo (Suave, Normal ou Economia) em Ajustes, e ligue ou desligue os clarões dos relâmpagos.
-[*][b]Correções:[/b] depois do modo repouso (ou de bloquear e desbloquear a tela), a festa voltava sem aceitar cliques; agora ela se ajeita sozinha ao acordar. O tempo em repouso com o jogo aberto passa a render como jogo fechado, e os eventos que venceram nesse meio-tempo não começam mais todos de uma vez. Um arrasto interrompido (Alt+Tab no meio) também não deixa mais a festa presa.
+[*][b]Correções:[/b] depois do modo repouso (ou de bloquear e desbloquear a tela), a festa voltava sem aceitar cliques; agora ela se ajeita sozinha ao acordar. Às vezes, depois de a placa sumir (clicando em outro programa), a festa também parava de aceitar cliques até clicar no ícone da barra de tarefas; isso acabou. O item da mão agora fica na frente da Mandioca, e os pintinhos seguem a galinha em fila, sem tremer. O tempo em repouso com o jogo aberto passa a render como jogo fechado, e os eventos que venceram nesse meio-tempo não começam mais todos de uma vez. Um arrasto interrompido (Alt+Tab no meio) também não deixa mais a festa presa.
 [*][b]Botão de tamanho:[/b] ao arrastar, uma moldura tracejada mostra na hora o tamanho pedido (a festa pula para o tamanho mais perto e a moldura pisca a cada pulo).
 [/list]
 
@@ -71,7 +72,8 @@ A big party of an update!
 [*][b]Country wedding:[/b] after the square dance, the newlyweds and the priest step onto the floor. Click them to throw rice and win gifts (a veil, a top hat and a bouquet!).
 [*][b]Pot smash:[/b] a clay pot hangs from the bunting. Whack it until it breaks and it rains candy.
 [*][b]Sack race:[/b] three kids in sacks at the starting line. Click your runner to make him hop, but keep the rhythm: rushed hops end in a tumble!
-[*][b]Party Album:[/b] 35 stickers of party moments across 7 pages. Each full page gives +2% forever.
+[*][b]Party Album:[/b] 35 stickers of party moments across 7 pages, in its own window (album button on the sign). Each full page gives +2% forever.
+[*][b]New sign buttons:[/b] the Achievements button opens your goals directly and shows how many are ready to claim. Hold the ticket button to buy several at once.
 [*][b]The real sky:[/b] the party’s moon follows the real moon phase, the Southern Cross shines in the starry sky, shooting stars pour down on real meteor shower nights, flocks of white-winged doves cross the sky, all of July is festa julina, June 12 is Brazilian Valentine’s Day and the party celebrates its own birthday every year.
 [*][b]Road trip to Campina Grande[/b] for the crew, Caruaru’s eternal rival.
 [*][b]Wandering Accordionist:[/b] a rare visitor who crosses the party playing, and everything earns +50% while he does. Say hi for tickets!
@@ -108,7 +110,7 @@ A big party of an update!
 [*][b]Open with Windows[/b] (Settings > Window or the tray menu), off by default.
 [*][b]18 new achievements.[/b]
 [*][b]Performance:[/b] pick a frame rate profile (Smooth, Normal or Saver) in Settings, and turn the lightning flashes on or off.
-[*][b]Fixes:[/b] after sleep mode (or locking and unlocking the screen), the party came back without accepting clicks; now it fixes itself on wake. Time asleep with the game open now earns like a closed game, and events that came due meanwhile no longer all start at once. An interrupted drag (Alt+Tab midway) no longer leaves the party stuck either.
+[*][b]Fixes:[/b] after sleep mode (or locking and unlocking the screen), the party came back without accepting clicks; now it fixes itself on wake. Sometimes, after the sign hid (clicking another program), the party also stopped taking clicks until you clicked its taskbar icon; that is gone. Hand items now sit in front of the Cassava, and the chicks follow the hen in a line without jittering. Time asleep with the game open now earns like a closed game, and events that came due meanwhile no longer all start at once. An interrupted drag (Alt+Tab midway) no longer leaves the party stuck either.
 [*][b]Size button:[/b] while dragging, a dashed frame shows the requested size right away (the party snaps to the nearest size and the frame blinks on each snap).
 [/list]
 
@@ -127,7 +129,8 @@ Thank you for taking good care of your cassava!
 [*][b]Boda campestre:[/b] después de la cuadrilla, entran los novios y el cura a la pista. Haz clic en ellos para tirar arroz y ganar regalos (¡un velo, una chistera y un ramo!).
 [*][b]Quiebra de la olla:[/b] una olla de barro cuelga de las banderitas. Dale golpes hasta que se rompa y llueva dulce.
 [*][b]Carrera de sacos:[/b] tres niños en sacos en la línea de salida. Haz clic en tu corredor para que salte, pero con ritmo: ¡el salto apurado termina en tropiezo!
-[*][b]Álbum de la Fiesta:[/b] 35 estampas de momentos de la fiesta en 7 páginas. Cada página completa da +2% para siempre.
+[*][b]Álbum de la Fiesta:[/b] 35 estampas de momentos de la fiesta en 7 páginas, en su propia ventana (botón del álbum en el letrero). Cada página completa da +2% para siempre.
+[*][b]Letrero nuevo:[/b] el botón de Logros abre directo las metas y muestra cuántas hay para cobrar. Mantén pulsado el botón de la ficha para comprar varias a la vez.
 [*][b]El cielo de verdad:[/b] la luna de la fiesta sigue la fase de la luna real, la Cruz del Sur brilla en el cielo estrellado, llueven estrellas fugaces en las noches de lluvia de meteoros, bandadas de palomas ala blanca cruzan el cielo, todo julio es fiesta julina, el 12 de junio es el Día de los Enamorados y la fiesta celebra su propio cumpleaños cada año.
 [*][b]Viaje a Campina Grande[/b] para la pandilla, la eterna rival de Caruaru.
 [*][b]Acordeonista Andariego:[/b] un visitante raro que cruza la fiesta tocando, y todo rinde +50% mientras tanto. ¡Salúdalo y gana fichas!
@@ -164,7 +167,7 @@ Thank you for taking good care of your cassava!
 [*][b]Abrir con Windows[/b] (Ajustes > Ventana o el menú de la bandeja), desactivado de fábrica.
 [*][b]18 logros nuevos.[/b]
 [*][b]Rendimiento:[/b] elige el perfil de cuadros por segundo (Suave, Normal o Ahorro) en Ajustes y activa o desactiva los destellos de los relámpagos.
-[*][b]Correcciones:[/b] después del modo de suspensión (o de bloquear y desbloquear la pantalla), la fiesta volvía sin aceptar clics; ahora se arregla sola al despertar. El tiempo en suspensión con el juego abierto ahora rinde como con el juego cerrado, y los eventos que vencieron mientras tanto ya no empiezan todos a la vez. Un arrastre interrumpido (Alt+Tab a la mitad) tampoco deja la fiesta trabada.
+[*][b]Correcciones:[/b] después del modo de suspensión (o de bloquear y desbloquear la pantalla), la fiesta volvía sin aceptar clics; ahora se arregla sola al despertar. A veces, después de que el letrero se ocultaba (al hacer clic en otro programa), la fiesta también dejaba de aceptar clics hasta hacer clic en su icono de la barra de tareas; eso se acabó. El objeto de la mano ahora va delante de la Mandioca, y los pollitos siguen a la gallina en fila, sin temblar. El tiempo en suspensión con el juego abierto ahora rinde como con el juego cerrado, y los eventos que vencieron mientras tanto ya no empiezan todos a la vez. Un arrastre interrumpido (Alt+Tab a la mitad) tampoco deja la fiesta trabada.
 [*][b]Botón de tamaño:[/b] al arrastrar, un marco punteado muestra al instante el tamaño pedido (la fiesta salta al tamaño más cercano y el marco parpadea en cada salto).
 [/list]
 

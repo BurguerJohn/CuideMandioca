@@ -914,6 +914,18 @@ SHIRT_ICON = """
 """
 
 UI_ICONS = {
+    # Álbum de figurinhas: a página azul com três figurinhas coladas (botão da placa).
+    'album': """
+jjjjjjjjjj
+jJJJJJJJJj
+jJAAJHHHJj
+jJAAJHHHJj
+jJJJJJJJJj
+jJGGGJXXJj
+jJGGGJXXJj
+jJJJJJJJJj
+jjjjjjjjjj
+""",
     # Panela de barro com tampa: o botão da cozinha na placa.
     'panela': """
 ...ss....
