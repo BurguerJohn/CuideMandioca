@@ -63,12 +63,13 @@ def poste(tela, x, y0, y1, cor='#6e3c1c', luz='#9a5a2c'):
 
 # --- Ícones dos botões da placa (11x10) ----------------------------------------------------------------------------------
 ICONES = {
+    'cordel': ['nnnnnnnnnnn', 'nwwwwnwwwwn', 'nwkkwnwkkwn', 'nwwwwnwwwwn', 'nwkkwnwkkwn', 'nwwwwnwwwwn', 'nwkkwnwkkwn', 'nwwwwnwwwwn', 'nnnnnnnnnnn', '...........'],
     'bichos': ['....rr.....', '...rwwr....', '...wwwwy...', '..wwwwwyy..', '.wwwwwwww..', '.wwwwwwww..', '..wwwwww...', '...wwww....', '....o.o.....', '...oo.oo....'],
     'aquario': ['...........', '..cccccccc.', '.cbbbbbbbc.', '.cbboobbbc.', '.cboooobbc.', '.cbboooybc.', '.cbbbbbbbc.', '.cLLbbbLLc.', '.ctttttttc.', '..ccccccc..'],
     'horta': ['...l.l.l...', '..lLlLlLl..', '...L.L.L...', '..ooo.ooo..', '..ooo.ooo..', '...o...o...', 'nnnnnnnnnnn', 'NnNnNnNnNnN', 'NNNNNNNNNNN', '...........'],
     'fogueira': ['....y......', '...yoy.....', '..yoroy.y..', '.yorrroyy..', '.yorrrroy..', '..orRRro...', '..nnrrnn...', '.nNnnnnNn..', '.NNNnnNNN..', '...........'],
     'palco': ['rrrrrrrrrrr', 'rRrRrRrRrRr', 'r.........r', 'r..y...y..r', 'r.yyy.yyy.r', 'r..k...k..r', 'r.........r', 'nnnnnnnnnnn', 'NNNNNNNNNNN', '...........'],
-    'provador': ['....yy.....', '...y..y....', '....yy.....', '...yyyy....', '..yyyyyy...', '.rrrrrrrrr.', '.rrbbbbrrr.', '.rrbbbbrrr.', '..rrrrrrr..', '...........'],
+    'mata': ['g.........g', 'wg.......gw', '.wg.....gw.', '..wg...gw..', '...wg.gw...', '....www....', '...ywgwy...', '..yy...yy..', '.nn.....nn.', '...........'],
     'ceu': ['....y......', '...yyy..y..', '..yyyyy.yy.', '...yyy.yyy.', '..y.y.y.y..', '.y..y..y...', '.......y...', 'bbbbbbbbbbb', 'BBBBBBBBBBB', '...........'],
     'bairro': ['..r....r...', '.rrr..rrr..', 'rrrrrrrrrr.', 'tttt.tttt..', 'tbbt.tbbt..', 'ttttntttt..', 'tttnntttt..', 'GGGGGGGGGG.', '...........', '...........'],
 }
@@ -88,14 +89,15 @@ def icones():
 # --- Exportação ---------------------------------------------------------------------------------------------------------------
 def exportar(add, icons):
     """Junta a arte das janelas no pacote e devolve o `manifest['janelas']`."""
+    import janela_cordel
     import janela_bichos
     import janela_aquario
     import janela_horta
     import janela_fogueira
     import janela_palco
-    import janela_provador
+    import janela_mata
     import janela_ceu
     import janela_bairro
     for nome, imagem in icones().items():
         icons[f'ui:{nome}'] = imagem
-    return {'bichos': janela_bichos.exportar(add), 'aquario': janela_aquario.exportar(add), 'horta': janela_horta.exportar(add), 'fogueira': janela_fogueira.exportar(add), 'palco': janela_palco.exportar(add), 'provador': janela_provador.exportar(add), 'ceu': janela_ceu.exportar(add), 'bairro': janela_bairro.exportar(add)}
+    return {'cordel': janela_cordel.exportar(add), 'bichos': janela_bichos.exportar(add), 'aquario': janela_aquario.exportar(add), 'horta': janela_horta.exportar(add), 'fogueira': janela_fogueira.exportar(add), 'palco': janela_palco.exportar(add), 'mata': janela_mata.exportar(add), 'ceu': janela_ceu.exportar(add), 'bairro': janela_bairro.exportar(add)}

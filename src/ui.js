@@ -106,8 +106,9 @@
   // app em [data-humor]). Clicar abre a aba Comidas da loja.
   function moodTitle(engine, mood = engine.mood()) {
     const max = engine.cfg.moodMax;
+    const held = engine.bellyHoldLeft();
     return t('hud.moodTitle', { love: Math.round(100 * mood.amor / max), belly: Math.round(100 * mood.barriga / max),
-      stat: engine.stats.rebolado.name, f: number(engine.moodFactor(mood), 2) });
+      stat: engine.stats.rebolado.name, f: number(engine.moodFactor(mood), 2) }) + (held > 0 ? ` ${t('hud.moodHold', { t: duration(held) })}` : '');
   }
   // `named`: com o nome de cada barra (na aba Comidas; na placa só os ícones).
   function moodBars(engine, mood, icon, named = false) {
@@ -145,8 +146,9 @@
     const minisList = ctx.minis || [];
     const janelaButtons = (casaOpen ? `<button class="ferramenta ${ctx.casaVisible ? 'aberta' : ''}" data-action="casa" ` +
       `title="${esc(t('hud.casa'))}">${ctx.icon('ui:casa')}</button>` : '') +
-      minisList.map(mini => `<button class="ferramenta ${mini.visible ? 'aberta' : ''}" data-action="mini" data-mini="${mini.id}" ` +
-        `title="${esc(t('hud.mini', { name: mini.name }))}">${ctx.icon(`ui:${mini.id}`)}</button>`).join('');
+      minisList.map(mini => `<button class="ferramenta ${mini.visible ? 'aberta' : ''} ${mini.pending ? 'chama' : ''}" data-action="mini" data-mini="${mini.id}" ` +
+        `title="${esc(t('hud.mini', { name: mini.name }))}${mini.pending ? ` ${esc(t('hud.miniPending', { n: mini.pending }))}` : ''}">${ctx.icon(`ui:${mini.id}`)}` +
+        `${mini.pending ? `<i class="selo-botao">${mini.pending}</i>` : ''}</button>`).join('');
     const janelasRow = janelaButtons ? `<div class="barra-janelas">${janelaButtons}</div>` : '';
     // O que está valendo agora: frenesi (do balão de sorte) e quadrilha marcada, cada um com os segundos que faltam.
     const r = s.runtime;
@@ -290,6 +292,7 @@
         else if (item.source === 'casamento') { state = esc(t('shop.onlyWedding')); cls = 'especial'; }
         else if (item.source === 'leilao') { state = esc(t('shop.onlyAuction')); cls = 'especial'; }
         else if (item.source === 'cobra') { state = esc(t('shop.onlySnake')); cls = 'especial'; }
+        else if (item.source === 'luta') { state = esc(t('shop.onlyBattle')); cls = 'especial'; }
         else if (engine.itemLocked(item.id)) { state = `🔒 ${esc(engine.data.tiers[item.tier].name)}`; cls = 'especial'; }
         else state = `<span class="preco" data-cost="${item.price}" data-currency="tickets">${ctx.icon('ui:fichas')}${item.price}</span>`;
         return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-item" data-id="${item.id}" ` +

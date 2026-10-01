@@ -11,7 +11,8 @@
   // `opts`: { document, engine, sprites, anchor(), settings(), changeSettings(partial), placaRect(), size() ({width, height} da
   // tela), t(key, vars), sound(name), toast(text, kind), focused() }.
   function create(opts) {
-    const { document, engine, sprites } = opts;
+    const { document, sprites } = opts;
+    let engine = opts.engine;
     const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
     const windows = new Map();      // id -> { id, element, canvas, view, status, drawnAt }
     let lastSignature = '';
@@ -200,12 +201,23 @@
       for (const item of windows.values()) item.view.onEvents?.(engine, events, now);
     }
 
-    // As janelas que já abriram, com o botão da placa: `visible` diz se a janela está na tela.
+    // As janelas que já abriram, com o botão da placa: `visible` diz se a janela está na tela e `pending` quantas coisas dela ainda
+    // esperam o jogador (páginas do cordel por completar, por exemplo: o botão pisca).
     function items() {
-      return engine.minis.opened().filter(id => views[id]).map(id => ({ id, name: title(id), visible: visible(id) }));
+      return engine.minis.opened().filter(id => views[id]).map(id => ({ id, name: title(id), visible: visible(id), pending: engine.mini(id).pending?.() || 0 }));
     }
-    // Muda quando o conjunto de botões ou o que está aberto muda (para a placa se redesenhar).
-    function signature() { return items().map(item => `${item.id}${item.visible ? '+' : '-'}`).join(','); }
+    // Muda quando o conjunto de botões, o que está aberto ou o que está pendente muda (para a placa se redesenhar).
+    function signature() { return items().map(item => `${item.id}${item.visible ? '+' : '-'}${item.pending || ''}`).join(','); }
+
+    // Outro jogo no lugar do atual (reiniciar ou importar a festa): as janelas do jogo anterior somem (e com elas o botão de cada uma na
+    // placa) e as do novo reaparecem conforme os convidados dele.
+    function setEngine(next) {
+      if (!next || next === engine) return;
+      for (const item of windows.values()) item.element.remove?.();
+      windows.clear();
+      engine = next;
+      restore();
+    }
 
     // Janelas abertas na carga do jogo: já abertas pela pessoa na última vez ficam como estavam.
     function restore() {
@@ -255,7 +267,7 @@
     }
 
     return { ensure, place, placeAll, toggle, close, setHidden, draw, onEvents, items, signature, restore, dragStart, dragMove, dragEnd,
-      visible, probe, windows, setHelp, toggleHelp, helpOpen };
+      visible, probe, windows, setHelp, toggleHelp, helpOpen, setEngine };
   }
 
   root.ArraiaJanelas = { create, registerView, views };

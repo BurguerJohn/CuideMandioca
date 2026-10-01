@@ -66,7 +66,7 @@
   const firstRun = !raw || !!loadError;
 
   const ui = {
-    tab: 'festa', lastLetter: null, open: false, modal: false, focused: true, logFilter: 'desbloqueios', lastLogRender: 0,
+    tab: 'festa', yeye: '', lastLetter: null, open: false, modal: false, focused: true, logFilter: 'desbloqueios', lastLogRender: 0,
     dock: { open: false, cat: 'melhorias', side: 'esquerda', dx: 0 }, preview: null,
     rings: { open: false, playing: false, result: null },
     tela: { open: false, id: 'correio' }, telaPos: null,
@@ -721,7 +721,7 @@
   }
 
   // Itens que não se compram: de onde cada um vem (rolês, Argolas, casamento, leilão).
-  const ONLY_FROM = { role: 'app.onlyOutings', argolas: 'app.onlyRings', casamento: 'app.onlyWedding', leilao: 'app.onlyAuction', cobra: 'app.onlySnake' };
+  const ONLY_FROM = { role: 'app.onlyOutings', argolas: 'app.onlyRings', casamento: 'app.onlyWedding', leilao: 'app.onlyAuction', cobra: 'app.onlySnake', luta: 'app.onlyBattle' };
   function dockItem(id) {
     const item = engine.items[id];
     const side = ui.dock.side;
@@ -1054,6 +1054,7 @@
     if (a === 'reiniciar') {
       if (!confirm(t('app.restartConfirm'))) return;
       engine = new GameEngine(data);
+      ui.janelas?.setEngine(engine);
       ui.tab = 'festa';
       forgetRound();
       save();
@@ -1203,11 +1204,11 @@
   const LADO_SONS = { 'barraca-beijo': 'carinho', 'barraca-comidas': 'bola', cadeia: 'penetra', espantalho: 'galinha', fardo: 'pintinho',
     mastro: 'equipar', carroca: 'lenha', 'barril-quentao': 'bola', 'fogao-lenha': 'fogo', 'barraca-cordel': 'revelar' };
   // O som de cada bicho da festa que reage ao clique.
-  const BICHO_SONS = { sapo: 'sapo', trem: 'apito', kombi: 'buzina', 'carro-boi': 'boi', papagaio: 'papagaio', jegue: 'zurro', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca' };
+  const BICHO_SONS = { sapo: 'sapo', trem: 'apito', kombi: 'buzina', 'carro-boi': 'boi', papagaio: 'papagaio', jegue: 'zurro', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca', rafael: 'yeah' };
 
   // --- Eventos do motor --------------------------------------------------------------------------------
   // Som de cada acontecimento da festa (os que o jogador não causou com um clique).
-  const EVENT_SOUNDS = { contest: 'porte', daily: 'premio', 'new-year': 'porte', 'bingo-number': 'bola', 'bingo-line': 'acerto', 'bingo-win': 'conquista', 'bingo-lost': 'errou', 'quadrilha-call': 'grito', pote: 'aviso', saco: 'aviso', 'saco-go': 'juiz', leilao: 'aviso', 'leilao-call': 'martelo', announce: 'altofalante', cobra: 'cobra', fotografo: 'aviso', burro: 'aviso', 'fantasia-soon': 'aviso', cold: 'chuva', quentao: 'moeda', sticker: 'revelar', 'album-page': 'conquista', visitor: 'quadrilha', set: 'premio', wedding: 'sinos', 'wedding-end': 'premio', 'special-day': 'quadrilha', quadrilha: 'quadrilha', 'goal-done': 'aviso', rain: 'chuva', thunder: 'trovao', 'rain-end': 'arcoiris', balloon: 'aviso', 'frenzy-start': 'porte', learn: 'crescer', grow: 'crescer', 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso',
+  const EVENT_SOUNDS = { contest: 'porte', daily: 'premio', 'new-year': 'porte', 'bingo-number': 'bola', 'bingo-line': 'acerto', 'bingo-win': 'conquista', 'bingo-lost': 'errou', 'quadrilha-call': 'grito', pote: 'aviso', saco: 'aviso', 'saco-go': 'juiz', leilao: 'aviso', 'leilao-call': 'martelo', announce: 'altofalante', cobra: 'cobra', fotografo: 'aviso', burro: 'aviso', 'fantasia-soon': 'aviso', cold: 'chuva', quentao: 'moeda', sticker: 'revelar', 'album-page': 'conquista', visitor: 'quadrilha', set: 'premio', wedding: 'sinos', 'wedding-end': 'premio', 'special-day': 'quadrilha', quadrilha: 'quadrilha', 'goal-done': 'aviso', rain: 'chuva', thunder: 'trovao', 'rain-end': 'arcoiris', balloon: 'aviso', 'frenzy-start': 'porte', learn: 'crescer', grow: 'crescer', 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso', rafael: 'yeah',
     'prize-ready': 'aviso', 'letter-ready': 'pombo', 'outing-done': 'aviso', crasher: 'penetra', request: 'pedido',
     'size-up': 'convidado', 'flare-start': 'fogo', 'cook-ready': 'aviso', 'house-room': 'crescer', 'house-resident': 'convidado' };
   // Acontecimentos que mudam o que as janelas mostram: prenda pronta, carta chegando, turma voltando do rolê...
@@ -1256,7 +1257,14 @@
       } else if (event.type === 'fishing-open') toast(t('app.fishingOpen'), 'grande');
       else if (event.type === 'prize-ready') toast(t('app.prizeReady'));
       else if (event.type === 'letter-ready') toast(t('app.letterReady'));
-      else if (event.type === 'cook-ready') toast(t('app.cookReady', { dish: engine.recipe(event.id)?.name || event.id }), 'ouro');
+      else if (event.type === 'mini' && event.mini === 'mata' && event.kind === 'win' && event.first) {
+        // O troféu do chefe avisa mesmo com a janela escondida.
+        toast(t('mini.mata.cleared', { stage: event.stage }), 'ouro');
+        for (const id of event.items || []) toast(t('mini.mata.unlocked', { item: engine.items[id]?.name || id }), 'ouro');
+      } else if (event.type === 'mini' && event.mini === 'cordel' && (event.kind === 'page' || event.kind === 'page-done')) {
+        const title = engine.data.minis.cordel.pages[event.page - 1]?.title || '';
+        toast(t(event.kind === 'page' ? 'mini.cordel.newPage' : 'mini.cordel.pageDone', { title }), 'ouro');
+      } else if (event.type === 'cook-ready') toast(t('app.cookReady', { dish: engine.recipe(event.id)?.name || event.id }), 'ouro');
       else if (event.type === 'outing-done') {
         toast(t('app.outingDone', { name: engine.chars[engine.state.outings[event.index].char]?.name || t('app.someone') }));
       } else if (event.type === 'special-day') {
@@ -1683,10 +1691,19 @@
     setTimeout(() => { renderWindows(); renderHud(true); }, 0);
   });
 
+  // Segredo: digitar "yeye" com o jogo em foco chama o Rafael para a festa (ou, se ele já está lá, faz ele gritar de novo).
+  const YEYE = 'yeye';
   document.addEventListener('keydown', event => {
     // Os atalhos do jogo não podem consumir a digitação nem a ativação dos controles nativos.
     const editing = event.target?.isContentEditable || event.target?.closest?.('input, select, textarea, [contenteditable=""], [contenteditable="true"]');
     if (editing && event.key !== 'Escape') return;
+    if (ui.focused && !event.ctrlKey && !event.altKey && !event.metaKey && !event.repeat && typeof event.key === 'string' && /^[a-z]$/i.test(event.key)) {
+      ui.yeye = (ui.yeye + event.key.toLowerCase()).slice(-YEYE.length);
+      if (ui.yeye === YEYE) {
+        ui.yeye = '';
+        if (engine.unlockRafael().first) { toast(t('app.rafael')); saveLater(); }
+      }
+    } else if (event.key !== 'Shift') ui.yeye = '';
     // Itens da vitrine são cartões (div com role="button"): Enter e espaço funcionam como clique.
     const card = event.target?.closest?.('[role="button"][data-action]');
     if (card && (event.key === 'Enter' || event.key === ' ')) {
@@ -1723,6 +1740,7 @@
       const imported = new GameEngine(data, JSON.parse(await file.text()));
       if (!confirm(t('app.importConfirm'))) return;
       engine = imported;
+      ui.janelas?.setEngine(engine);
       forgetRound();
       save();
       renderHud(true);
@@ -1764,8 +1782,7 @@
     // Voltando do repouso (ou de muito tempo com a festa escondida): o tempo parado rende como jogo fechado.
     const woke = engine.wake();
     if (woke && woke.cheer >= 1) {
-      toast(I18N.t('app.wake', { time: UI.duration(woke.seconds * 1000), n: UI.compact(woke.cheer) }) +
-        (woke.guests > 0 ? ` ${I18N.t('app.welcomeGuests', { n: woke.guests })}` : ''), 'ouro');
+      toast(I18N.t('app.wake', { time: UI.duration(woke.seconds * 1000), n: UI.compact(woke.cheer) }), 'ouro');
       saveLater();
     }
     let remaining = woke ? 0 : Math.min(delta, desktop ? 30 : 1);
@@ -1894,7 +1911,6 @@
   } else if (engine.welcome) {
     showModal(`<h2>${UI.esc(t('app.welcomeBack'))}</h2><p>${t('app.welcomeBackText', {
       time: UI.duration(engine.welcome.seconds * 1000), n: UI.compact(engine.welcome.cheer) })}` +
-      (engine.welcome.guests > 0 ? ` ${t('app.welcomeGuests', { n: engine.welcome.guests })}` : '') +
       (engine.welcome.bunny ? ` ${UI.esc(t('app.welcomeBunny', { v: Math.round(engine.welcome.bunny * 100) }))}` : '') + '</p>' +
       `<p class="miudo">${UI.esc(t(engine.welcome.capped ? 'app.welcomeCapped' : 'app.welcomeRule',
         { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +

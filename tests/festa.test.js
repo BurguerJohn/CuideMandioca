@@ -685,6 +685,66 @@ test('o varal equipado troca as cores de todas as bandeirinhas (e a prévia da l
   festa.draw(engine, (now += 30), { varal: 'varal-azul' });
 });
 
+test('os itens caros e criativos: custam mais que os antigos, liberam por porte, têm arte (e formas próprias) e vestem a festa', () => {
+  const NOVOS = ['fatia-melancia', 'abacaxi-real', 'gorro-tubarao', 'cartola-magica', 'chapeu-mago', 'capacete-astronauta',
+    'balao-estrela', 'sorvete-triplo', 'espada-neon', 'cajado-cristal', 'bola-cristal', 'agua-viva',
+    'onca', 'psicodelico', 'galaxia', 'sereia', 'neon-retro', 'nuvem', 'gelo', 'lava', 'bolo-confeitado', 'pista-disco',
+    'varal-pizza', 'varal-coracao', 'varal-peixe', 'varal-lanterna', 'varal-estrelas'];
+  const byId = Object.fromEntries(data.items.map(item => [item.id, item]));
+  for (const cat of ['chapeu', 'mao', 'tecido', 'terreiro', 'varal']) {
+    const antigos = data.items.filter(item => item.cat === cat && !NOVOS.includes(item.id));
+    const novos = NOVOS.map(id => byId[id]).filter(item => item.cat === cat);
+    assert.ok(novos.length >= 5, `${cat}: pelo menos 5 itens novos`);
+    for (const item of novos) {
+      assert.ok(item.price > Math.max(...antigos.map(old => old.price)), `${item.id} custa mais que qualquer item antigo de ${cat}`);
+      assert.ok(item.tier >= 2 && !item.source, `${item.id} libera da Festa da Cidade em diante e se compra com fichas`);
+    }
+  }
+  // Itens trancados pelo porte só abrem quando a festa chega lá.
+  const fresh = new GameEngine(data, null, { rng: () => 0.5 });
+  fresh.state.tickets = 1000;
+  assert.equal(fresh.itemLocked('capacete-astronauta'), true);
+  assert.equal(fresh.buyItem('capacete-astronauta'), false);
+  const late = lateGame();
+  late.state.tickets = 1000;
+  assert.equal(late.itemLocked('capacete-astronauta'), false);
+  assert.equal(late.buyItem('capacete-astronauta'), true);
+  assert.equal(late.state.tickets, 1000 - byId['capacete-astronauta'].price);
+  // Arte: o chapéu alto sobe pelo oy, o item de mão animado tem vários quadros, o terreiro e o varal têm formas e cores próprias.
+  assert.ok(bundle.hats['chapeu-mago'].oy < bundle.hats['fatia-melancia'].oy, 'o chapéu de mago passa do topo da cabeça');
+  for (const id of ['balao-estrela', 'sorvete-triplo', 'espada-neon', 'cajado-cristal', 'bola-cristal', 'agua-viva']) {
+    assert.equal(bundle.hand[id].frames, 4, `${id} se mexe em 4 quadros`);
+    assert.equal(bundle.hand[id].growth.length, 3, `${id} nos tamanhos menores`);
+  }
+  assert.deepEqual(bundle.terrains.nuvem.root, [], 'a nuvem não tem raízes');
+  assert.equal(bundle.terrains['pista-disco'].pattern, 'disco');
+  for (const id of ['lava', 'gelo', 'bolo-confeitado']) assert.equal(bundle.terrains[id].root.length, 4, `raízes de ${id}`);
+  for (const id of ['varal-pizza', 'varal-coracao', 'varal-peixe', 'varal-lanterna', 'varal-estrelas']) {
+    const varal = bundle.varais[id];
+    assert.ok(varal.shape.length >= 5 && varal.shape.every(row => row.length === varal.shape[0].length), `forma do ${id}`);
+    assert.ok(varal.colors.length >= 3, `cores do ${id}`);
+  }
+  // A festa veste, pendura e desenha cada um.
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let now = 9000;
+  for (const id of NOVOS) {
+    engine.state.inventory.push(id);
+    assert.ok(engine.equip(id), `veste o ${id}`);
+    for (let i = 0; i < 4; i++) festa.draw(engine, (now += 40));
+    festa.draw(engine, (now += 40), { [byId[id].cat]: id });
+  }
+  // Os conjuntos novos fecham com as três peças e rendem o bônus.
+  for (const set of data.sets.filter(entry => entry.bonus >= 0.09)) {
+    for (const id of [set.hat, set.hand, set.fabric]) { engine.state.inventory.push(id); engine.equip(id); }
+    assert.equal(engine.activeSet()?.id, set.id, set.id);
+  }
+});
+
 test('com 71 convidados chega o jegue da manta azul: passeia, pasta e zurra no clique', () => {
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -1074,4 +1134,101 @@ test('a Mandioca pede comida com a Barriga baixa (e não pede nada feliz)', () =
   assert.equal(run({ amor: 90, barriga: 5 }), 'fome');
   assert.equal(run({ amor: 5, barriga: 90 }), 'carente');
   assert.equal(run({ amor: 100, barriga: 100 }), null);
+});
+
+test('os troféus da Mata Encantada: 12 itens que só vêm dos chefes, com arte própria, e a festa veste cada um (e fecha os conjuntos novos)', () => {
+  const trofeus = data.items.filter(item => item.source === 'luta');
+  assert.equal(trofeus.length, data.minis.mata.unlocks.length);
+  const porCategoria = Object.fromEntries(['chapeu', 'mao', 'tecido', 'terreiro', 'varal'].map(cat => [cat, trofeus.filter(item => item.cat === cat).map(item => item.id)]));
+  assert.deepEqual(Object.values(porCategoria).map(list => list.length), [5, 3, 1, 2, 1]);
+  // Nenhum se compra: nem com a festa no máximo e cheia de fichas.
+  const late = lateGame();
+  late.state.tickets = 100000;
+  for (const item of trofeus) {
+    assert.equal(late.buyItem(item.id), false, `${item.id} não se compra`);
+    assert.equal(late.owned(item.id), false);
+  }
+  // Arte: chapéus que passam do topo da cabeça sobem pelo oy, mãos animadas em 4 quadros (e nos tamanhos menores), terreiros e varal próprios.
+  for (const id of porCategoria.chapeu) {
+    assert.ok(bundle.hats[id] && bundle.hats[id].growth.length === 3, `chapéu ${id} nos tamanhos menores`);
+    assert.ok(bundle.icons[`item:${id}`], `ícone de ${id}`);
+  }
+  assert.ok(bundle.hats['cobra-grande'].oy < bundle.hats['chapeu-boto'].oy, 'a cobra enrolada é mais alta que o chapéu do Boto');
+  assert.ok(bundle.hats['cabelo-curupira'].oy < bundle.hats['capuz-lobisomem'].oy);
+  for (const id of porCategoria.mao) {
+    assert.equal(bundle.hand[id].frames, 4, `${id} se mexe em 4 quadros`);
+    assert.equal(bundle.hand[id].growth.length, 3);
+    assert.ok(bundle.icons[`item:${id}`]);
+  }
+  assert.ok(bundle.mandioca['capa-boi-bumba'] && bundle.mandioca['capa-boi-bumba'].frames > 100, 'a capa existe no corpo da Mandioca');
+  assert.ok(bundle.icons['item:capa-boi-bumba']);
+  for (const id of porCategoria.terreiro) {
+    const terrain = bundle.terrains[id];
+    assert.ok(terrain.top.length >= 3 && terrain.root.length === 4 && terrain.flowers.length >= 3, `terreiro ${id}`);
+    assert.ok(bundle.icons[`item:${id}`]);
+  }
+  const varal = bundle.varais['varal-boitata'];
+  assert.ok(varal.shape.length >= 6 && varal.shape.every(row => row.length === varal.shape[0].length) && varal.colors.length >= 3);
+  assert.ok(bundle.icons['item:varal-boitata']);
+  // A festa veste, pendura e desenha cada um (sem a festa levantar erro) e nenhum precisa de loja para aparecer.
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let now = 9000;
+  for (const item of trofeus) {
+    assert.equal(engine.addItem(item.id), true);
+    assert.ok(engine.equip(item.id), `veste o ${item.id}`);
+    for (let i = 0; i < 4; i++) festa.draw(engine, (now += 40));
+    festa.draw(engine, (now += 40), { [item.cat]: item.id });
+  }
+  // Os dois conjuntos novos fecham com as três peças e rendem o bônus (dentro do teto de 12%).
+  for (const id of ['guardiao-da-mata', 'lenda-viva']) {
+    const set = data.sets.find(entry => entry.id === id);
+    assert.ok(set && set.bonus <= 0.12 && set.bonus >= 0.1, id);
+    for (const piece of [set.hat, set.hand, set.fabric]) assert.equal(data.items.find(item => item.id === piece).source, 'luta', `${id}: ${piece} é troféu`);
+    for (const piece of [set.hat, set.hand, set.fabric]) engine.equip(piece);
+    assert.equal(engine.activeSet()?.id, id);
+  }
+});
+
+test('o Rafael (segredo "yeye") só aparece depois de chamado, anda e bebe o quentão e grita pulando no clique', () => {
+  const { fakeContext } = require('./fake-dom');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = [];
+  canvas.getContext = () => ({ ...fakeContext(), drawImage(image, sx) { draws.push([image.value, sx]); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle);
+  festa.setScale(3);
+  const engine = new GameEngine(data, null, { rng: () => 0.3 });
+  const meta = bundle.chars.rafael;
+  const sheet = bundle.images[meta.image];
+  const used = () => new Set(draws.filter(([image]) => image === sheet).map(([, sx]) => sx / meta.w));
+  const run = (frames, from) => { let now = from; for (let i = 0; i < frames; i++) festa.draw(engine, (now += 30)); return now; };
+  const yeah = new Set(meta.poses.yeah);
+  let now = run(40, 5000);
+  assert.equal(used().size, 0, 'sem o segredo ele não está na festa');
+  assert.ok(!festa.areas().some(area => area.id === 'bicho:rafael'));
+  // Chamado: aparece clicável, grita ao chegar (quadros de pulo) e depois volta a passear.
+  engine.unlockRafael();
+  festa.onEvents(engine, [{ type: 'rafael', first: true }], now);
+  now = run(30, now);
+  assert.ok(festa.areas().some(area => area.id === 'bicho:rafael'), 'o Rafael é clicável');
+  assert.ok([...used()].some(frame => yeah.has(frame)), 'grita ao chegar');
+  now = run(70, now);
+  draws.length = 0;
+  now = run(400, now);
+  const calm = [...used()];
+  assert.ok(calm.length >= 3, `anda, para, pisca e bebe (${calm})`);
+  assert.ok(!calm.some(frame => yeah.has(frame)), 'depois do grito ele volta ao normal');
+  assert.ok(calm.some(frame => meta.poses.anda.includes(frame)), 'anda');
+  // Clicar nele faz gritar de novo.
+  draws.length = 0;
+  festa.poke('bicho:rafael');
+  run(30, now);
+  assert.ok([...used()].some(frame => yeah.has(frame)), 'o clique faz gritar "YEAH YEAH"');
 });

@@ -46,6 +46,7 @@ test('as abas mostram preços, postos e rolês no fim do jogo', () => {
     'melhorias também têm ação para a ativação pelo teclado');
   assert.match(dock('lado'), /Em uso/);
   assert.match(dock('chapeu'), /Só nas Argolas/);
+  assert.match(dock('chapeu'), /Só na Mata Encantada/, 'os troféus da Mata dizem de onde vêm');
   assert.match(dock('chapeu'), /data-preview="vaqueiro"/);
   assert.match(render('turma'), /Trabalhando: Par da quadrilha/);
   assert.match(render('turma'), /Em rolê/);
@@ -234,4 +235,17 @@ test('a placa ganha o botão da casa da Mandioca do convidado 100 em diante, e o
   const log = UI.panel(engine, ctx(engine, { tab: 'historico', logFilter: 'tudo' }));
   assert.match(log, /A casa ganhou um cômodo: Cozinha/);
   assert.match(log, /Macaxeira se mudou para a casa/);
+});
+
+test('o botão de uma janela com coisa pendente pisca e mostra o número (o das outras não)', () => {
+  const engine = new GameEngine(data);
+  while (engine.state.size < 30) engine.addFame(engine.fameNeed() - engine.state.fame);
+  const botoes = (pending) => UI.hud(engine, ctx(engine, { minis: [{ id: 'cordel', name: 'Cordel da Mandioca', visible: false, pending },
+    { id: 'bichos', name: 'Quintal dos Bichos', visible: true, pending: 0 }] }));
+  const html = botoes(3);
+  assert.match(html, /class="ferramenta  chama" data-action="mini" data-mini="cordel"[^>]*title="[^"]*3 páginas da história para completar[^"]*">[\s\S]*?<i class="selo-botao">3<\/i><\/button>/);
+  assert.match(html, /class="ferramenta aberta " data-action="mini" data-mini="bichos"/, 'a janela sem pendência não pisca');
+  assert.equal((html.match(/data-mini="bichos"[^>]*>[\s\S]*?<\/button>/)[0].match(/selo-botao/g) || []).length, 0);
+  assert.match(botoes(1), /1 página da história para completar/);
+  assert.doesNotMatch(botoes(0), /chama" data-action="mini"|páginas da história/);
 });

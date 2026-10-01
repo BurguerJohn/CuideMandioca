@@ -31,7 +31,7 @@
   const FIRE_CORE = '#ffd27a';
   const SMOKE = '#3b3346';
   // Chapéus de metal ou pedraria: ganham o brilho de joia.
-  const SHINY = new Set(['coroa-milho', 'rei-baiao', 'coroa-flores', 'tiara-chifrinho']);
+  const SHINY = new Set(['coroa-milho', 'rei-baiao', 'coroa-flores', 'tiara-chifrinho', 'cartola-magica', 'chapeu-mago', 'capacete-astronauta']);
   const MARGIN = 16;
   const BASE_H = 204;
   const BASE_GROUND = 160;
@@ -172,7 +172,7 @@
       particles: [], texts: [], arrivals: new Map(), shown: {}, celebrateUntil: 0, jumpUntil: 0,
       nextBlink: 0, blinkUntil: 0, nextSpark: 0, nextSweat: 0, nextFirework: 0, nextNote: 0, nextHeart: {}, frame: 0, previous: 0,
       lastDraw: 0, stepSum: 0, stepCrit: false, stepAt: 0, crasherSeen: null, leaving: null,
-      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
+      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, rafael: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
       nextZ: 0, nextSmoke: 0, pops: [],
       light: null, nextFireSmoke: 0, dustAt: 0, rockets: [], flashes: [], shooting: null, nextShoot: 0, glintAt: 0
     });
@@ -393,9 +393,11 @@
           if (y === edge) {
             if (palette.pattern === 'planks') color = x % 6 === 0 ? palette.sub[0] : palette.top[0];
             else if (palette.pattern === 'checker') color = (Math.floor(x / 2) + y) % 2 ? palette.top[0] : palette.mid[0];
+            else if (palette.pattern === 'disco') color = palette.top[Math.floor(x / 3) % palette.top.length];
             else color = pick(palette.top, r);
           } else if (y === edge + 1) {
             if (palette.pattern === 'checker') color = (Math.floor(x / 2) + y) % 2 ? palette.top[0] : palette.mid[0];
+            else if (palette.pattern === 'disco') color = palette.mid[(Math.floor(x / 3) + 1) % palette.mid.length];
             else color = pick(palette.mid, r);
           } else if (y === edge + 2) color = pick(palette.sub, r);
           else if (y < 7) color = pick(palette.soil, r);
@@ -417,7 +419,9 @@
           for (let k = 0; k < 4 + Math.floor(r() * 4); k++) put(x + k + 1, top, palette.puddle[k % 2]);
         }
       }
-      const roots = Math.max(3, Math.floor(width / 32));
+      // Cada terreiro pode ter as próprias raízes: [fio, escura, média, clara] (lista vazia: sem raízes, como a nuvem).
+      const rootColors = palette.root || ['#4a2418', '#4a2418', '#80482a', '#bd7a3e'];
+      const roots = rootColors.length ? Math.max(3, Math.floor(width / 32)) : 0;
       for (let n = 0; n < roots; n++) {
         let x = Math.floor(width * (0.15 + 0.7 * n / Math.max(1, roots - 1)));
         let y = bottoms[x];
@@ -425,11 +429,11 @@
         for (let step = 0; step < length; step++) {
           y++;
           if (step % 3 === 2) x += r() < 0.5 ? -1 : 1;
-          put(x + 1, top + y, '#4a2418');
+          put(x + 1, top + y, rootColors[0]);
         }
         if (n % 3 === 1) {
           ['343', '343', '232', '.2.'].forEach((row, dy) => [...row].forEach((c, dx) => {
-            if (c !== '.') put(x + dx, top + y + 1 + dy, { 2: '#4a2418', 3: '#80482a', 4: '#bd7a3e' }[c]);
+            if (c !== '.') put(x + dx, top + y + 1 + dy, { 2: rootColors[1], 3: rootColors[2], 4: rootColors[3] }[c]);
           }));
         }
       }
@@ -876,10 +880,10 @@
     const flags = new Map();
     // Cores do varal equipado: cada bandeirinha é [cor, sombra, brilho, florzinha?]. Sem varal no pacote, as de sempre.
     const DEFAULT_FLAGS = FLAGS.map((color, index) => [color, FLAG_DARK[index], FLAG_LIGHT[index]]);
-    let varal = { id: 'varal-colorido', colors: DEFAULT_FLAGS };
+    let varal = { id: 'varal-colorido', colors: DEFAULT_FLAGS, shape: null };
     function setVaral(id) {
       const found = id !== 'varal-colorido' && bundle.varais && bundle.varais[id];
-      varal = found ? { id, colors: found.colors } : { id: 'varal-colorido', colors: DEFAULT_FLAGS };
+      varal = found ? { id, colors: found.colors, shape: found.shape || null } : { id: 'varal-colorido', colors: DEFAULT_FLAGS, shape: null };
     }
     function flagImage(c, level) {
       const key = `${varal.id}:${c}:${level}`;
@@ -887,10 +891,25 @@
       if (image) return image;
       const [base, dark, light, dot] = varal.colors[c % varal.colors.length];
       image = document.createElement('canvas');
-      image.width = 7;
-      image.height = 6;
+      const shape = varal.shape;
+      // Varal de formato próprio (coração, peixe, lanterna...): a forma vem do pacote, letra por letra (b cor, d sombra, l brilho e
+      // o detalhe); a bandeirinha balança deslocando as linhas de baixo, como a de sempre.
+      image.width = shape ? 9 : 7;
+      image.height = shape ? shape.length : 6;
       const p = image.getContext('2d');
       const shift = level * 1.3 / 3;
+      if (shape) {
+        shape.forEach((row, dy) => {
+          const ox = Math.round(shift * dy / 6);
+          [...row].forEach((letter, dx) => {
+            if (letter === '.') return;
+            p.fillStyle = letter === 'd' ? dark : letter === 'l' ? light : letter === 'o' ? (dot || base) : base;
+            p.fillRect(dx + ox + 1, dy, 1, 1);
+          });
+        });
+        flags.set(key, image);
+        return image;
+      }
       for (let dy = 1; dy < 7; dy++) {
         const ox = Math.round(shift * dy / 6);
         for (let dx = -2; dx <= 2; dx++) {
@@ -940,7 +959,8 @@
         const c = (index + phase) % varal.colors.length;
         const gust = fx.windNow;
         const level = Math.max(-3, Math.min(3, Math.round(3 * Math.sin(now / (420 - 230 * Math.abs(gust)) + index * 0.8) + 2.5 * gust)));
-        g.drawImage(flagImage(c, level), x - 3, y + 1);
+        const flag = flagImage(c, level);
+        g.drawImage(flag, x - (flag.width >> 1), y + 1);
       }
     }
 
@@ -1295,11 +1315,16 @@
       triangulo: { every: 640, dancing: true }, 'sanfona-ouro': { every: 420, dancing: true }, estrelinha: { every: 90 },
       'pau-selfie': { every: 7000 }, peixinho: { every: 850 }, 'frango-assado': { every: 520 }, 'bolo-fuba': { every: 700 },
       buque: { every: 1500 }, 'maca-amor': { every: 3200 }, 'cobra-de-pano': { every: 9000, dancing: true },
-      pandeiro: { every: 380, dancing: true }, zabumba: { every: 560, dancing: true }
+      pandeiro: { every: 380, dancing: true }, zabumba: { every: 560, dancing: true },
+      'balao-estrela': { every: 1100 }, 'sorvete-triplo': { every: 1300 }, 'espada-neon': { every: 260 }, 'cajado-cristal': { every: 520 },
+      'bola-cristal': { every: 640 }, 'agua-viva': { every: 700 },
+      'tocha-caipora': { every: 150 }, 'ferradura-fogo': { every: 240 }, 'caldeirao-cuca': { every: 500 }
     };
     function handFx(id, ix, iy, item, now, dancing) {
       const top = ix + item.w / 2;
       if (id === 'lampiao') halo(top, iy + item.h * 0.55, 9, '#ffc460', 0.16 + 0.04 * Math.sin(now / 90));
+      if (id === 'tocha-caipora') halo(top, iy + 5, 11, '#ff9a3a', 0.17 + 0.05 * Math.sin(now / 70));
+      if (id === 'ferradura-fogo') halo(top, iy + item.h * 0.45, 8, '#ff7a2a', 0.12 + 0.04 * Math.sin(now / 110));
       if (id === 'pau-selfie' && now < (fx.selfieUntil || 0)) {
         halo(top, iy + 1, 7, '#ffffff', 0.8 * (fx.selfieUntil - now) / 140);
         g.fillStyle = '#ffffff';
@@ -1329,7 +1354,27 @@
       } else if (id === 'maca-amor') float('coracao', top, iy - 1, now, ['#ff4f9e']);
       else if (id === 'cobra-de-pano') say(tr('fx.sss'), top + 4, iy - 4, now, '#9ef05a', 900, 6);
       else if (id === 'zabumba') float('nota', top + (rng() < 0.5 ? -3 : 3), iy + 2, now, ['#ff907a', '#fff07a']);
-      else if (id === 'pandeiro') {
+      else if (id === 'balao-estrela') float('brilho', top + (rng() - 0.5) * 6, iy + 1, now, ['#fff07a']);
+      else if (id === 'tocha-caipora' || id === 'ferradura-fogo') {
+        // Brasa que sobe da chama e esfria no ar.
+        fx.particles.push({ x: top + (rng() - 0.5) * 5, y: iy + (id === 'tocha-caipora' ? 2 : item.h * 0.3), vx: (rng() - 0.5) * 0.02, vy: -0.02 - rng() * 0.02,
+          born: now, ttl: 420 + rng() * 300, colors: SPARK, ember: true });
+      } else if (id === 'caldeirao-cuca') {
+        // Bolha verde que sobe do caldeirão e estoura.
+        fx.particles.push({ x: top + (rng() - 0.5) * 7, y: iy + 1, vx: (rng() - 0.5) * 0.004, vy: -0.01, born: now, ttl: 800, colors: ['#9affb0', '#d8ffe0'], twinkle: true });
+      } else if (id === 'espada-neon') {
+        // Faísca da cor do brilho do momento, que corre pela lâmina.
+        const neon = ['#3ae8ff', '#ff4adc', '#9aff3a', '#ffb83a'];
+        fx.particles.push({ x: top + (rng() - 0.5) * 3, y: iy + 1 + rng() * 6, vx: (rng() - 0.5) * 0.02, vy: -0.01, born: now, ttl: 300,
+          colors: [neon[Math.floor(now / 250) % 4]], twinkle: true });
+      } else if (id === 'cajado-cristal') float('brilho', top + (rng() < 0.5 ? -3 : 3), iy + 1 + rng() * 3, now, ['#a8f4ff', '#ffffff']);
+      else if (id === 'bola-cristal') float('brilho', top + (rng() - 0.5) * 6, iy + 2, now, ['#d8b4ff', '#fff4a8']);
+      else if (id === 'sorvete-triplo') {
+        // Pinga um pouquinho de sorvete derretido.
+        fx.particles.push({ x: top - 2, y: iy + item.h * 0.5, vx: 0, vy: 0.012, born: now, ttl: 520, colors: ['#ff8ab8'] });
+      } else if (id === 'agua-viva') {
+        fx.particles.push({ x: top + (rng() - 0.5) * 8, y: iy + item.h * 0.5, vx: 0, vy: -0.006, born: now, ttl: 900, colors: ['#ffd0f0'], twinkle: true });
+      } else if (id === 'pandeiro') {
         // Tchic-tchic: brilho numa platinela e, de vez em quando, uma nota.
         const side = rng() < 0.5 ? 0 : item.w - 1;
         fx.particles.push({ x: ix + side, y: iy + item.h / 2 - 1, vx: 0, vy: -0.004, born: now, ttl: 220, colors: ['#fffff0', '#c8ccd6'], twinkle: true });
@@ -3248,6 +3293,7 @@
       }
       if (typeof id !== 'string' || !id.startsWith('bicho:')) return;
       const now = root.performance?.now?.() || 0;
+      if (id === 'bicho:rafael') { fx.rafael.shout = now; return; }
       const key = id.slice(6);
       const kind = key.split(':')[0];
       fx.react[key] = now;
@@ -3306,6 +3352,48 @@
       const hop = critter('amendoim', state.x, GROUND - meta.h + 2, meta.w, meta.h, now);
       sprite(meta, frame, state.x, GROUND - meta.h + 2 + hop, state.dir < 0);
       spots.set('amendoim', { x: state.x + meta.w / 2, y: GROUND - meta.h });
+    }
+
+    // O Rafael (segredo: digitar "yeye" com o jogo em foco): passeia pela frente da festa com um quentão na mão, para, dá uma bicada
+    // no quentão, pisca e, quando alguém clica nele (ou digita "yeye" de novo), pula gritando "YEAH YEAH!" com confete.
+    const YEAH_MS = 1500;
+    const YEAH_STEP = 240;
+    function drawRafael(engine, now) {
+      if (!engine.state.rafael) return;
+      const meta = bundle.chars.rafael;
+      if (!meta) return;
+      const pose = meta.poses;
+      const r = fx.rafael;
+      const state = roam(r, now, layout.L + 6, layout.R - meta.w - 6, 0.016, 0.45);
+      if (r.seed === undefined) r.seed = Math.floor(rng() * 5000);
+      const cx = state.x + meta.w / 2;
+      if (r.shout !== undefined && r.shout !== r.shoutDone) {
+        r.shoutDone = r.shout;
+        r.yeahAt = now;
+        say('YEAH YEAH!', cx, Math.max(10, GROUND - meta.h - 2), now, '#fff07a', YEAH_MS, 8);
+        confetti(now, cx, GROUND - meta.h + 8, 16);
+      }
+      const shouting = r.yeahAt !== undefined && now - r.yeahAt < YEAH_MS;
+      let frame;
+      if (shouting) {
+        // Grita parado no lugar, pulando duas vezes (um "YEAH" para cada pulo).
+        Object.assign(state, { mode: 'para', until: Math.max(state.until, r.yeahAt + YEAH_MS + 400) });
+        const [low, high, top] = pose.yeah;
+        frame = [low, high, low, high, top, high][Math.floor((now - r.yeahAt) / YEAH_STEP) % 6];
+      } else if (state.mode === 'anda') {
+        frame = pose.anda[Math.floor(now / 150) % pose.anda.length];
+      } else {
+        const t = now + r.seed;
+        frame = pose.parado;
+        if (t % 6400 < 1110) frame = pose.bebe[Math.floor(t % 6400 / 370)];
+        else if (t % 3300 < 140) frame = pose.pisca;
+      }
+      const y = GROUND - meta.h + 2;
+      const hop = critter('rafael', state.x, y, meta.w, meta.h, now);
+      shadow(cx, 12, 0.8);
+      sprite(meta, frame, state.x, y + hop, state.dir < 0);
+      rim(meta, frame, state.x, y + hop, state.dir < 0, cx);
+      spots.set('rafael', { x: cx, y: GROUND - meta.h });
     }
 
     // Ciranda: com duas ou mais crianças, de tempos em tempos elas dão a volta na fogueira por uns segundos. Passam por
@@ -4103,6 +4191,8 @@
         reset();
         draw(engine, now);
       }
+      // O Rafael chamado (ou digitando "yeye" de novo): grita assim que for desenhado.
+      if (Array.isArray(events) && events.some(event => event.type === 'rafael')) fx.rafael.shout = now;
       if (!layout) return;
       const hostX = layout.host.x + 12;
       const up = n => GROUND - Math.round(n * fx.scale);
@@ -4688,6 +4778,7 @@
       moodLines(engine, now);
       if (engine.state.size < 25 && bundle.scenery.sapo) drawFrog(now);
       drawPeddler(engine, now);
+      drawRafael(engine, now);
       drawCrasher(engine, now);
       drawRequest(engine, now);
       ambientEstalo(now);
@@ -4930,7 +5021,7 @@
     function setSleepy(on) { sleepy = on === true; }
 
     // Estado dos enfeites que vêm e vão sozinhos (para os testes e as fotos): vento (-1 a 1) e ciranda das crianças.
-    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
+    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rafael: fx.rafael.x === undefined ? null : { x: fx.rafael.x, mode: fx.rafael.mode, yeahAt: fx.rafael.yeahAt ?? null, shout: fx.rafael.shout ?? null }, rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
 
     // A pessoa voltou para a festa depois de um tempo fora: a Mandioca dá um pulinho, faz o olhar felizinho e cumprimenta.
     const GREETINGS = 4;

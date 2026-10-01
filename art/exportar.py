@@ -26,6 +26,9 @@ import janelas
 import cenario
 import crescer
 import danca
+import itens_novos
+import itens_mata
+import rafael
 import tamanhos
 from scene import (BACK_TINT, HEART, Layer, awning, bonfire, booth_back, booth_counter, crate, flag_mast, mastro_sao_joao,
                    sign, stage)
@@ -42,7 +45,7 @@ FRAME_W, FRAME_H = 24 + PAD * 2, 40 + PAD
 # dança nova já vem nos quatro tamanhos. Chapéus e itens de mão dos tamanhos menores saem reduzidos (art/crescer.py).
 GROWTH = [0.62, 0.75, 0.88, 1.0]
 FABRICS = ['xadrez-vermelho', 'xadrez-azul', 'xadrez-verde', 'remendado', 'chita', 'chita-rosa', 'xadrez-ouro', 'chita-amarela',
-           'xadrez-roxo']
+           'xadrez-roxo'] + list(itens_novos.TECIDOS)
 CROWD_FABRICS = ['xadrez-azul', 'chita', 'xadrez-vermelho', 'chita-rosa', 'xadrez-verde', 'remendado']
 # Cada pessoa da festa é um tecido com um chapéu: palha (o de sempre), de couro, azul ou lenço vermelho; nas damas, a coroa
 # de flores troca de cor. Quatro "jeitos" por tecido, então a multidão deixa de ser uma fila de gêmeos.
@@ -86,7 +89,7 @@ def strip(frames):
 
 # Volume: luz quente na borda de cima/esquerda e sombra arroxeada na de baixo/direita, 1 pixel para dentro do
 # contorno (o contorno não muda). Vale para quem fica na frente da festa: gente, bichos, chapéus, itens e barracas.
-VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'criancas', 'penetra', 'casamento', 'lado-', 'caixote',
+VOLUME = ('mandioca-', 'mata-comuns', 'mata-chefes', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'criancas', 'penetra', 'casamento', 'lado-', 'caixote',
           'cenario-galinha', 'cenario-pintinho', 'cenario-gato', 'cenario-bode', 'cenario-balao', 'cenario-mandioquinha',
           'cenario-milharal', 'cenario-bananeira', 'cenario-coqueiro', 'cenario-mandacaru', 'cenario-carrossel',
           'cenario-balao-grande', 'cenario-boi', 'cenario-balao-ouro', 'cenario-pote', 'cenario-caramelo', 'cenario-pombo', 'cenario-trem', 'cenario-sapo', 'cenario-saco', 'cenario-leiloeiro', 'cenario-kombi', 'cenario-jegue', 'cenario-sanfoneiro', 'cenario-fotografo', 'cenario-carro-boi', 'cenario-papagaio', 'compadres', 'casa-moradores')
@@ -563,6 +566,9 @@ def export_hats():
         manifest['hats'][hat_id] = add(f'chapeu-{hat_id}', image, ox=-1, oy=-1)
     manifest['hats']['oculos-coracao'] = add('chapeu-oculos-coracao', heart_glasses(), ox=-1, oy=-1)
     manifest['hats']['chapeu-palhaco'] = add('chapeu-chapeu-palhaco', clown_hat(), ox=-1, oy=-1)
+    # Os chapéus caros e criativos (art/itens_novos.py): os altos passam do topo da Mandioca, então sobem pelo `oy`.
+    for hat_id, hat in itens_novos.CHAPEUS.items():
+        manifest['hats'][hat_id] = add(f'chapeu-{hat_id}', itens_novos.pintar(hat['texto'], hat['cores']), ox=-1, oy=-1 - hat['acima'])
     for hat_id, meta in manifest['hats'].items():
         image = images[meta['image']]
         icons[f'item:{hat_id}'] = image.crop(image.getbbox())
@@ -636,6 +642,8 @@ def export_hand():
         if item_id == 'lampiao':
             frames.append(fill(sprites.HAND_FILL['lampiao-2'][0]))
         manifest['hand'][item_id] = add(f'mao-{item_id}', frames, pivot=[px + 1, py + 1], fps=4)
+    for item_id, mao in itens_novos.MAOS.items():
+        manifest['hand'][item_id] = add(f'mao-{item_id}', mao['quadros'], pivot=mao['pivo'], fps=mao['fps'])
     for item_id, meta in manifest['hand'].items():
         image = images[meta['image']].crop((0, 0, meta['w'], meta['h']))
         icons[f'item:{item_id}'] = image.crop(image.getbbox())
@@ -662,6 +670,9 @@ def export_chars():
     manifest['chars']['sopinha'] = add('turma-sopinha', animar.sopinha(), fps=1,
                                        poses={'senta': 0, 'funga': 1, 'pisca': 2, 'orelha': 3, 'pulo': 4, 'deita': 5})
     manifest['chars']['sopinha']['rim'] = luz('turma-sopinha')
+    # O Rafael (segredo: digitar "yeye"): anda com o quentão, bebe, pisca e grita "YEAH YEAH". Como o Sopinha, a festa escolhe a pose.
+    manifest['chars']['rafael'] = add('turma-rafael', rafael.quadros(), fps=8, poses=rafael.POSES)
+    manifest['chars']['rafael']['rim'] = luz('turma-rafael')
     # Pipoca atrás do balcão da Barraca de Comidas (`top`: pixels do quadro acima da linha do balcão) e Amendoim, o
     # ambulante, que passeia pela frente da festa.
     manifest['chars']['pipoca'] = add('turma-pipoca', animar.pipoca(), fps=7, top=1)
@@ -1373,6 +1384,10 @@ def export_icons():
     for varal, colors in VARAIS.items():
         icons[f'item:{varal}'] = varal_icon(colors)
         manifest['varais'][varal] = {'colors': [[f'#{PALETTE[c].lstrip("#")}' for c in flag] for flag in colors]}
+    for varal, (forma, colors) in itens_novos.VARAIS_NOVOS.items():
+        shape = itens_novos.FORMAS[forma]
+        icons[f'item:{varal}'] = itens_novos.icone_varal(colors, shape)
+        manifest['varais'][varal] = {'colors': [[f'#{PALETTE[c].lstrip("#")}' for c in flag] for flag in colors], 'shape': shape}
     for fabric in FABRICS:
         icons[f'item:{fabric}'] = fill(sprites.SHIRT_ICON, fabric)
 
@@ -1430,6 +1445,9 @@ def export_terrains():
         manifest['terrains'][terrain_id] = {key: (to_hex(value) if key != 'pattern' else value)
                                             for key, value in palette.items()}
         icons[f'item:{terrain_id}'] = mini_ground(palette)
+    for terrain_id, palette in itens_novos.TERRENOS_NOVOS.items():
+        manifest['terrains'][terrain_id] = dict(palette)
+        icons[f'item:{terrain_id}'] = itens_novos.mini_terreno(palette)
 
 
 # --- Ícone do app e pacote ---------------------------------------------------------------------

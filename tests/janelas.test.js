@@ -15,7 +15,7 @@ function setup(level, options = {}) {
   require('../src/festa.js');
   require('../src/janela-base.js');
   require('../src/janelas.js');
-  for (const id of ['bichos', 'aquario', 'horta', 'fogueira', 'palco', 'provador', 'ceu', 'bairro']) require(`../src/janela-${id}.js`);
+  for (const id of ['cordel', 'bichos', 'aquario', 'horta', 'fogueira', 'palco', 'mata', 'ceu', 'bairro']) require(`../src/janela-${id}.js`);
   const clock = { t: 1_000_000_000 };
   const engine = new GameEngine(data, null, { rng: () => 0.5, now: () => clock.t });
   engine.state.size = level;
@@ -50,13 +50,13 @@ test('o botão da janela só aparece depois que ela abre, e mostra e esconde o r
   assert.deepEqual(host.items(), []);
   assert.equal(host.toggle('bichos'), false, 'fechada: nada acontece');
   engine.state.records.size = 12;
-  assert.deepEqual(host.items().map(item => [item.id, item.visible]), [['bichos', false]]);
-  assert.equal(host.signature(), 'bichos-');
+  assert.deepEqual(host.items().map(item => [item.id, item.visible]), [['cordel', false], ['bichos', false]]);
+  assert.equal(host.signature(), 'cordel-1,bichos-', 'a página 1 do cordel espera a ação');
   assert.equal(host.toggle('bichos'), true);
   assert.equal(settings.minis.bichos.hidden, false);
   assert.equal(host.visible('bichos'), true);
   assert.equal(host.windows.get('bichos').element.hidden, false);
-  assert.equal(host.signature(), 'bichos+');
+  assert.equal(host.signature(), 'cordel-1,bichos+');
   host.toggle('bichos');
   assert.equal(host.visible('bichos'), false);
   assert.equal(host.windows.get('bichos').element.hidden, true);
@@ -360,52 +360,6 @@ test('palco: escolhe a música, marca o ritmo nas pistas, vê o resultado e fech
   assert.ok(view.probe().particles <= 160);
 });
 
-// --- Provador -------------------------------------------------------------------------------------------------------------
-test('provador: a Mandioca no espelho veste item, veste conjunto e posa pelos cliques', () => {
-  const { host, engine, sounds } = setup(50, { minis: { provador: { hidden: false } } });
-  host.restore();
-  const view = host.windows.get('provador').view;
-  let now = 1000;
-  host.draw((now += 40));
-  const areas = view.probe().areas.map(area => area.id);
-  assert.ok(['mandioca', 'aba:chapeu', 'aba:conjunto', 'item:chapeu-palha', 'pagina:+'].every(id => areas.includes(id)), areas.join(','));
-  assert.match(view.status(engine), /^mini\.provador\.statusNone$/);
-
-  // Item que não tem: erro. Comprado: veste.
-  clickArea(host, 'provador', 'item:palha-furada', now);
-  assert.equal(engine.state.equipped.chapeu, 'chapeu-palha');
-  assert.ok(sounds.includes('erro'));
-  engine.addItem('palha-furada');
-  host.draw((now += 40));
-  clickArea(host, 'provador', 'item:palha-furada', now);
-  assert.equal(engine.state.equipped.chapeu, 'palha-furada');
-  assert.ok(sounds.includes('equipar'));
-
-  // Conjuntos: falta peça, não veste; com as três, veste tudo.
-  clickArea(host, 'provador', 'aba:conjunto', now);
-  host.draw((now += 40));
-  assert.equal(engine.mini('provador').info().tab, 'conjunto');
-  clickArea(host, 'provador', 'conjunto:pescador', now);
-  assert.equal(engine.state.equipped.mao, 'bandeirinha', 'sem as peças nada muda');
-  engine.addItem('vara-pescar');
-  engine.addItem('xadrez-azul');
-  host.draw((now += 40));
-  clickArea(host, 'provador', 'conjunto:pescador', now);
-  assert.equal(engine.setBonus(), data.sets.find(set => set.id === 'pescador').bonus);
-  host.draw((now += 40));
-  assert.match(view.status(engine), /^mini\.provador\.statusSet$/);
-
-  // Pose: cada clique na Mandioca troca a pose. Página: as setinhas andam.
-  const pose = view.probe().pose;
-  clickArea(host, 'provador', 'mandioca', now);
-  assert.equal(view.probe().pose, (pose + 1) % 3);
-  clickArea(host, 'provador', 'aba:chapeu', now);
-  host.draw((now += 40));
-  clickArea(host, 'provador', 'pagina:+', now);
-  assert.equal(view.probe().page, 1);
-  for (let i = 0; i < 600; i++) host.draw((now += 33));
-});
-
 // --- Céu de São João ------------------------------------------------------------------------------------------------------
 test('céu: foguete sobe onde se clica e estoura, a Grande Final vem com vários, a estrela cadente e a simpatia respondem aos cliques', () => {
   const { host, engine, sounds, toasts } = setup(70, { minis: { ceu: { hidden: false } } });
@@ -530,4 +484,305 @@ test('ajuda: cada janela tem um "?" que abre o como funciona (nos 3 idiomas, sem
   } finally {
     I18N.setLanguage('pt-BR');
   }
+});
+
+// --- Mata Encantada (o auto battler) --------------------------------------------------------------------------------------------
+test('mata: a janela desenha a batalha e a lista de itens, e responde aos cliques (etapa, pausa, bichinho, alvo e itens)', () => {
+  const { host, engine, sounds, toasts } = setup(60, { minis: { mata: { hidden: false } } });
+  host.restore();
+  const view = host.windows.get('mata').view;
+  const mata = engine.mini('mata');
+  const s = engine.state.minis.mata;
+  let now = 1000;
+  const frame = (ticks = 1) => { for (let i = 0; i < ticks; i++) { engine.tick(0.05); host.draw((now += 40)); } };
+  frame();
+  let areas = view.probe().areas.map(area => area.id);
+  for (const id of ['hero', 'prev', 'next', 'dots', 'auto', 'stats', 'mood', 'pet']) assert.ok(areas.includes(id), `área ${id}`);
+  assert.equal(areas.filter(id => id.startsWith('item:')).length, data.minis.mata.unlocks.length, 'um quadradinho por item');
+  assert.match(view.status(engine), /^mini\.mata\.statusStage · mini\.mata\.statusBattle$/);
+  // As criaturas entram e viram áreas clicáveis (a Mandioca bate nelas).
+  frame(40);
+  areas = view.probe().areas.map(area => area.id);
+  const foes = areas.filter(id => id.startsWith('foe:'));
+  assert.ok(foes.length >= 1, 'criatura na cena');
+  clickArea(host, 'mata', foes[0], now);
+  assert.ok(sounds.includes('clique'));
+  // Pausa e volta.
+  clickArea(host, 'mata', 'auto', now);
+  assert.equal(s.auto, false);
+  assert.match(view.status(engine), /mini\.mata\.paused$/);
+  clickArea(host, 'mata', 'auto', now);
+  assert.equal(s.auto, true);
+  // As setas: sem recorde não passa da etapa 1 (som de erro); com recorde, vai.
+  sounds.length = 0;
+  clickArea(host, 'mata', 'next', now);
+  assert.equal(s.stage, 1);
+  assert.ok(sounds.includes('erro'));
+  s.best = 3;
+  clickArea(host, 'mata', 'next', now);
+  assert.equal(s.stage, 2);
+  clickArea(host, 'mata', 'prev', now);
+  assert.equal(s.stage, 1);
+  // O bichinho: clicar escolhe quem acompanha (e o bônus aparece no status).
+  assert.equal(s.companion, '');
+  clickArea(host, 'mata', 'pet', now);
+  assert.equal(s.companion, mata.info().pets[0].id);
+  frame(5);
+  assert.ok(view.probe().areas.some(area => area.id === 'pet-arena'), 'o bichinho aparece na batalha');
+  // Clicar num item da lista avisa o que ele pede.
+  toasts.length = 0;
+  clickArea(host, 'mata', `item:${data.minis.mata.unlocks[0].item}`, now);
+  assert.ok(toasts.some(text => /mini\.mata\.itemLocked/.test(text)));
+  // Vários quadros de batalha seguidos não estouram nada (partículas, números e ícones têm limite).
+  engine.state.levels.folego = 200;
+  frame(600);
+  assert.ok(view.probe().particles <= 160 && view.probe().floaters <= 12 && view.probe().says <= 8);
+});
+
+test('mata: a vitória sobre o chefe mostra o cartaz e a lista de itens passa a mostrar o troféu como da Mandioca', () => {
+  const { host, engine, sounds } = setup(60, { minis: { mata: { hidden: false } } });
+  host.restore();
+  for (const id of Object.keys(engine.state.levels)) engine.state.levels[id] = 300;
+  let now = 1000;
+  for (let i = 0; i < 1500 && engine.state.minis.mata.best < 1; i++) { engine.tick(0.1); host.draw((now += 40)); }
+  assert.ok(engine.state.minis.mata.best >= 1);
+  host.draw((now += 40));
+  assert.ok(sounds.includes('mata-vitoria'));
+  const view = host.windows.get('mata').view;
+  assert.ok(view.probe().banner, 'o cartaz de vitória');
+  assert.equal(engine.mini('mata').info().unlocks[0].owned, true);
+});
+
+test('mata: o painel traz textos nos 3 idiomas (criaturas, golpes e dicas) e o desenho aguenta cada cenário e cada criatura', () => {
+  const I18N = require('../src/i18n.js');
+  const sheet = bundle.janelas.mata;
+  assert.equal(sheet.fundos.frames, 10, 'um cenário por etapa da lista');
+  for (const creature of data.minis.mata.creatures.concat(data.minis.mata.bosses)) assert.ok(creature.lore && creature.lore.length > 30, `${creature.id}: história do folclore`);
+  assert.equal(sheet.comuns.ids.length, data.minis.mata.creatures.length);
+  assert.equal(sheet.chefes.ids.length, data.minis.mata.bosses.length);
+  assert.equal(sheet.comuns.frames, sheet.comuns.ids.length * 2, 'dois quadros por criatura');
+  for (const creature of data.minis.mata.creatures) assert.ok(sheet.comuns.ids.includes(creature.id), creature.id);
+  for (const boss of data.minis.mata.bosses) assert.ok(sheet.chefes.ids.includes(boss.id), boss.id);
+  for (const icon of ['coracao', 'milho', 'espada', 'cruz', 'escudo', 'raio', 'pata', 'play', 'pausa', 'esq', 'dir', 'caveira', 'queima', 'veneno', 'tontura', 'lento', 'fraqueza', 'confusao', 'investida', 'cura', 'alvo', 'enrage']) {
+    assert.ok(sheet.ui.ids.includes(icon), `ícone ${icon}`);
+  }
+  try {
+    for (const lang of I18N.LANGUAGES.map(entry => entry.id)) {
+      I18N.setLanguage(lang);
+      const powers = new Set(data.minis.mata.creatures.concat(data.minis.mata.bosses).flatMap(creature => creature.powers.map(power => power.kind)));
+      for (const kind of powers) {
+        const text = I18N.t(`mini.mata.power.${kind}`, { every: 3, dur: 4, mult: 2, share: 25, pct: 50 });
+        assert.doesNotMatch(text, /\{\w+\}|mini\.mata/, `${lang}: golpe ${kind}: ${text}`);
+      }
+      for (const key of ['stage', 'best', 'next', 'allDone', 'miss', 'boss', 'victory', 'defeat', 'revive', 'itemOwned', 'petNone', 'petEmpty', 'tipFocus', 'tipPause', 'tipPlay']) {
+        assert.notEqual(I18N.t(`mini.mata.${key}`, { n: 1, name: 'x', stage: 1 }), `mini.mata.${key}`, `${lang}: falta mini.mata.${key}`);
+      }
+      // Nomes dos chefes, das criaturas e das etapas existem no idioma (o jogo troca os dados no lugar).
+      const copy = JSON.parse(JSON.stringify(data));
+      I18N.localizeData(copy, lang);
+      if (lang !== 'pt-BR') {
+        assert.equal(copy.minis.mata.bosses.find(boss => boss.id === 'mula-sem-cabeca').name === data.minis.mata.bosses.find(boss => boss.id === 'mula-sem-cabeca').name, false, `${lang}: Mula traduzida`);
+        assert.ok(copy.minis.mata.bosses.concat(copy.minis.mata.creatures).every((creature, i) => creature.lore && creature.lore !== data.minis.mata.bosses.concat(data.minis.mata.creatures)[i].lore), `${lang}: histórias traduzidas`);
+        assert.ok(copy.minis.mata.stages.filter((stage, i) => stage.name !== data.minis.mata.stages[i].name).length >= 8, `${lang}: etapas traduzidas`);
+        assert.equal(copy.minis.mata.creatures.filter((creature, i) => creature.name !== data.minis.mata.creatures[i].name).length >= 7, true, `${lang}: criaturas`);
+      }
+    }
+  } finally {
+    I18N.setLanguage('pt-BR');
+  }
+  // Cada cenário (etapas 1 a 11, que dá a volta) e cada chefe aparecem sem erro.
+  const { host, engine } = setup(60, { minis: { mata: { hidden: false } } });
+  host.restore();
+  const s = engine.state.minis.mata;
+  s.best = 40;
+  let now = 1000;
+  for (let stage = 1; stage <= 11; stage++) {
+    engine.mini('mata').select(stage);
+    s.battle = data.minis.mata.battles;
+    for (let i = 0; i < 40; i++) { engine.tick(0.1); host.draw((now += 40)); }
+    assert.ok(host.windows.get('mata').view.probe().areas.some(area => area.id.startsWith('foe:')), `etapa ${stage}: chefe na cena`);
+  }
+});
+
+test('reiniciar ou importar a festa troca o motor das janelas: os botões e as janelas do jogo velho somem e os do novo valem', () => {
+  const { host, engine, clock } = setup(80, { minis: { bichos: { hidden: false }, mata: { hidden: false } } });
+  host.restore();
+  assert.equal(host.items().length, data.minis.windows.length, 'jogo velho: todas abertas');
+  assert.equal(host.windows.size, 2);
+  const fresh = new GameEngine(data, null, { rng: () => 0.5, now: () => clock.t });
+  host.setEngine(fresh);
+  assert.deepEqual(host.items(), [], 'festa nova: nenhum botão na placa');
+  assert.equal(host.windows.size, 0, 'e nenhuma janela na tela');
+  assert.equal(host.signature(), '');
+  // O jogo velho já não manda: crescer ele não abre nada, crescer o novo abre.
+  engine.state.records.size = 200;
+  assert.deepEqual(host.items(), []);
+  fresh.state.size = 12;
+  fresh.state.records.size = 12;
+  assert.deepEqual(host.items().map(item => item.id), ['cordel', 'bichos']);
+  host.restore();
+  assert.deepEqual([...host.windows.keys()], ['bichos']);
+  for (let i = 0, now = 1000; i < 20; i++) host.draw((now += 40));
+  // Importar outra festa: as janelas dela (as que ela já abriu) aparecem.
+  const imported = new GameEngine(data, null, { rng: () => 0.5, now: () => clock.t });
+  imported.state.size = 60;
+  imported.state.records.size = 60;
+  host.setEngine(imported);
+  assert.equal(host.items().length, data.minis.windows.filter(entry => entry.start <= 60).length);
+  assert.deepEqual([...host.windows.keys()], ['bichos', 'mata'], 'só voltam na tela as que a pessoa deixou abertas e a festa nova já abriu');
+  host.setEngine(imported);
+  assert.equal(host.windows.size, 2, 'o mesmo motor de novo não mexe em nada');
+});
+
+// --- Cordel da Mandioca (a janela da história) ------------------------------------------------------------------------------------------
+test('cordel: a janela desenha a página e as bolinhas, vira só as páginas liberadas e completa a página clicando na coisa dela', () => {
+  const { host, engine, sounds } = setup(35, { minis: { cordel: { hidden: false } } });
+  host.restore();
+  const view = host.windows.get('cordel').view;
+  const cordel = engine.mini('cordel');
+  let now = 1000;
+  const frame = (n = 1) => { for (let i = 0; i < n; i++) host.draw((now += 40)); };
+  frame();
+  const areas = () => view.probe().areas.map(area => area.id);
+  for (const id of ['prev', 'next', 'ponto']) assert.ok(areas().includes(id), `área ${id}`);
+  assert.equal(areas().filter(id => id.startsWith('pagina:')).length, 20, 'uma bolinha por página');
+  assert.match(view.status(engine), /^mini\.cordel\.statusPage · O Quintal ao Amanhecer$/);
+  // As setas viram a página (com a página deslizando) e a bolinha trancada diz que não abre.
+  clickArea(host, 'cordel', 'next', now);
+  assert.equal(cordel.info().page, 2);
+  assert.ok(sounds.includes('clique'));
+  frame(2);
+  assert.equal(view.probe().turning, true, 'a página está deslizando');
+  frame(14);
+  assert.equal(view.probe().turning, false);
+  assert.match(view.status(engine), /O Convite do Vento$/);
+  sounds.length = 0;
+  clickArea(host, 'cordel', 'pagina:5', now);
+  assert.equal(cordel.info().page, 2, 'a página 5 ainda está trancada');
+  assert.ok(sounds.includes('erro'));
+  clickArea(host, 'cordel', 'pagina:3', now);
+  assert.equal(cordel.info().page, 3);
+  frame(16);
+  clickArea(host, 'cordel', 'next', now);
+  assert.equal(cordel.info().page, 3, 'depois da última liberada não passa');
+  clickArea(host, 'cordel', 'pagina:1', now);
+  frame(16);
+  assert.equal(view.probe().shown, 1);
+  // Clicar na coisa da página: reação, fala, som e, no último clique, a página completa.
+  const goal = data.minis.cordel.pages[0].goal;
+  const cheer0 = engine.state.cheer;
+  sounds.length = 0;
+  for (let i = 0; i < goal; i++) {
+    clickArea(host, 'cordel', 'ponto', now);
+    frame(2);
+    assert.equal(view.probe().reacting, true);
+  }
+  assert.ok(sounds.includes(data.minis.cordel.pages[0].sound));
+  assert.ok(sounds.includes('conquista'), 'a página completa soa');
+  assert.equal(engine.state.minis.cordel.done.quintal, true);
+  assert.ok(engine.state.cheer > cheer0);
+  assert.ok(view.probe().says >= 1);
+});
+
+test('cordel: as 20 páginas aparecem sem erro (arte, turma e Mandioca) e a arte tem tudo o que o jogo precisa', () => {
+  const sheet = bundle.janelas.cordel;
+  assert.equal(sheet.paginas.length, 20);
+  for (const [i, page] of sheet.paginas.entries()) {
+    const id = data.minis.cordel.pages[i].id;
+    assert.equal(page.frames, 8, `${id}: 4 quadros do laço e 4 da reação`);
+    assert.ok(page.w === 224 && page.h === 112, `${id}: 224 x 112`);
+    const [hx, hy, stage] = page.heroi;
+    assert.ok(hx > 10 && hx < 214 && hy > 60 && hy <= 112 && stage >= 0 && stage <= 3, `${id}: onde a Mandioca fica`);
+    const [x, y, w, h] = page.ponto;
+    assert.ok(x >= 0 && y >= 0 && w > 10 && h > 10 && x + w <= 224 && y + h <= 112, `${id}: o ponto de clique está dentro da cena`);
+    assert.ok(['danca', 'descanso', 'comemora'].includes(page.pose));
+    for (const entry of page.elenco) assert.ok(bundle.chars[entry.id], `${id}: ${entry.id} é da turma`);
+  }
+  for (const icon of ['esq', 'dir', 'estrela', 'seta', 'cadeado', 'ponto', 'ponto-cheio']) assert.ok(sheet.ui.ids.includes(icon), `ícone ${icon}`);
+  assert.ok(bundle.icons['ui:cordel'], 'o botão da placa');
+  // Todas as páginas, com a festa grande o bastante para abrir todas, vestindo coisas diferentes.
+  const { host, engine } = setup(200, { minis: { cordel: { hidden: false } } });
+  host.restore();
+  let now = 1000;
+  for (let n = 1; n <= 20; n++) {
+    engine.mini('cordel').go(n);
+    for (let i = 0; i < 30; i++) host.draw((now += 40));
+    assert.equal(host.windows.get('cordel').view.probe().shown, n, `página ${n} na tela`);
+  }
+  assert.equal(engine.mini('cordel').info().page, 20);
+});
+
+test('cordel: os versos cabem na fonte de pixel nos 3 idiomas e ninguém fica sem texto', () => {
+  const I18N = require('../src/i18n.js');
+  const stripped = text => String(text).replace(/[’'`¡¿]/g, '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+  try {
+    for (const lang of I18N.LANGUAGES.map(entry => entry.id)) {
+      I18N.setLanguage(lang);
+      const copy = JSON.parse(JSON.stringify(data));
+      I18N.localizeData(copy, lang);
+      copy.minis.cordel.pages.forEach((page, i) => {
+        const original = data.minis.cordel.pages[i];
+        const lines = page.text.split('\n');
+        assert.equal(lines.length, 4, `${lang} ${page.id}: quatro versos`);
+        for (const line of lines) {
+          assert.ok(line.length <= 52, `${lang} ${page.id}: verso comprido (${line.length}): ${line}`);
+          assert.match(stripped(line), /^[A-Za-z0-9 .,:!?{}\-]+$/, `${lang} ${page.id}: letra que a fonte de pixel não tem: ${line}`);
+        }
+        for (const field of ['say', 'done']) assert.match(stripped(page[field]), /^[A-Za-z0-9 .,:!?\-]+$/, `${lang} ${page.id}.${field}: ${page[field]}`);
+        assert.ok(page.title.length > 3 && page.hint.length > 10);
+        if (lang !== 'pt-BR') {
+          assert.notEqual(page.title, original.title, `${lang} ${page.id}: título traduzido`);
+          assert.notEqual(page.text, original.text, `${lang} ${page.id}: versos traduzidos`);
+          assert.notEqual(page.hint, original.hint, `${lang} ${page.id}: dica traduzida`);
+        }
+      });
+      for (const key of ['statusPage', 'tipPrev', 'tipNext', 'tipEnd', 'tipDone', 'locked', 'newPage', 'pageDone', 'tipClicks']) {
+        assert.notEqual(I18N.t(`mini.cordel.${key}`, { n: 1, m: 2, title: 'x', guests: 10 }), `mini.cordel.${key}`, `${lang}: falta mini.cordel.${key}`);
+      }
+      assert.ok(copy.minis.windows.find(entry => entry.id === 'cordel').name.length > 5);
+    }
+  } finally {
+    I18N.setLanguage('pt-BR');
+  }
+});
+
+test('cordel: o botão da placa leva o número de páginas por completar e a placa se redesenha quando ele muda', () => {
+  const { host, engine } = setup(35, { minis: { cordel: { hidden: false } } });
+  host.restore();
+  const entry = () => host.items().find(item => item.id === 'cordel');
+  assert.equal(entry().pending, 3);
+  assert.equal(host.items().find(item => item.id === 'bichos').pending, 0, 'janela sem pendência não pisca');
+  const before = host.signature();
+  for (let i = 0; i < data.minis.cordel.pages[0].goal; i++) engine.mini('cordel').poke(1);
+  assert.equal(entry().pending, 2);
+  assert.notEqual(host.signature(), before, 'a placa precisa se redesenhar');
+  engine.state.records.size = 55;
+  assert.equal(entry().pending, 4);
+});
+
+test('fogueira: a comida no espeto é desenhada por cima do fogo (não fica escondida atrás das chamas)', () => {
+  const { host, engine } = setup(40, { minis: { fogueira: { hidden: false } } });
+  const real = globalThis.document.createElement;
+  const order = [];
+  globalThis.document.createElement = tag => {
+    const element = real(tag);
+    if (tag === 'canvas') {
+      const getContext = element.getContext;
+      element.getContext = () => ({ ...getContext(), drawImage(image) { order.push(image.value); } });
+    }
+    return element;
+  };
+  try {
+    host.restore();
+    engine.state.minis.fogueira.heat = data.minis.fogueira.heatMax;
+    engine.mini('fogueira').put(0, 'milho');
+    host.draw(1000);
+    host.draw(1100);
+  } finally {
+    globalThis.document.createElement = real;
+  }
+  const fire = bundle.images[bundle.fires['4'].image];
+  const food = bundle.images[bundle.janelas.fogueira.comidas.image];
+  assert.ok(order.includes(fire) && order.includes(food), 'o fogo e a comida foram desenhados');
+  assert.ok(order.indexOf(fire) < order.indexOf(food), 'a comida vem depois (por cima) do fogo');
 });

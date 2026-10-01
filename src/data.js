@@ -151,6 +151,20 @@ globalThis.GAME_DATA = {
       desc: 'Só falta o terno remendado.' },
     { id: 'chapeu-coco', cat: 'chapeu', name: 'Chapéu-coco', price: 0, source: 'leilao',
       desc: 'De quem sempre dá o último lance.' },
+    // Itens caros e criativos (sem relação com São João): liberam por porte da festa e custam bem mais fichas. A arte vem de
+    // art/itens_novos.py.
+    { id: 'fatia-melancia', cat: 'chapeu', name: 'Fatia de Melancia', price: 26, tier: 2,
+      desc: 'Refresca a cabeça e esconde as sementes (quase todas).' },
+    { id: 'abacaxi-real', cat: 'chapeu', name: 'Abacaxi Real', price: 30, tier: 2,
+      desc: 'Coroa de rei de verdade: espinhosa por fora, doce por dentro.' },
+    { id: 'gorro-tubarao', cat: 'chapeu', name: 'Gorro de Tubarão', price: 34, tier: 3,
+      desc: 'Ele só morde as ideias ruins. A testa fica por sua conta.' },
+    { id: 'cartola-magica', cat: 'chapeu', name: 'Cartola Mágica', price: 38, tier: 3,
+      desc: 'Tem um coelho dentro. Ninguém sabe quem o colocou lá.' },
+    { id: 'chapeu-mago', cat: 'chapeu', name: 'Chapéu de Mago', price: 44, tier: 3,
+      desc: 'Estrelas, uma lua e um feitiço que sempre sai pela culatra.' },
+    { id: 'capacete-astronauta', cat: 'chapeu', name: 'Capacete de Astronauta', price: 52, tier: 4,
+      desc: 'Um pequeno passo para a Mandioca, um grande salto na pista.' },
 
     { id: 'bandeirinha', cat: 'mao', name: 'Bandeirinha', price: 0, source: 'inicial', desc: 'Pra acenar pra todo mundo.' },
     { id: 'espiga', cat: 'mao', name: 'Espiga de Milho', price: 5, desc: 'Grande, amarelinha e cheia de grão.' },
@@ -175,6 +189,18 @@ globalThis.GAME_DATA = {
     { id: 'pandeiro', cat: 'mao', name: 'Pandeiro', price: 11, desc: 'Tchic-tchic-tum: segura o ritmo do coco.' },
     { id: 'sombrinha', cat: 'mao', name: 'Sombrinha de Frevo', price: 9, desc: 'Pequenininha e colorida: pede um passo de frevo.' },
     { id: 'cobra-de-pano', cat: 'mao', name: 'Cobra de Pano', price: 0, source: 'cobra', desc: 'A da quadrilha. Olha a cobra! É mentira.' },
+    { id: 'balao-estrela', cat: 'mao', name: 'Balão Estrela', price: 26, tier: 2,
+      desc: 'Inflado com pura animação. Nem os estalinhos têm coragem de furar.' },
+    { id: 'sorvete-triplo', cat: 'mao', name: 'Sorvete Triplo', price: 28, tier: 2,
+      desc: 'Hortelã, morango e chocolate. Derrete mais rápido que a vergonha na pista.' },
+    { id: 'espada-neon', cat: 'mao', name: 'Espada de Neon', price: 36, tier: 3,
+      desc: 'Muda de cor a cada passo de dança. Só corta o tédio.' },
+    { id: 'cajado-cristal', cat: 'mao', name: 'Cajado de Cristal', price: 42, tier: 3,
+      desc: 'O cristal flutua sozinho. Ninguém sabe por quê, e ele não conta.' },
+    { id: 'bola-cristal', cat: 'mao', name: 'Bola de Cristal', price: 46, tier: 4,
+      desc: 'Ela prevê que a festa vai ser boa. Até hoje não errou.' },
+    { id: 'agua-viva', cat: 'mao', name: 'Guarda-chuva de Água-viva', price: 50, tier: 4,
+      desc: 'Não molha ninguém, mas dá um choquinho em quem chega perto demais.' },
 
     { id: 'xadrez-vermelho', cat: 'tecido', name: 'Xadrez Vermelho', price: 0, source: 'inicial',
       desc: 'O uniforme oficial de qualquer arraiá.' },
@@ -186,6 +212,16 @@ globalThis.GAME_DATA = {
     { id: 'xadrez-ouro', cat: 'tecido', name: 'Xadrez de Ouro', price: 0, source: 'role', desc: 'Brilha mais que a fogueira.' },
     { id: 'chita-amarela', cat: 'tecido', name: 'Chita Amarela', price: 9, desc: 'Cor de milho, com florzinha.' },
     { id: 'xadrez-roxo', cat: 'tecido', name: 'Xadrez Roxo', price: 10, desc: 'Pra quem é da roça e da cidade.' },
+    { id: 'onca', cat: 'tecido', name: 'Estampa de Onça', price: 22, tier: 2,
+      desc: 'Rrrrr! Só no tecido, pode chegar mais perto.' },
+    { id: 'psicodelico', cat: 'tecido', name: 'Listras Psicodélicas', price: 26, tier: 2,
+      desc: 'Não encare por muito tempo. As listras te encaram de volta.' },
+    { id: 'galaxia', cat: 'tecido', name: 'Galáxia', price: 30, tier: 3,
+      desc: 'Estrelas, nebulosas e uma pitada de poeira cósmica.' },
+    { id: 'sereia', cat: 'tecido', name: 'Escamas de Sereia', price: 34, tier: 3,
+      desc: 'Brilha na água, na terra e principalmente na pista.' },
+    { id: 'neon-retro', cat: 'tecido', name: 'Neon Retrô', price: 38, tier: 4,
+      desc: 'Direto de 1985, com grade e tudo.' },
 
     // Varais: as bandeirinhas da festa inteira (cores e desenho vêm de art/exportar.py, VARAIS).
     { id: 'varal-colorido', cat: 'varal', name: 'Bandeirinhas Coloridas', price: 0, source: 'inicial',
@@ -194,6 +230,16 @@ globalThis.GAME_DATA = {
     { id: 'varal-chita', cat: 'varal', name: 'Bandeirinhas de Chita', price: 10, desc: 'Florzinha de tecido balançando no vento.' },
     { id: 'varal-brasil', cat: 'varal', name: 'Bandeirinhas Verde e Amarelo', price: 12, desc: 'Arraiá em clima de Copa.' },
     { id: 'varal-ouro', cat: 'varal', name: 'Bandeirinhas Douradas', price: 16, desc: 'Pra festa que já virou tradição.' },
+    { id: 'varal-pizza', cat: 'varal', name: 'Bandeirinhas de Pizza', price: 30, tier: 2,
+      desc: 'Fatias penduradas no fio. O cheiro de queijo vem junto.' },
+    { id: 'varal-coracao', cat: 'varal', name: 'Corações ao Vento', price: 34, tier: 2,
+      desc: 'Balançam de amor e de vento.' },
+    { id: 'varal-peixe', cat: 'varal', name: 'Peixes de Vento', price: 38, tier: 3,
+      desc: 'Nadam no ar de boca aberta, contra a corrente do vento.' },
+    { id: 'varal-lanterna', cat: 'varal', name: 'Lanternas de Papel', price: 44, tier: 3,
+      desc: 'Redondas, vermelhas e cheias de sorte.' },
+    { id: 'varal-estrelas', cat: 'varal', name: 'Céu Estrelado', price: 50, tier: 4,
+      desc: 'Uma constelação inteira pendurada num fio.' },
 
     { id: 'terra-batida', cat: 'terreiro', name: 'Terra Batida', price: 0, source: 'inicial',
       desc: 'Poeira boa de levantar no xote.' },
@@ -204,6 +250,42 @@ globalThis.GAME_DATA = {
     { id: 'tablado', cat: 'terreiro', name: 'Tablado de Madeira', price: 12, desc: 'Pra ouvir o arrasta-pé.' },
     { id: 'pista-forro', cat: 'terreiro', name: 'Pista de Forró', price: 0, source: 'role',
       desc: 'Xadrez no chão e brilho no olhar.' },
+    { id: 'nuvem', cat: 'terreiro', name: 'Nuvem Fofa', price: 36, tier: 3,
+      desc: 'Pise leve: a pista flutua de verdade, e sem avião.' },
+    { id: 'gelo', cat: 'terreiro', name: 'Iceberg', price: 38, tier: 3,
+      desc: 'Escorrega mais que o lamaçal e ninguém reclama do calor.' },
+    { id: 'lava', cat: 'terreiro', name: 'Rocha de Lava', price: 42, tier: 3,
+      desc: 'Chão de vulcão: quente, rachado e cheio de brasas.' },
+    { id: 'bolo-confeitado', cat: 'terreiro', name: 'Bolo de Confeitaria', price: 46, tier: 4,
+      desc: 'Cobertura de morango por cima, massa fofa por baixo. Pise com educação.' },
+    { id: 'pista-disco', cat: 'terreiro', name: 'Pista de Disco', price: 54, tier: 4,
+      desc: 'Luzes coloridas no chão e nenhuma vergonha de dançar.' },
+
+    // Troféus da Mata Encantada: só se ganham derrotando o chefe de cada etapa (`minis.mata.unlocks`).
+    { id: 'cabelo-curupira', cat: 'chapeu', name: 'Cabeleira do Curupira', price: 0, source: 'luta',
+      desc: 'Vermelha feito brasa. Os pés ficam pra trás, o estilo vai pra frente.' },
+    { id: 'coroa-iara', cat: 'chapeu', name: 'Coroa da Iara', price: 0, source: 'luta',
+      desc: 'Pérola, concha e um canto que ninguém esquece.' },
+    { id: 'capuz-lobisomem', cat: 'chapeu', name: 'Capuz de Lobisomem', price: 0, source: 'luta',
+      desc: 'Pelo, orelha e uma lua cheia escondida no bolso.' },
+    { id: 'cobra-grande', cat: 'chapeu', name: 'Cobra Grande', price: 0, source: 'luta',
+      desc: 'A Boiúna enrolada na cabeça, quietinha (por enquanto).' },
+    { id: 'chapeu-boto', cat: 'chapeu', name: 'Chapéu do Boto', price: 0, source: 'luta',
+      desc: 'Branquinho, pra esconder o buraco da cabeça. Ninguém vai notar.' },
+    { id: 'tocha-caipora', cat: 'mao', name: 'Tocha da Caipora', price: 0, source: 'luta',
+      desc: 'Acende a mata inteira e ainda pede um fuminho.' },
+    { id: 'ferradura-fogo', cat: 'mao', name: 'Ferradura de Fogo', price: 0, source: 'luta',
+      desc: 'Sobrou da mula. O coice vem de brinde.' },
+    { id: 'caldeirao-cuca', cat: 'mao', name: 'Caldeirão da Cuca', price: 0, source: 'luta',
+      desc: 'Borbulha sozinho. Nem pergunte o que tem dentro.' },
+    { id: 'capa-boi-bumba', cat: 'tecido', name: 'Capa do Boi-Bumbá', price: 0, source: 'luta',
+      desc: 'Veludo, lantejoula e fita: o boi nunca morre de verdade.' },
+    { id: 'brejo-mapinguari', cat: 'terreiro', name: 'Brejo do Mapinguari', price: 0, source: 'luta',
+      desc: 'Lama, cogumelo e um cheiro que a gente nunca esquece.' },
+    { id: 'clareira-encantada', cat: 'terreiro', name: 'Clareira Encantada', price: 0, source: 'luta',
+      desc: 'Cogumelo que brilha, vagalume de verdade e nenhuma pressa.' },
+    { id: 'varal-boitata', cat: 'varal', name: 'Varal do Boitatá', price: 0, source: 'luta',
+      desc: 'Bandeirinhas de fogo-fátuo, e o barbante nem chamusca.' },
 
     { id: 'fardo', cat: 'lado', kind: 'enfeite', name: 'Fardo de Feno', price: 0, source: 'inicial',
       desc: 'Banco, palco e esconderijo.' },
@@ -392,15 +474,88 @@ globalThis.GAME_DATA = {
   // configuração de cada janela fica no próprio bloco dela, mais abaixo.
   minis: {
     windows: [
+      { id: 'cordel', name: 'Cordel da Mandioca', start: 10 },
       { id: 'bichos', name: 'Quintal dos Bichos', start: 12 },
       { id: 'aquario', name: 'Aquário', start: 18 },
       { id: 'horta', name: 'Horta', start: 22 },
       { id: 'fogueira', name: 'Fogueira de Perto', start: 30 },
       { id: 'palco', name: 'Palco do Forró', start: 38 },
-      { id: 'provador', name: 'Provador', start: 46 },
+      { id: 'mata', name: 'Mata Encantada', start: 50 },
       { id: 'ceu', name: 'Céu de São João', start: 60 },
       { id: 'bairro', name: 'Bairro', start: 75 }
     ],
+
+    // Cordel da Mandioca (convidado 10): o folheto com a história da Mandioca. A cada `every` convidados novos abre uma página (a primeira
+    // com 10, a segunda com 20... até `count`); cada página tem uma ilustração animada e uma coisa para clicar: `goal` cliques completam a
+    // página, e a primeira vez rende o prêmio de `reward` (Animação por página, Amor e fichas a cada `ticketsEvery` páginas e na última).
+    // As páginas 1 a 5 contam um São João bem tradicional, de 6 a 10 a história sai do trilho, de 11 a 15 vira uma loucura épica e de 16 a 20
+    // ela acaba na festa do próprio jogo. `arc` é o trecho (0 a 3) e `{n}` no texto vira o número de convidados.
+    cordel: {
+      every: 10, count: 20,
+      reward: { cheer: 20, cheerPerPage: 4, love: 2, ticketsEvery: 5, tickets: 2, finalTickets: 4 },
+      pages: [
+        { id: 'quintal', arc: 0, goal: 3, sound: 'pesca', title: 'O Quintal ao Amanhecer',
+          text: 'Num quintal de terra fofa,\nnasceu uma mandioca miúda.\nO galo cantou três vezes\ne a manhã foi bem-vinda.',
+          hint: 'Clique na regadora para molhar a muda.', say: 'GLUG GLUG!', done: 'A MUDA CRESCEU!' },
+        { id: 'convite', arc: 0, goal: 3, sound: 'pombo', title: 'O Convite do Vento',
+          text: 'Passou um vento faceiro\nlevando um papelzinho:\nera o convite do São João,\ncom bandeira e carinho.',
+          hint: 'Clique no convite para pegá-lo no ar.', say: 'QUASE!', done: 'PEGOU O CONVITE!' },
+        { id: 'cozinha', arc: 0, goal: 4, sound: 'pote', title: 'A Cozinha da Canjica',
+          text: 'Na cozinha da Canjica\no fogão fazia fumaça.\nMexe daqui, mexe de lá,\ne a panela cantava de graça.',
+          hint: 'Clique na panela para mexer a canjica.', say: 'MEXE, MEXE!', done: 'FICOU NO PONTO!' },
+        { id: 'fogueira', arc: 0, goal: 4, sound: 'estalo', title: 'A Fogueira Acesa',
+          text: 'Quando a noite ficou grande\na fogueira se acendeu.\nTodo mundo dançou junto\ne a mandioca cresceu.',
+          hint: 'Clique na lenha para jogar uma tora na fogueira.', say: 'ESTALA!', done: 'FOGUEIRA E FESTA!' },
+        { id: 'balao', arc: 0, goal: 3, sound: 'crescer', title: 'O Balão de Papel',
+          text: 'Soltou um balão de papel\ncom um pedido de coração.\nO balão piscou esquisito\ne subiu sem direção!',
+          hint: 'Clique no balão para ele subir.', say: 'SOBE!', done: 'PRA LONGE, MUITO LONGE!' },
+        { id: 'lua', arc: 1, goal: 3, sound: 'sapo', title: 'A Lua de Queijo',
+          text: 'Subiu, passou nuvem e estrela,\nfoi parar na lua, então.\nE a lua era de queijo coalho,\ncom buraco e cheiro de pão.',
+          hint: 'Clique nas crateras para ver quem mora nelas.', say: 'PLOC!', done: 'A LUA TEM MORADOR!' },
+        { id: 'dj', arc: 1, goal: 4, sound: 'palco-zabumba', title: 'O Coelho DJ',
+          text: 'Na lua morava um coelho\ntocando forró espacial.\nA mandioca dançou tanto\nque ficou tonta e sem sinal.',
+          hint: 'Clique na picape do DJ para trocar a música.', say: 'TUNTS TUNTS!', done: 'PISTA EM CHAMAS!' },
+        { id: 'submarino', arc: 1, goal: 3, sound: 'apito', title: 'O Submarino de Abóbora',
+          text: 'Caiu da lua num mergulho\nno fundo azul do mar.\nEntrou num submarino de abóbora\ncom um peixe pra ajudar.',
+          hint: 'Clique no periscópio para o sonar apitar.', say: 'PIIIM!', done: 'ACHOU UM CARDUME!' },
+        { id: 'doces', arc: 1, goal: 4, sound: 'carinho', title: 'A Cidade de Cocada',
+          text: 'Chegou numa cidade de doce:\ncasa de cocada, rua de paçoca.\nLambeu o poste de pirulito\ne choveu confete e pipoca!',
+          hint: 'Clique no pirulito gigante para lambê-lo.', say: 'LAMBE!', done: 'TÁ DOCE DEMAIS!' },
+        { id: 'dragao', arc: 1, goal: 3, sound: 'zurro', title: 'O Dragão de Feijão',
+          text: 'Mas no meio da cidade\num dragão de feijão acordou.\nSoltou fogo de panela\ne o balão dela roubou!',
+          hint: 'Clique no nariz do dragão.', say: 'ATCHIM!', done: 'O DRAGÃO ESPIROU!' },
+        { id: 'relogios', arc: 2, goal: 4, sound: 'sino', title: 'A Guerra dos Relógios',
+          text: 'No reino dos mil relógios\no tempo virou do avesso.\nA mandioca, de capa e coragem,\njurou: Eu paro esse tropeço!',
+          hint: 'Clique no relógio gigante para parar o tempo.', say: 'TIC TAC!', done: 'O TEMPO PAROU!' },
+        { id: 'coliseu', arc: 2, goal: 4, sound: 'grito', title: 'O Coliseu das Mil Mandiocas',
+          text: 'No Coliseu das Mandiocas\no povo gritava: Atacar!\nCada uma tinha um sabor\ne todas queriam lutar.',
+          hint: 'Clique na plateia para fazer a ola.', say: 'OLÁ, OLA!', done: 'A OLA DEU A VOLTA!' },
+        { id: 'galaxia', arc: 2, goal: 4, sound: 'drones', title: 'A Via Láctea de Pamonha',
+          text: 'A galáxia era de pamonha,\nde palha, milho e creme.\nPlaneta de melancia girava\ne a mandioca surfava no cometa.',
+          hint: 'Clique nos planetas para fazê-los girar.', say: 'GIRA!', done: 'TUDO EM ÓRBITA!' },
+        { id: 'rei', arc: 2, goal: 5, sound: 'trovao', title: 'O Rei Mandiocão',
+          text: 'No trono de raiz e raio\nsentou o Rei Mandiocão.\nMas a faísca da fogueira\nvirou espada em sua mão.',
+          hint: 'Clique na espada para carregar a faísca.', say: 'ZZZAP!', done: 'ESPADA CARREGADA!' },
+        { id: 'bigbang', arc: 2, goal: 3, sound: 'drones', title: 'O Big Bang Junino',
+          text: 'Bum! A faísca explodiu\nnum mar de fogos de artifício.\nO rei virou confete e festa\ne o universo, um bom início.',
+          hint: 'Clique na faísca para a explosão.', say: 'BUM!', done: 'UNIVERSO NOVO!' },
+        { id: 'bandeirinhas', arc: 3, goal: 5, sound: 'palco-sanfona', title: 'O Caminho de Bandeirinhas',
+          text: 'Das estrelas brotou uma trilha\nde bandeirinhas a tremular.\nLá longe tocava uma sanfona\ne deu vontade de chegar.',
+          hint: 'Clique nas bandeirinhas para tocar as notas.', say: 'DÓ RÉ MI!', done: 'A MÚSICA DEU O CAMINHO!' },
+        { id: 'arcoiris', arc: 3, goal: 3, sound: 'arcoiris', title: 'A Ponte do Arco-íris',
+          text: 'Um arco-íris de milho e doce\nfez uma ponte no ar.\nE lá embaixo, bem pequena,\na festa a brilhar.',
+          hint: 'Clique no arco-íris para ele brilhar.', say: 'BRILHA!', done: 'A PONTE ACENDEU!' },
+        { id: 'portao', arc: 3, goal: 3, sound: 'sino', title: 'O Portão do Arraiá',
+          text: 'Chegou no portão do arraiá\nde lanterna na mão.\nO povo gritou: Chegou!\ne abriu alas, de coração.',
+          hint: 'Clique no sino do portão.', say: 'DOOOM!', done: 'CHEGOU!' },
+        { id: 'quadrilha', arc: 3, goal: 4, sound: 'grito', title: 'A Quadrilha de Todo Mundo',
+          text: 'Juntou o coelho, o dragão e o rei\nnuma quadrilha de arrasar.\nAnarriê! gritou a marcadora\ne o mundo inteiro a dançar.',
+          hint: 'Clique na marcadora para gritar anarriê.', say: 'ANARRIÊ!', done: 'TODO MUNDO GIROU!' },
+        { id: 'festa', arc: 3, goal: 5, sound: 'quebra', title: 'A Festa É Sua',
+          text: 'E a festa que ela buscou\né essa que você faz:\nfogueira, sanfona e bandeira\ncom {n} convidados e mais!',
+          hint: 'Clique para soltar os fogos da sua festa.', say: 'POU POU!', done: 'A FESTA É SUA!' }
+      ]
+    },
 
     // Quintal dos Bichos (convidado 12): os bichos do cenário da festa moram num quintal. Carinho e milho enchem o laço de cada
     // um (`bond`); com o laço cheio ele dá um presente (clique no presente), e só dá outro depois de `giftWait` s. O carinho
@@ -456,15 +611,17 @@ globalThis.GAME_DATA = {
     // assa em `seconds` s no calor cheio; virar o espeto (até `turnMax` vezes, com a comida entre 10% e 90%) deixa a comida certinha:
     // tirada entre `perfect[0]` e `perfect[1]` do ponto e virada ao menos uma vez, o prêmio vale `perfectMult` vezes; passou do ponto
     // (até `burnAt`) vale 70%; depois disso queimou e não rende nada. Pular a fogueira (com calor a partir de `jumpMinHeat`) rende
-    // `jump` e espera `jumpWait` s. Quase tudo o que sai daqui é Barriga e Amor da Mandioca (gasta lenha, não rende ficha à toa).
+    // `jump` e espera `jumpWait` s. O prêmio de toda comida tirada do fogo (no ponto ou passada; queimada não rende) é a Barriga da
+    // Mandioca 100% cheia e parada por `bellyHold` horas (só começa a baixar depois); o `reward` de cada comida é um extra pequeno
+    // (que vale mais no ponto e menos passado do ponto). Gasta lenha, não rende ficha à toa.
     fogueira: {
       heatMax: 100, heatPerWood: 20, heatLoss: 0.15, minHeat: 15, slots: 4, burnAt: 1.5, perfect: [1.0, 1.2], perfectMult: 1.5, turnMax: 2,
-      jumpWait: 90, jumpMinHeat: 30, jump: { cheer: 45, love: 3 },
+      jumpWait: 90, jumpMinHeat: 30, jump: { cheer: 45, love: 3 }, bellyHold: 2,
       foods: [
-        { id: 'milho', name: 'Milho assado', seconds: 60, reward: { belly: 14 } },
-        { id: 'batata', name: 'Batata-doce assada', seconds: 90, reward: { belly: 24 } },
-        { id: 'linguica', name: 'Linguiça', seconds: 75, reward: { cheer: 60, belly: 10 } },
-        { id: 'queijo', name: 'Queijo coalho', seconds: 45, reward: { love: 6, belly: 6 } }
+        { id: 'milho', name: 'Milho assado', seconds: 60, reward: { cheer: 30 } },
+        { id: 'batata', name: 'Batata-doce assada', seconds: 90, reward: { wood: 3 } },
+        { id: 'linguica', name: 'Linguiça', seconds: 75, reward: { cheer: 60 } },
+        { id: 'queijo', name: 'Queijo coalho', seconds: 45, reward: { love: 6 } }
       ]
     },
 
@@ -514,6 +671,65 @@ globalThis.GAME_DATA = {
     // seguidas ao mesmo vizinho ele dá também uma ficha. Quem está no rolê não está em casa.
     bairro: {
       visitWait: 2400, giftBase: 20, giftPerLevel: 4, ticketEvery: 4
+    },
+
+    // Mata Encantada (convidado 50): um auto battler. A Mandioca enfrenta criaturas do folclore em etapas de `battles` batalhas mais
+    // um chefe (a batalha de um grupo de 1 a 4 criaturas), sozinha, uma atrás da outra. Os 4 atributos viram status (Rebolado: Ataque,
+    // Fôlego: Vida, Refresco: Defesa e o descanso entre as batalhas, Ritmo: velocidade), a Barriga mexe na Vida e o Amor no Ataque (de
+    // -`moodPercent`% a +`moodPercent`%, e o Amor também aumenta a chance de acerto crítico) e um bicho do Quintal pode acompanhar:
+    // todos dão o mesmo bônus em tudo (`petPercent`% no máximo), proporcional ao laço dele. Cada derrota seguida dá `teimosiaPercent`%
+    // a mais (até `teimosiaMax` vezes) até a etapa cair. Vitórias rendem Animação (segundos da festa), os chefes também rendem
+    // fichas e lenha, e cada batalha gasta um pouquinho de Barriga e devolve um pouquinho de Amor. `unlocks` é a lista de itens que a
+    // primeira vitória sobre o chefe da etapa (`stage`) libera para a Mandioca vestir. Depois da última etapa da lista as etapas
+    // repetem os chefes, cada vez mais fortes (o crescimento é por etapa, sem fim).
+    mata: {
+      battles: 4, petPercent: 20, moodPercent: 20, teimosiaPercent: 3, teimosiaMax: 5, specialEvery: 8,
+      hero: { hpBase: 40, hpPerLevel: 3, atkBase: 5, atkPerLevel: 0.7, intervalBase: 2, speedPerLevel: 0.02, minInterval: 0.4, defHalf: 150,
+        defMax: 0.6, restHeal: 0.35, restDef: 0.5, critBase: 0.05, critLove: 0.2, critMult: 2, specialMult: 1.6, specialHeal: 0.05 },
+      foe: { hp: 90, atk: 5.5, hpGrowth: 1.1, atkGrowth: 1.09, step: 0.08, bossHp: 4, bossAtk: 1.5, crowdShare: 0.6, escortShare: 0.5 },
+      reward: { cheer: 1.2, cheerPerStage: 0.12, bossMult: 3, love: 0.15, loveBoss: 0.6, firstClear: { tickets: 2, wood: 3 }, bossWood: 1,
+        ticketEvery: 15, belly: 0.15, bellyBoss: 0.5 },
+      creatures: [
+        { id: 'fogo-fatuo', name: 'Fogo-fátuo', lore: 'Luzinha azul que dança nos pântanos e faz o viajante se perder.', hp: 0.55, atk: 0.8, interval: 1.5, powers: [{ kind: 'burn', every: 3, dur: 4, dps: 0.2 }] },
+        { id: 'mao-de-cabelo', name: 'Mão-de-cabelo', lore: 'Mão cabeluda que sai do escuro e agarra quem passa distraído.', hp: 0.8, atk: 0.9, interval: 1.8, powers: [{ kind: 'slow', every: 3, dur: 4, factor: 1.6 }] },
+        { id: 'cabeca-de-cuia', name: 'Cabeça-de-cuia', lore: 'Dizem que era um homem castigado: a cabeça virou uma cuia assustadora.', hp: 0.9, atk: 1, interval: 2, powers: [{ kind: 'weak', every: 3, dur: 5, factor: 0.7 }] },
+        { id: 'boto', name: 'Boto Cor-de-Rosa', lore: 'De dia é boto rosa; de noite vira rapaz de chapéu para encantar as moças da festa.', hp: 1, atk: 0.8, interval: 1.9, powers: [{ kind: 'confuse', every: 3, dur: 4 }] },
+        { id: 'anhanga', name: 'Anhangá', lore: 'Espírito do veado branco de olhos de brasa, protetor dos bichos do mato.', hp: 1.1, atk: 1.1, interval: 2, powers: [{ kind: 'burn', every: 4, dur: 5, dps: 0.3 }] },
+        { id: 'boi-cara-preta', name: 'Boi da Cara Preta', lore: 'O boi da cantiga de ninar, que vem pegar criança que não quer dormir.', hp: 1.5, atk: 1.2, interval: 2.4, powers: [{ kind: 'charge', every: 3, mult: 2.2 }] },
+        { id: 'pisadeira', name: 'Pisadeira', lore: 'Velha magrela de unhas enormes que pisa no peito de quem dorme de barriga cheia.', hp: 0.9, atk: 1, interval: 2.2, powers: [{ kind: 'stun', every: 3, dur: 1.2 }] },
+        { id: 'homem-do-saco', name: 'Homem do Saco', lore: 'O velho do saco, que leva embora criança desobediente.', hp: 1.2, atk: 0.9, interval: 2.2, powers: [{ kind: 'stun', every: 4, dur: 1.6 }] },
+        { id: 'corpo-seco', name: 'Corpo-seco', lore: 'Gente má que a terra não quis: ficou seca, de casca dura, e anda por aí.', hp: 1.4, atk: 1.1, interval: 2, powers: [{ kind: 'drain', share: 0.5 }] }
+      ],
+      bosses: [
+        { id: 'curupira', name: 'Curupira', lore: 'Protetor da mata, tem o cabelo de fogo e os pés virados para trás para despistar caçador.', hp: 1, atk: 1, interval: 2, powers: [{ kind: 'confuse', every: 4, dur: 5 }] },
+        { id: 'caipora', name: 'Caipora', lore: 'Guardiã dos bichos, anda montada num porco-do-mato e adora um fumo de rolo.', hp: 1.1, atk: 1, interval: 2, powers: [{ kind: 'slow', every: 3, dur: 4, factor: 1.7 }, { kind: 'charge', every: 5, mult: 2.5 }] },
+        { id: 'iara', name: 'Iara', lore: 'A mãe-d’água que canta nos rios e leva para o fundo quem se deixa encantar.', hp: 1.1, atk: 0.9, interval: 2, powers: [{ kind: 'stun', every: 4, dur: 1.5 }, { kind: 'heal', every: 6, share: 0.12 }] },
+        { id: 'boitata', name: 'Boitatá', lore: 'A cobra de fogo que vigia os campos e castiga quem queima a mata.', hp: 1.2, atk: 1, interval: 1.8, powers: [{ kind: 'burn', every: 2, dur: 5, dps: 0.3 }] },
+        { id: 'mula-sem-cabeca', name: 'Mula-sem-cabeça', lore: 'Mula que galopa pelas noites com uma labareda no lugar da cabeça.', hp: 1.2, atk: 1.1, interval: 2, powers: [{ kind: 'charge', every: 3, mult: 2.4 }, { kind: 'burn', every: 4, dur: 4, dps: 0.25 }] },
+        { id: 'lobisomem', name: 'Lobisomem', lore: 'Na noite de lua cheia, o homem vira lobo e uiva pelos terreiros.', hp: 1.3, atk: 1.2, interval: 1.9, powers: [{ kind: 'enrage', below: 0.5, atk: 1.4, speed: 0.8 }, { kind: 'drain', share: 0.25 }] },
+        { id: 'cuca', name: 'Cuca', lore: 'A velha jacaré do sítio, que canta de ninar e leva criança que não dorme.', hp: 1.3, atk: 1.1, interval: 2, powers: [{ kind: 'weak', every: 3, dur: 6, factor: 0.6 }, { kind: 'stun', every: 6, dur: 1.5 }] },
+        { id: 'mapinguari', name: 'Mapinguari', lore: 'Gigante peludo de um olho só e boca na barriga, cujo fedor se sente de longe.', hp: 1.6, atk: 1.2, interval: 2.4, powers: [{ kind: 'weak', every: 2, dur: 5, factor: 0.7 }, { kind: 'charge', every: 5, mult: 2.5 }] },
+        { id: 'boiuna', name: 'Boiúna', lore: 'A cobra grande do rio, preta e enorme, com olhos que brilham como lanternas.', hp: 1.35, atk: 1.15, interval: 2, powers: [{ kind: 'stun', every: 4, dur: 2 }, { kind: 'poison', every: 2, dur: 5, dps: 0.25 }] },
+        { id: 'boi-bumba', name: 'Boi-Bumbá', lore: 'O boi da festa que morre e ressuscita, e faz o arraiá inteiro dançar.', hp: 1.2, atk: 1.15, interval: 2, powers: [{ kind: 'revive', hp: 0.5 }, { kind: 'charge', every: 4, mult: 2.2 }, { kind: 'confuse', every: 3, dur: 3 }] }
+      ],
+      stages: [
+        { id: 'mata-fechada', name: 'Mata Fechada', boss: 'curupira', mobs: ['fogo-fatuo', 'mao-de-cabelo'] },
+        { id: 'clareira', name: 'Clareira da Caipora', boss: 'caipora', mobs: ['fogo-fatuo', 'mao-de-cabelo', 'cabeca-de-cuia'] },
+        { id: 'beira-do-rio', name: 'Beira do Rio', boss: 'iara', mobs: ['boto', 'cabeca-de-cuia', 'mao-de-cabelo'] },
+        { id: 'campo-queimado', name: 'Campo Queimado', boss: 'boitata', mobs: ['fogo-fatuo', 'anhanga', 'boi-cara-preta'] },
+        { id: 'encruzilhada', name: 'Encruzilhada', boss: 'mula-sem-cabeca', mobs: ['boi-cara-preta', 'pisadeira', 'homem-do-saco'] },
+        { id: 'lua-cheia', name: 'Noite de Lua Cheia', boss: 'lobisomem', mobs: ['corpo-seco', 'pisadeira', 'anhanga'] },
+        { id: 'casa-da-cuca', name: 'Casa da Cuca', boss: 'cuca', mobs: ['pisadeira', 'homem-do-saco', 'corpo-seco'] },
+        { id: 'brejo', name: 'Brejo Fedorento', boss: 'mapinguari', mobs: ['corpo-seco', 'mao-de-cabelo', 'boto'] },
+        { id: 'rio-negro', name: 'Rio Negro', boss: 'boiuna', mobs: ['boto', 'cabeca-de-cuia', 'anhanga'] },
+        { id: 'arraia-encantado', name: 'Arraiá Encantado', boss: 'boi-bumba', mobs: ['fogo-fatuo', 'boi-cara-preta', 'pisadeira', 'corpo-seco', 'boto'] }
+      ],
+      unlocks: [
+        { item: 'cabelo-curupira', stage: 1 }, { item: 'tocha-caipora', stage: 2 }, { item: 'coroa-iara', stage: 3 },
+        { item: 'varal-boitata', stage: 4 }, { item: 'ferradura-fogo', stage: 5 }, { item: 'capuz-lobisomem', stage: 6 },
+        { item: 'caldeirao-cuca', stage: 7 }, { item: 'brejo-mapinguari', stage: 8 }, { item: 'cobra-grande', stage: 9 },
+        { item: 'capa-boi-bumba', stage: 10 }, { item: 'clareira-encantada', stage: 15 }, { item: 'chapeu-boto', stage: 20 }
+      ]
     }
   },
 
@@ -759,7 +975,15 @@ globalThis.GAME_DATA = {
     { id: 'pe-de-serra', name: 'Forró Pé-de-Serra', hat: 'rei-baiao', hand: 'zabumba', fabric: 'xadrez-vermelho', bonus: 0.07 },
     { id: 'passista', name: 'Passista de Frevo', hat: 'coroa-flores', hand: 'sombrinha', fabric: 'chita-rosa', bonus: 0.04 },
     { id: 'roda-de-coco', name: 'Roda de Coco', hat: 'lenco-chita', hand: 'pandeiro', fabric: 'chita-amarela', bonus: 0.04 },
-    { id: 'olha-a-cobra', name: 'Olha a Cobra!', hat: 'tiara-chifrinho', hand: 'cobra-de-pano', fabric: 'xadrez-verde', bonus: 0.05 }
+    { id: 'olha-a-cobra', name: 'Olha a Cobra!', hat: 'tiara-chifrinho', hand: 'cobra-de-pano', fabric: 'xadrez-verde', bonus: 0.05 },
+    { id: 'mago', name: 'Mago Supremo', hat: 'chapeu-mago', hand: 'cajado-cristal', fabric: 'galaxia', bonus: 0.11 },
+    { id: 'astronauta', name: 'Astronauta do Arraiá', hat: 'capacete-astronauta', hand: 'espada-neon', fabric: 'neon-retro', bonus: 0.12 },
+    { id: 'magico', name: 'Mágico de Palco', hat: 'cartola-magica', hand: 'bola-cristal', fabric: 'psicodelico', bonus: 0.1 },
+    { id: 'rei-dos-mares', name: 'Rei dos Mares', hat: 'gorro-tubarao', hand: 'agua-viva', fabric: 'sereia', bonus: 0.1 },
+    { id: 'sobremesa', name: 'Sobremesa Tropical', hat: 'abacaxi-real', hand: 'sorvete-triplo', fabric: 'onca', bonus: 0.09 },
+    { id: 'infantil', name: 'Festa Infantil', hat: 'fatia-melancia', hand: 'balao-estrela', fabric: 'psicodelico', bonus: 0.09 },
+    { id: 'guardiao-da-mata', name: 'Guardião da Mata', hat: 'cabelo-curupira', hand: 'tocha-caipora', fabric: 'capa-boi-bumba', bonus: 0.1 },
+    { id: 'lenda-viva', name: 'Lenda Viva', hat: 'capuz-lobisomem', hand: 'caldeirao-cuca', fabric: 'capa-boi-bumba', bonus: 0.11 }
   ],
 
   config: {

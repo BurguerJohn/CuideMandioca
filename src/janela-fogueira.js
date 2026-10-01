@@ -27,7 +27,9 @@
 
     function rewardLines(reward) {
       const lines = [];
+      if (reward.bellyFull) lines.push(tr('mini.gain.bellyFull', { h: reward.bellyFull }));
       if (reward.cheer) lines.push(tr('gain.cheer', { n: compact(reward.cheer) }));
+      if (reward.wood) lines.push(tr('gain.wood', { n: reward.wood }));
       if (reward.belly) lines.push(tr('mini.gain.belly', { n: Math.round(reward.belly) }));
       if (reward.love) lines.push(tr('mini.gain.love', { n: Math.round(reward.love) }));
       return lines;
@@ -117,8 +119,9 @@
       [[14, 68], [158, 70]].forEach(([x, y], i) => base.sprite(small, Math.floor(now / 600 + i) % 2, x, y - small.h - (jump && now - jump.t0 < 900 ? Math.abs(Math.sin(now / 90)) * 5 : 0), { flip: i === 1 }));
       base.region('fogo', meta.fogo[0] - 26, meta.fogo[1] - 40, 52, 46, { tip: info.canJump ? tr('mini.fogueira.tipFire')
         : info.heat < engine.data.minis.fogueira.jumpMinHeat ? tr('mini.fogueira.tipFireCold') : tr('mini.fogueira.tipFireWait', { n: Math.ceil(info.jumpWait) }) });
-      info.sticks.forEach((stick, slot) => drawStick(slot, stick, info, now));
+      // O fogo primeiro e os espetos por cima: a comida assando fica na frente das chamas, não escondida atrás delas.
       drawFire(info, now);
+      info.sticks.forEach((stick, slot) => drawStick(slot, stick, info, now));
       // Quem pula passa por cima do fogo.
       if (jump) {
         const t = (now - jump.t0) / 900;

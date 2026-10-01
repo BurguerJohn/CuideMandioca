@@ -125,6 +125,10 @@
       byId(data.minis.fogueira.foods, override.fogueiraFoods, ['name']);
       byId(data.minis.palco.songs, override.palcoSongs, ['name']);
       byId(data.minis.ceu.simpatias, override.ceuSimpatias, ['name', 'text']);
+      byId(data.minis.mata.creatures, override.mataCreatures, ['name', 'lore']);
+      byId(data.minis.mata.bosses, override.mataBosses, ['name', 'lore']);
+      byId(data.minis.mata.stages, override.mataStages, ['name']);
+      byId(data.minis.cordel.pages, override.cordelPages, ['title', 'text', 'hint', 'say', 'done']);
     }
     byId(data.scenery.landmarks, override.landmarks, ['name']);
     byId(data.scenery.cycle, override.cycle, ['name']);

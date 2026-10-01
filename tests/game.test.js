@@ -35,14 +35,37 @@ test('o Sopinha aumenta o que a festa rende com o jogo fechado', () => {
     engine.state.fame = engine.fameNeed() - 50;
     const saved = engine.exportState();
     clock.now += 2 * 3600 * 1000;
-    return new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now }).welcome;
+    const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now });
+    return { ...back.welcome, size: back.state.size, fame: back.state.fame, startFame: saved.fame };
   };
   const plain = away(false);
   const bunny = away(true);
   assert.equal(plain.bunny, 0);
   assert.ok(Math.abs(bunny.bunny - 0.3) < 1e-9, 'nível 3: +30%');
   assert.ok(Math.abs(bunny.cheer / plain.cheer - 1.3) < 1e-9);
-  assert.ok(plain.guests >= 1 && bunny.guests >= plain.guests, 'a janela de volta conta os convidados que chegaram');
+  assert.ok(plain.cheer > 100 && !('guests' in plain), 'a janela de volta só conta Animação');
+  assert.deepEqual([plain.size, bunny.size], [10, 10], 'nenhum convidado chega com o jogo fechado');
+  assert.deepEqual([plain.fame, bunny.fame], [plain.startFame, plain.startFame], 'a barra de convidados não anda');
+});
+
+test('com o jogo fechado (ou o computador dormindo) a festa só rende Animação: a barra de convidados e o tamanho ficam parados', () => {
+  const { engine, clock } = game();
+  growTo(engine, 30);
+  engine.tick(0.25);
+  const s = engine.state;
+  s.fame = engine.fameNeed() - 5;
+  const before = { size: s.size, fame: s.fame, record: s.records.size, cheer: s.cheer, earned: s.stats.cheerEarned };
+  engine.drainEvents();
+  clock.now += 6 * 3600 * 1000;
+  const woke = engine.wake();
+  assert.ok(woke && woke.cheer > 1000, 'rendeu bastante Animação');
+  assert.equal(s.cheer, before.cheer + woke.cheer, 'a Animação entrou no saldo');
+  assert.ok(s.stats.cheerEarned > before.earned, 'e conta como Animação ganha');
+  assert.deepEqual([s.size, s.fame, s.records.size], [before.size, before.fame, before.record], 'sem convidado novo e sem a barra andar');
+  assert.equal(engine.drainEvents().some(event => event.type === 'size-up'), false);
+  // Com o jogo aberto a Animação continua enchendo a barra.
+  engine.earn(100);
+  assert.equal(s.size, before.size + 1, 'aberto, a Animação vira convidado');
 });
 
 test('a Mandioca começa broto e cresce com as melhorias, rendendo mais a cada tamanho', () => {
@@ -380,7 +403,7 @@ test('vestir as três peças de um conjunto rende o bônus do conjunto em cima d
     assert.equal(engine.items[set.hat]?.cat, 'chapeu', `${set.id}: chapéu`);
     assert.equal(engine.items[set.hand]?.cat, 'mao', `${set.id}: mão`);
     assert.equal(engine.items[set.fabric]?.cat, 'tecido', `${set.id}: tecido`);
-    assert.ok(set.bonus > 0 && set.bonus <= 0.1);
+    assert.ok(set.bonus > 0 && set.bonus <= 0.12);
     keys.add(`${set.hat}|${set.hand}|${set.fabric}`);
   }
   assert.equal(keys.size, data.sets.length, 'nenhum conjunto repete as três peças de outro');
@@ -733,7 +756,8 @@ test('o diário guarda cada acontecimento com o tempo de jogo', () => {
   const saved = engine.exportState();
   clock.now += 3 * 3600 * 1000;
   const later = new GameEngine(data, saved, { now: () => clock.now });
-  assert.ok(later.state.log.some(entry => entry.type === 'size' && entry.offline), 'o que rende com o jogo fechado fica marcado');
+  assert.equal(later.state.log.some(entry => entry.type === 'size' && entry.offline), false, 'com o jogo fechado nenhum convidado chega');
+  assert.equal(later.state.size, saved.size);
   for (let i = 0; i < 4100; i++) later.record('request', { kind: 'milho' });
   assert.equal(later.state.log.length, 4000, 'o diário tem teto');
   assert.ok(later.state.log.some(entry => entry.type === 'tier'), 'desbloqueio nunca sai do diário');
@@ -1030,10 +1054,12 @@ test('São João do ano que vem: volta ao quintal com a turma, as roupas e as fi
   s.wood = 50;
   s.bonfire.calor = 5;
   s.stats.steps = 1200000;
+  engine.unlockRafael();
   assert.equal(engine.canNewYear(), true);
   assert.equal(engine.newYear(), true);
   s = engine.state;
   assert.equal(s.year, 2);
+  assert.equal(s.rafael, true, 'o Rafael fica de um ano para o outro');
   assert.equal(s.size, 1, 'de volta ao quintal');
   assert.equal(engine.tierIndex(), 0);
   assert.equal(s.cheer, 0);
@@ -2277,4 +2303,71 @@ test('fora do jogo, a festa rende pela média do humor no caminho, não pelo hum
   const expected = engine.cheerPerSecond() / engine.moodFactor() * mood * seconds * engine.offlineRate();
   engine.catchUp(since);
   assert.ok(Math.abs(engine.welcome.cheer - expected) < 1e-6 * expected, `${engine.welcome.cheer} ≈ ${expected}`);
+});
+
+test('Barriga parada: fica 100% cheia e sem baixar pelo tempo da parada, e só depois baixa no ritmo de sempre', () => {
+  const { engine, clock } = game();
+  const max = data.config.moodMax;
+  engine.state.humor = { amor: 50, barriga: 10, at: clock.now, holdUntil: 0 };
+  assert.equal(engine.bellyHeld(), false);
+  engine.fillBelly(2);
+  assert.equal(engine.mood().barriga, max);
+  assert.equal(engine.bellyHeld(), true);
+  assert.ok(Math.abs(engine.bellyHoldLeft() - 2 * 3600000) < 1);
+  clock.now += 119 * 60000;
+  assert.equal(engine.mood().barriga, max, 'com 1 min de sobra ainda está cheia');
+  assert.ok(Math.abs(engine.mood().amor - (50 - 119 / 60 * max / data.config.loveHours)) < 1e-6, 'o Amor baixa normalmente durante a parada');
+  engine.settleMood();
+  assert.equal(engine.state.humor.barriga, max, 'acertar a conta não estraga a parada');
+  assert.ok(engine.bellyHeld());
+  clock.now += 61 * 60000;      // 2 h 0 min depois mais 1 h: a parada acabou há 1 h
+  assert.ok(Math.abs(engine.mood().barriga - (max - max / data.config.bellyHours)) < 1e-6, 'depois da parada baixa 1 hora de Barriga');
+  assert.equal(engine.bellyHeld(), false);
+  // Outra comida recomeça a contagem (não soma): a parada volta para 2 h.
+  engine.fillBelly(2);
+  assert.ok(Math.abs(engine.bellyHoldLeft() - 2 * 3600000) < 1);
+  engine.fillBelly(1);
+  assert.ok(Math.abs(engine.bellyHoldLeft() - 2 * 3600000) < 1, 'uma parada menor não encurta a que já vale');
+});
+
+test('Barriga parada: o avanço do tempo, o save e a carga com lixo guardam a parada sem estragar nada', () => {
+  const { engine, clock } = game();
+  const max = data.config.moodMax;
+  engine.fillBelly(2);
+  engine.advance(3600);
+  assert.equal(engine.mood().barriga, max, '1 h depois (avanço): ainda parada');
+  assert.ok(Math.abs(engine.bellyHoldLeft() - 3600000) < 2000, 'falta 1 h');
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now });
+  assert.ok(Math.abs(back.bellyHoldLeft() - 3600000) < 2000, 'o save guarda a parada');
+  assert.equal(back.mood().barriga, max);
+  for (const lixo of ['logo', NaN, -50, 1e18]) {
+    const messy = JSON.parse(JSON.stringify(saved));
+    messy.humor.holdUntil = lixo;
+    const clean = new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.now });
+    const left = clean.bellyHoldLeft();
+    assert.ok(Number.isFinite(left) && left >= 0 && left <= 24 * 3600000, `holdUntil ${lixo}: ${left}`);
+  }
+  // O debug de Amor e Barriga zerados desfaz a parada.
+  engine.debug('triste');
+  assert.equal(engine.bellyHeld(), false);
+  assert.equal(engine.mood().barriga, 0);
+});
+
+test('segredo "yeye": o Rafael é chamado uma vez, o save lembra dele e lixo no save não chama ninguém', () => {
+  const { engine, clock } = game();
+  assert.equal(engine.state.rafael, false, 'de fábrica ele não está na festa');
+  engine.events.length = 0;
+  assert.deepEqual(engine.unlockRafael(), { first: true });
+  assert.equal(engine.state.rafael, true);
+  assert.deepEqual(engine.events.filter(event => event.type === 'rafael').map(event => event.first), [true]);
+  assert.deepEqual(engine.unlockRafael(), { first: false }, 'digitar de novo só o faz gritar');
+  assert.deepEqual(engine.events.filter(event => event.type === 'rafael').map(event => event.first), [true, false]);
+  const saved = engine.exportState();
+  assert.equal(new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now }).state.rafael, true, 'o save lembra');
+  for (const lixo of ['sim', 1, {}, null, 'true']) {
+    const messy = JSON.parse(JSON.stringify(saved));
+    messy.rafael = lixo;
+    assert.equal(new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.now }).state.rafael, false, `rafael: ${JSON.stringify(lixo)}`);
+  }
 });

@@ -4,7 +4,8 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (Minis) {
   'use strict';
 
-  // Fogueira de Perto: lenha acende o fogo, os espetos assam (vire na hora certa, tire no ponto) e dá para pular a fogueira.
+  // Fogueira de Perto: lenha acende o fogo, os espetos assam (vire na hora certa, tire no ponto) e dá para pular a fogueira. Toda comida
+  // tirada do fogo deixa a Barriga da Mandioca cheia e parada por `bellyHold` horas.
   // Configuração em `data.minis.fogueira`. O calor e o ponto da comida andam com o jogo aberto (fechado, a fogueira espera).
   Minis.define('fogueira', (engine, tools) => {
     const { clamp, finite, int } = tools;
@@ -134,6 +135,7 @@
         const perfect = stick.progress <= c.perfect[1] && stick.turns >= 1;
         const mult = perfect ? c.perfectMult : stick.progress <= c.perfect[1] ? 1 : 0.7;
         const spec = Object.fromEntries(Object.entries(item.reward).map(([key, value]) => [key, Math.max(1, Math.round(value * mult))]));
+        spec.bellyFull = c.bellyHold;                  // o prêmio da comida: Barriga cheia e parada por `bellyHold` horas
         const reward = tools.reward(spec);
         s.sticks[slot] = null;
         s.roasted++;

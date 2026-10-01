@@ -681,3 +681,31 @@ test('a casa da Mandioca aparece no convidado 100, tem botão na placa, arrasta 
   await Promise.resolve();
   assert.equal(node('#casa').hidden, false);
 });
+
+test('digitar "yeye" com o jogo em foco chama o Rafael; sem foco, em campo de texto ou com a sequência quebrada, não', async () => {
+  const { document, run } = boot();
+  await Promise.resolve();
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const digitar = (texto, extra = {}) => {
+    for (const key of texto) document.listeners.keydown({ key, target: { closest: () => null }, preventDefault() {}, ...extra });
+  };
+  assert.doesNotMatch(toasts(), /Rafael/);
+  digitar('yey');
+  digitar('x');
+  digitar('ye');
+  assert.doesNotMatch(toasts(), /Rafael/, 'a sequência quebrada zera');
+  // Com Ctrl, num campo de texto ou sem foco (outra janela na frente) não vale.
+  digitar('yeye', { ctrlKey: true });
+  for (const key of 'yeye') document.listeners.keydown({ key, target: { closest: () => ({}) }, preventDefault() {} });
+  run({ foco: false });
+  digitar('yeye');
+  assert.doesNotMatch(toasts(), /Rafael/, 'sem foco o segredo não vale');
+  run({ foco: true });
+  // Maiúsculas valem; com o jogo em foco o Rafael chega e o aviso diz.
+  digitar('YeYe');
+  assert.match(toasts(), /Rafael chegou à festa/);
+  // Digitar de novo não repete o aviso (ele só grita na festa).
+  const before = toasts();
+  digitar('yeye');
+  assert.equal(toasts(), before);
+});

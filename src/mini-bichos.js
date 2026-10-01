@@ -142,6 +142,13 @@
         return { ok: true, pet, reward };
       },
 
+      // Um agrado de fora (a Mata Encantada): o bicho que acompanhou a Mandioca ganha laço.
+      comfort(id, amount) {
+        if (!find(id)) return false;
+        addBond(slot(id), amount);
+        return true;
+      },
+
       count() { return present().pets.length; }
     };
   });

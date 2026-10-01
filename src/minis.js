@@ -9,7 +9,7 @@
   // (`src/mini-<id>.js`) que guarda o estado dentro do save (`state.minis[id]`), anda com o tempo e dá os prêmios;
   // quem desenha é `src/janela-<id>.js`. Todas abrem num número de convidados (`data.minis.windows[].start`) e o botão
   // delas aparece na placa. Aqui ficam o registro dos modelos, a abertura por convidados e as ferramentas comuns.
-  const IDS = ['bichos', 'aquario', 'horta', 'fogueira', 'palco', 'provador', 'ceu', 'bairro'];
+  const IDS = ['cordel', 'bichos', 'aquario', 'horta', 'fogueira', 'palco', 'mata', 'ceu', 'bairro'];
   const models = {};
   const define = (id, factory) => { models[id] = factory; };
 
@@ -52,6 +52,10 @@
             given.cheer = amount;
           }
           if (finite(spec.love) > 0) given.love = engine.addLove(spec.love);
+          if (finite(spec.bellyFull) > 0) {
+            engine.fillBelly(spec.bellyFull);
+            given.bellyFull = spec.bellyFull;
+          }
           if (finite(spec.belly) > 0) {
             engine.settleMood();
             const before = s.humor.barriga;
@@ -96,7 +100,7 @@
       for (const id of this.opened()) this.api[id].hear?.(type, detail);
     }
 
-    // Convidado novo (nunca visto antes): quem abre agora avisa.
+    // Convidado novo (nunca visto antes): quem abre agora avisa, e as janelas abertas que se importam (uma página nova no cordel...) ficam sabendo.
     grew(size) {
       for (const entry of this.list()) {
         if (entry.start === size && this.api[entry.id]) {
@@ -105,6 +109,7 @@
           this.engine.emit('mini-open', { id: entry.id, size });
         }
       }
+      for (const id of this.opened()) this.api[id].grew?.(size);
     }
   }
 

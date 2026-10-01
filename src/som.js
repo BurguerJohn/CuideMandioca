@@ -181,6 +181,16 @@
         sanfona(v, 0.34, 0.45, [17, 21, 24]);
       }
     },
+    // O grito do Rafael: "YEAH, YEAH!" (a segunda mais alta), uma voz rouca de sawtooth que sobe e cai com um chiado na frente.
+    yeah: {
+      gap: 600,
+      play: v => [0, 0.34].forEach((at, i) => {
+        const base = i ? 250 : 215;
+        v.ruido(at, 0.07, { type: 'bandpass', freq: 2400, gain: 0.03 });
+        v.tom(at, 0.1, base, { to: base * 1.55, type: 'sawtooth', gain: 0.06, filter: 1600 });
+        v.tom(at + 0.1, 0.2, base * 1.55, { to: base * 1.15, type: 'sawtooth', gain: 0.055, filter: 1100 });
+      })
+    },
     // Zurro do jegue: "i-óóó", um guincho agudo e um ronco grave, duas vezes.
     zurro: {
       gap: 600,
@@ -257,6 +267,15 @@
     'palco-triangulo': { play: v => { v.tom(0, 0.45, 3100, { type: 'sine', gain: 0.05 }); v.tom(0, 0.35, 4650, { type: 'sine', gain: 0.025 }); } },
     'palco-zabumba': { play: v => { v.tom(0, 0.16, 140, { to: 62, type: 'sine', gain: 0.2 }); v.ruido(0, 0.05, { type: 'lowpass', freq: 700, gain: 0.1 }); } },
     'palco-sanfona': { play: v => sanfona(v, 0, 0.26, [19, 23, 26], 0.03) },
+    // Mata Encantada: o golpe (um baque seco), o crítico (baque e brilho), a pancada que a Mandioca leva (grave), o passo especial (arpejo
+    // curto), o chefe aparecendo (ronco que desce), a vitória (três notas subindo) e a derrota (duas descendo).
+    'mata-golpe': { gap: 70, play: v => { v.tom(0, 0.07, 240, { to: 120, type: 'triangle', gain: 0.12 }); v.ruido(0, 0.03, { freq: 1500, gain: 0.07 }); } },
+    'mata-critico': { gap: 90, play: v => { v.tom(0, 0.09, 300, { to: 110, type: 'triangle', gain: 0.15 }); v.ruido(0, 0.04, { freq: 2200, gain: 0.1 }); v.tom(0.03, 0.12, 1500, { to: 2400, type: 'sine', gain: 0.04 }); } },
+    'mata-dano': { gap: 90, play: v => { v.tom(0, 0.12, 150, { to: 70, type: 'sawtooth', gain: 0.06, filter: 700 }); v.ruido(0, 0.04, { type: 'lowpass', freq: 600, gain: 0.1 }); } },
+    'mata-especial': { gap: 400, play: v => [0, 4, 7, 12].forEach((step, i) => v.tom(i * 0.05, 0.2, nota(26 + step), { type: 'triangle', gain: 0.07 })) },
+    'mata-chefe': { gap: 1500, play: v => { v.tom(0, 0.7, 110, { to: 50, type: 'sawtooth', gain: 0.07, filter: 500 }); v.ruido(0, 0.5, { type: 'lowpass', freq: 300, gain: 0.1 }); } },
+    'mata-vitoria': { gap: 1000, play: v => [0, 4, 7].forEach((step, i) => v.tom(i * 0.1, 0.22, nota(24 + step), { type: 'triangle', gain: 0.08 })) },
+    'mata-derrota': { gap: 1500, play: v => [7, 3, 0].forEach((step, i) => v.tom(i * 0.16, 0.3, nota(19 + step), { type: 'sine', gain: 0.08 })) },
     foto: { play: v => { v.ruido(0, 0.02, { type: 'highpass', freq: 3000, gain: 0.2 }); v.ruido(0.06, 0.03, { type: 'highpass', freq: 2000, gain: 0.16 }); } }
   };
 

@@ -112,7 +112,7 @@
         burro: { active: null, nextAt: 0 },
         fantasia: { judgeAt: 0, nextAt: 0 },
         cozinha: { pot: null, buff: null },
-        humor: { amor: this.cfg.moodStart, barriga: this.cfg.moodStart, at: now },
+        humor: { amor: this.cfg.moodStart, barriga: this.cfg.moodStart, at: now, holdUntil: 0 },
         minis: this.minis.fresh(),
         album: [],
         bornAt: now,
@@ -121,6 +121,7 @@
         setsWorn: [],
         daily: { day: null, streak: 0 },
         kissAt: 0,
+        rafael: false,
         yearStart: 0,
         records: { maior: null, size: 1 },
         weather: { rain: null, rainbow: null, nextAt: 0, thunderAt: 0 },
@@ -210,6 +211,7 @@
       s.hints = s.hints && typeof s.hints === 'object' ? { ...s.hints } : {};
       s.bingo = { round: this.cleanBingo(raw.bingo?.round) };
       s.kissAt = Math.max(0, finite(raw.kissAt));
+      s.rafael = raw.rafael === true;
       // A corrida de saco não volta no meio: a próxima continua agendada.
       s.saco = { active: null, nextAt: Math.max(0, finite(raw.saco?.nextAt)) };
       // Leilão no meio: o lance guardado volta para o bolso e o próximo leilão continua agendado.
@@ -235,7 +237,9 @@
       const moodAt = finite(humor.at, 0);
       s.humor = { amor: clamp(finite(humor.amor, this.cfg.moodStart), 0, this.cfg.moodMax),
         barriga: clamp(finite(humor.barriga, this.cfg.moodStart), 0, this.cfg.moodMax),
-        at: moodAt > 0 ? Math.min(moodAt, this.now()) : this.now() };
+        at: moodAt > 0 ? Math.min(moodAt, this.now()) : this.now(),
+        // Barriga parada (comida da fogueira): até 24 h à frente no máximo, para um save mexido não deixar a Barriga cheia para sempre.
+        holdUntil: clamp(finite(humor.holdUntil, 0), 0, this.now() + 24 * 3600000) };
       const stickers = new Set((this.data.album || []).flatMap(page => page.stickers.map(sticker => sticker.id)));
       s.album = Array.isArray(raw.album) ? [...new Set(raw.album)].filter(id => stickers.has(id)) : [];
       // Dia em que a festa começou (para o aniversário). Save de antes disso conta a partir de hoje.
@@ -288,11 +292,11 @@
       let mood = 0;
       for (let i = 0; i < 12; i++) mood += this.moodFactor(this.mood(lastSeen + (i + 0.5) / 12 * seconds * 1000)) / 12;
       const cheer = this.cheerPerSecond() / this.moodFactor() * mood * seconds * this.offlineRate();
-      const before = this.state.size;
+      // Com o jogo fechado a festa só rende Animação: a barra de convidados não anda (os convidados novos só chegam com o jogo aberto).
       this.offline = true;
-      this.earn(cheer);
+      this.earn(cheer, false);
       this.offline = false;
-      this.welcome = { seconds, cheer, bunny, capped: away > seconds, guests: this.state.size - before };
+      this.welcome = { seconds, cheer, bunny, capped: away > seconds };
     }
 
     // A festa ficou parada com o jogo aberto (o computador dormiu, a janela ficou escondida ou minimizada): o tempo parado
@@ -482,7 +486,7 @@
         } else if (op === 'feliz' || op === 'triste') {
           // Amor e Barriga lá em cima (feliz) ou zerados (triste).
           const level = op === 'feliz' ? this.cfg.moodMax : 0;
-          s.humor = { amor: level, barriga: level, at: now };
+          s.humor = { amor: level, barriga: level, at: now, holdUntil: 0 };
           note = op === 'feliz' ? 'Amor e Barriga cheios' : 'Amor e Barriga zerados';
         } else if (op === 'cozinha') {
           // A panela fica pronta agora (vazia, vai uma pamonha já cozida).
@@ -564,6 +568,7 @@
       s.kissAt = back(s.kissAt);
       for (const key of ['pokeAt', 'popAt', 'riceAt', 'cartAt', 'flagAt', 'compadreAt', 'announceAt']) s.runtime[key] = back(s.runtime[key]);
       s.humor.at = back(s.humor.at);
+      s.humor.holdUntil = back(s.humor.holdUntil);
       this.minis.shift(ms);
       if (s.cozinha.pot) for (const key of ['startAt', 'readyAt']) s.cozinha.pot[key] -= ms;
       if (s.cozinha.buff) s.cozinha.buff.until = back(s.cozinha.buff.until);
@@ -712,13 +717,14 @@
       return { landmarks, counts };
     }
 
-    // Toda Animação que a festa junta vira fama aos pouquinhos; gastar não dá fama, só deixa a festa render mais.
-    earn(amount) {
+    // Toda Animação que a festa junta vira fama aos pouquinhos (a barra de convidados); gastar não dá fama, só deixa a festa render mais.
+    // `fame: false` é a Animação do jogo fechado, que só enche o saldo.
+    earn(amount, fame = true) {
       const s = this.state;
       s.cheer += amount;
       s.stats.cheerEarned += amount;
       if (s.stats.cheerEarned >= 1000) this.unlock('mil');
-      this.addFame(amount);
+      if (fame) this.addFame(amount);
     }
 
     spend(amount) {
@@ -908,10 +914,22 @@
     mood(at = this.now()) {
       const h = this.state.humor;
       const hours = Math.max(0, at - h.at) / 3600000;
+      // A Barriga parada (a comida da fogueira) só começa a baixar quando a parada acaba.
+      const bellyHours = Math.max(0, at - Math.max(h.at, h.holdUntil || 0)) / 3600000;
       const max = this.cfg.moodMax;
       return { amor: clamp(h.amor - hours * max / this.cfg.loveHours, 0, max),
-        barriga: clamp(h.barriga - hours * max / this.cfg.bellyHours, 0, max) };
+        barriga: clamp(h.barriga - bellyHours * max / this.cfg.bellyHours, 0, max) };
     }
+    // A Barriga 100% cheia e parada por `hours` horas (pela comida da fogueira); outra comida recomeça a contagem.
+    fillBelly(hours) {
+      this.settleMood();
+      const h = this.state.humor;
+      h.barriga = this.cfg.moodMax;
+      h.holdUntil = Math.max(h.holdUntil || 0, this.now() + hours * 3600000);
+    }
+    // Quanto falta (em ms) para a Barriga parada voltar a baixar; 0 se não está parada.
+    bellyHoldLeft() { return Math.max(0, (this.state.humor.holdUntil || 0) - this.now()); }
+    bellyHeld() { return this.bellyHoldLeft() > 0; }
     // Quanto o Rebolado vale com esse humor: tudo vazio ×moodLow, metade ×1, tudo cheio ×moodHigh.
     moodFactor(m = this.mood()) {
       const level = (m.amor + m.barriga) / (2 * this.cfg.moodMax);
@@ -920,7 +938,7 @@
     }
     settleMood(now = this.now()) {
       const m = this.mood(now);
-      this.state.humor = { amor: m.amor, barriga: m.barriga, at: now };
+      this.state.humor = { amor: m.amor, barriga: m.barriga, at: now, holdUntil: this.state.humor.holdUntil || 0 };
     }
     addLove(amount) {
       this.settleMood();
@@ -1645,6 +1663,15 @@
       return { ready: true, tickets: this.cfg.kissTickets };
     }
 
+    // Segredo da festa: digitar "yeye" com o jogo em foco chama o Rafael, que passa a andar pela festa com um quentão na mão (fica
+    // de um ano para o outro). `first` diz se foi a primeira vez; digitar de novo só faz ele gritar.
+    unlockRafael() {
+      const first = !this.state.rafael;
+      this.state.rafael = true;
+      this.emit('rafael', { first });
+      return { first };
+    }
+
     // Concurso de quadrilha: cada jurado parte de 7 e soma a marcadora (Pamonha), o conjunto que a Mandioca veste, a pista
     // cheia de pares e o repertório; mais um tantinho de sorte. A média decide o lugar e o prêmio.
     contestScore() {
@@ -1685,10 +1712,12 @@
       if (!this.canNewYear()) return false;
       const old = this.state;
       const next = this.fresh();
-      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt', 'humor']) {
+      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt', 'humor', 'rafael']) {
         next[key] = old[key];
       }
       next.year = (old.year || 1) + 1;
+      // A história do cordel fica: página lida e prêmio recebido não se perdem de um ano para o outro.
+      if (old.minis?.cordel) next.minis.cordel = old.minis.cordel;
       next.yearStart = old.stats.playtime;
       // Rodadas no meio: a entrada volta (elas acabam com a festa). O lance guardado do leilão também.
       if (old.bingo?.round && !old.bingo.round.result) next.tickets += old.bingo.round.cost;
