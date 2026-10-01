@@ -117,6 +117,15 @@
       byId(data.house.rooms, override.houseRooms, ['name']);
       byId(data.house.activities, override.houseActivities, ['name']);
     }
+    if (data.minis) {
+      byId(data.minis.windows, override.minisWindows, ['name']);
+      byId(data.minis.bichos.pets, override.bichosPets, ['name', 'giftName']);
+      byId(data.minis.aquario.species, override.aquarioSpecies, ['name']);
+      byId(data.minis.horta.crops, override.hortaCrops, ['name']);
+      byId(data.minis.fogueira.foods, override.fogueiraFoods, ['name']);
+      byId(data.minis.palco.songs, override.palcoSongs, ['name']);
+      byId(data.minis.ceu.simpatias, override.ceuSimpatias, ['name', 'text']);
+    }
     byId(data.scenery.landmarks, override.landmarks, ['name']);
     byId(data.scenery.cycle, override.cycle, ['name']);
     byId(data.requests, override.requests, ['text']);

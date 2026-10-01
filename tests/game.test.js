@@ -2091,7 +2091,7 @@ test('avanço determinístico equivale a rodar a festa segundo a segundo, inclus
   }
   const timestamps = new Set(['nextAt', 'until', 'born', 'endsAt', 'judgeAt', 'readyAt', 'startAt', 'saleAt',
     'leaveAt', 'bidAt', 'rivalAt', 'thunderAt', 'kissAt', 'start', 'at', 'fallUntil', 'pokeAt', 'riceAt',
-    'cartAt', 'flagAt', 'compadreAt', 'announceAt']);
+    'cartAt', 'flagAt', 'compadreAt', 'announceAt', 'grainAt', 'giftAt', 'petAt', 'foodAt', 'bubbleAt', 'waterAt', 'crowAt', 'plantedAt', 'jumpAt', 'cooldownAt', 'startAt', 'rocketAt', 'finaleAt', 'starAt', 'simpatiaAt']);
   const relative = ({ engine, clock }) => JSON.parse(JSON.stringify(engine.state, (key, value) =>
     timestamps.has(key) && value ? value - clock.now : value));
   assert.deepEqual(relative(fast), relative(live), 'mesmos saldos, estatísticas, diário e tempos restantes');

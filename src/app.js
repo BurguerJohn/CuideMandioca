@@ -228,6 +228,7 @@
     document.body.classList.toggle('placa-passar', ui.settings.hud === 'passar');
     ui.anchor = { left, width, lift, top: size.top, side };
     placeCasa();
+    ui.janelas?.placeAll();
     placeDock();
     if (ui.open) placeWindow($('#painel'), 'panelPos');
     if (ui.rings.open) placeWindow($('#argolas'), 'ringsPos');
@@ -262,12 +263,24 @@
   // A Casa da Mandioca (do convidado 100 em diante) é uma janela só dela. Some quando a pessoa a esconde, ou com a festa.
   const casaVisible = () => !!ui.casa && engine.houseInfo().open && !ui.settings.casaHidden && !ui.settings.hidden;
 
+  // O painel "como funciona" da casa cobre a cena; o texto é montado ao abrir (no idioma de agora, com os números do `house`).
+  function setCasaHelp(open) {
+    const panel = $('#casa-ajuda');
+    if (!panel) return;
+    if (open) {
+      panel.querySelector('h3').textContent = `${t('casa.title')}: ${t('help.title')}`;
+      panel.querySelector('p').textContent = t('casa.help', { start: engine.data.house.start, perRoom: engine.data.house.perRoom });
+      panel.querySelector('small').textContent = t('help.close');
+    }
+    panel.hidden = !open;
+  }
+
   function placeCasa() {
     const element = $('#casa');
     if (!element || !ui.casa) return;
     const visible = casaVisible();
     element.hidden = !visible;
-    if (!visible) return;
+    if (!visible) { setCasaHelp(false); return; }
     // Cabe na tela: no máximo 55% da largura e 88% da altura; o fator é inteiro (a arte fica nítida).
     ui.casa.setScale(3 * ui.settings.zoom, { width: innerWidth * 0.55, height: innerHeight * 0.88 });
     const info = engine.houseInfo();
@@ -433,7 +446,8 @@
 
   // --- Renderização ------------------------------------------------------------------------------------
   function context() {
-    return { tab: ui.tab, panelOpen: ui.open, debug: ui.debug, casaVisible: casaVisible(), lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
+    return { tab: ui.tab, panelOpen: ui.open, debug: ui.debug, casaVisible: casaVisible(), minis: ui.janelas ? ui.janelas.items() : [],
+      lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
       settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side,
       ringPlaying: ui.rings.playing, ringResult: ui.rings.result, zoomLabel: zoomLabel(),
       closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter };
@@ -506,7 +520,7 @@
       engine.specialDay()?.id, engine.daysToSaoJoao(), s.leilao?.active ? `${s.leilao.active.leader}:${s.leilao.active.price}` : '', !!s.saco?.active,
       !!s.cold?.active, !!s.visitor?.active, !!(s.fotografo?.active && !s.fotografo.active.shot), !!(s.burro?.active && !s.burro.active.pinned), !!s.fantasia?.judgeAt,
       `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha'),
-      engine.goalsReady(), ui.open && ui.tab, ui.debug, engine.houseInfo().open, casaVisible()].join('|');
+      engine.goalsReady(), ui.open && ui.tab, ui.debug, engine.houseInfo().open, casaVisible(), ui.janelas?.signature() || ''].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
     const placa = $('#placa');
@@ -1006,9 +1020,16 @@
     }
     if (a === 'fixar') { changeSettings({ pinned: !ui.settings.pinned }); return; }
     if (a === 'placa') { changeSettings({ hud: d.value }); return; }
-    if (a === 'placa-auto') { changeSettings({ placa: null, casa: null }); return; }
-    if (a === 'casa') { changeSettings({ casaHidden: !ui.settings.casaHidden }); return; }
-    if (a === 'casa-fechar') { changeSettings({ casaHidden: true }); return; }
+    if (a === 'placa-auto') {
+      changeSettings({ placa: null, casa: null, minis: Object.fromEntries(Object.entries(ui.settings.minis || {}).map(([id, entry]) => [id, { hidden: entry.hidden }])) });
+      return;
+    }
+    if (a === 'mini') { ui.janelas?.toggle(d.mini); return; }
+    if (a === 'mini-fechar') { ui.janelas?.close(d.mini); return; }
+    if (a === 'mini-ajuda') { ui.janelas?.toggleHelp(d.mini); return; }
+    if (a === 'casa') { setCasaHelp(false); changeSettings({ casaHidden: !ui.settings.casaHidden }); return; }
+    if (a === 'casa-fechar') { setCasaHelp(false); changeSettings({ casaHidden: true }); return; }
+    if (a === 'casa-ajuda') { setCasaHelp(!!$('#casa-ajuda')?.hidden); return; }
     if (a === 'idioma') { changeLanguage(d.value); return; }
     if (a === 'esconder') {
       changeSettings({ hidden: true });
@@ -1495,11 +1516,18 @@
       }
       return;
     }
+    // As janelas extras arrastam pelo fundo; só o clique sem arrastar é da janela (um bicho que reage, um canteiro que planta...).
+    const miniDrag = ui.janelas?.dragStart(event.target, event);
+    if (miniDrag) {
+      ui.drag = miniDrag;
+      event.preventDefault();
+      return;
+    }
     // A casa arrasta pelo fundo (ou por um morador: só o clique sem arrastar faz ele reagir) e muda só ela de lugar.
     const house = event.target.closest?.('#casa');
     // A barra de rolagem da cena (casa enorme) é do navegador: o fundo em volta da casa é que arrasta.
     if (house && event.target.id === 'casa-cena') return;
-    if (house && !event.target.closest('button')) {
+    if (house && !event.target.closest('button, .ajuda-painel')) {
       const hit = ui.casa?.hit(event.clientX, event.clientY);
       ui.drag = { kind: 'casa', x: event.clientX, y: event.clientY, index: hit ? hit.index : null,
         start: { left: parseFloat(house.style.left) || 0, bottom: parseFloat(house.style.bottom) || 0 }, moved: false };
@@ -1548,6 +1576,8 @@
     } else if (drag.kind === 'vitrine') {
       ui.dock.dx = drag.start + dx;
       placeDock();
+    } else if (drag.kind === 'mini') {
+      ui.janelas?.dragMove(drag, dx, dy);
     } else if (drag.kind === 'casa') {
       const element = $('#casa');
       const w = element.offsetWidth || 300;
@@ -1591,6 +1621,8 @@
       else { setZoom(1, true); tocar('clique'); }
     } else if (drag.kind === 'placa') {
       if (drag.moved) changeSettings({ placa: ui.settings.placa });
+    } else if (drag.kind === 'mini') {
+      comSom(() => ui.janelas?.dragEnd(drag, performance.now()), null);
     } else if (drag.kind === 'casa') {
       if (drag.moved) changeSettings({ casa: ui.settings.casa });
       else if (drag.index !== null) comSom(() => ui.casa?.poke(drag.index, performance.now()), null);
@@ -1742,6 +1774,7 @@
     if (events.length) {
       ui.festa?.onEvents(engine, events, t);
       ui.casa?.onEvents(engine, events, t);
+      ui.janelas?.onEvents(events, t);
       notify(events);
       // Conquista salva logo: o save leva a lista para a Steam.
       if (events.some(event => ['size-up', 'tier-up', 'fished', 'outing-done', 'achievement'].includes(event.type))) saveLater();
@@ -1774,6 +1807,8 @@
       });
     }
     if (ui.rings.open) safely(() => ui.game?.draw(t));
+    // As janelas extras: desenhadas só quando aparecem (não escondidas nem com o jogo sem foco).
+    if (ui.janelas && !document.body.classList.contains('jogo-desfocado')) safely(() => ui.janelas.draw(t));
     // A casa: desenhada só quando aparece (não escondida nem com o jogo sem foco), e a 30 quadros por segundo.
     if (ui.casa && t - (ui.casaAt || 0) >= 33 && casaVisible() && !document.body.classList.contains('jogo-desfocado')) {
       ui.casaAt = t;
@@ -1819,6 +1854,20 @@
       const found = ui.casa.hit(event.clientX, event.clientY);
       houseCanvas.title = found ? t('casa.tip', { name: found.who.name, activity: found.who.activityName }) : '';
     });
+  }
+  if (globalThis.ArraiaJanelas && sprites) {
+    ui.janelas = globalThis.ArraiaJanelas.create({
+      document, engine, sprites,
+      anchor: () => ui.anchor,
+      settings: () => ui.settings,
+      changeSettings: partial => changeSettings(partial),
+      placaRect: () => { const placa = $('#placa'); return placa && !placa.hidden && placa.getBoundingClientRect ? placa.getBoundingClientRect() : null; },
+      size: () => ({ width: innerWidth, height: innerHeight }),
+      t: (key, vars) => t(key, vars),
+      sound: (name, options) => tocar(name, options),
+      toast: (text, kind) => toast(text, kind)
+    });
+    ui.janelas.restore();
   }
   const ringsCanvas = $('#argolas-canvas');
   if (globalThis.ArraiaArgolas && sprites && typeof ringsCanvas?.getContext === 'function') {

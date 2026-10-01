@@ -7,9 +7,9 @@
   const { LANGUAGES } = i18n;
 
   // Preferências da festa, sempre normalizadas antes de usar ou salvar.
-  const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false,
+  const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false, minis: {},
     display: null, language: 'auto', sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
-  const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'casa', 'casaHidden', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm'];
+  const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'casa', 'casaHidden', 'minis', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm'];
   // Quadros por segundo com foco / de fundo: suave 60/30, normal 30/20, economia 20/12.
   const PERFS = ['suave', 'normal', 'economia'];
   const language = value => (LANGUAGES.some(entry => entry.id === value) ? value : 'auto');
@@ -24,6 +24,18 @@
     return { dx: Math.round(bounded(value.dx, -8000, 8000, 0)), dy: Math.round(bounded(value.dy, -8000, 8000, 0)) };
   }
 
+  // Janelas extras (src/janelas.js): para cada uma, se está escondida e onde ela está (a partir do pé esquerdo da festa).
+  function minisSettings(value) {
+    const result = {};
+    if (!value || typeof value !== 'object') return result;
+    for (const [id, entry] of Object.entries(value).slice(0, 32)) {
+      if (!/^[a-z][a-z0-9-]{0,24}$/.test(id) || !entry || typeof entry !== 'object') continue;
+      const spot = placaOffset(entry);
+      result[id] = { hidden: entry.hidden !== false, ...(spot || {}) };
+    }
+    return result;
+  }
+
   function normalizeSettings(raw) {
     const r = raw && typeof raw === 'object' ? raw : {};
     return {
@@ -36,6 +48,7 @@
       placa: placaOffset(r.placa),
       casa: placaOffset(r.casa),
       casaHidden: r.casaHidden === true,
+      minis: minisSettings(r.minis),
       display: Number.isInteger(r.display) ? r.display : null,
       language: language(r.language),
       sound: r.sound !== false,

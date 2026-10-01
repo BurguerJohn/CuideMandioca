@@ -8,6 +8,12 @@ const { fakeContext, fakeDocument } = require('./fake-dom');
 require('../src/festa-sprites.js');
 const bundle = globalThis.FESTA_SPRITES;
 
+// A festa sorteia posições e comportamentos com Math.random (a multidão, os bichos): com semente fixa os testes não oscilam.
+const realRandom = Math.random;
+let seed = 20260930;
+Math.random = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+test.after(() => { Math.random = realRandom; });
+
 test('o pacote de arte tem sprite e ícone para todo item, personagem e pedido', () => {
   const slot = { chapeu: bundle.hats, mao: bundle.hand, tecido: bundle.mandioca, terreiro: bundle.terrains, lado: bundle.sides, varal: bundle.varais };
   for (const item of data.items) {

@@ -13,9 +13,11 @@
     <header class="casa-topo">
       <h2 data-i18n="casa.title">Casa da Mandioca</h2>
       <span id="casa-contagem" class="casa-contagem"></span>
+      <button class="ajuda" data-action="casa-ajuda" title="Como funciona" data-i18n-title="help.button" data-i18n-label="help.button">?</button>
       <button class="fechar" data-action="casa-fechar" title="Esconder a casa" data-i18n-title="casa.hide">×</button>
     </header>
-    <div id="casa-cena" class="casa-cena"><canvas id="casa-canvas" aria-label="A casa da Mandioca e seus moradores" data-i18n-label="casa.title"></canvas></div>
+    <div id="casa-cena" class="casa-cena"><canvas id="casa-canvas" aria-label="A casa da Mandioca e seus moradores" data-i18n-label="casa.title"></canvas>
+      <div id="casa-ajuda" class="ajuda-painel" data-action="casa-ajuda" hidden><h3></h3><p></p><small></small></div></div>
   </section>
   <div id="placa" class="placa ui" aria-live="polite"></div>
   <section id="vitrine" class="vitrine ui" hidden aria-label="Vitrine de compras" data-i18n-label="app.shopLabel"></section>
@@ -58,10 +60,29 @@
   <script src="src/i18n.js"></script>
   <script src="src/settings.js"></script>
   <script src="src/data.js"></script>
+  <script src="src/minis.js"></script>
+  <script src="src/mini-bichos.js"></script>
+  <script src="src/mini-aquario.js"></script>
+  <script src="src/mini-horta.js"></script>
+  <script src="src/mini-fogueira.js"></script>
+  <script src="src/mini-palco.js"></script>
+  <script src="src/mini-provador.js"></script>
+  <script src="src/mini-ceu.js"></script>
+  <script src="src/mini-bairro.js"></script>
   <script src="src/core.js"></script>
   <script src="src/festa-sprites.js"></script>
   <script src="src/festa.js"></script>
   <script src="src/casa.js"></script>
+  <script src="src/janela-base.js"></script>
+  <script src="src/janelas.js"></script>
+  <script src="src/janela-bichos.js"></script>
+  <script src="src/janela-aquario.js"></script>
+  <script src="src/janela-horta.js"></script>
+  <script src="src/janela-fogueira.js"></script>
+  <script src="src/janela-palco.js"></script>
+  <script src="src/janela-provador.js"></script>
+  <script src="src/janela-ceu.js"></script>
+  <script src="src/janela-bairro.js"></script>
   <script src="src/argolas.js"></script>
   <script src="src/som.js"></script>
   <script src="src/ui.js"></script>

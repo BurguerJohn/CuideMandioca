@@ -139,10 +139,15 @@
     }).join('');
     const upcoming = engine.sceneryPiece(s.size + 1);
     const goalsReady = engine.goalsReady();
-    // A casa da Mandioca (do convidado 100): o botão mostra ou esconde a janela dela.
+    // As janelas soltas da festa: a casa da Mandioca (do convidado 100) e as extras (`data.minis`). Cada uma tem um botão que
+    // mostra ou esconde o retângulo dela, numa fileira só delas.
     const casaOpen = engine.houseInfo().open;
-    const casaButton = casaOpen ? `<button class="ferramenta ${ctx.casaVisible ? 'aberta' : ''}" data-action="casa" ` +
-      `title="${esc(t('hud.casa'))}">${ctx.icon('ui:casa')}</button>` : '';
+    const minisList = ctx.minis || [];
+    const janelaButtons = (casaOpen ? `<button class="ferramenta ${ctx.casaVisible ? 'aberta' : ''}" data-action="casa" ` +
+      `title="${esc(t('hud.casa'))}">${ctx.icon('ui:casa')}</button>` : '') +
+      minisList.map(mini => `<button class="ferramenta ${mini.visible ? 'aberta' : ''}" data-action="mini" data-mini="${mini.id}" ` +
+        `title="${esc(t('hud.mini', { name: mini.name }))}">${ctx.icon(`ui:${mini.id}`)}</button>`).join('');
+    const janelasRow = janelaButtons ? `<div class="barra-janelas">${janelaButtons}</div>` : '';
     // O que está valendo agora: frenesi (do balão de sorte) e quadrilha marcada, cada um com os segundos que faltam.
     const r = s.runtime;
     const buffs = [
@@ -181,11 +186,11 @@
       (upcoming ? `<div class="proximo" title="${esc(t('hud.nextTitle'))}">${t('hud.next', { piece: esc(upcoming.name) })}</div>` : '') +
       moodRow(engine, ctx) +
       // Loja e argolas mais as telas: com mais de 8 botões (a cozinha), a grade ganha a 5ª coluna em vez de outra fileira.
-      `<div class="placa-barra"><div class="barra-jogo${shown.length + 2 + (casaOpen ? 1 : 0) > 8 ? ' cheia' : ''}">` +
+      `<div class="placa-barra"><div class="barra-jogo${shown.length + 2 > 8 ? ' cheia' : ''}">` +
       `<button class="ferramenta" data-action="vitrine" title="${esc(t('hud.shop'))}">${ctx.icon('ui:loja')}</button>` +
       `<button class="ferramenta argolas" data-action="argolas" title="${esc(t('rings.title'))}">${ctx.icon('ui:argolas')}` +
       `<i class="preco-argolas" data-live="ringCost"${engine.ringCost() > engine.cfg.ringCost ? '' : ' hidden'}>` +
-      `${engine.ringCost()}</i></button>` + telas + casaButton + `</div><div class="barra-sistema">` +
+      `${engine.ringCost()}</i></button>` + telas + `</div>` + janelasRow + `<div class="barra-sistema">` +
       `<button class="ferramenta" data-action="abrir" title="${esc(t('hud.panel'))}">` +
       `${ctx.icon('ui:painel')}</button>` +
       // Conquistas: abre o painel nessa aba; o selo conta as metas cumpridas esperando o resgate.

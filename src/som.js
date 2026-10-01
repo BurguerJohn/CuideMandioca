@@ -253,6 +253,10 @@
     drones: { gap: 2000, play: v => [0, 4, 7, 12].forEach((step, i) => v.tom(i * 0.12, 0.4, nota(12 + step), { type: 'sine', gain: 0.035 })) },
     // Estalinho: um estalo seco e curtinho, com um chiado de faísca atrás.
     estalo: { gap: 90, play: v => { v.ruido(0, 0.025, { type: 'highpass', freq: 1800, gain: 0.22 }); v.ruido(0.02, 0.09, { type: 'highpass', freq: 5000, gain: 0.05 }); } },
+    // Palco do Forró (acerto na pista): triângulo (um ping brilhante), zabumba (batida grave) e sanfona (acorde curto).
+    'palco-triangulo': { play: v => { v.tom(0, 0.45, 3100, { type: 'sine', gain: 0.05 }); v.tom(0, 0.35, 4650, { type: 'sine', gain: 0.025 }); } },
+    'palco-zabumba': { play: v => { v.tom(0, 0.16, 140, { to: 62, type: 'sine', gain: 0.2 }); v.ruido(0, 0.05, { type: 'lowpass', freq: 700, gain: 0.1 }); } },
+    'palco-sanfona': { play: v => sanfona(v, 0, 0.26, [19, 23, 26], 0.03) },
     foto: { play: v => { v.ruido(0, 0.02, { type: 'highpass', freq: 3000, gain: 0.2 }); v.ruido(0.06, 0.03, { type: 'highpass', freq: 2000, gain: 0.16 }); } }
   };
 

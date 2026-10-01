@@ -22,6 +22,7 @@ from render import hex_rgb, outline, shade, sprite, tint
 import animar
 import casamento
 import casa_salas
+import janelas
 import cenario
 import crescer
 import danca
@@ -1485,6 +1486,7 @@ def main():
     export_rings()
     manifest['scenery'] = cenario.export(add)
     manifest['casa'] = casa_salas.exportar(add, icons)
+    manifest['janelas'] = janelas.exportar(add, icons)
     export_icons()
     export_terrains()
     export_app_icon()

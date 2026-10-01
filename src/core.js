@@ -5,6 +5,10 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // As janelas extras (src/minis.js e src/mini-*.js): no Node cada arquivo se registra aqui; no navegador, o index.html carrega.
+  const Minis = (typeof module === 'object' && module.exports)
+    ? (() => { const api = require('./minis.js'); api.IDS.forEach(id => require(`./mini-${id}.js`)); return api; })()
+    : globalThis.ArraiaMinis;
   const SAVE_VERSION = 1;
   const STATS = ['rebolado', 'folego', 'refresco', 'ritmo'];
   const BONFIRE = ['labareda', 'brasa', 'calor'];
@@ -63,6 +67,7 @@
       this.chars = Object.fromEntries(data.chars.map(char => [char.id, char]));
       this.validate();
       this.sceneryPlan = planScenery(data.scenery, SCENERY_PLAN);
+      this.minis = new Minis.Minis(this);
       this.events = [];
       this.welcome = null;
       this.state = saved ? this.load(saved) : this.fresh();
@@ -108,6 +113,7 @@
         fantasia: { judgeAt: 0, nextAt: 0 },
         cozinha: { pot: null, buff: null },
         humor: { amor: this.cfg.moodStart, barriga: this.cfg.moodStart, at: now },
+        minis: this.minis.fresh(),
         album: [],
         bornAt: now,
         hints: {},
@@ -249,6 +255,7 @@
         : [{ t: Math.round(finite(s.stats.playtime)), type: 'inicio', size: s.size }];
       s.runtime = { ...this.freshRuntime(), dancing: true };
       this.state = s;
+      s.minis = this.minis.load(raw.minis);
       s.runtime.stamina = this.maxStamina();
       this.staggerDue(s);
       this.catchUp(finite(s.lastSeen, this.now()));
@@ -316,6 +323,7 @@
       this.events.push({ type, ...detail });
       if (this.events.length > 200) this.events.shift();
       this.albumCheck('event', type, detail);
+      this.minis?.hear(type, detail);
     }
 
     // Álbum da Festa: as figurinhas que um acontecimento (`event`) ou uma entrada do diário (`record`) dá.
@@ -556,6 +564,7 @@
       s.kissAt = back(s.kissAt);
       for (const key of ['pokeAt', 'popAt', 'riceAt', 'cartAt', 'flagAt', 'compadreAt', 'announceAt']) s.runtime[key] = back(s.runtime[key]);
       s.humor.at = back(s.humor.at);
+      this.minis.shift(ms);
       if (s.cozinha.pot) for (const key of ['startAt', 'readyAt']) s.cozinha.pot[key] -= ms;
       if (s.cozinha.buff) s.cozinha.buff.until = back(s.cozinha.buff.until);
       // Os eventos da festa com relógio de verdade também andam: balão, chuva e arco-íris, quadrilha, quebra-pote e corrida de saco.
@@ -615,7 +624,7 @@
         grew++;
         this.record('size', { size: s.size });
         // Só os convidados que a festa nunca teve antes contam para a casa (o recorde fica salvo e passa de um ano para o outro).
-        if (s.size > s.records.size) { s.records.size = s.size; this.houseGrew(s.size); }
+        if (s.size > s.records.size) { s.records.size = s.size; this.houseGrew(s.size); this.minis.grew(s.size); }
       }
       if (!grew) return;
       this.emit('size-up', { size: s.size, count: grew });
@@ -637,6 +646,11 @@
       if (s.size > s.records.size) s.records.size = s.size;
       this.updateTimers(this.now());
     }
+
+    // --- Janelas extras --------------------------------------------------------------------------------------------------
+    // `mini('horta')` é o modelo da janela (as ações dela); `miniOpen(id)`, se ela já abriu (o recorde de convidados conta).
+    mini(id) { return this.minis.api[id]; }
+    miniOpen(id) { return this.minis.open(id); }
 
     // --- Casa da Mandioca -----------------------------------------------------------------------------------------------
     // A casa segue o recorde de convidados (ela não some quando um ano novo recomeça a festa). Do convidado `start` em diante,
@@ -960,6 +974,7 @@
       s.stats.playtime += dt;
       this.lastTick = this.now();
       this.updateTimers(this.now());
+      this.minis.tick(dt);
       this.updateGoals();
       if (!r.dayAnnounced && this.specialDay()) { r.dayAnnounced = true; this.emit('special-day', { id: this.specialDay().id, bonus: this.specialDay().bonus }); }
       if (s.bonfire.labareda > 0) {

@@ -78,11 +78,25 @@ body.jogo-desfocado .placa, body.jogo-desfocado.placa-passar.sobre-festa .placa 
 .casa { position: absolute; padding: 4px 6px 6px; cursor: move; transition: opacity .2s steps(3); }
 .casa canvas { display: block; image-rendering: pixelated; cursor: pointer; }
 /* Casa enorme (mais de uns 400 convidados) passa da altura da tela mesmo na menor escala: a cena ganha rolagem própria. */
-.casa-cena { max-height: calc(100vh - 76px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--madeira) var(--papel3); }
+.casa-cena { position: relative; max-height: calc(100vh - 76px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--madeira) var(--papel3); }
 .casa-topo { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
 .casa-topo h2 { font-size: 15px; font-weight: 700; margin: 0; }
 .casa-contagem { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--madeira); }
-.casa-topo .fechar { position: static; width: 22px; height: 22px; line-height: 18px; font-size: 18px; }
+.casa-topo .fechar { position: static; width: 22px; height: 22px; line-height: 18px; font-size: 18px; margin-left: 0; }
+/* O "?" de cada janela e o painel "como funciona" que cobre a cena (clicar nele fecha) */
+.casa-topo .ajuda {
+  flex: none; width: 22px; height: 22px; padding: 0; font-size: 14px; font-weight: 700; line-height: 18px; cursor: pointer;
+  color: var(--tinta); background: #ffd21e; border: 3px solid var(--tinta); box-shadow: inset -3px -3px 0 #d8a800;
+}
+.ajuda-painel {
+  position: absolute; inset: 0; z-index: 2; box-sizing: border-box; overflow-y: auto; padding: 10px 12px; cursor: pointer; text-align: left;
+  color: var(--tinta); background: var(--papel); border: 3px solid var(--tinta); font-size: 13px; line-height: 1.4;
+  scrollbar-width: thin; scrollbar-color: var(--madeira) var(--papel3);
+}
+.ajuda-painel[hidden] { display: none; }
+.ajuda-painel h3 { margin: 0 0 6px; font-size: 14px; }
+.ajuda-painel p { margin: 0; white-space: pre-line; }
+.ajuda-painel small { display: block; margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--madeira); }
 body.placa-passar .casa { opacity: 0; }
 body.placa-passar.sobre-festa .casa { opacity: 1; }
 body.jogo-desfocado .casa, body.jogo-desfocado.placa-passar.sobre-festa .casa { opacity: 0; pointer-events: none; }
@@ -256,6 +270,7 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .placa-barra { margin: 8px -4px -4px; padding-top: 6px; border-top: 3px solid var(--papel3); }
 .barra-jogo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
 .barra-jogo.cheia { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.barra-janelas { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin-top: 4px; padding-top: 4px; border-top: 2px dotted var(--papel3); }
 .barra-sistema { display: flex; align-items: center; gap: 4px; margin-top: 5px; }
 .placa-barra .espaco { flex: 1; }
 .ferramenta {

@@ -387,6 +387,136 @@ globalThis.GAME_DATA = {
     names: ['Macaxeira', 'Aipinzinho', 'Tapioca', 'Beiju', 'Farinha', 'Polvilho', 'Tucupi', 'Maniva', 'Goma', 'Puba', 'Carimã', 'Mané', 'Bolinho', 'Nhoque', 'Biscoito', 'Rapadura', 'Quindim', 'Pudim', 'Mingau', 'Fubá', 'Xerém', 'Tutu', 'Virado', 'Acarajé', 'Moqueca', 'Vatapá', 'Caruru', 'Baião', 'Xote', 'Frevo', 'Coquinho', 'Jabuti', 'Tatu', 'Sabiá', 'Caju', 'Jabuticaba', 'Pitanga', 'Umbu', 'Graviola', 'Mangaba', 'Cupuaçu', 'Açaí', 'Buriti', 'Pequi', 'Jenipapo', 'Cambuci', 'Araçá', 'Guaraná', 'Tamarindo', 'Sapoti', 'Cajá', 'Bacuri', 'Taperebá', 'Pipi', 'Zeca', 'Nina', 'Dudu', 'Lulu', 'Tico', 'Bidu', 'Cocada', 'Paçoca', 'Canjica', 'Pamonha', 'Brigadeiro', 'Beijinho', 'Curau', 'Mungunzá', 'Tacacá', 'Farofa', 'Pirão', 'Sequilho']
   },
 
+  // Janelas extras da festa (retângulos soltos, como a Casa da Mandioca): cada uma abre no convidado `start` (o recorde conta,
+  // um ano novo não fecha janela nenhuma) e ganha um botão na placa. A Casa abre no convidado 100 (`house.start`). O resto da
+  // configuração de cada janela fica no próprio bloco dela, mais abaixo.
+  minis: {
+    windows: [
+      { id: 'bichos', name: 'Quintal dos Bichos', start: 12 },
+      { id: 'aquario', name: 'Aquário', start: 18 },
+      { id: 'horta', name: 'Horta', start: 22 },
+      { id: 'fogueira', name: 'Fogueira de Perto', start: 30 },
+      { id: 'palco', name: 'Palco do Forró', start: 38 },
+      { id: 'provador', name: 'Provador', start: 46 },
+      { id: 'ceu', name: 'Céu de São João', start: 60 },
+      { id: 'bairro', name: 'Bairro', start: 75 }
+    ],
+
+    // Quintal dos Bichos (convidado 12): os bichos do cenário da festa moram num quintal. Carinho e milho enchem o laço de cada
+    // um (`bond`); com o laço cheio ele dá um presente (clique no presente), e só dá outro depois de `giftWait` s. O carinho
+    // também enche o Amor da Mandioca. Os grãos de milho (`grainMax`, um novo a cada `grainEvery` s) chamam o bicho mais perto.
+    bichos: {
+      grainMax: 5, grainEvery: 15, petCooldown: 5, bondMax: 10, petBond: 1, grainBond: 2, giftWait: 420, lovePet: 3,
+      pets: [
+        { id: 'galinha', scenery: 'galinha', name: 'Galinha', gift: 'ovo', giftName: 'um ovo fresquinho', reward: { tickets: 2 } },
+        { id: 'gato', scenery: 'gato', name: 'Gato dorminhoco', gift: 'rato', giftName: 'um ratinho de pano', reward: { cheer: 90 } },
+        { id: 'bode', scenery: 'bode', name: 'Bode', gift: 'leite', giftName: 'uma garrafa de leite', reward: { belly: 25 } },
+        { id: 'caramelo', scenery: 'caramelo', name: 'Vira-lata caramelo', gift: 'graveto', giftName: 'um graveto para a fogueira', reward: { wood: 3 } },
+        { id: 'papagaio', scenery: 'papagaio', name: 'Papagaio fofoqueiro', gift: 'carta', giftName: 'uma fofoca escrita', reward: { tickets: 1, love: 4 } },
+        { id: 'jegue', scenery: 'jegue', name: 'Jegue da manta azul', gift: 'cesta', giftName: 'uma cesta de prendas', reward: { wood: 4, tickets: 1 } },
+        { id: 'boi', scenery: 'boi', name: 'Bumba-meu-boi', gift: 'fita', giftName: 'uma fita de campeão', reward: { cheer: 300, tickets: 2 } }
+      ]
+    },
+
+    // Aquário (convidado 18): cada prenda fisgada na pescaria solta um peixe no tanque (3 de saída). Ração faz o peixe crescer
+    // (`growth`: quantas rações para virar médio e depois grande); peixe grande solta, de tempos em tempos (`bubbleEvery` s, dividido
+    // pelos grandes), uma bolha dourada que rende Animação (`bubbleCheer` s da festa) e, às vezes, uma ficha. Cada espécie nova rende
+    // fichas; as 12 juntas rendem o prêmio da coleção. A raridade (`rarity`) sorteia a espécie com as chances de `rarityChance`.
+    aquario: {
+      tankMax: 14, starter: 3, foodMax: 6, foodEvery: 20, growth: [3, 6], bubbleEvery: 1800, bubbleMax: 6, bubbleCheer: 20, bubbleTicketChance: 0.1,
+      discoverTickets: 3, completeReward: { cheer: 600, tickets: 10 }, rarityChance: [0.55, 0.3, 0.12, 0.03],
+      species: [
+        { id: 'lambari', name: 'Lambari', rarity: 0 }, { id: 'piaba', name: 'Piaba', rarity: 0 }, { id: 'tilapia', name: 'Tilápia', rarity: 0 },
+        { id: 'acara', name: 'Acará-bandeira', rarity: 0 }, { id: 'bagre', name: 'Bagre', rarity: 1 }, { id: 'traira', name: 'Traíra', rarity: 1 },
+        { id: 'pacu', name: 'Pacu', rarity: 1 }, { id: 'tucunare', name: 'Tucunaré', rarity: 1 }, { id: 'dourado', name: 'Dourado', rarity: 2 },
+        { id: 'pintado', name: 'Pintado', rarity: 2 }, { id: 'piranha', name: 'Piranha', rarity: 2 }, { id: 'pirarucu', name: 'Pirarucu', rarity: 3 }
+      ]
+    },
+
+    // Horta (convidado 22): canteiros onde a Mandioca planta (a semente é de graça). Cada planta leva `minutes` para ficar no ponto
+    // (também com o jogo fechado) e rende o prêmio dela; regar corta `waterCut` do que falta (até `waterLimit` vezes por planta,
+    // com a regadora que volta a cada `waterEvery` s). A horta começa com `plotsStart` canteiros e ganha um a cada `plotEvery`
+    // convidados depois da abertura, até `plotMax`. De tempos em tempos (`crowEvery` s) um corvo pousa num canteiro: se ninguém
+    // espantar em `crowSeconds` s, ele come a planta (o Espantalho Galã num dos lados da festa afasta os corvos). A primeira colheita
+    // de cada planta rende `firstHarvest` a mais.
+    horta: {
+      plotsStart: 4, plotEvery: 10, plotMax: 10, waterMax: 5, waterEvery: 20, waterCut: 0.2, waterLimit: 2,
+      crowEvery: [480, 900], crowSeconds: 25, crowReward: { cheer: 40 }, firstHarvest: { tickets: 2 },
+      crops: [
+        { id: 'milho', name: 'Milho', minutes: 4, reward: { tickets: 1, belly: 8 } },
+        { id: 'amendoim', name: 'Amendoim', minutes: 8, reward: { wood: 2, belly: 6 } },
+        { id: 'batata-doce', name: 'Batata-doce', minutes: 12, reward: { belly: 18, love: 2 } },
+        { id: 'mandioca', name: 'Mandioca', minutes: 15, reward: { cheer: 120, love: 3 } },
+        { id: 'abobora', name: 'Abóbora', minutes: 25, reward: { tickets: 3, cheer: 60 } }
+      ]
+    },
+
+    // Fogueira de Perto (convidado 30): a fogueira em close. Lenha (`heatPerWood`) acende o fogo, que esfria `heatLoss` por segundo;
+    // com calor a partir de `minHeat` os espetos assam (quanto mais quente, mais depressa: de 40% a 100% da velocidade). Cada comida
+    // assa em `seconds` s no calor cheio; virar o espeto (até `turnMax` vezes, com a comida entre 10% e 90%) deixa a comida certinha:
+    // tirada entre `perfect[0]` e `perfect[1]` do ponto e virada ao menos uma vez, o prêmio vale `perfectMult` vezes; passou do ponto
+    // (até `burnAt`) vale 70%; depois disso queimou e não rende nada. Pular a fogueira (com calor a partir de `jumpMinHeat`) rende
+    // `jump` e espera `jumpWait` s. Quase tudo o que sai daqui é Barriga e Amor da Mandioca (gasta lenha, não rende ficha à toa).
+    fogueira: {
+      heatMax: 100, heatPerWood: 20, heatLoss: 0.15, minHeat: 15, slots: 4, burnAt: 1.5, perfect: [1.0, 1.2], perfectMult: 1.5, turnMax: 2,
+      jumpWait: 90, jumpMinHeat: 30, jump: { cheer: 45, love: 3 },
+      foods: [
+        { id: 'milho', name: 'Milho assado', seconds: 60, reward: { belly: 14 } },
+        { id: 'batata', name: 'Batata-doce assada', seconds: 90, reward: { belly: 24 } },
+        { id: 'linguica', name: 'Linguiça', seconds: 75, reward: { cheer: 60, belly: 10 } },
+        { id: 'queijo', name: 'Queijo coalho', seconds: 45, reward: { love: 6, belly: 6 } }
+      ]
+    },
+
+    // Palco do Forró (convidado 38): o trio toca e você marca o ritmo. Cada música cai em 3 pistas (triângulo, zabumba e sanfona);
+    // clicar na pista na hora certa acerta (perfeito até `perfect` ms de diferença, bom até `good`). No fim a nota (acertos
+    // perfeitos valem 3, bons 2, sobre 3 por nota) dá 0 a 3 estrelas (`stars`: o mínimo de cada uma) e o prêmio de `rewards`; a
+    // primeira vez que uma música tira 3 estrelas rende `firstThree` a mais. Depois de um show premiado o palco descansa `wait` s
+    // (dá para ensaiar nesse tempo, sem prêmio). Cada música só abre depois de 1 estrela na anterior. As notas saem de `seed`
+    // (sempre as mesmas) a cada meio tempo, `lead` ms depois de começar.
+    palco: {
+      lead: 2200, travel: 1700, perfect: 80, good: 150, wait: 480, stars: [0.45, 0.7, 0.9],
+      rewards: [{}, { cheer: 60 }, { cheer: 150, love: 3 }, { cheer: 300, love: 6, tickets: 1 }], firstThree: { tickets: 2 },
+      songs: [
+        { id: 'xote', name: 'Xote da Mandioca', bpm: 100, notes: 26, seed: 11 },
+        { id: 'baiao', name: 'Baião Quentinho', bpm: 118, notes: 34, seed: 23 },
+        { id: 'forro-ouro', name: 'Forró de Ouro', bpm: 136, notes: 42, seed: 37 },
+        { id: 'arrasta-pe', name: 'Arrasta-pé', bpm: 150, notes: 52, seed: 41 }
+      ]
+    },
+
+    // Céu de São João (convidado 60): o céu da festa à noite. Foguetes (até `rocketMax`, um novo a cada `rocketEvery` s) sobem onde
+    // você clicar e rendem `rocketCheer` s de Animação; `volley` foguetes em `volleyMs` ms fazem a Grande Final (`finale`, no máximo
+    // uma a cada `finaleWait` s). A cada `starEvery` s uma estrela cadente cruza o céu por `starSeconds` s: clique nela para fazer
+    // um pedido (um dos `wishes`, sorteado). A cada `simpatiaWait` s dá para fazer uma simpatia: escolha uma de 3 cartas e valha o
+    // prêmio dela (`frenzy` é o frenesi, em segundos).
+    ceu: {
+      rocketMax: 6, rocketEvery: 40, rocketCheer: 10, volley: 4, volleyMs: 12000, finale: { cheer: 60, tickets: 1 }, finaleWait: 300,
+      starEvery: [180, 360], starSeconds: 5, wishes: [{ cheer: 90 }, { tickets: 2 }, { wood: 4 }, { love: 6 }, { belly: 20 }],
+      simpatiaWait: 10800,
+      simpatias: [
+        { id: 'faca', name: 'Faca na bananeira', text: 'Crava a faca na bananeira e, de manhã, o nome do amor aparece no corte.', reward: { love: 15 } },
+        { id: 'alianca', name: 'Aliança no copo', text: 'Pendura a aliança num fio dentro do copo d’água: as batidas contam os anos de sorte.', reward: { tickets: 3 } },
+        { id: 'ovo', name: 'Clara de ovo', text: 'Põe a clara na água ao sereno e de manhã ela desenha o futuro da festa.', reward: { cheer: 150 } },
+        { id: 'agulha', name: 'Agulha na água', text: 'Se a agulha boiar na bacia, o ano vem de sorte.', reward: { tickets: 2, love: 4 } },
+        { id: 'milho', name: 'Espiga de cabelo comprido', text: 'Quem acha espiga com cabelo comprido tem fartura na mesa o ano inteiro.', reward: { belly: 30 } },
+        { id: 'fogueira', name: 'Pular três vezes', text: 'Pula a fogueira três vezes sem olhar para trás e o frio passa.', reward: { wood: 8 } },
+        { id: 'cebola', name: 'Cebola na cabeceira', text: 'Dorme com a cebola no travesseiro e sonha com a festa do ano que vem.', reward: { cheer: 90, love: 6 } },
+        { id: 'banho', name: 'Banho de ervas', text: 'Banho de alecrim e manjericão na noite de São João: dá um gás danado!', frenzy: 15 },
+        { id: 'papel', name: 'Papelzinho com nomes', text: 'Escreve os nomes no papelzinho, põe debaixo da fronha e o primeiro que cair é o escolhido.', reward: { tickets: 2, cheer: 40 } },
+        { id: 'estalinho', name: 'Estalinho contra mau-olhado', text: 'Estalinho no chão espanta o mau-olhado e acorda a alegria.', reward: { cheer: 120 } }
+      ]
+    },
+
+    // Bairro (convidado 75): a rua onde mora a turma (uma casa para cada integrante que a Mandioca já pescou, na ordem de
+    // `data.chars`). Visitar um vizinho rende `giftBase` s de Animação mais `giftPerLevel` s por nível dele, com um recado (uma das
+    // cartas do correio elegante), e cada vizinho só recebe visita de novo depois de `visitWait` s; a cada `ticketEvery` visitas
+    // seguidas ao mesmo vizinho ele dá também uma ficha. Quem está no rolê não está em casa.
+    bairro: {
+      visitWait: 2400, giftBase: 20, giftPerLevel: 4, ticketEvery: 4
+    }
+  },
+
   recipes: [
     { id: 'pamonha', name: 'Pamonha', wood: 4, minutes: 3, bonus: 0.2, buffMinutes: 15,
       desc: 'Milho verde ralado, cozido na palha e amarradinho.' },
