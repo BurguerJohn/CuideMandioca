@@ -9,6 +9,14 @@
 <body>
   <div id="festa" class="festa"><canvas id="festa-canvas" aria-label="A festa junina da Mandioca" data-i18n-label="app.canvas"></canvas></div>
   <div id="zoom-guia" class="zoom-guia" hidden aria-hidden="true"><b></b></div>
+  <section id="casa" class="casa ui" hidden aria-label="Casa da Mandioca" data-i18n-label="casa.title">
+    <header class="casa-topo">
+      <h2 data-i18n="casa.title">Casa da Mandioca</h2>
+      <span id="casa-contagem" class="casa-contagem"></span>
+      <button class="fechar" data-action="casa-fechar" title="Esconder a casa" data-i18n-title="casa.hide">×</button>
+    </header>
+    <div id="casa-cena" class="casa-cena"><canvas id="casa-canvas" aria-label="A casa da Mandioca e seus moradores" data-i18n-label="casa.title"></canvas></div>
+  </section>
   <div id="placa" class="placa ui" aria-live="polite"></div>
   <section id="vitrine" class="vitrine ui" hidden aria-label="Vitrine de compras" data-i18n-label="app.shopLabel"></section>
   <div id="avisos" class="avisos ui" role="status" aria-live="polite"></div>
@@ -53,6 +61,7 @@
   <script src="src/core.js"></script>
   <script src="src/festa-sprites.js"></script>
   <script src="src/festa.js"></script>
+  <script src="src/casa.js"></script>
   <script src="src/argolas.js"></script>
   <script src="src/som.js"></script>
   <script src="src/ui.js"></script>

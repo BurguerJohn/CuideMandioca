@@ -10,7 +10,7 @@ const { fakeDocument } = require('./fake-dom');
 
 const IDS = ['#festa', '#festa-canvas', '#placa', '#avisos', '#painel', '#painel-abas', '#painel-corpo',
   '#painel-titulo', '#janela', '#janela-corpo', '#importar', '#vitrine', '#argolas', '#argolas-canvas', '#argolas-info',
-  '#tela', '#tela-corpo', '#tela-titulo', '#zoom-guia'];
+  '#tela', '#tela-corpo', '#tela-titulo', '#zoom-guia', '#casa', '#casa-canvas', '#casa-contagem', '#casa-cena'];
 
 function boot(extra = {}, desktopExtra = {}) {
   const document = fakeDocument(IDS);
@@ -639,4 +639,45 @@ test('digitar "banana" na aba Histórico liga o botão de teste só nesta sessã
   digitar('banana');
   assert.doesNotMatch(node('#placa').innerHTML, /data-tela="teste"/);
   assert.equal(node('#tela').hidden, true);
+});
+
+test('a casa da Mandioca aparece no convidado 100, tem botão na placa, arrasta e dá para esconder e mostrar', async () => {
+  const { GameEngine } = core;
+  const bundle = require('../src/festa-sprites.js') && globalThis.FESTA_SPRITES;
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  require('../src/casa.js');
+  const young = new GameEngine(data, null, {}).exportState();
+  const before = boot({ ArraiaCasa: globalThis.ArraiaCasa, FESTA_SPRITES: bundle }, { loadGame: () => young });
+  await Promise.resolve();
+  assert.equal(before.document.nodes.get('#casa').hidden, true, 'sem a casa antes do convidado 100');
+  assert.doesNotMatch(before.document.nodes.get('#placa').innerHTML, /data-action="casa"/);
+
+  const old = new GameEngine(data, null, {}).exportState();
+  old.size = 102;
+  old.records.size = 102;
+  const { document, calls } = boot({ ArraiaCasa: globalThis.ArraiaCasa, FESTA_SPRITES: bundle }, { loadGame: () => old });
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  assert.equal(node('#casa').hidden, false, 'a casa aparece');
+  assert.match(node('#casa-contagem').textContent, /2 moradores/);
+  assert.match(node('#placa').innerHTML, /data-action="casa"/, 'botão da casa na placa');
+  assert.ok(node('#casa').style.left !== undefined && node('#casa').style.bottom !== undefined, 'a casa foi posta na tela');
+
+  // Arrastar pelo fundo leva só a casa e guarda a posição (em relação à festa) nos ajustes.
+  const target = { matches: () => false, closest: selector => (selector === '#casa' ? node('#casa') : null) };
+  document.listeners.pointerdown({ button: 0, clientX: 100, clientY: 100, target, preventDefault() {} });
+  document.listeners.pointermove({ clientX: 160, clientY: 70, buttons: 1 });
+  document.listeners.pointerup({ button: 0, clientX: 160, clientY: 70 });
+  const saved = calls.filter(entry => entry[0] === 'settings').at(-1);
+  assert.ok(saved?.[1].casa && Number.isFinite(saved[1].casa.dx) && Number.isFinite(saved[1].casa.dy), 'posição da casa salva');
+
+  // Esconder (pelo X) e mostrar (pelo botão da placa).
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'casa-fechar' });
+  await Promise.resolve();
+  assert.equal(node('#casa').hidden, true);
+  click({ action: 'casa' });
+  await Promise.resolve();
+  assert.equal(node('#casa').hidden, false);
 });

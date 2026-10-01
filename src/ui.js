@@ -139,6 +139,10 @@
     }).join('');
     const upcoming = engine.sceneryPiece(s.size + 1);
     const goalsReady = engine.goalsReady();
+    // A casa da Mandioca (do convidado 100): o botão mostra ou esconde a janela dela.
+    const casaOpen = engine.houseInfo().open;
+    const casaButton = casaOpen ? `<button class="ferramenta ${ctx.casaVisible ? 'aberta' : ''}" data-action="casa" ` +
+      `title="${esc(t('hud.casa'))}">${ctx.icon('ui:casa')}</button>` : '';
     // O que está valendo agora: frenesi (do balão de sorte) e quadrilha marcada, cada um com os segundos que faltam.
     const r = s.runtime;
     const buffs = [
@@ -177,11 +181,11 @@
       (upcoming ? `<div class="proximo" title="${esc(t('hud.nextTitle'))}">${t('hud.next', { piece: esc(upcoming.name) })}</div>` : '') +
       moodRow(engine, ctx) +
       // Loja e argolas mais as telas: com mais de 8 botões (a cozinha), a grade ganha a 5ª coluna em vez de outra fileira.
-      `<div class="placa-barra"><div class="barra-jogo${shown.length + 2 > 8 ? ' cheia' : ''}">` +
+      `<div class="placa-barra"><div class="barra-jogo${shown.length + 2 + (casaOpen ? 1 : 0) > 8 ? ' cheia' : ''}">` +
       `<button class="ferramenta" data-action="vitrine" title="${esc(t('hud.shop'))}">${ctx.icon('ui:loja')}</button>` +
       `<button class="ferramenta argolas" data-action="argolas" title="${esc(t('rings.title'))}">${ctx.icon('ui:argolas')}` +
       `<i class="preco-argolas" data-live="ringCost"${engine.ringCost() > engine.cfg.ringCost ? '' : ' hidden'}>` +
-      `${engine.ringCost()}</i></button>` + telas + `</div><div class="barra-sistema">` +
+      `${engine.ringCost()}</i></button>` + telas + casaButton + `</div><div class="barra-sistema">` +
       `<button class="ferramenta" data-action="abrir" title="${esc(t('hud.panel'))}">` +
       `${ctx.icon('ui:painel')}</button>` +
       // Conquistas: abre o painel nessa aba; o selo conta as metas cumpridas esperando o resgate.
@@ -709,7 +713,7 @@
       ['sempre', 'passar'].map(mode => `<button class="chip ${st.hud === mode ? 'ativa' : ''}" data-action="placa" ` +
         `data-value="${mode}">${esc(t(mode === 'sempre' ? 'settings.signAlways' : 'settings.signHover'))}</button>`).join('') +
       `</div><p class="miudo">${esc(t('settings.signHint'))}</p>` +
-      (st.placa ? `<div class="botoes"><button class="btn claro" data-action="placa-auto">${esc(t('settings.signAuto'))}</button></div>` : '') +
+      (st.placa || st.casa ? `<div class="botoes"><button class="btn claro" data-action="placa-auto">${esc(t('settings.signAuto'))}</button></div>` : '') +
       `</div><div class="cartao"><div class="rotulo">${esc(t('settings.numbers'))}</div><div class="numeros">` +
       stats.map(([label, value]) => `<div><span>${esc(label)}</span><b>${value}</b></div>`).join('') + `</div></div></div>` +
       `<div class="cartao"><div class="rotulo">${esc(t('settings.game'))}</div><p class="miudo">${esc(t('settings.saveHint'))}</p>` +
@@ -794,6 +798,8 @@
       case 'bandeirinha': return t('log.flag');
       case 'compadres': return t('log.compadres', { n: compact(entry.amount || 0) });
       case 'cozinha': return t('log.cozinha', { dish: engine.recipe?.(entry.id)?.name || entry.id });
+      case 'casa-comodo': return t('log.casaRoom', { room: engine.houseRoom(entry.room).name });
+      case 'casa-morador': return t('log.casaMoved', { name: engine.houseResident(entry.index).name });
       case 'comida': return t('log.comida', { food: engine.food?.(entry.id)?.name || entry.id, n: entry.count || 1 });
       case 'fantasia': return t(`log.fantasia.${[1, 2, 3].includes(entry.place) ? entry.place : 3}`, { tickets: entry.tickets || 0 });
       case 'burro': return t(`log.burro.${['mosca', 'perto', 'longe'].includes(entry.grade) ? entry.grade : 'fora'}`,

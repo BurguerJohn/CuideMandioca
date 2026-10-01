@@ -22,7 +22,7 @@ const NOITE = {
     #fundo-noite i { position: absolute; left: 0; top: 0; width: 2px; height: 2px; box-shadow: ${estrelas(70, 11)}; }
     #avisos { display: none !important; }`
 };
-const SEM_PLACA = '#placa { display: none !important; }';
+const SEM_PLACA = '#placa, #casa { display: none !important; }';
 
 // Área de trabalho de escritório falsa (sem marca nenhuma): planilha, papel de parede e barra de tarefas, no idioma
 // da gravação.

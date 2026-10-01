@@ -21,6 +21,7 @@ import sprites
 from render import hex_rgb, outline, shade, sprite, tint
 import animar
 import casamento
+import casa_salas
 import cenario
 import crescer
 import danca
@@ -87,7 +88,7 @@ def strip(frames):
 VOLUME = ('mandioca-', 'chapeu-', 'mao-', 'turma-', 'multidao', 'plateia', 'criancas', 'penetra', 'casamento', 'lado-', 'caixote',
           'cenario-galinha', 'cenario-pintinho', 'cenario-gato', 'cenario-bode', 'cenario-balao', 'cenario-mandioquinha',
           'cenario-milharal', 'cenario-bananeira', 'cenario-coqueiro', 'cenario-mandacaru', 'cenario-carrossel',
-          'cenario-balao-grande', 'cenario-boi', 'cenario-balao-ouro', 'cenario-pote', 'cenario-caramelo', 'cenario-pombo', 'cenario-trem', 'cenario-sapo', 'cenario-saco', 'cenario-leiloeiro', 'cenario-kombi', 'cenario-jegue', 'cenario-sanfoneiro', 'cenario-fotografo', 'cenario-carro-boi', 'cenario-papagaio', 'compadres')
+          'cenario-balao-grande', 'cenario-boi', 'cenario-balao-ouro', 'cenario-pote', 'cenario-caramelo', 'cenario-pombo', 'cenario-trem', 'cenario-sapo', 'cenario-saco', 'cenario-leiloeiro', 'cenario-kombi', 'cenario-jegue', 'cenario-sanfoneiro', 'cenario-fotografo', 'cenario-carro-boi', 'cenario-papagaio', 'compadres', 'casa-moradores')
 LUZ_QUENTE = (255, 236, 196)
 
 
@@ -1483,6 +1484,7 @@ def main():
     export_props()
     export_rings()
     manifest['scenery'] = cenario.export(add)
+    manifest['casa'] = casa_salas.exportar(add, icons)
     export_icons()
     export_terrains()
     export_app_icon()

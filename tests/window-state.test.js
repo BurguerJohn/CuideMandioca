@@ -7,7 +7,7 @@ const { normalizeSettings, mergeSettings, publicSettings, pickDisplay } = requir
 
 test('preferências inválidas voltam ao padrão', () => {
   assert.deepEqual(normalizeSettings({ pinned: 'sim', zoom: 9, x: 9, lift: -3, hud: 'x', hidden: 1, display: 'a' }),
-    { pinned: true, zoom: 3, x: 1, lift: 0, hud: 'sempre', hidden: false, placa: null, display: null, language: 'auto',
+    { pinned: true, zoom: 3, x: 1, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false, display: null, language: 'auto',
       sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
   assert.equal(normalizeSettings({ sound: false }).sound, false, 'som desligado fica desligado');
   assert.equal(normalizeSettings({ sound: 'não' }).sound, true, 'valor estranho: som ligado');
@@ -26,7 +26,7 @@ test('mudanças parciais só alteram as chaves conhecidas', () => {
   assert.equal(next.x, 0.3);
   assert.equal(next.hud, 'passar');
   assert.equal('malicioso' in next, false);
-  assert.deepEqual(Object.keys(publicSettings(next)), ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm']);
+  assert.deepEqual(Object.keys(publicSettings(next)), ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'casa', 'casaHidden', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm']);
   assert.equal(normalizeSettings({ music: true }).music, true);
   assert.equal(normalizeSettings({ startup: true }).startup, true);
   assert.equal(normalizeSettings({ startup: 1 }).startup, false, 'abrir com o Windows só liga com true de verdade');

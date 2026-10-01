@@ -614,6 +614,8 @@
         s.size++;
         grew++;
         this.record('size', { size: s.size });
+        // Só os convidados que a festa nunca teve antes contam para a casa (o recorde fica salvo e passa de um ano para o outro).
+        if (s.size > s.records.size) { s.records.size = s.size; this.houseGrew(s.size); }
       }
       if (!grew) return;
       this.emit('size-up', { size: s.size, count: grew });
@@ -634,6 +636,52 @@
       }
       if (s.size > s.records.size) s.records.size = s.size;
       this.updateTimers(this.now());
+    }
+
+    // --- Casa da Mandioca -----------------------------------------------------------------------------------------------
+    // A casa segue o recorde de convidados (ela não some quando um ano novo recomeça a festa). Do convidado `start` em diante,
+    // a cada `perRoom` convidados: um cômodo novo e, nos dois seguintes, um morador novo dentro dele. Cada cômodo da lista
+    // `rooms` aparece uma vez só: quando o último enche com os moradores dele a casa está completa e não cresce mais.
+    houseLevel() { return Math.max(this.state.size, this.state.records.size); }
+    houseInfo(level = this.houseLevel()) {
+      const h = this.data.house;
+      if (level < h.start) return { open: false, level, rooms: 0, residents: 0, complete: false };
+      const k = level - h.start;
+      const cycle = Math.floor(k / h.perRoom);
+      const perRoom = h.perRoom - 1;
+      const rooms = Math.min(cycle + 1, h.rooms.length);
+      const residents = Math.min(cycle * perRoom + (k % h.perRoom), h.rooms.length * perRoom);
+      return { open: true, level, rooms, residents, complete: rooms === h.rooms.length && residents === h.rooms.length * perRoom };
+    }
+    houseRoom(index) {
+      const h = this.data.house;
+      const kind = h.rooms[index % h.rooms.length];
+      return { index, id: kind.id, name: kind.name, kind: index % h.rooms.length, acts: kind.acts };
+    }
+    houseResident(index) {
+      const h = this.data.house;
+      const room = this.houseRoom(Math.floor(index / 2));
+      const activity = room.acts[index % 2];
+      return { index, room: room.index, slot: index % 2, activity, name: h.names[index % h.names.length],
+        role: index === 0 ? 'esposa' : index === 1 ? 'filho' : null, design: index % h.designs,
+        activityName: this.data.house.activities.find(entry => entry.id === activity)?.name || activity };
+    }
+    // O convidado `size` (novo, nunca visto) chegou: um cômodo novo ou um morador novo.
+    houseGrew(size) {
+      const h = this.data.house;
+      if (size < h.start) return;
+      const k = size - h.start;
+      const cycle = Math.floor(k / h.perRoom);
+      if (cycle >= h.rooms.length) return;   // a casa está completa
+      const step = k % h.perRoom;
+      if (step === 0) {
+        this.record('casa-comodo', { room: cycle });
+        this.emit('house-room', { room: cycle, size, first: k === 0 });
+      } else {
+        const index = cycle * (h.perRoom - 1) + step - 1;
+        this.record('casa-morador', { index });
+        this.emit('house-resident', { index, room: Math.floor(index / 2), size });
+      }
     }
 
     // Cenário: a peça que a lotação `size` trouxe e tudo o que a festa já ganhou até agora.

@@ -125,7 +125,7 @@ test('janela cobre a área útil, vaza cliques e só aceita IPC da própria fest
   assert.equal(win.ignore, false, 'outra origem não mexe na janela');
 
   const settings = await handlers.get('desktop:update-settings')(own, { zoom: 1.5, pinned: false, lixo: 1 });
-  assert.deepEqual(settings, { pinned: false, zoom: 1.5, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null,
+  assert.deepEqual(settings, { pinned: false, zoom: 1.5, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false,
     sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
   assert.equal(win.onTop, false);
   assert.equal(await handlers.get('desktop:update-settings')({ sender: {} }, { zoom: 2 }), null);

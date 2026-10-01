@@ -62,7 +62,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 #festa-canvas { display: block; image-rendering: pixelated; }
 
 /* Moldura de madeira usada na placa, no painel e nas janelas */
-.placa, .painel, .janela {
+.placa, .painel, .janela, .casa {
   background: var(--papel);
   border: 3px solid var(--tinta);
   box-shadow: 0 0 0 4px var(--madeira-clara), 0 0 0 7px var(--madeira), 0 0 0 10px var(--tinta), 8px 8px 0 10px var(--sombra);
@@ -74,6 +74,18 @@ body.placa-passar .placa { opacity: 0; }
 body.placa-passar.sobre-festa .placa { opacity: 1; }
 /* Sem foco (o último clique foi fora do jogo) a placa some e deixa o clique passar */
 body.jogo-desfocado .placa, body.jogo-desfocado.placa-passar.sobre-festa .placa { opacity: 0; pointer-events: none; }
+/* A casa da Mandioca: janela própria ao lado da festa, com a mesma moldura de madeira da placa */
+.casa { position: absolute; padding: 4px 6px 6px; cursor: move; transition: opacity .2s steps(3); }
+.casa canvas { display: block; image-rendering: pixelated; cursor: pointer; }
+/* Casa enorme (mais de uns 400 convidados) passa da altura da tela mesmo na menor escala: a cena ganha rolagem própria. */
+.casa-cena { max-height: calc(100vh - 76px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--madeira) var(--papel3); }
+.casa-topo { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; }
+.casa-topo h2 { font-size: 15px; font-weight: 700; margin: 0; }
+.casa-contagem { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--madeira); }
+.casa-topo .fechar { position: static; width: 22px; height: 22px; line-height: 18px; font-size: 18px; }
+body.placa-passar .casa { opacity: 0; }
+body.placa-passar.sobre-festa .casa { opacity: 1; }
+body.jogo-desfocado .casa, body.jogo-desfocado.placa-passar.sobre-festa .casa { opacity: 0; pointer-events: none; }
 .placa-linha { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .recurso { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
 .placa-porte { display: flex; justify-content: space-between; align-items: center; margin: 8px 0 4px; font-size: 13px; font-weight: 700; }

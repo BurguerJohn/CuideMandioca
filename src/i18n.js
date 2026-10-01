@@ -113,6 +113,10 @@
     byId(data.bonfire, override.bonfire, ['name', 'text']);
     byId(data.recipes || [], override.recipes, ['name', 'desc']);
     byId(data.foods || [], override.foods, ['name', 'desc']);
+    if (data.house) {
+      byId(data.house.rooms, override.houseRooms, ['name']);
+      byId(data.house.activities, override.houseActivities, ['name']);
+    }
     byId(data.scenery.landmarks, override.landmarks, ['name']);
     byId(data.scenery.cycle, override.cycle, ['name']);
     byId(data.requests, override.requests, ['text']);

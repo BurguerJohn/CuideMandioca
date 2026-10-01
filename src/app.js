@@ -227,6 +227,7 @@
     toasts.style.bottom = `${Math.round(Math.min(hudBottom + hudHeight + 10, innerHeight - 60))}px`;
     document.body.classList.toggle('placa-passar', ui.settings.hud === 'passar');
     ui.anchor = { left, width, lift, top: size.top, side };
+    placeCasa();
     placeDock();
     if (ui.open) placeWindow($('#painel'), 'panelPos');
     if (ui.rings.open) placeWindow($('#argolas'), 'ringsPos');
@@ -256,6 +257,55 @@
     const bottom = Math.min(a.lift + a.top + 6, innerHeight - height - 8);
     dock.style.left = `${Math.round(left)}px`;
     dock.style.bottom = `${Math.round(Math.max(8, bottom))}px`;
+  }
+
+  // A Casa da Mandioca (do convidado 100 em diante) é uma janela só dela. Some quando a pessoa a esconde, ou com a festa.
+  const casaVisible = () => !!ui.casa && engine.houseInfo().open && !ui.settings.casaHidden && !ui.settings.hidden;
+
+  function placeCasa() {
+    const element = $('#casa');
+    if (!element || !ui.casa) return;
+    const visible = casaVisible();
+    element.hidden = !visible;
+    if (!visible) return;
+    // Cabe na tela: no máximo 55% da largura e 88% da altura; o fator é inteiro (a arte fica nítida).
+    ui.casa.setScale(3 * ui.settings.zoom, { width: innerWidth * 0.55, height: innerHeight * 0.88 });
+    const info = engine.houseInfo();
+    const counter = $('#casa-contagem');
+    if (counter) counter.textContent = t('casa.count', { n: info.residents });
+    const canvasSize = ui.casa.size();
+    const w = Math.max(element.offsetWidth || 0, canvasSize.width + 12);
+    const h = Math.max(element.offsetHeight || 0, Math.min(canvasSize.height, innerHeight - 76) + 38);
+    const a = ui.anchor || { left: 0, width: 0, lift: 0, top: 0 };
+    const custom = ui.settings.casa;
+    let left;
+    let bottom;
+    if (custom) {
+      left = a.left + custom.dx;
+      bottom = a.lift + custom.dy;
+    } else {
+      // Sozinha, a casa procura um lugar onde caiba e não cubra a placa (é nela que fica o botão que mostra e esconde a casa):
+      // ao lado direito da festa, em cima da placa, ao lado da placa, ou em cima da festa.
+      const placa = $('#placa');
+      const r = placa && !placa.hidden && placa.getBoundingClientRect ? placa.getBoundingClientRect() : null;
+      const placaRect = r && r.width ? r : null;
+      const covers = (l, b) => !!placaRect && l < placaRect.right + 6 && l + w > placaRect.left - 6 &&
+        innerHeight - b - h < placaRect.bottom + 6 && innerHeight - b > placaRect.top - 6;
+      const fits = (l, b) => l >= 6 && l + w <= innerWidth - 6 && b >= 6 && b + h <= innerHeight - 6;
+      const spots = [
+        [a.left + a.width + 12, a.lift + 10],
+        ...(placaRect ? [[placaRect.left, innerHeight - placaRect.top + 14], [placaRect.right + 12, innerHeight - placaRect.top - h],
+          [placaRect.left - 12 - w, innerHeight - placaRect.top - h]] : []),
+        [a.left + 10, a.lift + a.top + 8]
+      ];
+      const pick = spots.find(([l, b]) => fits(l, b) && !covers(l, b)) || spots.find(([l, b]) => !covers(clamp(l, 6, Math.max(6, innerWidth - w - 6)),
+        clamp(b, 6, Math.max(6, innerHeight - h - 6)))) || spots[spots.length - 1];
+      [left, bottom] = pick;
+    }
+    left = clamp(left, 6, Math.max(6, innerWidth - w - 6));
+    bottom = clamp(bottom, 6, Math.max(6, innerHeight - h - 6));
+    element.style.left = `${Math.round(left)}px`;
+    element.style.bottom = `${Math.round(bottom)}px`;
   }
 
   // Painel e janela das argolas abrem logo acima da festa. A posição fica guardada em relação ao pé esquerdo da
@@ -383,7 +433,7 @@
 
   // --- Renderização ------------------------------------------------------------------------------------
   function context() {
-    return { tab: ui.tab, panelOpen: ui.open, debug: ui.debug, lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
+    return { tab: ui.tab, panelOpen: ui.open, debug: ui.debug, casaVisible: casaVisible(), lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
       settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side,
       ringPlaying: ui.rings.playing, ringResult: ui.rings.result, zoomLabel: zoomLabel(),
       closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter };
@@ -456,7 +506,7 @@
       engine.specialDay()?.id, engine.daysToSaoJoao(), s.leilao?.active ? `${s.leilao.active.leader}:${s.leilao.active.price}` : '', !!s.saco?.active,
       !!s.cold?.active, !!s.visitor?.active, !!(s.fotografo?.active && !s.fotografo.active.shot), !!(s.burro?.active && !s.burro.active.pinned), !!s.fantasia?.judgeAt,
       `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha'),
-      engine.goalsReady(), ui.open && ui.tab, ui.debug].join('|');
+      engine.goalsReady(), ui.open && ui.tab, ui.debug, engine.houseInfo().open, casaVisible()].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
     const placa = $('#placa');
@@ -956,7 +1006,9 @@
     }
     if (a === 'fixar') { changeSettings({ pinned: !ui.settings.pinned }); return; }
     if (a === 'placa') { changeSettings({ hud: d.value }); return; }
-    if (a === 'placa-auto') { changeSettings({ placa: null }); return; }
+    if (a === 'placa-auto') { changeSettings({ placa: null, casa: null }); return; }
+    if (a === 'casa') { changeSettings({ casaHidden: !ui.settings.casaHidden }); return; }
+    if (a === 'casa-fechar') { changeSettings({ casaHidden: true }); return; }
     if (a === 'idioma') { changeLanguage(d.value); return; }
     if (a === 'esconder') {
       changeSettings({ hidden: true });
@@ -1136,13 +1188,34 @@
   // Som de cada acontecimento da festa (os que o jogador não causou com um clique).
   const EVENT_SOUNDS = { contest: 'porte', daily: 'premio', 'new-year': 'porte', 'bingo-number': 'bola', 'bingo-line': 'acerto', 'bingo-win': 'conquista', 'bingo-lost': 'errou', 'quadrilha-call': 'grito', pote: 'aviso', saco: 'aviso', 'saco-go': 'juiz', leilao: 'aviso', 'leilao-call': 'martelo', announce: 'altofalante', cobra: 'cobra', fotografo: 'aviso', burro: 'aviso', 'fantasia-soon': 'aviso', cold: 'chuva', quentao: 'moeda', sticker: 'revelar', 'album-page': 'conquista', visitor: 'quadrilha', set: 'premio', wedding: 'sinos', 'wedding-end': 'premio', 'special-day': 'quadrilha', quadrilha: 'quadrilha', 'goal-done': 'aviso', rain: 'chuva', thunder: 'trovao', 'rain-end': 'arcoiris', balloon: 'aviso', 'frenzy-start': 'porte', learn: 'crescer', grow: 'crescer', 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso',
     'prize-ready': 'aviso', 'letter-ready': 'pombo', 'outing-done': 'aviso', crasher: 'penetra', request: 'pedido',
-    'size-up': 'convidado', 'flare-start': 'fogo', 'cook-ready': 'aviso' };
+    'size-up': 'convidado', 'flare-start': 'fogo', 'cook-ready': 'aviso', 'house-room': 'crescer', 'house-resident': 'convidado' };
   // Acontecimentos que mudam o que as janelas mostram: prenda pronta, carta chegando, turma voltando do rolê...
   const REFRESH_EVENTS = new Set(['bingo-win', 'bingo-lost', 'goal-done', 'learn', 'grow', 'tier-up', 'fishing-open', 'prize-ready', 'letter-ready', 'outing-done', 'legendary', 'item',
     'achievement', 'cook-ready', 'cook-end', 'cook-served', 'cook-start']);
 
   // Nome da prenda do leilão: o item ou os minutos de Animação.
   const prizeName = prize => (prize?.item ? engine.items[prize.item]?.name || prize.item : t('app.leilaoPrizeCheer', { n: UI.compact(prize?.cheer || 0) }));
+
+  // Cômodo ou morador novo na casa: um aviso cada (se chegarem vários de uma vez, como depois de um tempo fora, um só).
+  function houseToast(event, events) {
+    const news = events.filter(entry => entry.type === 'house-room' || entry.type === 'house-resident');
+    if (news.length > 3) {
+      if (event === news[0]) {
+        toast(t('app.casaGrew', { rooms: news.filter(entry => entry.type === 'house-room').length,
+          residents: news.filter(entry => entry.type === 'house-resident').length }), 'ouro');
+        renderHud(true);
+      }
+      return;
+    }
+    if (event.type === 'house-room') {
+      toast(t(event.first ? 'app.casaFirst' : 'app.casaRoom', { room: engine.houseRoom(event.room).name }), 'ouro');
+    } else {
+      const who = engine.houseResident(event.index);
+      toast(t(who.role === 'esposa' ? 'app.casaEsposa' : who.role === 'filho' ? 'app.casaFilho' : 'app.casaResident', { name: who.name }), 'ouro');
+    }
+    renderHud(true);
+    placeCasa();
+  }
 
   function notify(events) {
     let refresh = false;
@@ -1180,6 +1253,8 @@
         toast(t('app.record', { time: UI.duration(event.seconds * 1000), before: UI.duration(event.before * 1000) }), 'ouro');
       } else if (event.type === 'daily') {
         toast(t(event.streak > 1 ? 'app.dailyStreak' : 'app.daily', { n: event.tickets, streak: event.streak }), 'ouro');
+      } else if (event.type === 'house-room' || event.type === 'house-resident') {
+        houseToast(event, events);
       } else if (event.type === 'new-year') {
         toast(t('app.newYear', { n: event.year, v: Math.round(event.bonus * 100) }), 'grande');
       } else if (event.type === 'hint') {
@@ -1420,6 +1495,17 @@
       }
       return;
     }
+    // A casa arrasta pelo fundo (ou por um morador: só o clique sem arrastar faz ele reagir) e muda só ela de lugar.
+    const house = event.target.closest?.('#casa');
+    // A barra de rolagem da cena (casa enorme) é do navegador: o fundo em volta da casa é que arrasta.
+    if (house && event.target.id === 'casa-cena') return;
+    if (house && !event.target.closest('button')) {
+      const hit = ui.casa?.hit(event.clientX, event.clientY);
+      ui.drag = { kind: 'casa', x: event.clientX, y: event.clientY, index: hit ? hit.index : null,
+        start: { left: parseFloat(house.style.left) || 0, bottom: parseFloat(house.style.bottom) || 0 }, moved: false };
+      event.preventDefault();
+      return;
+    }
     const handle = event.target.closest?.('[data-arrastar]');
     if (handle && !event.target.closest('button')) {
       const key = { argolas: 'ringsPos', tela: 'telaPos' }[handle.dataset.arrastar] || 'panelPos';
@@ -1462,6 +1548,14 @@
     } else if (drag.kind === 'vitrine') {
       ui.dock.dx = drag.start + dx;
       placeDock();
+    } else if (drag.kind === 'casa') {
+      const element = $('#casa');
+      const w = element.offsetWidth || 300;
+      const h = element.offsetHeight || 300;
+      const left = clamp(drag.start.left + dx, 6, Math.max(6, innerWidth - w - 6));
+      const bottom = clamp(drag.start.bottom - dy, 6, Math.max(6, innerHeight - h - 6));
+      ui.settings.casa = { dx: Math.round(left - ui.anchor.left), dy: Math.round(bottom - ui.anchor.lift) };
+      placeCasa();
     } else if (drag.kind === 'placa') {
       const placa = $('#placa');
       const zoom = uiZoom();
@@ -1497,6 +1591,9 @@
       else { setZoom(1, true); tocar('clique'); }
     } else if (drag.kind === 'placa') {
       if (drag.moved) changeSettings({ placa: ui.settings.placa });
+    } else if (drag.kind === 'casa') {
+      if (drag.moved) changeSettings({ casa: ui.settings.casa });
+      else if (drag.index !== null) comSom(() => ui.casa?.poke(drag.index, performance.now()), null);
     }
     else if (drag.kind === 'festa') {
       if (drag.moved) changeSettings({ x: ui.settings.x, lift: ui.settings.lift });
@@ -1644,6 +1741,7 @@
     const events = engine.drainEvents();
     if (events.length) {
       ui.festa?.onEvents(engine, events, t);
+      ui.casa?.onEvents(engine, events, t);
       notify(events);
       // Conquista salva logo: o save leva a lista para a Steam.
       if (events.some(event => ['size-up', 'tier-up', 'fished', 'outing-done', 'achievement'].includes(event.type))) saveLater();
@@ -1676,6 +1774,16 @@
       });
     }
     if (ui.rings.open) safely(() => ui.game?.draw(t));
+    // A casa: desenhada só quando aparece (não escondida nem com o jogo sem foco), e a 30 quadros por segundo.
+    if (ui.casa && t - (ui.casaAt || 0) >= 33 && casaVisible() && !document.body.classList.contains('jogo-desfocado')) {
+      ui.casaAt = t;
+      safely(() => {
+        const before = ui.casa.size();
+        ui.casa.draw(engine, t);
+        const after = ui.casa.size();
+        if (after.width !== before.width || after.height !== before.height) placeCasa();
+      });
+    }
   }
 
   // Varal de bandeirinhas do topo das janelas, desenhado em pixel e usado como fundo repetido.
@@ -1702,6 +1810,15 @@
   if (globalThis.ArraiaFesta && sprites && typeof canvas?.getContext === 'function') {
     ui.festa = globalThis.ArraiaFesta.create(canvas, sprites, { sound: name => tocar(name) });
     scaleFesta();
+  }
+  const houseCanvas = $('#casa-canvas');
+  if (globalThis.ArraiaCasa && sprites?.casa && typeof houseCanvas?.getContext === 'function') {
+    ui.casa = globalThis.ArraiaCasa.create(houseCanvas, sprites, { sound: name => tocar(name) });
+    // Passar o mouse num morador mostra o nome e o que ele está fazendo.
+    houseCanvas.addEventListener('mousemove', event => {
+      const found = ui.casa.hit(event.clientX, event.clientY);
+      houseCanvas.title = found ? t('casa.tip', { name: found.who.name, activity: found.who.activityName }) : '';
+    });
   }
   const ringsCanvas = $('#argolas-canvas');
   if (globalThis.ArraiaArgolas && sprites && typeof ringsCanvas?.getContext === 'function') {

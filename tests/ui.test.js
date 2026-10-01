@@ -217,3 +217,21 @@ test('a placa mostra o Amor e a Barriga da Mandioca e quanto o Rebolado vale; a 
   assert.match(html, /Rebolado ×0,5/);
   assert.match(html, /Tudo cheio: Rebolado ×1,25; tudo vazio: ×0,5/);
 });
+
+test('a placa ganha o botão da casa da Mandioca do convidado 100 em diante, e o diário conta os cômodos e moradores', () => {
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  assert.doesNotMatch(UI.hud(engine, ctx(engine)), /data-action="casa"/, 'antes do 100 não tem casa');
+  engine.state.size = 100;
+  engine.state.records.size = 100;
+  assert.match(UI.hud(engine, ctx(engine)), /data-action="casa"/);
+  assert.doesNotMatch(UI.hud(engine, ctx(engine)), /ferramenta aberta" data-action="casa"/);
+  assert.match(UI.hud(engine, ctx(engine, { casaVisible: true })), /ferramenta aberta" data-action="casa"/, 'aberta quando a casa aparece');
+  // Diário (aba Histórico, filtro "tudo"): as duas entradas novas têm texto.
+  engine.state.size = 103;
+  engine.state.records.size = 103;
+  engine.record('casa-comodo', { room: 1 });
+  engine.record('casa-morador', { index: 0 });
+  const log = UI.panel(engine, ctx(engine, { tab: 'historico', logFilter: 'tudo' }));
+  assert.match(log, /A casa ganhou um cômodo: Cozinha/);
+  assert.match(log, /Macaxeira se mudou para a casa/);
+});

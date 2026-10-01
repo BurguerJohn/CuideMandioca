@@ -7,9 +7,9 @@
   const { LANGUAGES } = i18n;
 
   // Preferências da festa, sempre normalizadas antes de usar ou salvar.
-  const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null,
+  const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false,
     display: null, language: 'auto', sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
-  const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm'];
+  const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'casa', 'casaHidden', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm'];
   // Quadros por segundo com foco / de fundo: suave 60/30, normal 30/20, economia 20/12.
   const PERFS = ['suave', 'normal', 'economia'];
   const language = value => (LANGUAGES.some(entry => entry.id === value) ? value : 'auto');
@@ -34,6 +34,8 @@
       hud: r.hud === 'passar' ? 'passar' : 'sempre',
       hidden: r.hidden === true,
       placa: placaOffset(r.placa),
+      casa: placaOffset(r.casa),
+      casaHidden: r.casaHidden === true,
       display: Number.isInteger(r.display) ? r.display : null,
       language: language(r.language),
       sound: r.sound !== false,
