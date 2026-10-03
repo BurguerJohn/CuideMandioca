@@ -1,0 +1,452 @@
+{
+  "pid": 54172,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-54172-9CNU0r",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "placa",
+    "scrolling": false,
+    "canvas": false,
+    "area": "",
+    "dragLimit": true,
+    "limitEdge": "right",
+    "pointerType": "touch",
+    "prepared": {
+      "point": {
+        "x": 394,
+        "y": 605
+      },
+      "touchAction": "auto",
+      "expectedDrag": "placa",
+      "scrollAxis": "y",
+      "viewport": {
+        "width": 1104,
+        "height": 819,
+        "dpr": 1.25
+      },
+      "delta": {
+        "x": 694,
+        "y": 0
+      },
+      "scrollHeight": 20,
+      "clientHeight": 20
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "placa",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6696.399999856949,
+          "x": 394,
+          "y": 605,
+          "button": 0,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6697.200000047684,
+          "x": 394,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "firstMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 898,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "placa",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6696.399999856949,
+          "x": 394,
+          "y": 605,
+          "button": 0,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6697.200000047684,
+          "x": 394,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11699.200000047684,
+          "x": 1088,
+          "y": 605,
+          "button": -1,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11699.799999952316,
+          "x": 1088,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": {
+          "dx": 345,
+          "dy": 10
+        }
+      }
+    },
+    "lastMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 878,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "placa",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6696.399999856949,
+          "x": 394,
+          "y": 605,
+          "button": 0,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6697.200000047684,
+          "x": 394,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11699.200000047684,
+          "x": 1088,
+          "y": 605,
+          "button": -1,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11699.799999952316,
+          "x": 1088,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16706.099999904633,
+          "x": 1068,
+          "y": 605,
+          "button": -1,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16706.299999952316,
+          "x": 1068,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": {
+          "dx": 325,
+          "dy": 10
+        }
+      }
+    },
+    "ended": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 878,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6696.399999856949,
+          "x": 394,
+          "y": 605,
+          "button": 0,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6697.200000047684,
+          "x": 394,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11699.200000047684,
+          "x": 1088,
+          "y": 605,
+          "button": -1,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11699.799999952316,
+          "x": 1088,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16706.099999904633,
+          "x": 1068,
+          "y": 605,
+          "button": -1,
+          "buttons": 1,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16706.299999952316,
+          "x": 1068,
+          "y": 605,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        },
+        {
+          "type": "pointerup",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 20714.39999985695,
+          "x": 1068,
+          "y": 605,
+          "button": 0,
+          "buttons": 0,
+          "target": "B",
+          "owner": "placa",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": {
+          "dx": 325,
+          "dy": 10
+        }
+      }
+    },
+    "saved": {
+      "placa": {
+        "dx": 325,
+        "dy": 10
+      }
+    }
+  }
+}

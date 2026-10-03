@@ -1,0 +1,149 @@
+{
+  "cases": [
+    {
+      "existing": false,
+      "trigger": "debounce",
+      "operation": "mkdir",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "debounce",
+      "operation": "write",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "debounce",
+      "operation": "partial-write",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "debounce",
+      "operation": "rename",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "language",
+      "operation": "mkdir",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "language",
+      "operation": "write",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "language",
+      "operation": "partial-write",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "language",
+      "operation": "rename",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "late-quit",
+      "operation": "mkdir",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "late-quit",
+      "operation": "write",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "late-quit",
+      "operation": "partial-write",
+      "passed": true
+    },
+    {
+      "existing": false,
+      "trigger": "late-quit",
+      "operation": "rename",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "debounce",
+      "operation": "mkdir",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "debounce",
+      "operation": "write",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "debounce",
+      "operation": "partial-write",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "debounce",
+      "operation": "rename",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "language",
+      "operation": "mkdir",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "language",
+      "operation": "write",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "language",
+      "operation": "partial-write",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "language",
+      "operation": "rename",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "late-quit",
+      "operation": "mkdir",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "late-quit",
+      "operation": "write",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "late-quit",
+      "operation": "partial-write",
+      "passed": true
+    },
+    {
+      "existing": true,
+      "trigger": "late-quit",
+      "operation": "rename",
+      "passed": true
+    }
+  ],
+  "failures": []
+}

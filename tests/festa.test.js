@@ -128,6 +128,73 @@ function lateGame() {
   return engine;
 }
 
+test('a plateia usa quadros dentro das folhas e os guarda-chuvas têm cores válidas', () => {
+  const previousDocument = globalThis.document;
+  const previousImage = globalThis.Image;
+  const atlasSizes = new Set([bundle.crowd.audience, bundle.crowd.audience2, bundle.crowd.audience3]
+    .map(sheet => `${sheet.w * sheet.frames}|${sheet.h}`));
+  const outside = [];
+  const undefinedColors = [];
+  let normal = 0;
+  let mirrored = 0;
+  let umbrellas = 0;
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  const makeElement = document.createElement;
+  document.createElement = tag => {
+    const element = makeElement(tag);
+    if (tag === 'canvas') {
+      const context = fakeContext();
+      let fillStyle = context.fillStyle;
+      Object.defineProperty(context, 'fillStyle', {
+        get: () => fillStyle,
+        set(value) {
+          if (element.width === 9 && element.height === 8) {
+            umbrellas++;
+            if (value === undefined) undefinedColors.push(value);
+          }
+          fillStyle = value;
+        }
+      });
+      context.drawImage = (source, ...args) => {
+        if (args.length !== 8 || !atlasSizes.has(`${source.width}|${source.height}`)) return;
+        if (source instanceof globalThis.Image) normal++;
+        else mirrored++;
+        const [x, y, width, height] = args;
+        if (x < 0 || y < 0 || x + width > source.width || y + height > source.height) {
+          outside.push([x, y, width, height, source.width, source.height]);
+        }
+      };
+      element.getContext = () => context;
+    }
+    return element;
+  };
+  // Dimensões da própria arte: o contexto falso comum não percebe um recorte fora da folha de sprites.
+  globalThis.Image = class {
+    set src(value) {
+      const png = Buffer.from(value.split(',')[1], 'base64');
+      this.width = this.naturalWidth = png.readUInt32BE(16);
+      this.height = png.readUInt32BE(20);
+      this.complete = true;
+      this.onload?.();
+    }
+  };
+  try {
+    require('../src/festa.js');
+    const festa = globalThis.ArraiaFesta.create(document.createElement('canvas'), bundle);
+    const engine = lateGame();
+    for (let frame = 0; frame < 12; frame++) festa.draw(engine, 1000 + frame * 100);
+    assert.ok(normal > 0 && mirrored > 0, 'testa a plateia nos dois sentidos');
+    assert.equal(outside.length, 0, `nenhum convidado desaparece por um índice negativo: ${JSON.stringify(outside[0])}`);
+    engine.state.weather.rain = { born: engine.now() - 10000, until: engine.now() + 30000 };
+    festa.draw(engine, 2300);
+    assert.ok(umbrellas > 0, 'a chuva abriu os guarda-chuvas');
+    assert.equal(undefinedColors.length, 0, 'nenhum guarda-chuva recebe uma cor de índice negativo');
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.Image = previousImage;
+  }
+});
+
 test('a Mandioca é desenhada em todos os tamanhos e cresce com um clarão', () => {
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -174,14 +241,26 @@ test('os pintinhos seguem a galinha em fila, sem piscar entre andar e parar nem 
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
   require('../src/festa.js');
-  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  // Esta trajetória inclui uma meia-volta logo depois de alguns pintinhos começarem a seguir. O sorteio da festa
+  // fica separado dos outros testes: um teste de imagem novo não pode mudar o caminho desta galinha.
+  const originalRandom = Math.random;
+  let flockSeed = 3;
+  let festa;
+  try {
+    Math.random = () => { flockSeed = (flockSeed * 1103515245 + 12345) % 2147483648; return flockSeed / 2147483648; };
+    festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  } finally {
+    Math.random = originalRandom;
+  }
   festa.setScale(3);
   const engine = new GameEngine(data, null, { rng: () => 0.3 });
   while (engine.state.size < 160) engine.addFame(engine.fameNeed() - engine.state.fame);
   let now = 5000;
   let prev = null;
+  let prevHen = null;
   const toggledAt = [];
   let flicker = 0;
+  let stoppedForTurn = 0;
   let walked = 0;
   for (let f = 0; f < 3000; f++) {
     festa.draw(engine, (now += 17));
@@ -191,15 +270,21 @@ test('os pintinhos seguem a galinha em fila, sem piscar entre andar e parar nem 
       if (chick.walking) walked++;
       if (prev && prev[i].walking !== chick.walking) {
         // Antes ele alternava andar/parar quase todo quadro (e o desenho piscava entre andar e bicar).
-        if (f - (toggledAt[i] ?? -99) <= 3) flicker++;
+        if (f - (toggledAt[i] ?? -99) <= 3) {
+          // A mãe virar é uma parada real: quem ficou à frente espera ela passar, mesmo que tenha acabado de andar.
+          if (prevHen.dir !== hen.dir && !chick.walking) stoppedForTurn++;
+          else flicker++;
+        }
         toggledAt[i] = f;
       }
     });
     const xs = chicks.map(chick => Math.round(chick.x)).sort((a, b) => a - b);
     for (let i = 1; i < xs.length; i++) assert.notEqual(xs[i], xs[i - 1], `dois pintinhos no mesmo lugar (quadro ${f})`);
     prev = chicks;
+    prevHen = hen;
   }
   assert.ok(walked > 0, 'eles andam atrás da mãe');
+  assert.ok(stoppedForTurn > 0, 'os pintinhos também param quando a mãe inverte o rumo');
   assert.ok(flicker <= 2, `andar/parar trocando a cada quadro: ${flicker}`);
 });
 
@@ -264,6 +349,8 @@ test('o casamento na roça aparece na pista, some os dois pares e aceita o cliqu
   const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
   festa.setScale(3);
   const engine = lateGame();
+  let wall = engine.now();
+  engine.now = () => wall;
   let now = 5000;
   for (let i = 0; i < 5; i++) festa.draw(engine, (now += 17));
   assert.ok(!festa.areas().some(area => area.id === 'casamento'), 'sem casamento os noivos não aparecem');
@@ -279,6 +366,7 @@ test('o casamento na roça aparece na pista, some os dois pares e aceita o cliqu
   assert.ok(x1 > x0 && y1 > y0);
   // A cerimônia inteira, com arroz, vivas e o "sim" do final, sem quebrar o desenho.
   for (let second = 0; second < data.config.weddingSeconds; second++) {
+    wall += 1000;
     engine.tick(1);
     if (second % 4 === 0) { engine.throwRice(); }
     festa.onEvents(engine, engine.drainEvents(), now);
@@ -296,7 +384,16 @@ test('a festa é desenhada do quintal ao Maior São João do Mundo', () => {
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
   require('../src/festa.js');
   const canvas = globalThis.document.createElement('canvas');
-  const festa = globalThis.ArraiaFesta.create(canvas, bundle);
+  // Esta trajetória põe uma lanterna na frente da Mandioca no ponto testado; outros testes não mudam o sorteio.
+  let sceneSeed = 1670642688;
+  const originalRandom = Math.random;
+  let festa;
+  try {
+    Math.random = () => { sceneSeed = (sceneSeed * 1103515245 + 12345) % 2147483648; return sceneSeed / 2147483648; };
+    festa = globalThis.ArraiaFesta.create(canvas, bundle);
+  } finally {
+    Math.random = originalRandom;
+  }
   festa.setScale(3);
 
   const start = new GameEngine(data, null, { rng: () => 0.5 });
@@ -318,8 +415,11 @@ test('a festa é desenhada do quintal ao Maior São João do Mundo', () => {
   festa.onEvents(engine, [{ type: 'step', value: 1234, crit: true }, { type: 'rest-start' }, { type: 'flare-start' },
     { type: 'tier-up', tier: 4 }, { type: 'size-up', size: 121, count: 2 }, { type: 'fished', id: 'milho' }], 2050);
   festa.draw(engine, 2300);
-  assert.ok(['request', 'crasher', 'host', 'festa', 'terreiro', 'par', 'palco', 'fogueira', 'lado-esquerda',
-    'lado-direita'].includes(festa.hit(200, 400)));
+  const actualHit = festa.hit(200, 400);
+  const covering = festa.areas().filter(({ box: [left, top, right, bottom] }) =>
+    200 >= left && 200 < right && 400 >= top && 400 < bottom);
+  assert.equal(actualHit, 'lanterna:1', 'a lanterna sorteada é um alvo legítimo sobre a Mandioca');
+  assert.ok(covering.some(area => area.id === actualHit), 'o clique corresponde a uma área registrada que cobre o ponto');
   assert.equal(festa.hit(-50, 400), null);
   assert.match(festa.photo(2), /^data:image\/png/);
 
@@ -840,6 +940,26 @@ test('o confete do resultado do concurso espera o anúncio para aparecer', () =>
   }
 });
 
+test('o lote de um novo ano não ressuscita a cobra do ano anterior', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(document.createElement('canvas'), bundle);
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  engine.state.size = engine.state.records.size = 100;
+  festa.draw(engine, 5000);
+  assert.ok(engine.debug('cobra'));
+  assert.equal(engine.newYear(), true);
+  const events = engine.drainEvents();
+  assert.ok(events.some(event => event.type === 'cobra'));
+  assert.ok(events.some(event => event.type === 'new-year'));
+  festa.onEvents(engine, events, 5100);
+  festa.draw(engine, 5140);
+  assert.equal(festa.probe().cobra, null, 'a cobra cancelada não atravessa o quintal novo');
+  assert.ok(!festa.areas().some(area => area.id === 'cobra'), 'a cobra antiga não bloqueia cliques');
+  assert.ok(festa.probe().particles > 0 && festa.probe().texts > 0, 'a comemoração do ano novo ainda aparece');
+});
+
 test('reset limpa cenas e cliques da festa anterior e redesenha mesmo no mesmo instante', () => {
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -1231,4 +1351,51 @@ test('o Rafael (segredo "yeye") só aparece depois de chamado, anda e bebe o que
   festa.poke('bicho:rafael');
   run(30, now);
   assert.ok([...used()].some(frame => yeah.has(frame)), 'o clique faz gritar "YEAH YEAH"');
+});
+
+test('uma folha de arte que falha não prende o carregamento da festa inteira', () => {
+  for (const failed of ['folha-de-outra-janela', ...Object.keys(bundle.images)]) {
+    const calls = { drawImage: 0 };
+    globalThis.document = fakeDocument([], calls);
+    globalThis.Image = class {
+      set src(value) {
+        this.value = value;
+        this.complete = true;
+        this.failed = value === 'imagem-quebrada';
+        this.width = this.height = this.failed ? 0 : 12;
+        if (this.failed) this.onerror?.();
+        else this.onload?.();
+      }
+    };
+    require('../src/festa.js');
+    const canvas = globalThis.document.createElement('canvas');
+    const g = fakeContext(calls);
+    const drawImage = g.drawImage.bind(g);
+    g.drawImage = (...args) => {
+      if (args[0]?.failed) throw new Error('InvalidStateError: imagem sem dados');
+      drawImage(...args);
+    };
+    canvas.getContext = () => g;
+    const festa = globalThis.ArraiaFesta.create(canvas, { ...bundle, images: { ...bundle.images, [failed]: 'imagem-quebrada' } });
+    const engine = new GameEngine(data, null, { rng: () => 0.5 });
+    assert.doesNotThrow(() => festa.draw(engine, 1000));
+    assert.ok(festa.areas().length > 0, `${failed}: o resto da cena foi desenhado`);
+    assert.ok(calls.drawImage > 0, `${failed}: há arte visível`);
+  }
+});
+
+test('carregar um chapéu no lugar do enfeite lateral não interrompe o desenho nem remove os alvos da festa', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const clock = 1_000_000;
+  for (const side of ['esquerda', 'direita']) {
+    const saved = new GameEngine(data, null, { now: () => clock, rng: () => 0.5 }).exportState();
+    saved.equipped[side] = 'chapeu-palha';
+    const engine = new GameEngine(data, saved, { now: () => clock, rng: () => 0.5 });
+    const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+    assert.doesNotThrow(() => festa.draw(engine, 1000), `${side}: o save aceito precisa continuar desenhável`);
+    assert.ok(festa.areas().some(area => area.id === `lado-${side}`), 'o enfeite restaurado continua clicável');
+    assert.ok(festa.areas().some(area => area.id === 'host'), 'a Mandioca continua clicável');
+  }
 });

@@ -1,0 +1,30 @@
+{
+  "electron": "44.4.5",
+  "pid": 46012,
+  "restored": true,
+  "results": [
+    {
+      "help": false,
+      "target": {
+        "tag": "CANVAS",
+        "mini": "bichos"
+      },
+      "overlapping": true,
+      "accessible": false,
+      "miniVisible": true,
+      "helpVisible": false
+    },
+    {
+      "help": true,
+      "target": {
+        "tag": "P",
+        "mini": "bichos"
+      },
+      "overlapping": true,
+      "accessible": false,
+      "miniVisible": true,
+      "helpVisible": true
+    }
+  ],
+  "errors": []
+}

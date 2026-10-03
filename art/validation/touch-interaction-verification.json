@@ -1,0 +1,287 @@
+﻿{
+    "cases":  [
+                  {
+                      "file":  "touch-drag-verification.json",
+                      "pid":  49612,
+                      "surface":  "festa",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  553,
+                                     "top":  492.8000183105469,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  503,
+                                    "top":  467.8000183105469,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-placa-verification.json",
+                      "pid":  43908,
+                      "surface":  "placa",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  341,
+                                     "top":  588.7200317382812,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  391,
+                                    "top":  563.7200317382812,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-vitrine-verification.json",
+                      "pid":  35540,
+                      "surface":  "vitrine",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  350,
+                                     "top":  371.0400085449219,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  300,
+                                    "top":  371.0400085449219,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-painel-verification.json",
+                      "pid":  50264,
+                      "surface":  "painel",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  296,
+                                     "top":  8,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  246,
+                                    "top":  33,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-tela-verification.json",
+                      "pid":  27448,
+                      "surface":  "tela",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  436,
+                                     "top":  248,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  386,
+                                    "top":  223,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-argolas-verification.json",
+                      "pid":  29136,
+                      "surface":  "argolas",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  515,
+                                     "top":  8,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  465,
+                                    "top":  33,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-casa-verification.json",
+                      "pid":  20616,
+                      "surface":  "casa",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  186,
+                                     "top":  356.3999938964844,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  236,
+                                    "top":  331.3999938964844,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-bichos-verification.json",
+                      "pid":  12364,
+                      "surface":  "bichos",
+                      "canvas":  false,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  784,
+                                     "top":  602,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  734,
+                                    "top":  577,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-casa-canvas-verification.json",
+                      "pid":  21992,
+                      "surface":  "casa",
+                      "canvas":  true,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  186,
+                                     "top":  356.3999938964844,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  236,
+                                    "top":  331.3999938964844,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-bichos-canvas-verification.json",
+                      "pid":  28520,
+                      "surface":  "bichos",
+                      "canvas":  true,
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  784,
+                                     "top":  602,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  734,
+                                    "top":  577,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-scroll-painel-verification.json",
+                      "pid":  8804,
+                      "surface":  "painel",
+                      "canvas":  false,
+                      "scrolling":  true,
+                      "before":  {
+                                     "left":  296,
+                                     "top":  8,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  296,
+                                    "top":  8,
+                                    "scrollTop":  84.80000305175781,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-scroll-casa-verification.json",
+                      "pid":  57452,
+                      "surface":  "casa",
+                      "canvas":  false,
+                      "scrolling":  true,
+                      "before":  {
+                                     "left":  108,
+                                     "top":  6.200000286102295,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  null
+                                 },
+                      "after":  {
+                                    "left":  108,
+                                    "top":  6.200000286102295,
+                                    "scrollTop":  83.19999694824219,
+                                    "scrollLeft":  null
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-scroll-vitrine-verification.json",
+                      "pid":  33260,
+                      "surface":  "vitrine",
+                      "canvas":  false,
+                      "scrolling":  true,
+                      "before":  {
+                                     "left":  8,
+                                     "top":  266.8399963378906,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  0
+                                 },
+                      "after":  {
+                                    "left":  8,
+                                    "top":  266.8399963378906,
+                                    "scrollTop":  0,
+                                    "scrollLeft":  106.4000015258789
+                                },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-scroll-bichos-verification.json",
+                      "pid":  24176,
+                      "surface":  "bichos",
+                      "canvas":  false,
+                      "scrolling":  true,
+                      "before":  {
+                                     "left":  285,
+                                     "top":  29.200000762939453,
+                                     "scrollTop":  0,
+                                     "scrollLeft":  0
+                                 },
+                      "after":  {
+                                    "left":  285,
+                                    "top":  29.200000762939453,
+                                    "scrollTop":  35.20000076293945,
+                                    "scrollLeft":  0
+                                },
+                      "finalDrag":  null
+                  }
+              ],
+    "count":  14,
+    "tests":  650,
+    "packagedAt":  "2026-10-03T10:41:27.446Z"
+}

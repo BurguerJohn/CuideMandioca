@@ -1,0 +1,1893 @@
+{
+  "cases": [
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "faca",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "faca",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "faca",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "faca",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "faca",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "faca",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "alianca",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "alianca",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "alianca",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "alianca",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "alianca",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "alianca",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "ovo",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "ovo",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "ovo",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "ovo",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "ovo",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "ovo",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "agulha",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "agulha",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "agulha",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "agulha",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "agulha",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "agulha",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "milho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "milho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "milho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "milho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "milho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "milho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "fogueira",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "fogueira",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "fogueira",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "fogueira",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "fogueira",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "fogueira",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "cebola",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "cebola",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "cebola",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "cebola",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "cebola",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "cebola",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "banho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "banho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "banho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "banho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "banho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "banho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "papel",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "papel",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "papel",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "papel",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "papel",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "papel",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "estalinho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "estalinho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "estalinho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "estalinho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "estalinho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "pt-BR",
+      "card": "estalinho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 0,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 0,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 0,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 1,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 1,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 1,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 2,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 2,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 2,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 3,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 3,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 3,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 4,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 4,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "pt-BR",
+      "prize": 4,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "pt-BR",
+      "mode": "continuous",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "pt-BR",
+      "mode": "continuous",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "pt-BR",
+      "mode": "reload-each",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "pt-BR",
+      "mode": "reload-each",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "pt-BR",
+      "mode": "reload-before-finale",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "pt-BR",
+      "mode": "reload-before-finale",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "faca",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "faca",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "faca",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "faca",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "faca",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "faca",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "alianca",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "alianca",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "alianca",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "alianca",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "alianca",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "alianca",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "ovo",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "ovo",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "ovo",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "ovo",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "ovo",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "ovo",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "agulha",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "agulha",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "agulha",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "agulha",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "agulha",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "agulha",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "milho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "milho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "milho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "milho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "milho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "milho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "fogueira",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "fogueira",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "fogueira",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "fogueira",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "fogueira",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "fogueira",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "cebola",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "cebola",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "cebola",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "cebola",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "cebola",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "cebola",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "banho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "banho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "banho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "banho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "banho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "banho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "papel",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "papel",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "papel",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "papel",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "papel",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "papel",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "estalinho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "estalinho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "estalinho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "estalinho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "estalinho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "en",
+      "card": "estalinho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 0,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 0,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 0,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 1,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 1,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 1,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 2,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 2,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 2,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 3,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 3,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 3,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 4,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 4,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "en",
+      "prize": 4,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "en",
+      "mode": "continuous",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "en",
+      "mode": "continuous",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "en",
+      "mode": "reload-each",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "en",
+      "mode": "reload-each",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "en",
+      "mode": "reload-before-finale",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "en",
+      "mode": "reload-before-finale",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "faca",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "faca",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "faca",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "faca",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "faca",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "faca",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "alianca",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "alianca",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "alianca",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "alianca",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "alianca",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "alianca",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "ovo",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "ovo",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "ovo",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "ovo",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "ovo",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "ovo",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "agulha",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "agulha",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "agulha",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "agulha",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "agulha",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "agulha",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "milho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "milho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "milho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "milho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "milho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "milho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "fogueira",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "fogueira",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "fogueira",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "fogueira",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "fogueira",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "fogueira",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "cebola",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "cebola",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "cebola",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "cebola",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "cebola",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "cebola",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "banho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "banho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "banho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "banho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "banho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "banho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "papel",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "papel",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "papel",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "papel",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "papel",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "papel",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "estalinho",
+      "index": 0,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "estalinho",
+      "index": 0,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "estalinho",
+      "index": 1,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "estalinho",
+      "index": 1,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "estalinho",
+      "index": 2,
+      "mode": "continuous",
+      "passed": true
+    },
+    {
+      "kind": "cards",
+      "language": "es",
+      "card": "estalinho",
+      "index": 2,
+      "mode": "reload-cards",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 0,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 0,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 0,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 1,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 1,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 1,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 2,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 2,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 2,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 3,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 3,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 3,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 4,
+      "mode": "live",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 4,
+      "mode": "expired",
+      "passed": true
+    },
+    {
+      "kind": "stars",
+      "language": "es",
+      "prize": 4,
+      "mode": "reload-live",
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "es",
+      "mode": "continuous",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "es",
+      "mode": "continuous",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "es",
+      "mode": "reload-each",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "es",
+      "mode": "reload-each",
+      "spaced": true,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "es",
+      "mode": "reload-before-finale",
+      "spaced": false,
+      "passed": true
+    },
+    {
+      "kind": "rockets",
+      "language": "es",
+      "mode": "reload-before-finale",
+      "spaced": true,
+      "passed": true
+    }
+  ],
+  "actions": 2796,
+  "reloads": 816,
+  "newYears": 243,
+  "wishes": 45,
+  "simpatias": 360,
+  "rockets": 153,
+  "finales": 6,
+  "failures": []
+}

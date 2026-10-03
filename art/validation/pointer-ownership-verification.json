@@ -1,0 +1,129 @@
+﻿{
+    "cases":  [
+                  {
+                      "file":  "mixed-pointers-touch-hold-other-verification.json",
+                      "pid":  12568,
+                      "order":  "touch",
+                      "target":  "hold",
+                      "release":  "other",
+                      "initialTickets":  94,
+                      "endedTickets":  94,
+                      "freshTickets":  95,
+                      "stoppedTickets":  95,
+                      "nativeRejectedClicks":  [
+                                                   {
+                                                       "pointerId":  1,
+                                                       "pointerType":  "mouse",
+                                                       "trusted":  true,
+                                                       "action":  "ficha"
+                                                   }
+                                               ],
+                      "twoTouchZoom":  null,
+                      "cardBoughtAfterSwipe":  null,
+                      "cardBoughtAfterTap":  null
+                  },
+                  {
+                      "file":  "mixed-pointers-touch-card-owner-verification.json",
+                      "pid":  47764,
+                      "order":  "touch",
+                      "target":  "card",
+                      "release":  "owner",
+                      "initialTickets":  94,
+                      "endedTickets":  94,
+                      "freshTickets":  95,
+                      "stoppedTickets":  95,
+                      "nativeRejectedClicks":  [
+                                                   {
+                                                       "pointerId":  1,
+                                                       "pointerType":  "mouse",
+                                                       "trusted":  true,
+                                                       "action":  "vitrine-item"
+                                                   }
+                                               ],
+                      "twoTouchZoom":  null,
+                      "cardBoughtAfterSwipe":  null,
+                      "cardBoughtAfterTap":  null
+                  },
+                  {
+                      "file":  "mixed-pointers-mouse-hold-other-verification.json",
+                      "pid":  50976,
+                      "order":  "mouse",
+                      "target":  "hold",
+                      "release":  "other",
+                      "initialTickets":  94,
+                      "endedTickets":  94,
+                      "freshTickets":  95,
+                      "stoppedTickets":  95,
+                      "nativeRejectedClicks":  [
+                                                   {
+                                                       "pointerId":  2,
+                                                       "pointerType":  "touch",
+                                                       "trusted":  true,
+                                                       "action":  "ficha"
+                                                   }
+                                               ],
+                      "twoTouchZoom":  null,
+                      "cardBoughtAfterSwipe":  null,
+                      "cardBoughtAfterTap":  null
+                  },
+                  {
+                      "file":  "mixed-pointers-mouse-card-owner-verification.json",
+                      "pid":  56432,
+                      "order":  "mouse",
+                      "target":  "card",
+                      "release":  "owner",
+                      "initialTickets":  94,
+                      "endedTickets":  94,
+                      "freshTickets":  95,
+                      "stoppedTickets":  95,
+                      "nativeRejectedClicks":  [
+                                                   {
+                                                       "pointerId":  2,
+                                                       "pointerType":  "touch",
+                                                       "trusted":  true,
+                                                       "action":  "vitrine-item"
+                                                   }
+                                               ],
+                      "twoTouchZoom":  null,
+                      "cardBoughtAfterSwipe":  null,
+                      "cardBoughtAfterTap":  null
+                  },
+                  {
+                      "file":  "multi-touch-verification.json",
+                      "pid":  39968,
+                      "order":  null,
+                      "target":  null,
+                      "release":  null,
+                      "initialTickets":  null,
+                      "endedTickets":  null,
+                      "freshTickets":  null,
+                      "stoppedTickets":  null,
+                      "nativeRejectedClicks":  [
+
+                                               ],
+                      "twoTouchZoom":  0.5452538663326288,
+                      "cardBoughtAfterSwipe":  null,
+                      "cardBoughtAfterTap":  null
+                  },
+                  {
+                      "file":  "touch-drag-vitrine-card-verification.json",
+                      "pid":  37592,
+                      "order":  null,
+                      "target":  null,
+                      "release":  null,
+                      "initialTickets":  null,
+                      "endedTickets":  null,
+                      "freshTickets":  null,
+                      "stoppedTickets":  null,
+                      "nativeRejectedClicks":  [
+
+                                               ],
+                      "twoTouchZoom":  null,
+                      "cardBoughtAfterSwipe":  false,
+                      "cardBoughtAfterTap":  true
+                  }
+              ],
+    "count":  6,
+    "tests":  653,
+    "packagedAt":  "2026-10-03T11:32:00.736Z"
+}

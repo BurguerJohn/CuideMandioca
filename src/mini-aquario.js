@@ -9,6 +9,7 @@
   Minis.define('aquario', (engine, tools) => {
     const { clamp, finite, int } = tools;
     const stageOf = (growth, c) => (growth >= c.growth[1] ? 2 : growth >= c.growth[0] ? 1 : 0);
+    const bubbleInterval = (adults, c) => Math.max(60, c.bubbleEvery / adults) * 1000;
     const fishInfo = (fish, c) => ({ id: fish.id, species: fish.species, stage: fish.stage, growth: fish.growth,
       next: fish.stage === 0 ? c.growth[0] : fish.stage === 1 ? c.growth[1] : null });
 
@@ -92,7 +93,7 @@
         }
         const adults = s.fish.filter(entry => entry.stage === 2).length;
         if (!adults || s.bubbles >= c.bubbleMax) { s.bubbleAt = now; return; }
-        const every = Math.max(60, c.bubbleEvery / adults) * 1000;
+        const every = bubbleInterval(adults, c);
         const n = Math.floor((now - s.bubbleAt) / every);
         if (n > 0) {
           s.bubbles = Math.min(c.bubbleMax, s.bubbles + n);
@@ -123,39 +124,49 @@
         const s = tools.state();
         const c = tools.cfg();
         const id = species || rollSpecies();
+        const discovery = discover(id, quiet);
         if (s.fish.length >= c.tankMax) {
           const reward = tools.reward({ tickets: 1 });
-          if (!quiet) tools.emit('tank-full', { species: id, reward });
-          return { ok: false, full: true, reward };
+          reward.tickets += discovery?.tickets || 0;
+          if (!quiet) tools.emit('tank-full', { species: id, isNew: !!discovery, reward });
+          return { ok: false, full: true, isNew: !!discovery, reward };
         }
         const fish = { id: s.nextId++, species: id, growth: 0, stage: 0 };
         s.fish.push(fish);
-        const reward = discover(id, quiet);
-        if (!quiet) tools.emit('new-fish', { species: id, isNew: !!reward, id: fish.id });
-        return { ok: true, fish: fishInfo(fish, c), isNew: !!reward, reward };
+        if (!quiet) tools.emit('new-fish', { species: id, isNew: !!discovery, id: fish.id });
+        return { ok: true, fish: fishInfo(fish, c), isNew: !!discovery, reward: discovery };
       },
 
       // Jogar ração: gasta uma e alimenta o peixe que está mais perto de crescer (o que já comeu mais; se empatar, o mais antigo),
       // assim cada peixe cresce depressa em vez de todos devagar. Sem peixe para crescer, não gasta.
       drop() {
+        this.tick();
         const s = tools.state();
         const c = tools.cfg();
+        const now = tools.now();
         if (s.food <= 0) return { ok: false, reason: 'food' };
         const hungry = s.fish.filter(entry => entry.stage < 2).sort((p, q) => q.growth - p.growth || p.id - q.id)[0];
         if (!hungry) return { ok: false, reason: 'grown' };
-        if (s.food >= c.foodMax) s.foodAt = tools.now();
+        if (s.food >= c.foodMax) s.foodAt = now;
         s.food--;
         s.fed++;
         hungry.growth++;
         const before = hungry.stage;
+        const adults = s.fish.filter(entry => entry.stage === 2).length;
         hungry.stage = stageOf(hungry.growth, c);
         const grew = hungry.stage > before;
+        if (grew && hungry.stage === 2) {
+          // O progresso já feito continua; o adulto novo só acelera o que ainda falta.
+          const progress = adults ? (now - s.bubbleAt) / bubbleInterval(adults, c) : 0;
+          s.bubbleAt = now - progress * bubbleInterval(adults + 1, c);
+        }
         tools.emit(grew ? 'grew' : 'fed', { id: hungry.id, species: hungry.species, stage: hungry.stage });
         return { ok: true, fish: fishInfo(hungry, c), grew };
       },
 
       // Estourar uma bolha dourada.
       pop() {
+        this.tick();
         const s = tools.state();
         const c = tools.cfg();
         if (s.bubbles <= 0) return { ok: false, reason: 'empty' };
@@ -168,7 +179,10 @@
 
       // Uma prenda fisgada na pescaria solta um peixe no tanque.
       hear(type) {
-        if (type === 'fished' && tools.state().started) this.addFish();
+        if (type !== 'fished') return;
+        // No novo ano o aquário já está aberto pelo recorde, mesmo antes do primeiro quadro ou de abrir a janela.
+        this.start();
+        this.addFish();
       }
     };
   });

@@ -18,6 +18,8 @@
     const nameOf = id => engineRef?.data.minis.horta.crops.find(entry => entry.id === id)?.name || id;
     const spot = i => ({ x: meta.colunas[i % 5], y: meta.linhas[Math.floor(i / 5)] });
 
+    const effectText = buff => tr(`horta.buff.${buff.kind}`, { v: Math.round(buff.value * 100) });
+
     function rewardLines(reward) {
       const lines = [];
       if (reward.tickets) lines.push(tr('gain.tickets', { n: reward.tickets }));
@@ -54,7 +56,11 @@
         }
         if (plot.waters > 0) { base.g.fillStyle = '#56c8ee'; base.g.fillRect(x + 3, y + 2, 2, 2); if (plot.waters > 1) base.g.fillRect(x + 6, y + 2, 2, 2); }
       }
-      base.region(`plot:${plot.index}`, x, y - 8, w, h + 8, { plot: plot.index, tip });
+      // A folha tem quatro linhas transparentes no topo e a planta termina um pixel abaixo do solo.
+      // Excluí-las evita que o canteiro da frente capture a base da planta da fileira de trás.
+      const top = plot.crop ? y + h - meta.plantas.h + 5 : y;
+      const bottom = y + h + (plot.crop ? 1 : 0);
+      base.region(`plot:${plot.index}`, x, top, w, bottom - top, { plot: plot.index, tip });
     }
 
     function draw(engine, now) {
@@ -71,7 +77,19 @@
         const y = meta.prateleira - 2 - (chosen ? 3 : 0);
         if (chosen) { base.g.fillStyle = '#ffe27a'; base.g.fillRect(x - 1, y - 1, 18, 20); }
         base.sprite(meta.pacotes, meta.plantas.ids.indexOf(item.id), x, y);
-        base.region(`semente:${item.id}`, x, y, 16, 18, { semente: item.id, tip: tr('mini.horta.tipSeed', { crop: nameOf(item.id), time: timeText(item.minutes * 60) }) });
+        // A estrelinha dourada: essa planta já deu o bônus fixo. A barrinha verde: o bônus da colheita ainda valendo.
+        const have = info.harvested[item.id] > 0;
+        if (have) { base.g.fillStyle = '#ffe27a'; base.g.fillRect(x + 13, y + 1, 1, 3); base.g.fillRect(x + 12, y + 2, 3, 1); }
+        const running = info.buffs.find(entry => entry.crop === item.id);
+        if (running) {
+          base.g.fillStyle = '#26242e';
+          base.g.fillRect(x + 1, y + 14, 14, 3);
+          base.g.fillStyle = '#9ef05a';
+          base.g.fillRect(x + 2, y + 15, Math.max(1, Math.round(12 * running.left / (info.buffMinutes * 60))), 1);
+        }
+        const tip = tr('mini.horta.tipSeed', { crop: nameOf(item.id), time: timeText(item.minutes * 60), buff: effectText(item.buff), m: info.buffMinutes,
+          perm: tr(have ? 'mini.horta.permHave' : 'mini.horta.permNew', { v: info.permanentPct }) });
+        base.region(`semente:${item.id}`, x, y, 16, 18, { semente: item.id, tip });
       });
       base.sprite(meta.regadora, 0, 120, meta.prateleira + 2);
       base.text(String(info.water), 148, meta.prateleira + 5, info.water > 0 ? '#8ed6ff' : '#9a9ca8');
@@ -86,7 +104,7 @@
         base.g.fillRect(x + 2, y + 2, 24, 3);
         base.g.fillStyle = '#ff5a5a';
         base.g.fillRect(x + 3, y + 3, Math.round(22 * info.crow.left / total), 1);
-        base.region('corvo', x + 4, y - 14, 22, 18, { tip: tr('mini.horta.tipCrow') });
+        base.region('corvo', x + 6, y - 12 + bob, meta.corvo.w, meta.corvo.h, { crowPlot: info.crow.plot, until: info.crow.until, tip: tr('mini.horta.tipCrow') });
       }
       base.drawParticles(now);
       base.drawSays(now);
@@ -99,6 +117,9 @@
       const found = base.hit(clientX, clientY);
       if (!found) return false;
       if (found.id === 'corvo') {
+        // A região guardada ao esconder a janela pertence à visita que foi desenhada.
+        const crow = model.info().crow;
+        if (found.crowPlot !== crow?.plot || found.until !== crow?.until) return true;
         const got = model.scare();
         if (got.ok) {
           hooks.sound?.('grito');
@@ -131,8 +152,11 @@
           hooks.sound?.('moeda');
           base.spawn('estrela', x + 6, y - 4, now);
           base.spawn('brilho', x + 18, y - 6, now);
-          rewardLines(got.reward).forEach((line, i) => base.say(line, x + 14, y - 8 - i * 7, now, '#ffe27a'));
-          if (got.first) hooks.toast?.(tr('mini.horta.first', { crop: nameOf(got.crop.id) }), 'ouro');
+          const lines = rewardLines(got.reward).map(line => [line, '#ffe27a']);
+          if (got.permanent) lines.push([tr('mini.horta.permSay', { v: got.permanent }), '#9ef05a']);
+          if (got.buff) lines.push([tr('mini.horta.buffSay', { effect: effectText(got.buff), m: got.buff.minutes }), '#8ed6ff']);
+          lines.forEach(([line, color], i) => base.say(line, x + 14, y - 8 - i * 7, now, color));
+          if (got.first) hooks.toast?.(tr('mini.horta.first', { crop: nameOf(got.crop.id), v: got.permanent, total: got.total }), 'ouro');
         }
         return true;
       }

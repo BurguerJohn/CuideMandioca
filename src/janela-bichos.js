@@ -142,8 +142,8 @@
       else if (a.mode === 'sleep' && spec.sleep) { list = spec.sleep; fps = spec.sleepFps; }
       else { list = [spec.walk ? spec.walk[0] : 0]; fps = 1; }
       const frame = frameOf(list, fps, now, a.phase);
-      const x = a.x - sheet.w / 2;
-      const y = a.y - sheet.h;
+      const x = Math.round(a.x - sheet.w / 2);
+      const y = Math.round(a.y - sheet.h);
       // O bicho ao lado do bicho: sombrinha no chão.
       base.g.globalAlpha = 0.25;
       base.g.fillStyle = '#10200c';
@@ -158,7 +158,11 @@
       if (pet.ready) {
         const gift = meta.presentes.ids.indexOf(pet.gift);
         const bob = Math.round(Math.sin(now / 260 + a.phase) * 1.5);
-        base.sprite(meta.presentes, gift, a.x - 4, top - 4 + bob);
+        const gx = Math.round(a.x - 4);
+        const gy = Math.round(top - 4 + bob);
+        if (base.sprite(meta.presentes, gift, gx, gy)) {
+          base.region(`gift:${a.id}`, gx, gy, meta.presentes.w, meta.presentes.h, { pet: a.id, gift: true, tip });
+        }
         if (Math.floor(now / 500) % 2 === 0) base.spawn('brilho', a.x + 4, top - 8 + bob, now);
       } else if (pet.bond > 0) {
         const max = engineRef.data.minis.bichos.bondMax;
@@ -174,8 +178,10 @@
     function drawChick(chick, i, now) {
       const sheet = spriteOf('pintinho');
       const frame = chick.walking ? Math.floor(now / 1000 * 8 + chick.phase) % 2 : 2;
-      base.sprite(sheet, frame, chick.x - sheet.w / 2, chick.y - sheet.h, { flip: chick.dir < 0 });
-      base.region(`chick:${i}`, chick.x - 4, chick.y - 8, 8, 8, { chick: i, tip: tr('mini.bichos.chick') });
+      const x = Math.round(chick.x - sheet.w / 2);
+      const y = Math.round(chick.y - sheet.h);
+      base.sprite(sheet, frame, x, y, { flip: chick.dir < 0 });
+      base.region(`chick:${i}`, x - 1, y - 2, sheet.w + 2, sheet.h + 2, { chick: i, tip: tr('mini.bichos.chick') });
     }
 
     function drawGrain(now) {
@@ -227,6 +233,7 @@
       if (found?.pet) {
         const a = animals.get(found.pet);
         const state = model.info().pets.find(pet => pet.id === found.pet);
+        if (found.gift && !state?.ready) return true;
         if (state?.ready) {
           const got = model.collect(found.pet);
           if (got.ok) {

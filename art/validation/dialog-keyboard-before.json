@@ -1,0 +1,36 @@
+{
+  "pid": 18084,
+  "electron": "44.4.5",
+  "letter": {
+    "visible": true,
+    "focused": false,
+    "active": "BODY",
+    "letters": 1,
+    "left": 3,
+    "documentFocused": true
+  },
+  "afterSpace": {
+    "left": 2,
+    "visible": true
+  },
+  "letterTab": {
+    "inside": true,
+    "action": "fechar-janela"
+  },
+  "letterClosed": true,
+  "year": {
+    "focused": false,
+    "year": 1,
+    "visible": true,
+    "active": "ano-novo"
+  },
+  "repeatedEnter": {
+    "year": 1,
+    "visible": true
+  },
+  "yearTab": {
+    "inside": false
+  },
+  "escaped": true,
+  "errors": []
+}

@@ -1,0 +1,46 @@
+{
+  "pid": 46076,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-46076-TDl6v4",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": {
+    "point": {
+      "x": 448,
+      "y": 537
+    },
+    "before": {
+      "cheer": 99929.5542345923,
+      "tickets": 94,
+      "rebolado": 3,
+      "steps": 2,
+      "lastSeen": 1791009306405
+    },
+    "expected": {
+      "cheer": 100666.58856956962,
+      "tickets": 94,
+      "rebolado": 3,
+      "steps": 2,
+      "lastSeen": 1791010506405
+    },
+    "after": {
+      "cheer": 99879.5542345923,
+      "tickets": 94,
+      "rebolado": 4,
+      "steps": 2,
+      "lastSeen": 1791009306405
+    },
+    "held": true
+  },
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "error": "AssertionError [ERR_ASSERTION]: o callback da compra encerra o gesto que antecedeu o repouso\n\ntrue !== false\n\n    at C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:163:12"
+}

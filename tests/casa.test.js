@@ -172,9 +172,14 @@ function newRenderer() {
   require('../src/festa.js');
   require('../src/casa.js');
   const canvas = globalThis.document.createElement('canvas');
+  const g = canvas.getContext('2d');
+  const draws = [];
+  const drawImage = g.drawImage.bind(g);
+  g.drawImage = (...args) => { draws.push(args); drawImage(...args); };
+  canvas.getContext = () => g;
   const sounds = [];
   const casa = globalThis.ArraiaCasa.create(canvas, bundle, { sound: name => sounds.push(name) });
-  return { casa, canvas, sounds };
+  return { casa, canvas, sounds, draws };
 }
 
 test('a planta da casa: os andares sobem, o primeiro enche da esquerda para a direita e nada se sobrepõe', () => {
@@ -223,12 +228,14 @@ test('o renderizador da casa desenha os moradores, reage ao clique e dá festa n
   assert.deepEqual(sounds, ['carinho']);
   assert.equal(casa.poke(9, 4000), null, 'morador que não existe');
   // Chegada: cômodo e morador novos.
-  const grown = engineAt(103);
+  const grown = engine;
+  grown.state.size = grown.state.records.size = 103;
   casa.onEvents(grown, [{ type: 'house-room', room: 1, size: 103, first: false }], 5000);
   casa.draw(grown, 5033);
   assert.equal(casa.probe().rooms, 2);
   assert.ok(casa.probe().pops >= 1);
-  casa.onEvents(engineAt(104), [{ type: 'house-resident', index: 2, room: 1, size: 104 }], 6000);
+  grown.state.size = grown.state.records.size = 104;
+  casa.onEvents(grown, [{ type: 'house-resident', index: 2, room: 1, size: 104 }], 6000);
   assert.ok(casa.probe().pops >= 2);
   // A casa cheia de moradores desenha sem erro e sem acumular efeitos sem fim.
   const big = engineAt(200);
@@ -237,6 +244,27 @@ test('o renderizador da casa desenha os moradores, reage ao clique e dá festa n
   assert.equal(casa.probe().residents, 67);
   assert.ok(casa.probe().particles <= 160, 'no máximo 160 efeitos ao mesmo tempo');
   assert.ok(casa.probe().size.width >= 300 && casa.probe().size.height >= 300);
+});
+
+test('o novo ano não repete a chegada de cômodos antigos no mesmo lote de eventos', () => {
+  const { casa, draws } = newRenderer();
+  const engine = engineAt(102);
+  casa.draw(engine, 1000);
+  engine.state.cheer = 1e15;
+  engine.addFame(engine.fameNeed() - engine.state.fame);
+  assert.equal(engine.houseInfo().rooms, 2);
+  assert.equal(engine.newYear(), true);
+  const events = engine.drainEvents();
+  assert.ok(events.some(event => event.type === 'house-room'));
+  // O app já reseta a casa ao confirmar o ano novo; o lote seguinte também precisa respeitar esse limite.
+  casa.reset();
+  casa.onEvents(engine, events, 2000);
+  assert.equal(casa.probe().pops, 0, 'a chegada anterior não faz os cômodos reaparecerem pela segunda vez');
+  draws.length = 0;
+  casa.draw(engine, 2033);
+  const rooms = draws.filter(args => bundle.casa.salas.folhas.some(sheet => args[0].value === bundle.images[sheet.image]));
+  assert.equal(rooms.length, 2);
+  assert.ok(rooms.every(args => args[4] === bundle.casa.salas.rh), 'os cômodos preservados aparecem inteiros');
 });
 
 test('a escala da casa é inteira e cabe na tela', () => {
@@ -261,7 +289,8 @@ test('o primeiro cômodo e o primeiro morador já chegam com festa, mesmo antes 
   assert.ok(casa.probe().particles >= 1, 'a poeira sobe junto');
   casa.draw(engine, 1033);
   assert.equal(casa.probe().rooms, 1);
-  const wife = engineAt(101);
+  const wife = engine;
+  wife.state.size = wife.state.records.size = 101;
   casa.onEvents(wife, [{ type: 'house-resident', index: 0, room: 0, size: 101 }], 2000);
   assert.equal(casa.probe().pops, 2);
 });
@@ -293,4 +322,32 @@ test('quando o último cômodo enche a casa para: sem evento, sem cômodo repeti
   const { casa } = newRenderer();
   for (let t = 1000; t < 4000; t += 33) casa.draw(engine, t);
   assert.deepEqual([casa.probe().rooms, casa.probe().residents], [36, 72]);
+});
+
+test('a área clicável acompanha o morador enquanto ele chega de cima', () => {
+  const { casa, canvas, draws } = newRenderer();
+  canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: canvas.width, height: canvas.height });
+  const engine = engineAt(101);
+  casa.onEvents(engine, [{ type: 'house-resident', index: 0, room: 0 }], 1000);
+  casa.draw(engine, 1100);
+  const resident = draws.find(args => args[0].value === bundle.images[bundle.casa.moradores.folhas[0].image]);
+  assert.ok(resident, 'o morador já está visível durante a chegada');
+  const found = casa.hit(resident[5] + bundle.casa.moradores.w / 2, resident[6] + 3);
+  assert.equal(found?.index, 0, 'clicar no morador suspenso faz ele reagir');
+});
+
+test('trocar de partida apaga a casa anterior, seus moradores e suas reações', () => {
+  const { casa } = newRenderer();
+  const old = engineAt(102);
+  casa.onEvents(old, [{ type: 'house-room', room: 0 }, { type: 'house-resident', index: 0, room: 0 }], 1000);
+  casa.draw(old, 1200);
+  assert.ok(casa.poke(1, 1300));
+  assert.equal(casa.draw(engineAt(1), 1400), false);
+  assert.equal(casa.areas().length, 0, 'ninguém da partida antiga recebe cliques');
+  assert.equal(casa.poke(1, 1400), null);
+  assert.deepEqual([casa.probe().pops, casa.probe().reacts, casa.probe().particles, casa.probe().says], [0, 0, 0, 0]);
+  const fresh = engineAt(102);
+  casa.draw(fresh, 1500);
+  assert.equal(casa.areas().length, 2);
+  assert.deepEqual([casa.probe().pops, casa.probe().reacts, casa.probe().says], [0, 0, 0]);
 });

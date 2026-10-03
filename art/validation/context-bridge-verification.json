@@ -1,0 +1,24 @@
+{
+  "electron": "44.4.5",
+  "snapshotFrozen": false,
+  "logFrozen": false,
+  "rowFrozen": false,
+  "modified": true,
+  "buySucceeded": true,
+  "snapshotPreserved": true,
+  "otherGamePreserved": true,
+  "level": 3,
+  "logLevel": 3,
+  "bingo": {
+    "prize": {
+      "tickets": 0,
+      "amount": 0
+    },
+    "rendered": true,
+    "balancePreserved": true,
+    "winCount": 1,
+    "canBuyNext": true,
+    "newRoundResult": null
+  },
+  "errors": []
+}

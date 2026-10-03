@@ -1,0 +1,50 @@
+{
+  "pid": 47636,
+  "electron": "44.4.5",
+  "letter": {
+    "visible": true,
+    "focused": true,
+    "active": "janela",
+    "letters": 1,
+    "left": 3,
+    "documentFocused": true
+  },
+  "afterSpace": {
+    "left": 3,
+    "visible": true
+  },
+  "letterTab": {
+    "inside": true,
+    "action": "fechar-janela"
+  },
+  "letterClosed": true,
+  "letterReturn": {
+    "inMail": false
+  },
+  "emptyMail": {
+    "ready": 0,
+    "letters": 2,
+    "visible": false,
+    "disabledFocused": false
+  },
+  "year": {
+    "focused": true,
+    "year": 1,
+    "visible": true,
+    "active": "janela"
+  },
+  "repeatedEnter": {
+    "year": 1,
+    "visible": true
+  },
+  "yearTab": {
+    "inside": true,
+    "action": "ano-novo-sim"
+  },
+  "escaped": true,
+  "yearReturn": {
+    "inPanel": false
+  },
+  "backgroundFocusKept": true,
+  "errors": []
+}

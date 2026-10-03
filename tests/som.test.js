@@ -1,30 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const Som = require('../src/som.js');
-
-// Web Audio de mentira: guarda quantos osciladores e ruídos cada som agendou e o volume geral.
-function fakeAudio() {
-  const log = { oscillators: 0, noises: 0, contexts: 0, resumed: 0, master: [], sources: [], gains: [] };
-  const param = () => ({ value: 0, targets: [], setValueAtTime() {}, exponentialRampToValueAtTime() {},
-    setTargetAtTime(value) { this.targets.push(value); log.master.push(value); } });
-  const node = extra => ({ connect() {}, ...extra });
-  class AudioContext {
-    constructor() { log.contexts++; this.state = 'running'; this.currentTime = 0; this.sampleRate = 8000; this.destination = {}; }
-    resume() { log.resumed++; this.state = 'running'; return Promise.resolve(); }
-    createGain() { const gain = node({ gain: param() }); log.gains.push(gain); return gain; }
-    createDynamicsCompressor() { return node(); }
-    createBiquadFilter() { return node({ type: '', frequency: param(), Q: param() }); }
-    createOscillator() { log.oscillators++; return node({ type: '', detune: param(), frequency: param(), start() {}, stop() {} }); }
-    createBufferSource() {
-      log.noises++;
-      const source = node({ loop: false, start() {}, stop() {} });
-      log.sources.push(source);
-      return source;
-    }
-    createBuffer(channels, length) { const data = new Float32Array(length); return { getChannelData: () => data }; }
-  }
-  return { AudioContext, log };
-}
+const { fakeAudio } = require('./fake-audio');
 
 test('som: cada efeito agenda notas, respeita liga/desliga, volume e o intervalo entre repetições', () => {
   const { AudioContext, log } = fakeAudio();
@@ -73,6 +50,35 @@ test('som: ruídos longos repetem o buffer até o fim do efeito', () => {
   som.play('chuva');
   assert.ok(log.sources.length >= 4);
   assert.ok(log.sources.every(source => source.loop), 'o buffer de um segundo não corta o trovão e a chuva antes da hora');
+});
+
+test('som: falha parcial na inicialização não quebra ajustes e uma tentativa posterior recupera o áudio', () => {
+  for (const failedMethod of ['createDynamicsCompressor', 'createBuffer']) {
+    const { AudioContext, log } = fakeAudio();
+    let failures = 1;
+    let closed = 0;
+    class Failing extends AudioContext {
+      close() { closed++; this.state = 'closed'; return Promise.resolve(); }
+      createDynamicsCompressor(...args) {
+        if (failedMethod === 'createDynamicsCompressor' && failures-- > 0) throw Error('sem recursos');
+        return super.createDynamicsCompressor(...args);
+      }
+      createBuffer(...args) {
+        if (failedMethod === 'createBuffer' && failures-- > 0) throw Error('sem recursos');
+        return super.createBuffer(...args);
+      }
+    }
+    const som = Som.create({ AudioContext: Failing, volume: 0.5 });
+    assert.equal(som.play('moeda'), false, failedMethod);
+    const abandonedMaster = log.gains[0];
+    assert.doesNotThrow(() => som.set({ volume: 0.7 }), failedMethod);
+    assert.equal(closed, 1, 'o contexto incompleto libera seus recursos');
+    assert.equal(som.play('moeda'), true, 'a tentativa seguinte cria um contexto funcional');
+    assert.equal(log.contexts, 2);
+    assert.equal(abandonedMaster.gain.targets.length, 0, 'não tenta regular o nó do contexto descartado');
+    som.set({ volume: 0.8 });
+    assert.equal(log.master.at(-1), 0.8 * 0.8 * 0.9);
+  }
 });
 
 test('música: agenda os passos à frente do relógio do áudio, fica quieta sem som e para ao desligar', () => {

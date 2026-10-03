@@ -18,6 +18,34 @@
 
     function nextCrow() { return tools.now() + tools.between(...tools.cfg().crowEvery) * 1000; }
 
+    function refillWater(now) {
+      const s = tools.state();
+      const c = tools.cfg();
+      if (s.water >= c.waterMax) s.waterAt = now;
+      else {
+        const n = Math.floor((now - s.waterAt) / (c.waterEvery * 1000));
+        if (n > 0) {
+          s.water = Math.min(c.waterMax, s.water + n);
+          s.waterAt = s.water >= c.waterMax ? now : s.waterAt + n * c.waterEvery * 1000;
+        }
+      }
+    }
+
+    function expireCrow(now) {
+      const s = tools.state();
+      if (!s.crow) return;
+      const plot = s.plots[s.crow.plot];
+      if (!plot?.crop) s.crow = null;
+      else if (now >= s.crow.until) {
+        const eaten = { index: s.crow.plot, crop: plot.crop };
+        s.plots[s.crow.plot] = emptyPlot();
+        s.crow = null;
+        s.eaten++;
+        s.crowAt = nextCrow();
+        tools.emit('crow-ate', eaten);
+      }
+    }
+
     function plotInfo(plot, index, now) {
       if (!plot.crop) return { index, crop: null, stage: 0, progress: 0, ready: false, waters: 0, remaining: 0 };
       const total = Math.max(1, plot.readyAt - plot.plantedAt);
@@ -31,7 +59,7 @@
       fresh() {
         const c = tools.cfg();
         return { plots: Array.from({ length: c.plotMax }, emptyPlot), water: c.waterMax, waterAt: tools.now(), seed: c.crops[0].id, crow: null,
-          crowAt: 0, harvested: {}, planted: 0, scared: 0, eaten: 0 };
+          crowAt: 0, harvested: {}, buffs: {}, planted: 0, scared: 0, eaten: 0 };
       },
 
       load(raw) {
@@ -49,9 +77,16 @@
         });
         const harvested = {};
         for (const item of c.crops) if (finite(raw.harvested?.[item.id]) > 0) harvested[item.id] = int(raw.harvested[item.id], 0, 1e9, 0);
+        // Os bônus de 10 min das colheitas que ainda valem (no máximo `buffMinutes` à frente).
+        const buffs = {};
+        for (const item of c.crops) {
+          const until = finite(raw.buffs?.[item.id]);
+          if (item.buff && until > now) buffs[item.id] = Math.min(until, now + c.buffMinutes * 60000);
+        }
         // O corvo não espera o jogo fechado: ao voltar, não tem corvo e o próximo vem com calma.
         return { plots, water: int(raw.water, 0, c.waterMax, c.waterMax), waterAt: clamp(finite(raw.waterAt, now), 0, now),
-          seed: crop(raw.seed) ? raw.seed : c.crops[0].id, crow: null, crowAt: clamp(finite(raw.crowAt), 0, now + c.crowEvery[1] * 1000), harvested,
+          seed: crop(raw.seed) ? raw.seed : c.crops[0].id, crow: null,
+          crowAt: tools.object(raw.crow) ? nextCrow() : clamp(finite(raw.crowAt), 0, now + c.crowEvery[1] * 1000), harvested, buffs,
           planted: int(raw.planted, 0, 1e9, 0), scared: int(raw.scared, 0, 1e9, 0), eaten: int(raw.eaten, 0, 1e9, 0) };
       },
 
@@ -62,33 +97,17 @@
         s.crowAt = back(s.crowAt);
         for (const plot of s.plots) if (plot.crop) { plot.plantedAt -= ms; plot.readyAt -= ms; }
         if (s.crow) s.crow.until -= ms;
+        for (const id of Object.keys(s.buffs)) s.buffs[id] -= ms;
       },
 
       // A regadora enche com o tempo; o corvo vem de vez em quando e come a planta de quem não o espantar.
       tick() {
         const s = tools.state();
-        const c = tools.cfg();
         const now = tools.now();
-        if (s.water >= c.waterMax) s.waterAt = now;
-        else {
-          const n = Math.floor((now - s.waterAt) / (c.waterEvery * 1000));
-          if (n > 0) {
-            s.water = Math.min(c.waterMax, s.water + n);
-            s.waterAt = s.water >= c.waterMax ? now : s.waterAt + n * c.waterEvery * 1000;
-          }
-        }
+        refillWater(now);
         const open = plotsOpen();
         if (s.crow) {
-          const plot = s.plots[s.crow.plot];
-          if (!plot?.crop) s.crow = null;
-          else if (now >= s.crow.until) {
-            const eaten = { index: s.crow.plot, crop: plot.crop };
-            s.plots[s.crow.plot] = emptyPlot();
-            s.crow = null;
-            s.eaten++;
-            s.crowAt = nextCrow();
-            tools.emit('crow-ate', eaten);
-          }
+          expireCrow(now);
           return;
         }
         if (!s.crowAt) s.crowAt = nextCrow();
@@ -105,12 +124,14 @@
         const s = tools.state();
         const c = tools.cfg();
         const now = tools.now();
+        refillWater(now);
         const open = plotsOpen();
         const start = engine.data.minis.windows.find(entry => entry.id === 'horta').start;
         return { plots: s.plots.slice(0, c.plotMax).map((plot, i) => ({ ...plotInfo(plot, i, now), open: i < open })), open, plotMax: c.plotMax,
           nextPlotAt: open < c.plotMax ? start + (open - c.plotsStart + 1) * c.plotEvery : null,
-          water: s.water, waterMax: c.waterMax, seed: s.seed, crow: s.crow ? { plot: s.crow.plot, left: Math.max(0, (s.crow.until - now) / 1000) } : null,
-          crops: c.crops, harvested: { ...s.harvested } };
+          water: s.water, waterMax: c.waterMax, seed: s.seed, crow: s.crow ? { plot: s.crow.plot, until: s.crow.until, left: Math.max(0, (s.crow.until - now) / 1000) } : null,
+          crops: c.crops, harvested: { ...s.harvested }, bonus: engine.hortaBonus(), permanentPct: c.permanentPct, buffMinutes: c.buffMinutes,
+          buffs: engine.hortaBuffs().map(buff => ({ ...buff, left: Math.max(0, (buff.until - now) / 1000) })) };
       },
 
       select(id) {
@@ -123,8 +144,9 @@
       plant(index, id = tools.state().seed) {
         const s = tools.state();
         const item = crop(id);
+        expireCrow(tools.now());
         if (!item) return { ok: false, reason: 'crop' };
-        if (!(index >= 0 && index < plotsOpen())) return { ok: false, reason: 'closed' };
+        if (!Number.isInteger(index) || !(index >= 0 && index < plotsOpen())) return { ok: false, reason: 'closed' };
         if (s.plots[index].crop) return { ok: false, reason: 'busy' };
         const now = tools.now();
         s.plots[index] = { crop: id, plantedAt: now, readyAt: now + item.minutes * 60000, waters: 0 };
@@ -137,8 +159,10 @@
       water(index) {
         const s = tools.state();
         const c = tools.cfg();
+        expireCrow(tools.now());
         const plot = s.plots[index];
         const now = tools.now();
+        refillWater(now);
         if (!plot?.crop || !(index < plotsOpen())) return { ok: false, reason: 'empty' };
         if (now >= plot.readyAt) return { ok: false, reason: 'ready' };
         if (plot.waters >= c.waterLimit) return { ok: false, reason: 'watered' };
@@ -151,10 +175,13 @@
         return { ok: true, waters: plot.waters };
       },
 
-      // Colher a planta no ponto: o prêmio dela (e, na primeira vez de cada planta, as fichas extras).
+      // Colher a planta no ponto: o prêmio dela, o bônus de `buffMinutes` min da planta e, na primeira vez de cada planta, as fichas
+      // extras e o bônus fixo de Animação (`permanent`: quantos % essa planta acrescentou; `total`: o bônus fixo de agora).
+      // Colher a mesma planta de novo só recomeça a contagem dela.
       harvest(index) {
         const s = tools.state();
         const c = tools.cfg();
+        expireCrow(tools.now());
         const plot = s.plots[index];
         if (!plot?.crop || !(index < plotsOpen())) return { ok: false, reason: 'empty' };
         if (tools.now() < plot.readyAt) return { ok: false, reason: 'growing' };
@@ -164,13 +191,17 @@
         if (first) Object.assign(reward, tools.reward(c.firstHarvest), { tickets: (reward.tickets || 0) + (c.firstHarvest.tickets || 0) });
         s.harvested[item.id] = (s.harvested[item.id] || 0) + 1;
         s.plots[index] = emptyPlot();
-        tools.emit('harvest', { index, crop: item.id, reward, first });
-        return { ok: true, crop: item, reward, first };
+        if (item.buff) s.buffs[item.id] = tools.now() + c.buffMinutes * 60000;
+        const permanent = first ? c.permanentPct : 0;
+        const buff = item.buff ? { ...item.buff, minutes: c.buffMinutes } : null;
+        tools.emit('harvest', { index, crop: item.id, reward, first, permanent, buff });
+        return { ok: true, crop: item, reward, first, permanent, total: Math.round(engine.hortaBonus() * 100), buff };
       },
 
       // Espantar o corvo: ele voa embora e deixa uma gorjeta de Animação.
       scare() {
         const s = tools.state();
+        expireCrow(tools.now());
         if (!s.crow) return { ok: false, reason: 'none' };
         const index = s.crow.plot;
         s.crow = null;

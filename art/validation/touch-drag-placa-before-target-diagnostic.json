@@ -1,0 +1,282 @@
+{
+  "pid": 12604,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-12604-sCQgUM",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "placa",
+    "scrolling": false,
+    "prepared": {
+      "point": {
+        "x": 441,
+        "y": 787
+      },
+      "touchAction": "none",
+      "expectedDrag": "placa",
+      "delta": {
+        "x": 50,
+        "y": -25
+      },
+      "scrollHeight": 271,
+      "clientHeight": 271
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "events": [],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6562.5,
+          "x": 441,
+          "y": 787
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6563.299999952316,
+          "x": 441,
+          "y": 787
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "firstMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6562.5,
+          "x": 441,
+          "y": 787
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6563.299999952316,
+          "x": 441,
+          "y": 787
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11563.799999952316,
+          "x": 461,
+          "y": 777
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11564.099999904633,
+          "x": 461,
+          "y": 777
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "lastMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6562.5,
+          "x": 441,
+          "y": 787
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6563.299999952316,
+          "x": 441,
+          "y": 787
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11563.799999952316,
+          "x": 461,
+          "y": 777
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11564.099999904633,
+          "x": 461,
+          "y": 777
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16570.5,
+          "x": 491,
+          "y": 762
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16570.700000047684,
+          "x": 491,
+          "y": 762
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "ended": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6562.5,
+          "x": 441,
+          "y": 787
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6563.299999952316,
+          "x": 441,
+          "y": 787
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11563.799999952316,
+          "x": 461,
+          "y": 777
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11564.099999904633,
+          "x": 461,
+          "y": 777
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16570.5,
+          "x": 491,
+          "y": 762
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16570.700000047684,
+          "x": 491,
+          "y": 762
+        },
+        {
+          "type": "pointerup",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 20581.599999904633,
+          "x": 491,
+          "y": 762
+        },
+        {
+          "type": "touchend",
+          "trusted": true,
+          "at": 20581.900000095367,
+          "x": 491,
+          "y": 762
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    }
+  },
+  "error": "AssertionError [ERR_ASSERTION]: o toque nativo começou o arrasto da superfície\n\nnull !== 'placa'\n\n    at C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:269:14"
+}

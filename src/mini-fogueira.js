@@ -98,7 +98,7 @@
       put(slot, id = tools.state().selected) {
         const s = tools.state();
         if (!food(id)) return { ok: false, reason: 'food' };
-        if (!(slot >= 0 && slot < s.sticks.length)) return { ok: false, reason: 'slot' };
+        if (!Number.isInteger(slot) || !(slot >= 0 && slot < s.sticks.length)) return { ok: false, reason: 'slot' };
         if (s.sticks[slot]) return { ok: false, reason: 'busy' };
         s.sticks[slot] = { food: id, progress: 0, turns: 0, burnt: false };
         tools.emit('put', { slot, food: id });

@@ -1,0 +1,1519 @@
+{
+  "cases": [
+    {
+      "scene": "wedding",
+      "route": "close",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 1006,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "close",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1010,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "close",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 1005,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "close",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1009,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "close",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 999,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "close",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "suspend",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 1006,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "suspend",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1010,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 1005,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1009,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 999,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "auto",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 1006,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "auto",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1010,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 1005,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1009,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.31770833333,
+        "tickets": 999,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "wedding",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106934.58333333333,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "close",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 1006,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "close",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1010,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "close",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 1005,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "close",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1009,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "close",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 999,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "close",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "suspend",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 1006,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "suspend",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1010,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 1005,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1009,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 999,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "auto",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 1006,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "auto",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1010,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 1005,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1009,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100420.37037037036,
+        "tickets": 999,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "contest",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106935,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "close",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "close",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1007,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "close",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 1002,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "close",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1006,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "close",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 996,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "close",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "suspend",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "suspend",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1007,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 1002,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1006,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 996,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "auto",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 1003,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "auto",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1007,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 1002,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1006,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100641.96144675926,
+        "tickets": 996,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "palco",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 107039.61125,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 76
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "close",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 988,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "close",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 988,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "close",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 987,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "close",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 987,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "close",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 981,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "close",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 981,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "suspend",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 988,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "suspend",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 988,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 987,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 987,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 981,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 981,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "auto",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 988,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "auto",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 988,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 987,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 987,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.12210648147,
+        "tickets": 981,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-win",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106873.875,
+        "tickets": 981,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "close",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "close",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "close",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 999,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "close",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 999,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "close",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 993,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "close",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 993,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "suspend",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "suspend",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 999,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 999,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 993,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 993,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "auto",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "auto",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 1000,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 999,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 999,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100325.23148148147,
+        "tickets": 993,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "auction-loss",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 106875,
+        "tickets": 993,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "close",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 986,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "close",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 986,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "close",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 985,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "close",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 985,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "close",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 979,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "close",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 979,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "suspend",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 986,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "suspend",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 986,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 985,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "suspend",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 985,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 979,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "suspend",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 979,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "auto",
+      "round": "none",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 986,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "auto",
+      "round": "none",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 986,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 985,
+        "refund": 1,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "auto",
+      "round": "argolas",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 985,
+        "refund": 1,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 0.3333333333333333,
+      "result": {
+        "cheer": 100331.73611111111,
+        "tickets": 979,
+        "refund": 0,
+        "offlineSeconds": 1200,
+        "size": 75
+      },
+      "passed": true
+    },
+    {
+      "scene": "quentao",
+      "route": "auto",
+      "round": "bingo",
+      "hours": 13,
+      "result": {
+        "cheer": 107012.5,
+        "tickets": 979,
+        "refund": 0,
+        "offlineSeconds": 43200,
+        "size": 75
+      },
+      "passed": true
+    }
+  ],
+  "saves": 108,
+  "reloads": 216,
+  "failures": []
+}

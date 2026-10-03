@@ -1,0 +1,202 @@
+{
+  "pid": 36384,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-36384-81ffdd",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": true,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "cardSpace": {
+    "before": {
+      "hat": "palha-furada",
+      "tickets": 94,
+      "owned": false,
+      "focused": "lenco-chita",
+      "keys": []
+    },
+    "pressed": {
+      "hat": "lenco-chita",
+      "tickets": 89,
+      "owned": true,
+      "focused": "lenco-chita",
+      "keys": [
+        {
+          "key": " ",
+          "repeat": false,
+          "id": "lenco-chita"
+        }
+      ]
+    },
+    "repeated": {
+      "hat": "lenco-chita",
+      "tickets": 89,
+      "owned": true,
+      "focused": "lenco-chita",
+      "keys": [
+        {
+          "key": " ",
+          "repeat": false,
+          "id": "lenco-chita"
+        },
+        {
+          "key": " ",
+          "repeat": true,
+          "id": "lenco-chita"
+        }
+      ]
+    },
+    "released": {
+      "hat": "lenco-chita",
+      "tickets": 89,
+      "owned": true,
+      "focused": "lenco-chita",
+      "keys": [
+        {
+          "key": " ",
+          "repeat": false,
+          "id": "lenco-chita"
+        },
+        {
+          "key": " ",
+          "repeat": true,
+          "id": "lenco-chita"
+        }
+      ]
+    },
+    "fresh": {
+      "hat": "palha-furada",
+      "tickets": 89,
+      "owned": true,
+      "focused": "palha-furada",
+      "keys": [
+        {
+          "key": " ",
+          "repeat": false,
+          "id": "lenco-chita"
+        },
+        {
+          "key": " ",
+          "repeat": true,
+          "id": "lenco-chita"
+        },
+        {
+          "key": " ",
+          "repeat": false,
+          "id": "palha-furada"
+        }
+      ]
+    },
+    "enter": {
+      "pressed": {
+        "hat": "coroa-flores",
+        "tickets": 82,
+        "owned": true,
+        "focused": "coroa-flores",
+        "keys": [
+          {
+            "key": " ",
+            "repeat": false,
+            "id": "lenco-chita"
+          },
+          {
+            "key": " ",
+            "repeat": true,
+            "id": "lenco-chita"
+          },
+          {
+            "key": " ",
+            "repeat": false,
+            "id": "palha-furada"
+          },
+          {
+            "key": "Enter",
+            "repeat": false,
+            "id": "coroa-flores"
+          }
+        ]
+      },
+      "repeated": {
+        "hat": "coroa-flores",
+        "tickets": 82,
+        "owned": true,
+        "focused": "coroa-flores",
+        "keys": [
+          {
+            "key": " ",
+            "repeat": false,
+            "id": "lenco-chita"
+          },
+          {
+            "key": " ",
+            "repeat": true,
+            "id": "lenco-chita"
+          },
+          {
+            "key": " ",
+            "repeat": false,
+            "id": "palha-furada"
+          },
+          {
+            "key": "Enter",
+            "repeat": false,
+            "id": "coroa-flores"
+          },
+          {
+            "key": "Enter",
+            "repeat": true,
+            "id": "coroa-flores"
+          }
+        ]
+      },
+      "released": {
+        "hat": "coroa-flores",
+        "tickets": 82,
+        "owned": true,
+        "focused": "coroa-flores",
+        "keys": [
+          {
+            "key": " ",
+            "repeat": false,
+            "id": "lenco-chita"
+          },
+          {
+            "key": " ",
+            "repeat": true,
+            "id": "lenco-chita"
+          },
+          {
+            "key": " ",
+            "repeat": false,
+            "id": "palha-furada"
+          },
+          {
+            "key": "Enter",
+            "repeat": false,
+            "id": "coroa-flores"
+          },
+          {
+            "key": "Enter",
+            "repeat": true,
+            "id": "coroa-flores"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -48,8 +48,10 @@
       }
       const sheet = bundle.fires[String(level)];
       const frame = Math.floor(now / 1000 * sheet.fps) % sheet.frames;
-      base.sprite(sheet, frame, fx - sheet.w / 2, fy - sheet.h + 4);
+      const top = fy - sheet.h + 4;
+      base.sprite(sheet, frame, fx - sheet.w / 2, top);
       if (info.heat > 30 && Math.floor(now / 90) % 3 === 0) base.spawn('faisca', fx + ((now % 17) - 8), fy - sheet.h * 0.7, now);
+      return top;
     }
 
     function drawStick(slot, stick, info, now) {
@@ -117,10 +119,11 @@
       // Os dois espectadores nos bancos (pulam de alegria quando alguém pula a fogueira).
       const small = bundle.scenery.mandioquinha;
       [[14, 68], [158, 70]].forEach(([x, y], i) => base.sprite(small, Math.floor(now / 600 + i) % 2, x, y - small.h - (jump && now - jump.t0 < 900 ? Math.abs(Math.sin(now / 90)) * 5 : 0), { flip: i === 1 }));
-      base.region('fogo', meta.fogo[0] - 26, meta.fogo[1] - 40, 52, 46, { tip: info.canJump ? tr('mini.fogueira.tipFire')
-        : info.heat < engine.data.minis.fogueira.jumpMinHeat ? tr('mini.fogueira.tipFireCold') : tr('mini.fogueira.tipFireWait', { n: Math.ceil(info.jumpWait) }) });
       // O fogo primeiro e os espetos por cima: a comida assando fica na frente das chamas, não escondida atrás delas.
-      drawFire(info, now);
+      const fireTop = drawFire(info, now);
+      const hitTop = Math.min(meta.fogo[1] - 40, fireTop ?? meta.fogo[1] - 40);
+      base.region('fogo', meta.fogo[0] - 26, hitTop, 52, meta.fogo[1] + 6 - hitTop, { tip: info.canJump ? tr('mini.fogueira.tipFire')
+        : info.heat < engine.data.minis.fogueira.jumpMinHeat ? tr('mini.fogueira.tipFireCold') : tr('mini.fogueira.tipFireWait', { n: Math.ceil(info.jumpWait) }) });
       info.sticks.forEach((stick, slot) => drawStick(slot, stick, info, now));
       // Quem pula passa por cima do fogo.
       if (jump) {

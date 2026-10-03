@@ -19,7 +19,17 @@
   function create(canvas, bundle, { onThrow, onEnd, onLand = () => {} }) {
     const text = root.ArraiaFesta.pixelText;
     const images = {};
-    const load = (name, src) => { const image = new Image(); image.src = src; images[name] = image; };
+    const ready = image => image && image.complete !== false && image.width > 0;
+    const load = (name, src) => {
+      const image = new Image();
+      image.onerror = () => {
+        const blank = document.createElement('canvas');
+        blank.width = blank.height = 1;
+        images[name] = blank;
+      };
+      images[name] = image;
+      image.src = src;
+    };
     for (const key of ['fundo', 'garrafa', 'argola']) load(key, bundle.images[bundle.rings[key].image]);
     for (const key of ['fichas', 'animacao', 'lenha', 'presente']) load(key, bundle.icons[`ui:${key}`].src);
     const meta = bundle.rings;
@@ -53,6 +63,10 @@
 
     // A argola só encaixa se passar pela boca da garrafa: a folga vem do prêmio (garrafa de boca larga, mira fina).
     function throwRing(now) {
+      // O clique pode chegar depois do pouso e antes do desenho seguinte.
+      const before = game;
+      update(now);
+      if (game !== before) return false;
       if (!game || game.phase !== 'mirando') return false;
       const current = game;
       const x = ringX(now);
@@ -80,7 +94,7 @@
       }
       const iconName = { fichas: 'fichas', animacao: 'animacao', lenha: 'lenha', item: 'presente' }[prize.kind];
       const image = images[iconName];
-      if (image.complete) g.drawImage(image, Math.round(x - image.width / 2), y);
+      if (ready(image)) g.drawImage(image, Math.round(x - image.width / 2), y);
       const label = prize.kind === 'animacao' ? `X${prize.factor}` : prize.kind === 'item' ? '?' : `+${prize.amount}`;
       text(g, label, x, y + 12, '#fff4e4');
     }
@@ -112,7 +126,7 @@
         game.endAt = landedAt + 700;
       } else {
         game.phase = 'mirando';
-        game.aimFrom = now;
+        game.aimFrom = landedAt;
       }
       onLand(result);
     }
@@ -123,7 +137,7 @@
         game.ended = true;
         onEnd();
       }
-      if (!images.fundo.complete) return;
+      if (!ready(images.fundo)) return;
       g.clearRect(0, 0, W, H);
       g.drawImage(images.fundo, 0, 0);
       const bottle = meta.garrafa;

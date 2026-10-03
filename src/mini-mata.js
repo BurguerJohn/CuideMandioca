@@ -5,7 +5,7 @@
   'use strict';
 
   // Mata Encantada: um auto battler. A Mandioca enfrenta criaturas do folclore em etapas de `battles` batalhas mais um chefe, uma
-  // atrás da outra e sem ninguém mandar. Os quatro atributos da loja viram os status dela (Rebolado: Ataque, Fôlego: Vida, Refresco:
+  // atrás da outra, enquanto a janela está visível. Os quatro atributos da loja viram os status dela (Rebolado: Ataque, Fôlego: Vida, Refresco:
   // Defesa e descanso entre as batalhas, Ritmo: velocidade), a Barriga mexe na Vida e o Amor no Ataque, e um bicho do Quintal pode
   // acompanhar (o laço dele dá bônus em tudo). A batalha em andamento não vai para o save (volta ao começo da batalha); o que vai é
   // a etapa, o recorde, as vitórias e as criaturas derrotadas. Configuração e criaturas em `data.minis.mata`.
@@ -22,6 +22,7 @@
     let ahead = 0;
     let seq = 0;
     let uid = 0;
+    let isVisible = () => false;
     const events = [];
 
     const cfg = () => tools.cfg();
@@ -295,17 +296,19 @@
 
     // Depois da comemoração: a próxima batalha, ou a próxima etapa se acabou o chefe (a etapa só avança sozinha na primeira vitória
     // sobre o chefe dela: quem está treinando numa etapa que já venceu repete a mesma).
+    function checkpoint() {
+      return { stage: fight.boss && fight.first ? fight.n + 1 : fight.n, battle: fight.boss ? 0 : fight.battle + 1 };
+    }
+
     function next() {
       const s = state();
       const k = cfg();
       const hero = fight.hero;
+      Object.assign(s, checkpoint());
       let fraction;
       if (fight.boss) {
-        if (fight.first) s.stage = fight.n + 1;
-        s.battle = 0;
         fraction = 1;
       } else {
-        s.battle++;
         fraction = hero.hp / hero.max + k.hero.restHeal + k.hero.restDef * hero.defense;
       }
       begin(Math.min(1, fraction));
@@ -338,12 +341,14 @@
       fresh() {
         fight = null;
         ahead = 0;
+        events.length = 0;
         return { stage: 1, battle: 0, best: 0, auto: true, companion: '', teimosia: 0, wins: 0, bosses: 0, defeats: 0, kills: {} };
       },
 
       load(raw) {
         fight = null;
         ahead = 0;
+        events.length = 0;
         const k = cfg();
         if (!raw) return this.fresh();
         const best = int(raw.best, 0, 1e6, 0);
@@ -359,9 +364,17 @@
           defeats: int(raw.defeats, 0, 1e9, 0), kills };
       },
 
-      // A batalha anda de `STEP` em `STEP` (o jogo chama a cada quadro, ou de segundo em segundo quando o tempo passa de uma vez).
+      // A vitória já foi paga: reabrir durante a comemoração começa na batalha seguinte.
+      save(saved) {
+        if (fight?.phase === 'win') Object.assign(saved, checkpoint());
+      },
+
+      // A visibilidade pertence à interface, não ao save nem à escolha de pausar no botão.
+      setVisibilityCheck(check) { isVisible = typeof check === 'function' ? check : () => false; },
+
+      // O tempo escondido não entra no acumulador: reabrir continua exatamente de onde a luta parou.
       tick(dt) {
-        if (!state().auto || !(dt > 0)) return;
+        if (!isVisible() || !state().auto || !(dt > 0)) return;
         ahead = Math.min(MAX_AHEAD, ahead + dt);
         while (ahead >= STEP) { ahead -= STEP; step(STEP); }
       },
@@ -378,8 +391,8 @@
         const sp = spec(s.stage);
         const f = fight;
         return {
-          stage: s.stage, best: s.best, battle: s.battle, battles: k.battles, boss: bossBattle(s.battle), name: sp.name, scene: sp.scene, lap: sp.lap,
-          auto: s.auto, teimosia: s.teimosia, wins: s.wins, bosses: s.bosses, defeats: s.defeats, kills: s.kills, seq,
+          stage: s.stage, best: s.best, battle: f ? f.battle : s.battle, battles: k.battles, boss: f ? f.boss : bossBattle(s.battle), name: sp.name, scene: sp.scene, lap: sp.lap,
+          auto: s.auto, paused: !s.auto || !isVisible(), teimosia: s.teimosia, wins: s.wins, bosses: s.bosses, defeats: s.defeats, kills: s.kills, seq,
           phase: f ? f.phase : 'intro', t: f ? f.t : 0, clock: f ? f.clock : 0,
           hero: f ? { hp: Math.max(0, f.hero.hp), max: f.hero.max, swing: clamp(1 - f.hero.cd / f.hero.interval, 0, 1), meter: f.hero.meter / k.specialEvery,
             acted: f.hero.acted, hurt: f.hero.hurt, special: f.hero.special,
@@ -407,6 +420,8 @@
         s.battle = 0;
         s.teimosia = 0;
         fight = null;
+        ahead = 0;
+        events.length = 0;
         return true;
       },
       step(delta) { return this.select(state().stage + delta); },

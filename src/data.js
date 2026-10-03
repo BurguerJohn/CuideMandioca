@@ -593,16 +593,19 @@ globalThis.GAME_DATA = {
     // com a regadora que volta a cada `waterEvery` s). A horta começa com `plotsStart` canteiros e ganha um a cada `plotEvery`
     // convidados depois da abertura, até `plotMax`. De tempos em tempos (`crowEvery` s) um corvo pousa num canteiro: se ninguém
     // espantar em `crowSeconds` s, ele come a planta (o Espantalho Galã num dos lados da festa afasta os corvos). A primeira colheita
-    // de cada planta rende `firstHarvest` a mais.
+    // de cada planta rende `firstHarvest` a mais e deixa para sempre `permanentPct`% de Animação (por planta: com as 5, +50%; fica de
+    // um ano para o outro). Toda colheita dá também o `buff` da planta por `buffMinutes` min (`kind`: `cheer` = Animação, `speed` =
+    // Ritmo, `recovery` = Refresco, `crit` = chance de “Olha a cobra!”; colher a mesma planta de novo recomeça a contagem dela e
+    // plantas diferentes somam). As plantas mais demoradas dão o bônus maior.
     horta: {
       plotsStart: 4, plotEvery: 10, plotMax: 10, waterMax: 5, waterEvery: 20, waterCut: 0.2, waterLimit: 2,
-      crowEvery: [480, 900], crowSeconds: 25, crowReward: { cheer: 40 }, firstHarvest: { tickets: 2 },
+      crowEvery: [480, 900], crowSeconds: 25, crowReward: { cheer: 40 }, firstHarvest: { tickets: 2 }, permanentPct: 10, buffMinutes: 10,
       crops: [
-        { id: 'milho', name: 'Milho', minutes: 4, reward: { tickets: 1, belly: 8 } },
-        { id: 'amendoim', name: 'Amendoim', minutes: 8, reward: { wood: 2, belly: 6 } },
-        { id: 'batata-doce', name: 'Batata-doce', minutes: 12, reward: { belly: 18, love: 2 } },
-        { id: 'mandioca', name: 'Mandioca', minutes: 15, reward: { cheer: 120, love: 3 } },
-        { id: 'abobora', name: 'Abóbora', minutes: 25, reward: { tickets: 3, cheer: 60 } }
+        { id: 'milho', name: 'Milho', minutes: 4, reward: { tickets: 1, belly: 8 }, buff: { kind: 'cheer', value: 0.1 } },
+        { id: 'amendoim', name: 'Amendoim', minutes: 8, reward: { wood: 2, belly: 6 }, buff: { kind: 'speed', value: 0.15 } },
+        { id: 'batata-doce', name: 'Batata-doce', minutes: 12, reward: { belly: 18, love: 2 }, buff: { kind: 'recovery', value: 0.5 } },
+        { id: 'mandioca', name: 'Mandioca', minutes: 15, reward: { cheer: 120, love: 3 }, buff: { kind: 'cheer', value: 0.25 } },
+        { id: 'abobora', name: 'Abóbora', minutes: 25, reward: { tickets: 3, cheer: 60 }, buff: { kind: 'crit', value: 0.15 } }
       ]
     },
 
@@ -674,7 +677,7 @@ globalThis.GAME_DATA = {
     },
 
     // Mata Encantada (convidado 50): um auto battler. A Mandioca enfrenta criaturas do folclore em etapas de `battles` batalhas mais
-    // um chefe (a batalha de um grupo de 1 a 4 criaturas), sozinha, uma atrás da outra. Os 4 atributos viram status (Rebolado: Ataque,
+    // um chefe (a batalha de um grupo de 1 a 4 criaturas), enquanto a janela está visível. Os 4 atributos viram status (Rebolado: Ataque,
     // Fôlego: Vida, Refresco: Defesa e o descanso entre as batalhas, Ritmo: velocidade), a Barriga mexe na Vida e o Amor no Ataque (de
     // -`moodPercent`% a +`moodPercent`%, e o Amor também aumenta a chance de acerto crítico) e um bicho do Quintal pode acompanhar:
     // todos dão o mesmo bônus em tudo (`petPercent`% no máximo), proporcional ao laço dele. Cada derrota seguida dá `teimosiaPercent`%
@@ -685,8 +688,8 @@ globalThis.GAME_DATA = {
     mata: {
       battles: 4, petPercent: 20, moodPercent: 20, teimosiaPercent: 3, teimosiaMax: 5, specialEvery: 8,
       hero: { hpBase: 40, hpPerLevel: 3, atkBase: 5, atkPerLevel: 0.7, intervalBase: 2, speedPerLevel: 0.02, minInterval: 0.4, defHalf: 150,
-        defMax: 0.6, restHeal: 0.35, restDef: 0.5, critBase: 0.05, critLove: 0.2, critMult: 2, specialMult: 1.6, specialHeal: 0.05 },
-      foe: { hp: 90, atk: 5.5, hpGrowth: 1.1, atkGrowth: 1.09, step: 0.08, bossHp: 4, bossAtk: 1.5, crowdShare: 0.6, escortShare: 0.5 },
+        defMax: 0.6, restHeal: 0.15, restDef: 0.2, critBase: 0.05, critLove: 0.2, critMult: 2, specialMult: 1.6, specialHeal: 0.05 },
+      foe: { hp: 150, atk: 9, hpGrowth: 1.18, atkGrowth: 1.16, step: 0.12, bossHp: 5, bossAtk: 1.8, crowdShare: 0.4, escortShare: 0.7 },
       reward: { cheer: 1.2, cheerPerStage: 0.12, bossMult: 3, love: 0.15, loveBoss: 0.6, firstClear: { tickets: 2, wood: 3 }, bossWood: 1,
         ticketEvery: 15, belly: 0.15, bellyBoss: 0.5 },
       creatures: [

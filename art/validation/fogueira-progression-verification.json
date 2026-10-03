@@ -1,0 +1,1884 @@
+{
+  "cases": [
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "pt-BR",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "en",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "milho",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "batata",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "linguica",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "normal",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "normal",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "perfect",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "perfect",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "overcooked",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "overcooked",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    },
+    {
+      "language": "es",
+      "foodId": "queijo",
+      "quality": "burnt",
+      "mode": "reload-cooking",
+      "passed": true,
+      "result": {
+        "foodsRemoved": 4,
+        "quality": "burnt",
+        "pausedSkewersPreserved": true,
+        "expiredFullnessRenewed": false
+      }
+    }
+  ],
+  "actions": 4464,
+  "reloads": 3147,
+  "newYears": 144,
+  "roasts": 432,
+  "discarded": 144,
+  "jumps": 288,
+  "ticks": 49266,
+  "failures": []
+}

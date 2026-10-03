@@ -1,0 +1,4314 @@
+{
+  "pid": 40116,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-40116-2LfHe0",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [
+    {
+      "sender": 1,
+      "state": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Mandioca",
+        "cheer": 99982.66275030143,
+        "tickets": 94,
+        "wood": 0,
+        "fame": 11.108508058159725,
+        "size": 200,
+        "ticketLevel": 1,
+        "year": 1,
+        "levels": {
+          "rebolado": 2,
+          "folego": 1,
+          "refresco": 1,
+          "ritmo": 1
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791026128778,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791034228776
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791023698778
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791023995604.8105
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791023968778
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791024328778
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791024418778
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791024868778
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791025528778
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791030628778
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791028828778
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791025078778
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791027028778
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 49.98812499999998,
+          "barriga": 49.984166666666695,
+          "at": 1791023432196,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791023432196,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "jegue": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "boi": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791023432196,
+            "bubbles": 0,
+            "bubbleAt": 1791023432196,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791023432196,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791024118779,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": null,
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 0,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 0,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {}
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 1791023432197,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 1791023673655.2385,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "fogos"
+        ],
+        "bornAt": 1791023428776,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": 2.155000000095367,
+          "size": 200
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791025228778,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 4,
+              "wood": 3
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 4,
+              "wood": 3
+            }
+          },
+          {
+            "type": "sacos",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 4,
+              "wood": 3
+            }
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791023848778
+        },
+        "rings": {
+          "cost": 1,
+          "nextAt": 0
+        },
+        "stats": {
+          "playtime": 3.156400000095367,
+          "steps": 3,
+          "cheerEarned": 18.66275030144098,
+          "cheerSpent": 36,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 0,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 1,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "primeira-prenda",
+          "primeiro-passo",
+          "regional",
+          "maior"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 2
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 2,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 2,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 51
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 52
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 53
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 54
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 55
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 56
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 57
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 58
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 59
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 60
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "ceu"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 61
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 62
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 63
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 64
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 65
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 66
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 67
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 68
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 69
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 70
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 71
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 72
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 73
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 74
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 75
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "bairro"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 76
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 77
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 78
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 79
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 80
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 81
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 82
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 83
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 84
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 85
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 86
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 87
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 88
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 89
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 90
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 91
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 92
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 93
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 94
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 95
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 96
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 97
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 98
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 99
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 100
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 0
+          },
+          {
+            "t": 2,
+            "type": "tier",
+            "tier": 4
+          },
+          {
+            "t": 2,
+            "type": "achievement",
+            "id": "maior"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 101
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 0
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 102
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 1
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 103
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 1
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 104
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 2
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 105
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 3
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 106
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 2
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 107
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 4
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 108
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 5
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 109
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 3
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 110
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 6
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 111
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 7
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 112
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 4
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 113
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 8
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 114
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 9
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 115
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 5
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 116
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 10
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 117
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 11
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 118
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 6
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 119
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 12
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 120
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 13
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 121
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 7
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 122
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 14
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 123
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 15
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 124
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 8
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 125
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 16
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 126
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 17
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 127
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 9
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 128
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 18
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 129
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 19
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 130
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 10
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 131
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 20
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 132
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 21
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 133
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 11
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 134
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 22
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 135
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 23
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 136
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 12
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 137
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 24
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 138
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 25
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 139
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 13
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 140
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 26
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 141
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 27
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 142
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 14
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 143
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 28
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 144
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 29
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 145
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 15
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 146
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 30
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 147
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 31
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 148
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 16
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 149
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 32
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 150
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 33
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 151
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 17
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 152
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 34
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 153
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 35
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 154
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 18
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 155
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 36
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 156
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 37
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 157
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 19
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 158
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 38
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 159
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 39
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 160
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 20
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 161
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 40
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 162
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 41
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 163
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 21
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 164
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 42
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 165
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 43
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 166
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 22
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 167
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 44
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 168
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 45
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 169
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 23
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 170
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 46
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 171
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 47
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 172
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 24
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 173
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 48
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 174
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 49
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 175
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 25
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 176
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 50
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 177
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 51
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 178
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 26
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 179
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 52
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 180
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 53
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 181
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 27
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 182
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 54
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 183
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 55
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 184
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 28
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 185
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 56
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 186
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 57
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 187
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 29
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 188
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 58
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 189
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 59
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 190
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 30
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 191
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 60
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 192
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 61
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 193
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 31
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 194
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 62
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 195
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 63
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 196
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 32
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 197
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 64
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 198
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 65
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 199
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 33
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 200
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 66
+          }
+        ],
+        "runtime": {
+          "stamina": 5,
+          "dancing": true,
+          "lift": 0.1464000000953675,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 11.108508058159725,
+          "dance": "forro",
+          "danceLeft": 7,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791023709523.068,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791023432197
+      },
+      "disk": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Mandioca",
+        "cheer": 99982.66275030143,
+        "tickets": 94,
+        "wood": 0,
+        "fame": 11.108508058159725,
+        "size": 200,
+        "ticketLevel": 1,
+        "year": 1,
+        "levels": {
+          "rebolado": 2,
+          "folego": 1,
+          "refresco": 1,
+          "ritmo": 1
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791026128778,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791034228776
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791023698778
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791023995604.8105
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791023968778
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791024328778
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791024418778
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791024868778
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791025528778
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791030628778
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791028828778
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791025078778
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791027028778
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 49.98812499999998,
+          "barriga": 49.984166666666695,
+          "at": 1791023432196,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791023432196,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "jegue": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "boi": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791023432196,
+            "bubbles": 0,
+            "bubbleAt": 1791023432196,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791023432196,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791024118779,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": null,
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 0,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 0,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {}
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 1791023432197,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 1791023673655.2385,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "fogos"
+        ],
+        "bornAt": 1791023428776,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": 2.155000000095367,
+          "size": 200
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791025228778,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 4,
+              "wood": 3
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 4,
+              "wood": 3
+            }
+          },
+          {
+            "type": "sacos",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 4,
+              "wood": 3
+            }
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791023848778
+        },
+        "rings": {
+          "cost": 1,
+          "nextAt": 0
+        },
+        "stats": {
+          "playtime": 3.156400000095367,
+          "steps": 3,
+          "cheerEarned": 18.66275030144098,
+          "cheerSpent": 36,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 0,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 1,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "primeira-prenda",
+          "primeiro-passo",
+          "regional",
+          "maior"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 2
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 2,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 2,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 51
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 52
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 53
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 54
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 55
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 56
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 57
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 58
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 59
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 60
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "ceu"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 61
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 62
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 63
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 64
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 65
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 66
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 67
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 68
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 69
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 70
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 71
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 72
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 73
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 74
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 75
+          },
+          {
+            "t": 2,
+            "type": "mini",
+            "id": "bairro"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 76
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 77
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 78
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 79
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 80
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 81
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 82
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 83
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 84
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 85
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 86
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 87
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 88
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 89
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 90
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 91
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 92
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 93
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 94
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 95
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 96
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 97
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 98
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 99
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 100
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 0
+          },
+          {
+            "t": 2,
+            "type": "tier",
+            "tier": 4
+          },
+          {
+            "t": 2,
+            "type": "achievement",
+            "id": "maior"
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 101
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 0
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 102
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 1
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 103
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 1
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 104
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 2
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 105
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 3
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 106
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 2
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 107
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 4
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 108
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 5
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 109
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 3
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 110
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 6
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 111
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 7
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 112
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 4
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 113
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 8
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 114
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 9
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 115
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 5
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 116
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 10
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 117
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 11
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 118
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 6
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 119
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 12
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 120
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 13
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 121
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 7
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 122
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 14
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 123
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 15
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 124
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 8
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 125
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 16
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 126
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 17
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 127
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 9
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 128
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 18
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 129
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 19
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 130
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 10
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 131
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 20
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 132
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 21
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 133
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 11
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 134
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 22
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 135
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 23
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 136
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 12
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 137
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 24
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 138
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 25
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 139
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 13
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 140
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 26
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 141
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 27
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 142
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 14
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 143
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 28
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 144
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 29
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 145
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 15
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 146
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 30
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 147
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 31
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 148
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 16
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 149
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 32
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 150
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 33
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 151
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 17
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 152
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 34
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 153
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 35
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 154
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 18
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 155
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 36
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 156
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 37
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 157
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 19
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 158
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 38
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 159
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 39
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 160
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 20
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 161
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 40
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 162
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 41
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 163
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 21
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 164
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 42
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 165
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 43
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 166
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 22
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 167
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 44
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 168
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 45
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 169
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 23
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 170
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 46
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 171
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 47
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 172
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 24
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 173
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 48
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 174
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 49
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 175
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 25
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 176
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 50
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 177
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 51
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 178
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 26
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 179
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 52
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 180
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 53
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 181
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 27
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 182
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 54
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 183
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 55
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 184
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 28
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 185
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 56
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 186
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 57
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 187
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 29
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 188
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 58
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 189
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 59
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 190
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 30
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 191
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 60
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 192
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 61
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 193
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 31
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 194
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 62
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 195
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 63
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 196
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 32
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 197
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 64
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 198
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 65
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 199
+          },
+          {
+            "t": 2,
+            "type": "casa-comodo",
+            "room": 33
+          },
+          {
+            "t": 2,
+            "type": "size",
+            "size": 200
+          },
+          {
+            "t": 2,
+            "type": "casa-morador",
+            "index": 66
+          }
+        ],
+        "runtime": {
+          "stamina": 5,
+          "dancing": true,
+          "lift": 0.1464000000953675,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 11.108508058159725,
+          "dance": "forro",
+          "danceLeft": 7,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791023709523.068,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791023432197
+      }
+    }
+  ],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "casa",
+    "scrolling": true
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Error: O conteúdo não precisa rolar: casa {\"width\":1104,\"height\":819,\"clientHeight\":622,\"scrollHeight\":622,\"canvas\":\"622.4px\",\"hidden\":false,\"house\":{\"open\":true,\"level\":200,\"rooms\":34,\"residents\":67,\"complete\":false}}\n    at <anonymous>:36:61\n    at async <anonymous>:2:42\n\nfalse !== true\n\n    at pageEval (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:161:14)\n    at async C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:164:22"
+}

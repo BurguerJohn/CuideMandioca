@@ -1,0 +1,491 @@
+{
+  "pid": 54256,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-54256-wXYlOz",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "bichos",
+    "scrolling": false,
+    "canvas": false,
+    "area": "",
+    "dragLimit": true,
+    "limitEdge": "bottom",
+    "pointerType": "touch",
+    "prepared": {
+      "point": {
+        "x": 855,
+        "y": 619
+      },
+      "touchAction": "none",
+      "expectedDrag": "mini",
+      "scrollAxis": "y",
+      "limitBound": {
+        "key": "bottom",
+        "value": 6
+      },
+      "viewport": {
+        "width": 1104,
+        "height": 819,
+        "dpr": 1.25
+      },
+      "delta": {
+        "x": 0,
+        "y": 184
+      },
+      "scrollHeight": 23,
+      "clientHeight": 22
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 784,
+      "top": 602,
+      "bottom": 10,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 784,
+      "top": 602,
+      "bottom": 10,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "mini",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6603,
+          "x": 855,
+          "y": 619,
+          "button": 0,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6603.700000047684,
+          "x": 855,
+          "y": 619,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "firstMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 784,
+      "top": 606,
+      "bottom": 6,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "mini",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6603,
+          "x": 855,
+          "y": 619,
+          "button": 0,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6603.700000047684,
+          "x": 855,
+          "y": 619,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11606.200000047684,
+          "x": 855,
+          "y": 803,
+          "button": -1,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11606.900000095367,
+          "x": 855,
+          "y": 803,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false,
+            "dx": 231,
+            "dy": 6
+          }
+        }
+      }
+    },
+    "lastMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 784,
+      "top": 586,
+      "bottom": 26,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "mini",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6603,
+          "x": 855,
+          "y": 619,
+          "button": 0,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6603.700000047684,
+          "x": 855,
+          "y": 619,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11606.200000047684,
+          "x": 855,
+          "y": 803,
+          "button": -1,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11606.900000095367,
+          "x": 855,
+          "y": 803,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16612.599999904633,
+          "x": 855,
+          "y": 783,
+          "button": -1,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16613.200000047684,
+          "x": 855,
+          "y": 783,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false,
+            "dx": 231,
+            "dy": 26
+          }
+        }
+      }
+    },
+    "ended": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 784,
+      "top": 586,
+      "bottom": 26,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6603,
+          "x": 855,
+          "y": 619,
+          "button": 0,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6603.700000047684,
+          "x": 855,
+          "y": 619,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11606.200000047684,
+          "x": 855,
+          "y": 803,
+          "button": -1,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11606.900000095367,
+          "x": 855,
+          "y": 803,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16612.599999904633,
+          "x": 855,
+          "y": 783,
+          "button": -1,
+          "buttons": 1,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16613.200000047684,
+          "x": 855,
+          "y": 783,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointerup",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 20621,
+          "x": 855,
+          "y": 783,
+          "button": 0,
+          "buttons": 0,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchend",
+          "trusted": true,
+          "at": 20623.200000047684,
+          "x": 855,
+          "y": 783,
+          "target": "H2",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false,
+            "dx": 231,
+            "dy": 26
+          }
+        }
+      }
+    },
+    "saved": {
+      "minis": {
+        "bichos": {
+          "hidden": false,
+          "dx": 231,
+          "dy": 26
+        }
+      }
+    }
+  }
+}

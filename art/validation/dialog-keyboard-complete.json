@@ -1,0 +1,37 @@
+{
+  "pid": 42452,
+  "electron": "44.4.5",
+  "letter": {
+    "visible": true,
+    "focused": true,
+    "active": "janela",
+    "letters": 1,
+    "left": 3,
+    "documentFocused": true
+  },
+  "afterSpace": {
+    "left": 3,
+    "visible": true
+  },
+  "letterTab": {
+    "inside": true,
+    "action": "fechar-janela"
+  },
+  "letterClosed": true,
+  "year": {
+    "focused": true,
+    "year": 1,
+    "visible": true,
+    "active": "janela"
+  },
+  "repeatedEnter": {
+    "year": 1,
+    "visible": true
+  },
+  "yearTab": {
+    "inside": true,
+    "action": "ano-novo-sim"
+  },
+  "escaped": true,
+  "errors": []
+}

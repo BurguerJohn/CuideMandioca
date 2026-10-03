@@ -1,0 +1,127 @@
+{
+  "cases": [
+    {
+      "mode": "normal",
+      "operation": "mkdir",
+      "written": false,
+      "error": "mkdir indisponível",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "normal",
+      "operation": "stat",
+      "written": true,
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 200
+    },
+    {
+      "mode": "normal",
+      "operation": "read",
+      "written": true,
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 200
+    },
+    {
+      "mode": "normal",
+      "operation": "copy",
+      "written": true,
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 200
+    },
+    {
+      "mode": "normal",
+      "operation": "backup-rename",
+      "written": true,
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 200
+    },
+    {
+      "mode": "normal",
+      "operation": "write",
+      "written": false,
+      "error": "write interrompido",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "normal",
+      "operation": "primary-rename",
+      "written": false,
+      "error": "rename indisponível",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "recovered",
+      "operation": "mkdir",
+      "written": false,
+      "error": "mkdir indisponível",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "recovered",
+      "operation": "stat",
+      "written": false,
+      "error": "stat indisponível",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "recovered",
+      "operation": "read",
+      "written": false,
+      "error": "leitura indisponível",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "recovered",
+      "operation": "copy",
+      "written": false,
+      "error": "copy interrompido",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "recovered",
+      "operation": "backup-rename",
+      "written": false,
+      "error": "rename indisponível",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "recovered",
+      "operation": "write",
+      "written": false,
+      "error": "write interrompido",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    },
+    {
+      "mode": "recovered",
+      "operation": "primary-rename",
+      "written": false,
+      "error": "rename indisponível",
+      "faultHits": 1,
+      "retryErrors": [],
+      "fallbackCheer": 100
+    }
+  ],
+  "failures": []
+}

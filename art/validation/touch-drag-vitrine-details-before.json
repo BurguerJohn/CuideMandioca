@@ -1,0 +1,190 @@
+{
+  "pid": 51752,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-51752-cRPoBF",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "vitrine",
+    "scrolling": false,
+    "canvas": false,
+    "area": "details",
+    "prepared": {
+      "point": {
+        "x": 1020,
+        "y": 587
+      },
+      "touchAction": "auto",
+      "expectedDrag": "vitrine",
+      "scrollAxis": "x",
+      "viewport": {
+        "width": 1104,
+        "height": 819,
+        "dpr": 1.25
+      },
+      "delta": {
+        "x": -50,
+        "y": 0
+      },
+      "scrollHeight": 30,
+      "clientHeight": 30
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 350,
+      "top": 371.0400085449219,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [],
+      "prefs": null
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 350,
+      "top": 371.0400085449219,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": "vitrine",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6327.599999904633,
+          "x": 1020,
+          "y": 587,
+          "button": 0,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "vitrine",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6328.299999952316,
+          "x": 1020,
+          "y": 587,
+          "target": "DIV",
+          "owner": "vitrine",
+          "connected": true
+        }
+      ],
+      "prefs": null
+    },
+    "firstMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 330,
+      "top": 371.0400085449219,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6327.599999904633,
+          "x": 1020,
+          "y": 587,
+          "button": 0,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "vitrine",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6328.299999952316,
+          "x": 1020,
+          "y": 587,
+          "target": "DIV",
+          "owner": "vitrine",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11329.799999952316,
+          "x": 1000,
+          "y": 587,
+          "button": -1,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "vitrine",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11330.299999952316,
+          "x": 1000,
+          "y": 587,
+          "target": "DIV",
+          "owner": "vitrine",
+          "connected": true
+        },
+        {
+          "type": "pointercancel",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11334.200000047684,
+          "x": 0,
+          "y": 0,
+          "button": 0,
+          "buttons": 0,
+          "target": "DIV",
+          "owner": "vitrine",
+          "connected": true
+        }
+      ],
+      "prefs": null
+    }
+  },
+  "error": "AssertionError [ERR_ASSERTION]: o evento nativo chegou à página: pointermove\n    at touch (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:260:14)\n    at async C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:282:5"
+}

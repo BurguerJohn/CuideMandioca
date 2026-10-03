@@ -44,6 +44,20 @@ test('mudanças parciais só alteram as chaves conhecidas', () => {
   assert.equal(mergeSettings(next, { placa: null }).placa, null);
 });
 
+test('entradas inválidas de minis não ocupam o limite nem descartam posições válidas', () => {
+  const invalid = Object.fromEntries(Array.from({ length: 32 }, (_, index) => [`Entrada inválida ${index}`, { hidden: false }]));
+  const raw = { minis: { ...invalid, bichos: { hidden: false, dx: 123.4, dy: -42.2 } } };
+  const expected = { bichos: { hidden: false, dx: 123, dy: -42 } };
+  assert.deepEqual(normalizeSettings(raw).minis, expected, 'a janela visível no save mantém sua posição');
+  assert.deepEqual(mergeSettings(normalizeSettings(null), raw).minis, expected, 'atualizações usam o mesmo saneamento');
+
+  const manyValid = Object.fromEntries(Array.from({ length: 33 }, (_, index) => [`janela-${index}`, { hidden: false }]));
+  const bounded = normalizeSettings({ minis: { ...invalid, ...manyValid } }).minis;
+  assert.equal(Object.keys(bounded).length, 32, 'o limite continua valendo para entradas válidas');
+  assert.equal(Object.hasOwn(bounded, 'janela-31'), true);
+  assert.equal(Object.hasOwn(bounded, 'janela-32'), false);
+});
+
 test('monitor escolhido some e a festa volta para o principal', () => {
   const primary = { id: 1 };
   assert.equal(pickDisplay([primary, { id: 2 }], 2, primary).id, 2);

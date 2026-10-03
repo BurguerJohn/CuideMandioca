@@ -1,0 +1,8437 @@
+{
+  "pid": 15980,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-15980-vUKYaZ",
+  "activeRounds": true,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [
+    {
+      "language": "en",
+      "before": {
+        "name": "Troca 0",
+        "tickets": 94,
+        "year": 1,
+        "interrupted": {
+          "cost": 1,
+          "mataCheckpoint": {
+            "stage": 1,
+            "battle": 1,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 1,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 1
+            }
+          },
+          "palcoShows": 0,
+          "palcoStars": 0,
+          "palcoBest": {},
+          "liveMataPhase": "win",
+          "livePalco": true
+        },
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        }
+      },
+      "after": {
+        "name": "Troca 0",
+        "tickets": 95,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        },
+        "language": "en",
+        "choice": "en",
+        "settingsOpen": true,
+        "shopOpen": true,
+        "zoom": 0.5
+      },
+      "requestPhase": "closing",
+      "oldDestroyed": true
+    },
+    {
+      "language": "es",
+      "before": {
+        "name": "Troca 1",
+        "tickets": 94,
+        "year": 1,
+        "interrupted": {
+          "cost": 2,
+          "mataCheckpoint": {
+            "stage": 1,
+            "battle": 2,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 2,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 2
+            }
+          },
+          "palcoShows": 0,
+          "palcoStars": 0,
+          "palcoBest": {},
+          "liveMataPhase": "win",
+          "livePalco": true
+        },
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        }
+      },
+      "after": {
+        "name": "Troca 1",
+        "tickets": 96,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        },
+        "language": "es",
+        "choice": "es",
+        "settingsOpen": true,
+        "shopOpen": true,
+        "zoom": 0.5
+      },
+      "requestPhase": "closing",
+      "oldDestroyed": true
+    },
+    {
+      "language": "pt-BR",
+      "before": {
+        "name": "Troca 2",
+        "tickets": 93,
+        "year": 1,
+        "interrupted": {
+          "cost": 4,
+          "mataCheckpoint": {
+            "stage": 1,
+            "battle": 3,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 3,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 3
+            }
+          },
+          "palcoShows": 0,
+          "palcoStars": 0,
+          "palcoBest": {},
+          "liveMataPhase": "win",
+          "livePalco": true
+        },
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        }
+      },
+      "after": {
+        "name": "Troca 2",
+        "tickets": 97,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        },
+        "language": "pt-BR",
+        "choice": "pt-BR",
+        "settingsOpen": true,
+        "shopOpen": true,
+        "zoom": 0.5
+      },
+      "requestPhase": "closing",
+      "oldDestroyed": true
+    }
+  ],
+  "errors": [],
+  "saves": [
+    {
+      "sender": 1,
+      "state": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 0",
+        "cheer": 999999915715.8789,
+        "tickets": 94,
+        "wood": 0,
+        "fame": 439.8788573232921,
+        "size": 50,
+        "ticketLevel": 2,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.141072916666644,
+          "barriga": 49.83809722222223,
+          "at": 1791034565669,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034565669,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034565669,
+            "bubbles": 0,
+            "bubbleAt": 1791034565669,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034565669,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": {
+              "song": "xote",
+              "startAt": 1791034565541,
+              "notes": [
+                {
+                  "t": 2200,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 2500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 2800,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 3700,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4000,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 4600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4900,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 5500,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 6400,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 6700,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 7300,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 7600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 8200,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 8500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 9100,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 9400,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 10000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 10600,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10900,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 11200,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12100,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12700,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 13600,
+                  "lane": 2,
+                  "state": null
+                }
+              ],
+              "combo": 0,
+              "maxCombo": 0,
+              "score": 0,
+              "practice": false
+            },
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 1,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 1,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 1
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 2,
+          "nextAt": 1791035165661,
+          "held": 1
+        },
+        "stats": {
+          "playtime": 2.310900000095368,
+          "steps": 4,
+          "cheerEarned": 439.8788573232921,
+          "cheerSpent": 84760,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 1,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 1
+          }
+        ],
+        "runtime": {
+          "stamina": 62,
+          "dancing": true,
+          "lift": 0.30268300017833727,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.98571320875,
+          "dance": "forro",
+          "danceLeft": 6,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034848656.514,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034565673
+      },
+      "disk": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 0",
+        "cheer": 999999915715.8789,
+        "tickets": 94,
+        "wood": 0,
+        "fame": 439.8788573232921,
+        "size": 50,
+        "ticketLevel": 2,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.141072916666644,
+          "barriga": 49.83809722222223,
+          "at": 1791034565669,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034565669,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034565669,
+            "bubbles": 0,
+            "bubbleAt": 1791034565669,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034565669,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": {
+              "song": "xote",
+              "startAt": 1791034565541,
+              "notes": [
+                {
+                  "t": 2200,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 2500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 2800,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 3700,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4000,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 4600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4900,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 5500,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 6400,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 6700,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 7300,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 7600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 8200,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 8500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 9100,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 9400,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 10000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 10600,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10900,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 11200,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12100,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12700,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 13600,
+                  "lane": 2,
+                  "state": null
+                }
+              ],
+              "combo": 0,
+              "maxCombo": 0,
+              "score": 0,
+              "practice": false
+            },
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 1,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 1,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 1
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 2,
+          "nextAt": 1791035165661,
+          "held": 1
+        },
+        "stats": {
+          "playtime": 2.310900000095368,
+          "steps": 4,
+          "cheerEarned": 439.8788573232921,
+          "cheerSpent": 84760,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 1,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 1
+          }
+        ],
+        "runtime": {
+          "stamina": 62,
+          "dancing": true,
+          "lift": 0.30268300017833727,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.98571320875,
+          "dance": "forro",
+          "danceLeft": 6,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034848656.514,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034565673
+      }
+    },
+    {
+      "sender": 2,
+      "state": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 1",
+        "cheer": 999999916050.7126,
+        "tickets": 94,
+        "wood": 0,
+        "fame": 879.7126098384399,
+        "size": 50,
+        "ticketLevel": 3,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.282656249999974,
+          "barriga": 49.676875000000024,
+          "at": 1791034568093,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034568117,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034568077,
+            "bubbles": 0,
+            "bubbleAt": 1791034568077,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034568077,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": {
+              "song": "xote",
+              "startAt": 1791034568093,
+              "notes": [
+                {
+                  "t": 2200,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 2500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 2800,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 3700,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4000,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 4600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4900,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 5500,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 6400,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 6700,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 7300,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 7600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 8200,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 8500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 9100,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 9400,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 10000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 10600,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10900,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 11200,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12100,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12700,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 13600,
+                  "lane": 2,
+                  "state": null
+                }
+              ],
+              "combo": 0,
+              "maxCombo": 0,
+              "score": 0,
+              "practice": false
+            },
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 2,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 2,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 2
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "argolas"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 4,
+          "nextAt": 1791035168110,
+          "held": 2
+        },
+        "stats": {
+          "playtime": 4.52410000023842,
+          "steps": 8,
+          "cheerEarned": 879.7126098384399,
+          "cheerSpent": 84865,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 2,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 2,
+            "until": 5
+          }
+        ],
+        "runtime": {
+          "stamina": 62,
+          "dancing": true,
+          "lift": 0.1386840002675056,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.97827936887502,
+          "dance": "forro",
+          "danceLeft": 6,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034764422.355,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034568124
+      },
+      "disk": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 1",
+        "cheer": 999999916050.7126,
+        "tickets": 94,
+        "wood": 0,
+        "fame": 879.7126098384399,
+        "size": 50,
+        "ticketLevel": 3,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.282656249999974,
+          "barriga": 49.676875000000024,
+          "at": 1791034568093,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034568117,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034568077,
+            "bubbles": 0,
+            "bubbleAt": 1791034568077,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034568077,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": {
+              "song": "xote",
+              "startAt": 1791034568093,
+              "notes": [
+                {
+                  "t": 2200,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 2500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 2800,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 3700,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4000,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 4600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4900,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 5500,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 6400,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 6700,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 7300,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 7600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 8200,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 8500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 9100,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 9400,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 10000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 10600,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10900,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 11200,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12100,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12700,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 13600,
+                  "lane": 2,
+                  "state": null
+                }
+              ],
+              "combo": 0,
+              "maxCombo": 0,
+              "score": 0,
+              "practice": false
+            },
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 2,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 2,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 2
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "argolas"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 4,
+          "nextAt": 1791035168110,
+          "held": 2
+        },
+        "stats": {
+          "playtime": 4.52410000023842,
+          "steps": 8,
+          "cheerEarned": 879.7126098384399,
+          "cheerSpent": 84865,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 2,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 2,
+            "until": 5
+          }
+        ],
+        "runtime": {
+          "stamina": 62,
+          "dancing": true,
+          "lift": 0.1386840002675056,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.97827936887502,
+          "dance": "forro",
+          "danceLeft": 6,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034764422.355,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034568124
+      }
+    },
+    {
+      "sender": 3,
+      "state": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 1",
+        "cheer": 999999916266.6349,
+        "tickets": 96,
+        "wood": 0,
+        "fame": 1095.6349512781899,
+        "size": 50,
+        "ticketLevel": 3,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.27476388888885,
+          "barriga": 49.66635185185188,
+          "at": 1791034570366,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034570366,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034570366,
+            "bubbles": 0,
+            "bubbleAt": 1791034570366,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034570366,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": null,
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 2,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 2,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 2
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "argolas"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            },
+            "notified": true
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 4,
+          "nextAt": 1791035168110
+        },
+        "stats": {
+          "playtime": 6.568800000286102,
+          "steps": 11,
+          "cheerEarned": 1095.6349512781899,
+          "cheerSpent": 84865,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 2,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo",
+          "mil"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 2,
+            "until": 5
+          },
+          {
+            "t": 6,
+            "type": "achievement",
+            "id": "mil"
+          }
+        ],
+        "runtime": {
+          "stamina": 63,
+          "dancing": true,
+          "lift": 0.823589000089169,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.97232996387501,
+          "dance": "forro",
+          "danceLeft": 7,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034849881.8442,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034570366
+      },
+      "disk": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 1",
+        "cheer": 999999916266.6349,
+        "tickets": 96,
+        "wood": 0,
+        "fame": 1095.6349512781899,
+        "size": 50,
+        "ticketLevel": 3,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.27476388888885,
+          "barriga": 49.66635185185188,
+          "at": 1791034570366,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034570366,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034570366,
+            "bubbles": 0,
+            "bubbleAt": 1791034570366,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034570366,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": null,
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 2,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 2,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 2
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "argolas"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            },
+            "notified": true
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 4,
+          "nextAt": 1791035168110
+        },
+        "stats": {
+          "playtime": 6.568800000286102,
+          "steps": 11,
+          "cheerEarned": 1095.6349512781899,
+          "cheerSpent": 84865,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 2,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo",
+          "mil"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 2,
+            "until": 5
+          },
+          {
+            "t": 6,
+            "type": "achievement",
+            "id": "mil"
+          }
+        ],
+        "runtime": {
+          "stamina": 63,
+          "dancing": true,
+          "lift": 0.823589000089169,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.97232996387501,
+          "dance": "forro",
+          "danceLeft": 7,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034849881.8442,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034570366
+      }
+    },
+    {
+      "sender": 3,
+      "state": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 2",
+        "cheer": 999999916340.5024,
+        "tickets": 93,
+        "wood": 0,
+        "fame": 1319.5025888694472,
+        "size": 50,
+        "ticketLevel": 4,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.42412499999996,
+          "barriga": 49.51550000000003,
+          "at": 1791034570550,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034570573,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034570534,
+            "bubbles": 0,
+            "bubbleAt": 1791034570534,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034570534,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": {
+              "song": "xote",
+              "startAt": 1791034570550,
+              "notes": [
+                {
+                  "t": 2200,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 2500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 2800,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 3700,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4000,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 4600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4900,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 5500,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 6400,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 6700,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 7300,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 7600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 8200,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 8500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 9100,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 9400,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 10000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 10600,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10900,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 11200,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12100,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12700,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 13600,
+                  "lane": 2,
+                  "state": null
+                }
+              ],
+              "combo": 0,
+              "maxCombo": 0,
+              "score": 0,
+              "practice": false
+            },
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 3,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 3,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 3
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "argolas"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            },
+            "notified": true
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 8,
+          "nextAt": 1791035170566,
+          "held": 4
+        },
+        "stats": {
+          "playtime": 6.736300000143051,
+          "steps": 12,
+          "cheerEarned": 1319.5025888694472,
+          "cheerSpent": 85015,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 3,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo",
+          "mil"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 3,
+            "until": 7
+          },
+          {
+            "t": 6,
+            "type": "achievement",
+            "id": "mil"
+          }
+        ],
+        "runtime": {
+          "stamina": 62,
+          "dancing": true,
+          "lift": 0.1368139998216633,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.97111383550002,
+          "dance": "forro",
+          "danceLeft": 6,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034849881.8442,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034570579
+      },
+      "disk": {
+        "version": 1,
+        "seed": 1073741824,
+        "name": "Troca 2",
+        "cheer": 999999916340.5024,
+        "tickets": 93,
+        "wood": 0,
+        "fame": 1319.5025888694472,
+        "size": 50,
+        "ticketLevel": 4,
+        "year": 1,
+        "levels": {
+          "rebolado": 30,
+          "folego": 30,
+          "refresco": 30,
+          "ritmo": 30
+        },
+        "bonfire": {
+          "labareda": 0,
+          "brasa": 0,
+          "calor": 0
+        },
+        "inventory": [
+          "palha-furada"
+        ],
+        "equipped": {
+          "chapeu": "palha-furada",
+          "mao": "bandeirinha",
+          "tecido": "xadrez-vermelho",
+          "terreiro": "terra-batida",
+          "esquerda": "fardo",
+          "direita": "mastro",
+          "varal": "varal-colorido"
+        },
+        "crew": {
+          "milho": {
+            "level": 1
+          }
+        },
+        "outings": [
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          },
+          {
+            "char": null,
+            "startAt": 0,
+            "endsAt": 0
+          }
+        ],
+        "fishing": {
+          "ready": 0,
+          "nextAt": 1791037263100,
+          "unlocked": true
+        },
+        "mail": {
+          "ready": 1,
+          "nextAt": 1791045363098
+        },
+        "request": {
+          "active": null,
+          "nextAt": 1791034833100
+        },
+        "crasher": {
+          "active": null,
+          "nextAt": 1791035253101
+        },
+        "balloon": {
+          "active": null,
+          "nextAt": 1791035103100
+        },
+        "pote": {
+          "active": null,
+          "nextAt": 1791035463100
+        },
+        "saco": {
+          "active": null,
+          "nextAt": 1791035553100
+        },
+        "leilao": {
+          "active": null,
+          "nextAt": 1791036003100
+        },
+        "cold": {
+          "active": null,
+          "nextAt": 1791036663100
+        },
+        "visitor": {
+          "active": null,
+          "nextAt": 1791041763100
+        },
+        "fotografo": {
+          "active": null,
+          "nextAt": 1791039963100
+        },
+        "burro": {
+          "active": null,
+          "nextAt": 1791036213100
+        },
+        "fantasia": {
+          "judgeAt": 0,
+          "nextAt": 1791038163100
+        },
+        "cozinha": {
+          "pot": null,
+          "buff": null
+        },
+        "humor": {
+          "amor": 50.42412499999996,
+          "barriga": 49.51550000000003,
+          "at": 1791034570550,
+          "holdUntil": 0
+        },
+        "minis": {
+          "cordel": {
+            "page": 1,
+            "seen": 1,
+            "clicks": {},
+            "done": {}
+          },
+          "bichos": {
+            "grain": 5,
+            "grainAt": 1791034570573,
+            "petted": 0,
+            "fed": 0,
+            "gifts": 0,
+            "pets": {
+              "galinha": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "gato": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "bode": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "caramelo": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              },
+              "papagaio": {
+                "bond": 0,
+                "ready": false,
+                "giftAt": 0,
+                "petAt": 0
+              }
+            }
+          },
+          "aquario": {
+            "fish": [
+              {
+                "id": 1,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 2,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 3,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              },
+              {
+                "id": 4,
+                "species": "tilapia",
+                "growth": 0,
+                "stage": 0
+              }
+            ],
+            "seen": [
+              "tilapia"
+            ],
+            "food": 6,
+            "foodAt": 1791034570534,
+            "bubbles": 0,
+            "bubbleAt": 1791034570534,
+            "nextId": 5,
+            "fed": 0,
+            "popped": 0,
+            "complete": false,
+            "started": true
+          },
+          "horta": {
+            "plots": [
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              },
+              {
+                "crop": null,
+                "plantedAt": 0,
+                "readyAt": 0,
+                "waters": 0
+              }
+            ],
+            "water": 5,
+            "waterAt": 1791034570534,
+            "seed": "milho",
+            "crow": null,
+            "crowAt": 1791035253102,
+            "harvested": {},
+            "buffs": {},
+            "planted": 0,
+            "scared": 0,
+            "eaten": 0
+          },
+          "fogueira": {
+            "heat": 0,
+            "sticks": [
+              null,
+              null,
+              null,
+              null
+            ],
+            "selected": "milho",
+            "jumpAt": 0,
+            "roasted": 0,
+            "perfect": 0,
+            "burnt": 0,
+            "jumped": 0
+          },
+          "palco": {
+            "show": {
+              "song": "xote",
+              "startAt": 1791034570550,
+              "notes": [
+                {
+                  "t": 2200,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 2500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 2800,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 3700,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4000,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 4600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 4900,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 5500,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 6400,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 6700,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 7300,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 7600,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 8200,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 8500,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 9100,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 9400,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 10000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 10600,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 10900,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 11200,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12100,
+                  "lane": 2,
+                  "state": null
+                },
+                {
+                  "t": 12700,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13000,
+                  "lane": 0,
+                  "state": null
+                },
+                {
+                  "t": 13300,
+                  "lane": 1,
+                  "state": null
+                },
+                {
+                  "t": 13600,
+                  "lane": 2,
+                  "state": null
+                }
+              ],
+              "combo": 0,
+              "maxCombo": 0,
+              "score": 0,
+              "practice": false
+            },
+            "last": null,
+            "best": {},
+            "cooldownAt": 0,
+            "shows": 0,
+            "stars": 0
+          },
+          "mata": {
+            "stage": 1,
+            "battle": 3,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 3,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 3
+            }
+          },
+          "ceu": {
+            "rockets": 6,
+            "rocketAt": 0,
+            "volley": [],
+            "finaleAt": 0,
+            "fired": 0,
+            "finales": 0,
+            "starAt": 0,
+            "star": null,
+            "wishes": 0,
+            "simpatiaAt": 0,
+            "cards": null,
+            "simpatias": 0
+          },
+          "bairro": {
+            "homes": {},
+            "visits": 0
+          }
+        },
+        "album": [
+          "pescaria",
+          "argolas"
+        ],
+        "bornAt": 1791034563098,
+        "hints": {},
+        "bingo": {
+          "round": null
+        },
+        "setsWorn": [],
+        "daily": {
+          "day": "2026-10-03",
+          "streak": 1
+        },
+        "kissAt": 0,
+        "rafael": false,
+        "yearStart": 0,
+        "records": {
+          "maior": null,
+          "size": 50
+        },
+        "weather": {
+          "rain": null,
+          "rainbow": null,
+          "nextAt": 1791036363100,
+          "thunderAt": 0
+        },
+        "goals": [
+          {
+            "type": "outings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "crashers",
+            "target": 3,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            }
+          },
+          {
+            "type": "rings",
+            "target": 2,
+            "from": 0,
+            "reward": {
+              "tickets": 5,
+              "wood": 4
+            },
+            "notified": true
+          }
+        ],
+        "quadrilha": {
+          "nextAt": 1791034983100
+        },
+        "rings": {
+          "cost": 8,
+          "nextAt": 1791035170566,
+          "held": 4
+        },
+        "stats": {
+          "playtime": 6.736300000143051,
+          "steps": 12,
+          "cheerEarned": 1319.5025888694472,
+          "cheerSpent": 85015,
+          "fished": 1,
+          "outings": 0,
+          "letters": 0,
+          "requests": 0,
+          "crashers": 0,
+          "ringRounds": 3,
+          "ringHits": 0,
+          "pokes": 0,
+          "balloons": 0,
+          "rainbows": 0,
+          "upgrades": 116,
+          "goals": 0,
+          "weddings": 0,
+          "rice": 0,
+          "potes": 0,
+          "bingoCards": 0,
+          "bingos": 0,
+          "contests": 0,
+          "contestWins": 0,
+          "sacoRaces": 0,
+          "sacoWins": 0,
+          "leiloes": 0,
+          "lances": 0,
+          "quentao": 0,
+          "visitors": 0,
+          "cobras": 0,
+          "fotos": 0,
+          "burros": 0,
+          "burroMoscas": 0,
+          "fantasias": 0,
+          "fantasiaWins": 0,
+          "compadres": 0,
+          "dishes": 0,
+          "foods": 0
+        },
+        "achievements": [
+          "quermesse",
+          "cidade",
+          "regional",
+          "primeira-prenda",
+          "primeiro-passo",
+          "mil"
+        ],
+        "log": [
+          {
+            "t": 0,
+            "type": "comeco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 2
+          },
+          {
+            "t": 0,
+            "type": "daily",
+            "streak": 1,
+            "tickets": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 3
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 4
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 5
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 6
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 7
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 8
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 9
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 10
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "cordel"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 1
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "quermesse"
+          },
+          {
+            "t": 0,
+            "type": "fishing-open"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 11
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 12
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "bichos"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 13
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 14
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 15
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 16
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 17
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 18
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "aquario"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 19
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 20
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 21
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 22
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "horta"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 23
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 24
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 25
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 2
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "cidade"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 26
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 27
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 28
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 29
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 30
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "fogueira"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 31
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 32
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 33
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 34
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 35
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 36
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 37
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 38
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "palco"
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 39
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 40
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 41
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 42
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 43
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 44
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 45
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 46
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 47
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 48
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 49
+          },
+          {
+            "t": 0,
+            "type": "size",
+            "size": 50
+          },
+          {
+            "t": 0,
+            "type": "mini",
+            "id": "mata"
+          },
+          {
+            "t": 0,
+            "type": "tier",
+            "tier": 3
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "regional"
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "rebolado",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "item",
+            "id": "palha-furada"
+          },
+          {
+            "t": 0,
+            "type": "achievement",
+            "id": "primeira-prenda"
+          },
+          {
+            "t": 0,
+            "type": "fished",
+            "id": "milho",
+            "isNew": true,
+            "level": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "folego",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "grow",
+            "stage": 1
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "refresco",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 0,
+            "type": "level",
+            "key": "ritmo",
+            "from": 1,
+            "level": 30,
+            "until": 0
+          },
+          {
+            "t": 1,
+            "type": "achievement",
+            "id": "primeiro-passo"
+          },
+          {
+            "t": 2,
+            "type": "ticket",
+            "key": "ficha",
+            "count": 3,
+            "until": 7
+          },
+          {
+            "t": 6,
+            "type": "achievement",
+            "id": "mil"
+          }
+        ],
+        "runtime": {
+          "stamina": 62,
+          "dancing": true,
+          "lift": 0.1368139998216633,
+          "flareWait": 60,
+          "flareLeft": 0,
+          "flareUntil": 0,
+          "emberLeft": 0,
+          "emberUntil": 0,
+          "lastStep": 71.97111383550002,
+          "dance": "forro",
+          "danceLeft": 6,
+          "frenzyLeft": 0,
+          "frenzyUntil": 0,
+          "pokeAt": 0,
+          "popAt": 0,
+          "quadrilhaLeft": 0,
+          "quadrilhaUntil": 0,
+          "callIn": 0,
+          "calls": 0,
+          "weddingLeft": 0,
+          "weddingUntil": 0,
+          "rice": 0,
+          "riceAt": 0,
+          "announceAt": 1791034849881.8442,
+          "cobraLeft": 0,
+          "cobraUntil": 0,
+          "cobraDir": 1,
+          "daysAnnounced": []
+        },
+        "lastSeen": 1791034570579
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "language": "en",
+      "refunded": 1,
+      "checkpoint": {
+        "stage": 1,
+        "battle": 1,
+        "wins": 1
+      },
+      "unfinishedShowAwarded": false
+    },
+    {
+      "language": "es",
+      "refunded": 2,
+      "checkpoint": {
+        "stage": 1,
+        "battle": 2,
+        "wins": 2
+      },
+      "unfinishedShowAwarded": false
+    },
+    {
+      "language": "pt-BR",
+      "refunded": 4,
+      "checkpoint": {
+        "stage": 1,
+        "battle": 3,
+        "wins": 3
+      },
+      "unfinishedShowAwarded": false
+    }
+  ],
+  "resizes": [
+    {
+      "width": 640,
+      "height": 360,
+      "dpr": 1.25,
+      "name": "Troca 2",
+      "windows": [
+        {
+          "id": "vitrine",
+          "inside": true
+        },
+        {
+          "id": "painel",
+          "inside": true
+        },
+        {
+          "id": "mini-mata",
+          "inside": true
+        }
+      ],
+      "requested": {
+        "width": 640,
+        "height": 360
+      },
+      "nativeRequest": {
+        "x": 0,
+        "y": 0,
+        "width": 640,
+        "height": 360
+      },
+      "native": {
+        "x": 0,
+        "y": 0,
+        "width": 640,
+        "height": 360
+      }
+    },
+    {
+      "width": 360,
+      "height": 480,
+      "dpr": 1.25,
+      "name": "Troca 2",
+      "windows": [
+        {
+          "id": "vitrine",
+          "inside": true
+        },
+        {
+          "id": "painel",
+          "inside": true
+        },
+        {
+          "id": "mini-mata",
+          "inside": true
+        }
+      ],
+      "requested": {
+        "width": 360,
+        "height": 480
+      },
+      "nativeRequest": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 480
+      },
+      "native": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 480
+      }
+    },
+    {
+      "width": 1100,
+      "height": 851,
+      "dpr": 1.25,
+      "name": "Troca 2",
+      "windows": [
+        {
+          "id": "vitrine",
+          "inside": true
+        },
+        {
+          "id": "painel",
+          "inside": true
+        },
+        {
+          "id": "mini-mata",
+          "inside": true
+        }
+      ],
+      "requested": {
+        "width": 1100,
+        "height": 850
+      },
+      "nativeRequest": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 850
+      },
+      "native": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 851
+      }
+    }
+  ],
+  "windows": 4
+}

@@ -1,0 +1,392 @@
+{
+  "pid": 56256,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-56256-B8izCF",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "placa",
+    "scrolling": false,
+    "prepared": {
+      "point": {
+        "x": 441,
+        "y": 787
+      },
+      "touchAction": "none",
+      "expectedDrag": "placa",
+      "delta": {
+        "x": 50,
+        "y": -25
+      },
+      "scrollHeight": 271,
+      "clientHeight": 271
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "mousePress": true,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6406.900000095367,
+          "x": 441,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6408.700000047684,
+          "x": 441,
+          "y": 787,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "firstMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "mousePress": true,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6406.900000095367,
+          "x": 441,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6408.700000047684,
+          "x": 441,
+          "y": 787,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11399.799999952316,
+          "x": 461,
+          "y": 777,
+          "button": -1,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11400.100000143051,
+          "x": 461,
+          "y": 777,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "lastMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "mousePress": true,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6406.900000095367,
+          "x": 441,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6408.700000047684,
+          "x": 441,
+          "y": 787,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11399.799999952316,
+          "x": 461,
+          "y": 777,
+          "button": -1,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11400.100000143051,
+          "x": 461,
+          "y": 777,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16405.299999952316,
+          "x": 491,
+          "y": 762,
+          "button": -1,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16405.400000095367,
+          "x": 491,
+          "y": 762,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    },
+    "ended": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 341,
+      "top": 588.7200317382812,
+      "scrollTop": 0,
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6406.900000095367,
+          "x": 441,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6408.700000047684,
+          "x": 441,
+          "y": 787,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11399.799999952316,
+          "x": 461,
+          "y": 777,
+          "button": -1,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11400.100000143051,
+          "x": 461,
+          "y": 777,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16405.299999952316,
+          "x": 491,
+          "y": 762,
+          "button": -1,
+          "buttons": 1,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16405.400000095367,
+          "x": 491,
+          "y": 762,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "pointerup",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 20414.900000095367,
+          "x": 491,
+          "y": 762,
+          "button": 0,
+          "buttons": 0,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        },
+        {
+          "type": "touchend",
+          "trusted": true,
+          "at": 20415.10000014305,
+          "x": 491,
+          "y": 762,
+          "target": "BUTTON",
+          "owner": "placa",
+          "action": "tela",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "placa": null
+      }
+    }
+  },
+  "error": "AssertionError [ERR_ASSERTION]: o toque nativo começou o arrasto da superfície\n\nnull !== 'placa'\n\n    at C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:271:14"
+}

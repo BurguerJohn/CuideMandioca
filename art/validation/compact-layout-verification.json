@@ -1,0 +1,403 @@
+{
+  "electron": "44.4.5",
+  "pid": 19852,
+  "results": [
+    {
+      "screen": "boas-vindas",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "box": {
+        "left": 420,
+        "top": 176,
+        "right": 860,
+        "bottom": 544,
+        "width": 440,
+        "height": 368
+      },
+      "scroll": {
+        "height": 363,
+        "client": 363,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "correio",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "box": {
+        "left": 420,
+        "top": 250.5,
+        "right": 860,
+        "bottom": 469.5,
+        "width": 440,
+        "height": 219
+      },
+      "scroll": {
+        "height": 214,
+        "client": 214,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "pescaria",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "box": {
+        "left": 420,
+        "top": 183.25,
+        "right": 860,
+        "bottom": 536.75,
+        "width": 440,
+        "height": 353.5
+      },
+      "scroll": {
+        "height": 349,
+        "client": 349,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "boas-vindas",
+      "viewport": {
+        "width": 1024,
+        "height": 600
+      },
+      "box": {
+        "left": 292,
+        "top": 116,
+        "right": 732,
+        "bottom": 484,
+        "width": 440,
+        "height": 368
+      },
+      "scroll": {
+        "height": 363,
+        "client": 363,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "correio",
+      "viewport": {
+        "width": 1024,
+        "height": 600
+      },
+      "box": {
+        "left": 292,
+        "top": 190.5,
+        "right": 732,
+        "bottom": 409.5,
+        "width": 440,
+        "height": 219
+      },
+      "scroll": {
+        "height": 214,
+        "client": 214,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "pescaria",
+      "viewport": {
+        "width": 1024,
+        "height": 600
+      },
+      "box": {
+        "left": 292,
+        "top": 123.25,
+        "right": 732,
+        "bottom": 476.75,
+        "width": 440,
+        "height": 353.5
+      },
+      "scroll": {
+        "height": 349,
+        "client": 349,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "boas-vindas",
+      "viewport": {
+        "width": 800,
+        "height": 480
+      },
+      "box": {
+        "left": 180,
+        "top": 56,
+        "right": 620,
+        "bottom": 424,
+        "width": 440,
+        "height": 368
+      },
+      "scroll": {
+        "height": 363,
+        "client": 363,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "correio",
+      "viewport": {
+        "width": 800,
+        "height": 480
+      },
+      "box": {
+        "left": 180,
+        "top": 130.5,
+        "right": 620,
+        "bottom": 349.5,
+        "width": 440,
+        "height": 219
+      },
+      "scroll": {
+        "height": 214,
+        "client": 214,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "pescaria",
+      "viewport": {
+        "width": 800,
+        "height": 480
+      },
+      "box": {
+        "left": 180,
+        "top": 63.25,
+        "right": 620,
+        "bottom": 416.75,
+        "width": 440,
+        "height": 353.5
+      },
+      "scroll": {
+        "height": 349,
+        "client": 349,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "boas-vindas",
+      "viewport": {
+        "width": 640,
+        "height": 360
+      },
+      "box": {
+        "left": 100,
+        "top": 20,
+        "right": 540,
+        "bottom": 340,
+        "width": 440,
+        "height": 320
+      },
+      "scroll": {
+        "height": 363,
+        "client": 315,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "correio",
+      "viewport": {
+        "width": 640,
+        "height": 360
+      },
+      "box": {
+        "left": 100,
+        "top": 70.5,
+        "right": 540,
+        "bottom": 289.5,
+        "width": 440,
+        "height": 219
+      },
+      "scroll": {
+        "height": 214,
+        "client": 214,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "pescaria",
+      "viewport": {
+        "width": 640,
+        "height": 360
+      },
+      "box": {
+        "left": 100,
+        "top": 20,
+        "right": 540,
+        "bottom": 340,
+        "width": 440,
+        "height": 320
+      },
+      "scroll": {
+        "height": 349,
+        "client": 315,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "boas-vindas",
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "box": {
+        "left": 20,
+        "top": 79.70000457763672,
+        "right": 340,
+        "bottom": 560.3000106811523,
+        "width": 320,
+        "height": 480.6000061035156
+      },
+      "scroll": {
+        "height": 476,
+        "client": 476,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "correio",
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "box": {
+        "left": 20,
+        "top": 196.1999969482422,
+        "right": 340,
+        "bottom": 443.8000030517578,
+        "width": 320,
+        "height": 247.60000610351562
+      },
+      "scroll": {
+        "height": 243,
+        "client": 243,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "pescaria",
+      "viewport": {
+        "width": 360,
+        "height": 640
+      },
+      "box": {
+        "left": 20,
+        "top": 127.25,
+        "right": 340,
+        "bottom": 512.75,
+        "width": 320,
+        "height": 385.5
+      },
+      "scroll": {
+        "height": 381,
+        "client": 381,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "boas-vindas",
+      "viewport": {
+        "width": 360,
+        "height": 480
+      },
+      "box": {
+        "left": 20,
+        "top": 20,
+        "right": 340,
+        "bottom": 460,
+        "width": 320,
+        "height": 440
+      },
+      "scroll": {
+        "height": 476,
+        "client": 435,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "correio",
+      "viewport": {
+        "width": 360,
+        "height": 480
+      },
+      "box": {
+        "left": 20,
+        "top": 130.5,
+        "right": 340,
+        "bottom": 349.5,
+        "width": 320,
+        "height": 219
+      },
+      "scroll": {
+        "height": 214,
+        "client": 214,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    },
+    {
+      "screen": "pescaria",
+      "viewport": {
+        "width": 360,
+        "height": 480
+      },
+      "box": {
+        "left": 20,
+        "top": 47.25,
+        "right": 340,
+        "bottom": 432.75,
+        "width": 320,
+        "height": 385.5
+      },
+      "scroll": {
+        "height": 381,
+        "client": 381,
+        "overflowY": "auto"
+      },
+      "visible": true,
+      "buttonVisible": true
+    }
+  ],
+  "errors": []
+}

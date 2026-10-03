@@ -1,0 +1,40 @@
+{
+  "pid": 55748,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\art-regeneration-55748-ibtsa6tl",
+  "pillow": "11.0.0",
+  "outputs": {
+    "src/festa-sprites.js": {
+      "currentBytes": 5071708,
+      "rebuiltBytes": 5071708,
+      "bytesEqual": true,
+      "contentEqual": true
+    },
+    "desktop/tray.png": {
+      "currentBytes": 922,
+      "rebuiltBytes": 922,
+      "bytesEqual": true,
+      "contentEqual": true
+    },
+    "desktop/icon.ico": {
+      "currentBytes": 7386,
+      "rebuiltBytes": 7386,
+      "bytesEqual": true,
+      "contentEqual": true
+    }
+  },
+  "failures": [],
+  "metadataEqual": true,
+  "images": {
+    "current": 598,
+    "rebuilt": 598,
+    "changedPixels": [],
+    "encodingOnly": []
+  },
+  "icons": {
+    "current": 193,
+    "rebuilt": 193,
+    "changedPixels": [],
+    "encodingOnly": []
+  },
+  "sourceUnchanged": true
+}

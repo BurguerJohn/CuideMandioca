@@ -1,0 +1,76 @@
+{
+  "pid": 55872,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-help-keyboard-profile-55872-JjE0dn",
+  "electron": "44.4.5",
+  "cases": [
+    {
+      "id": "casa",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "casa-fechar",
+          "visible": true,
+          "height": 103,
+          "content": 427
+        },
+        {
+          "reading": true,
+          "active": "casa-ajuda",
+          "visible": true,
+          "height": 103,
+          "content": 427
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 2,
+        "scroll": 0,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true
+      }
+    },
+    {
+      "id": "cordel",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 103,
+          "content": 289
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 103,
+          "content": 289
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 2,
+        "scroll": 0,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true
+      }
+    }
+  ],
+  "errors": [],
+  "stage": "space-cordel",
+  "error": "AssertionError [ERR_ASSERTION]: Espaço lendo a ajuda não lança Argolas: casa\n\n2 !== 3\n\n    at C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\help-keyboard-probe.cjs:110:12"
+}

@@ -239,23 +239,24 @@
         y += Math.round(gone * 8);
       }
       const reborn = info.clock - enemy.bornAt;
+      const cx = x + sheet.w / 2;
       base.g.globalAlpha = enemy.dead ? alpha * 0.3 : 0.28;
       base.g.fillStyle = '#10200c';
-      base.g.fillRect(Math.round(slot.x - sheet.w / 3), slot.y + 1, Math.round(sheet.w * 2 / 3), 2);
+      base.g.fillRect(Math.round(cx - sheet.w / 3), slot.y + 1, Math.round(sheet.w * 2 / 3), 2);
       base.g.globalAlpha = 1;
-      if (enemy.focus && !enemy.dead) ui('alvo', slot.x - 5, slot.y + 3, 1);
+      if (enemy.focus && !enemy.dead) ui('alvo', cx - 5, slot.y + 3, 1);
       if (flash) spriteTinted(sheet, frame, x, y, '#ffffff', { alpha });
       else if (reborn >= 0 && reborn < 0.5 && !enemy.dead) spriteTinted(sheet, frame, x, y, '#ffe27a', { alpha });
       else base.sprite(sheet, frame, x, y, alpha < 1 ? { alpha } : {});
-      places.set(enemy.uid, { x: slot.x, top: y, mid: y + sheet.h / 2 });
+      places.set(enemy.uid, { x: cx, top: y, mid: y + sheet.h / 2 });
       if (enemy.dead) return;
       // Vida em cima, e o aviso do golpe especial que vem (um ícone balançando).
       const barW = enemy.boss ? 30 : 20;
       const barY = Math.max(10, y - 5);
-      bar(Math.round(slot.x - barW / 2), barY, barW, 3, enemy.hp / enemy.max, enemy.boss ? '#e0343e' : '#e8742a');
-      if (enemy.next) ui(STATUS_ICON[enemy.next] || 'investida', slot.x - 5, barY - 13 + Math.round(Math.sin(now / 120) * 1.5));
+      bar(Math.round(cx - barW / 2), barY, barW, 3, enemy.hp / enemy.max, enemy.boss ? '#e0343e' : '#e8742a');
+      if (enemy.next) ui(STATUS_ICON[enemy.next] || 'investida', cx - 5, barY - 13 + Math.round(Math.sin(now / 120) * 1.5));
       const tip = enemyTip(info, enemy);
-      base.region(`foe:${enemy.uid}`, slot.x - sheet.w / 2, y - 6, sheet.w, sheet.h + 8, { foe: enemy.uid, tip });
+      base.region(`foe:${enemy.uid}`, x, y - 6, sheet.w, sheet.h + 8, { foe: enemy.uid, tip });
     }
 
     // --- Textos de dica -----------------------------------------------------------------------------------------------------------
@@ -524,7 +525,7 @@
     function status(engine) {
       const info = engine.mini('mata').info();
       const where = info.boss ? tr('mini.mata.statusBoss') : tr('mini.mata.statusBattle', { n: info.battle + 1, m: info.battles });
-      return `${tr('mini.mata.statusStage', { n: info.stage })} · ${where}${info.auto ? '' : ` · ${tr('mini.mata.paused')}`}`;
+      return `${tr('mini.mata.statusStage', { n: info.stage })} · ${where}${info.paused ? ` · ${tr('mini.mata.paused')}` : ''}`;
     }
 
     function onEvents() {}

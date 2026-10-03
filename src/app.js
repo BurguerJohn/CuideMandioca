@@ -61,19 +61,21 @@
   let raw = null;
   try { raw = desktop ? desktop.loadGame() : readJSON(SAVE_KEY); } catch (_) { raw = null; }
   let engine;
+  let gameGeneration = 0;
+  let importRequest = 0;
   let loadError = null;
   try { engine = new GameEngine(data, raw); } catch (error) { engine = new GameEngine(data); loadError = error.message; }
   const firstRun = !raw || !!loadError;
 
   const ui = {
-    tab: 'festa', yeye: '', lastLetter: null, open: false, modal: false, focused: true, logFilter: 'desbloqueios', lastLogRender: 0,
+    tab: 'festa', yeye: '', lastLetter: null, open: false, modal: false, focused: true, focusRequest: 0, press: null, cancelledClick: false, spacePress: null, cancelledSpace: false, logFilter: 'desbloqueios', lastLogRender: 0,
     dock: { open: false, cat: 'melhorias', side: 'esquerda', dx: 0 }, preview: null,
     rings: { open: false, playing: false, result: null },
     tela: { open: false, id: 'correio' }, telaPos: null,
     settings: publicSettings(normalizeSettings(desktop ? null : readJSON(SETTINGS_KEY))),
     // Botão de teste ligado pelo código "banana" no Histórico: só vale nesta sessão (não é salvo).
     debug: false, segredo: '',
-    interactive: null, festa: null, game: null, drag: null, hold: null, panelPos: null, ringsPos: null,
+    interactive: null, festa: null, game: null, drag: null, hold: null, pointer: null, panelPos: null, ringsPos: null,
     hudKey: '', lastLive: 0, lastSave: 0, saveSoon: 0, closeArmedUntil: 0, tocou: false, redesenhar: false,
     // Ao abrir, o jogo recupera o tempo fora (convidados, conquistas...): esses sons de uma vez só viram barulho.
     quietUntil: performance.now() + 2000
@@ -98,7 +100,7 @@
   addEventListener('unhandledrejection', event => report(event.reason));
 
   // --- Som ---------------------------------------------------------------------------------------------
-  const som = globalThis.ArraiaSom?.create({ enabled: ui.settings.sound !== false, volume: ui.settings.volume }) || null;
+  const som = globalThis.ArraiaSom?.create({ enabled: ui.settings.sound !== false && !ui.settings.hidden, volume: ui.settings.volume }) || null;
   som?.setMusic(ui.settings.music === true && !ui.settings.hidden);
   // Com a festa escondida nada toca. `tocou` avisa quem chamou que a ação já tocou o seu próprio som.
   function tocar(name, options) {
@@ -108,6 +110,7 @@
   const janelas = () => [ui.open, ui.modal, ui.dock.open, ui.rings.open, ui.tela.open].filter(Boolean).length;
   // Uma ação do jogador com som: a própria ação toca o seu; senão, abrir ou fechar janela; senão, o som padrão.
   function comSom(action, fallback = 'clique') {
+    wakeGame();
     const before = janelas();
     ui.tocou = false;
     action();
@@ -118,19 +121,58 @@
   }
 
   // --- Save ------------------------------------------------------------------------------------------
-  function save() {
+  function save(game = engine) {
     try {
-      const state = engine.exportState();
+      // Fechar ou suspender pode salvar antes do primeiro quadro: os prêmios pendentes não mudam os bônus da pausa.
+      if (game === engine) wakeGame();
+      const state = game.exportState();
       if (desktop) {
-        if (!desktop.saveGame(state)) toast(t('app.saveFailedHere'), 'erro');
+        if (!desktop.saveGame(state)) { toast(t('app.saveFailedHere'), 'erro'); return false; }
       } else localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-      ui.lastSave = performance.now();
-    } catch (_) { toast(t('app.saveFailed'), 'erro'); }
+      return true;
+    } catch (_) { toast(t('app.saveFailed'), 'erro'); return false; }
+    finally { ui.lastSave = performance.now(); }
+  }
+  function saveReplacement(game, failureKey) {
+    if (save(game)) return true;
+    // O main guarda o snapshot antes de tentar gravar no disco; a sessão volta à festa que continua aberta.
+    save();
+    toast(t(failureKey), 'erro');
+    return false;
   }
   const saveLater = () => { ui.saveSoon = performance.now() + 800; };
 
   // --- Tamanho e posição de tudo o que flutua junto com a festa ----------------------------------------
   const uiZoom = () => clamp(ui.settings.zoom, 0.8, 1.3);
+  const windowOrder = [];
+  let restoringFocus = false;
+
+  function raiseWindow(element) {
+    if (!element?.style || element.isConnected === false) return;
+    const others = windowOrder.filter(item => item !== element && item.isConnected !== false);
+    windowOrder.splice(0, windowOrder.length, ...others, element);
+    windowOrder.forEach((item, index) => { item.style.zIndex = String(index + 1); });
+    // O aviso continua acima das janelas, mesmo quando outra é selecionada pelo mouse ou teclado.
+    $('#janela').style.zIndex = String(windowOrder.length + 1);
+  }
+
+  function closeFrontWindow() {
+    if (ui.modal) { closeModal(); return; }
+    const element = windowOrder.findLast(item => !item.hidden && item.isConnected !== false);
+    if (element === $('#painel')) closePanel();
+    else if (element === $('#argolas')) closeRings();
+    else if (element === $('#tela')) closeTela();
+    else if (element === $('#vitrine')) closeDock();
+    else if (element === $('#casa')) {
+      const help = $('#casa-ajuda');
+      if (help && !help.hidden) setCasaHelp(false);
+      else changeSettings({ casaHidden: true });
+    } else if (element?.dataset.mini) {
+      const id = element.dataset.mini;
+      if (ui.janelas?.helpOpen(id)) ui.janelas.setHelp(id, false);
+      else ui.janelas?.close(id);
+    }
+  }
 
   function festaSize() {
     return ui.festa ? ui.festa.size() : { width: 480, height: 612, top: 150, physical: 3, base: 3 };
@@ -190,6 +232,7 @@
   }
 
   function placeFesta() {
+    if (ui.settings.hidden && (ui.drag || ui.hold || ui.press || ui.spacePress)) dropPointer();
     const festa = $('#festa');
     const size = festaSize();
     const width = size.width;
@@ -262,25 +305,46 @@
 
   // A Casa da Mandioca (do convidado 100 em diante) é uma janela só dela. Some quando a pessoa a esconde, ou com a festa.
   const casaVisible = () => !!ui.casa && engine.houseInfo().open && !ui.settings.casaHidden && !ui.settings.hidden;
+  let casaHelpScroll = null;
 
   // O painel "como funciona" da casa cobre a cena; o texto é montado ao abrir (no idioma de agora, com os números do `house`).
   function setCasaHelp(open) {
     const panel = $('#casa-ajuda');
     if (!panel) return;
+    const returnFocus = !open && !panel.hidden && panel.contains?.(document.activeElement);
+    const scene = $('#casa-cena');
     if (open) {
+      if (ui.drag?.kind === 'casa') dropPointer();
+      if (panel.hidden && scene) casaHelpScroll = { x: scene.scrollLeft || 0, y: scene.scrollTop || 0 };
+      scene?.classList?.add('ajuda-aberta');
+      if (scene) { scene.scrollLeft = 0; scene.scrollTop = 0; }
       panel.querySelector('h3').textContent = `${t('casa.title')}: ${t('help.title')}`;
       panel.querySelector('p').textContent = t('casa.help', { start: engine.data.house.start, perRoom: engine.data.house.perRoom });
       panel.querySelector('small').textContent = t('help.close');
     }
     panel.hidden = !open;
+    if (open) panel.scrollTop = 0;
+    if (!open && scene) {
+      scene.classList?.remove('ajuda-aberta');
+      if (casaHelpScroll) { scene.scrollLeft = casaHelpScroll.x; scene.scrollTop = casaHelpScroll.y; casaHelpScroll = null; }
+    }
+    if (returnFocus && casaVisible()) {
+      const trigger = $('#casa')?.querySelector('button[data-action="casa-ajuda"]');
+      if (!trigger?.disabled) trigger?.focus?.({ preventScroll: true });
+    }
   }
 
   function placeCasa() {
     const element = $('#casa');
     if (!element || !ui.casa) return;
     const visible = casaVisible();
+    const wasHidden = element.hidden;
     element.hidden = !visible;
-    if (!visible) { setCasaHelp(false); return; }
+    if (!visible) {
+      if (ui.drag?.kind === 'casa') dropPointer();
+      setCasaHelp(false);
+      return;
+    }
     // Cabe na tela: no máximo 55% da largura e 88% da altura; o fator é inteiro (a arte fica nítida).
     ui.casa.setScale(3 * ui.settings.zoom, { width: innerWidth * 0.55, height: innerHeight * 0.88 });
     const info = engine.houseInfo();
@@ -319,6 +383,9 @@
     bottom = clamp(bottom, 6, Math.max(6, innerHeight - h - 6));
     element.style.left = `${Math.round(left)}px`;
     element.style.bottom = `${Math.round(bottom)}px`;
+    const scene = $('#casa-cena');
+    scene?.classList?.toggle('cena-arrastavel', !(scene.scrollWidth > scene.clientWidth || scene.scrollHeight > scene.clientHeight));
+    if (wasHidden) raiseWindow(element);
   }
 
   // Painel e janela das argolas abrem logo acima da festa. A posição fica guardada em relação ao pé esquerdo da
@@ -352,14 +419,24 @@
   }
 
   // --- Ajustes -----------------------------------------------------------------------------------------
+  let settingsRequest = 0;
+  let settingsRevision = -1;
+  let confirmedSettings = publicSettings(normalizeSettings(ui.settings));
+  const pendingSettings = new Map();
   function applySettings(settings) {
-    ui.settings = publicSettings(mergeSettings(ui.settings, settings));
-    som?.set({ enabled: ui.settings.sound !== false, volume: ui.settings.volume });
+    // Posições e volume em edição ainda não foram persistidos: o retrato do desktop conserva esses campos até soltar.
+    const moving = { festa: ['x', 'lift'], zoom: ['zoom', 'x', 'placa'], placa: ['placa'], casa: ['casa'], mini: ['minis'], barra: ['volume'] }[ui.drag?.kind] || [];
+    const position = Object.fromEntries(moving.map(key => [key, ui.settings[key]]));
+    if (document.activeElement?.id === 'volume') position.volume = ui.settings.volume;
+    ui.settings = publicSettings(mergeSettings(ui.settings, { ...settings, ...position }));
+    som?.set({ enabled: ui.settings.sound !== false && !ui.settings.hidden, volume: ui.settings.volume });
     som?.setMusic?.(ui.settings.music === true && !ui.settings.hidden);
     ui.festa?.setRate(rateNow());
     ui.festa?.setFlash?.(ui.settings.flash !== false);
     ui.festa?.setCalm?.(ui.settings.calm === true);
     scaleFesta();
+    // No desktop, as preferências iniciais chegam depois de carregar a partida e criar o gerenciador.
+    ui.janelas?.restore();
     renderHud(true);
     placeFesta();
     if (ui.open) renderWindows();
@@ -367,17 +444,53 @@
 
   function changeSettings(partial) {
     if (desktop) {
-      desktop.updateSettings(partial).then(applySettings).catch(error => toast(error.message, 'erro'));
+      const request = ++settingsRequest;
+      const normalized = publicSettings(mergeSettings(ui.settings, partial));
+      pendingSettings.set(request, Object.fromEntries(Object.keys(partial)
+        .filter(key => Object.prototype.hasOwnProperty.call(normalized, key)).map(key => [key, normalized[key]])));
+      renderSettingsSnapshot();
+      desktop.updateSettings(partial).then(settings => {
+        finishSettingsRequest(request);
+        receiveSettingsSnapshot(settings);
+      }).catch(error => {
+        pendingSettings.delete(request);
+        renderSettingsSnapshot();
+        toast(error.message, 'erro');
+      });
     } else {
       applySettings(partial);
       try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(ui.settings)); } catch (_) { /* sem armazenamento */ }
     }
   }
 
+  function finishSettingsRequest(request) {
+    const fields = Object.keys(pendingSettings.get(request) || {});
+    pendingSettings.delete(request);
+    // Uma confirmação mais nova da mesma chave também supera o overlay de pedidos anteriores.
+    for (const [previous, pending] of pendingSettings) {
+      if (previous < request) for (const key of fields) delete pending[key];
+    }
+  }
+
+  function renderSettingsSnapshot() {
+    // Cada pedido conserva só os seus campos até responder; outros ajustes seguem o último retrato do main.
+    const pending = Object.assign({}, ...pendingSettings.values());
+    applySettings({ ...confirmedSettings, ...pending });
+  }
+
+  function receiveSettingsSnapshot(settings) {
+    if (settings && Number.isSafeInteger(settings.revision) && settings.revision >= settingsRevision) {
+      settingsRevision = settings.revision;
+      confirmedSettings = publicSettings(mergeSettings(confirmedSettings, settings));
+    }
+    renderSettingsSnapshot();
+  }
+
   // Muda o tamanho sem tirar a placa do lugar: o lado da festa colado nela fica parado e o resto cresce.
   // Devolve o zoom que valeu de fato (a festa limita o tamanho para caber na tela).
   function setZoom(zoom, persist) {
     zoom = clamp(zoom, ZOOM_MIN, ZOOM_MAX);
+    const previousZoom = ui.settings.zoom;
     const before = ui.anchor;
     ui.settings.zoom = zoom;
     scaleFesta();
@@ -385,6 +498,11 @@
     if (size.capped) {
       zoom = size.physical / (3 * (globalThis.devicePixelRatio || 1));
       ui.settings.zoom = zoom;
+    }
+    if (persist && ui.drag?.kind === 'zoom') {
+      // A roda e os controles mudam a base do arrasto e já contam como um ajuste da alça.
+      ui.drag.start *= zoom / previousZoom;
+      ui.drag.moved = true;
     }
     const custom = ui.settings.placa;
     if (before && before.side !== 'topo') {
@@ -427,17 +545,41 @@
     item.timers = [setTimeout(() => { item.dataset.out = '1'; item.classList.add('saindo'); }, 3600), setTimeout(() => item.remove(), 4200)];
   }
 
+  let modalReturnFocus = null;
   function showModal(html) {
+    const dialog = $('#janela');
+    const active = document.activeElement;
+    if (!dialog.contains?.(active)) {
+      const container = active?.closest?.('.ui');
+      modalReturnFocus = container && active.focus && (active.id || active.dataset?.action)
+        ? { active, container, id: active.id, identity: Object.entries(active.dataset || {}).filter(([key]) => key !== 'cost') } : null;
+    }
     $('#janela-corpo').innerHTML = html;
-    $('#janela').hidden = false;
+    dialog.hidden = false;
+    dialog.scrollTop = 0;
     ui.modal = true;
     focusable();
+    // O teclado começa no aviso; Tab escolhe um botão antes que Enter possa confirmá-lo.
+    dialog.focus?.({ preventScroll: true });
   }
 
   function closeModal() {
-    $('#janela').hidden = true;
+    const dialog = $('#janela');
+    const previous = dialog.contains?.(document.activeElement) ? modalReturnFocus : null;
+    modalReturnFocus = null;
+    dialog.hidden = true;
     ui.modal = false;
     focusable();
+    if (!previous || previous.container.isConnected === false) return;
+    const { active, container, id, identity } = previous;
+    // Cartas e prendas redesenham o botão de origem enquanto o aviso está aberto.
+    const controls = container.querySelectorAll?.(id ? '[id]' : '[data-action]') || [];
+    const next = active.isConnected !== false ? active : [...controls].find(control => id ? control.id === id
+      : identity.every(([key, value]) => control.dataset[key] === value));
+    if (!next?.focus || next.disabled || next.closest?.('[hidden]') || next.getClientRects?.().length === 0) return;
+    restoringFocus = true;
+    try { next.focus({ preventScroll: true }); }
+    finally { restoringFocus = false; }
   }
 
   function focusable() {
@@ -459,6 +601,23 @@
     renderPanelBody();
   }
 
+  // O clique nativo vem depois do pointerup ou keyup. Um aviso nesse intervalo não pode remover seu botão.
+  const deferredRenders = new Set();
+  function deferRender(id, container) {
+    if (!(ui.press && container?.contains?.(ui.press.button)) &&
+      !(ui.spacePress && container?.contains?.(ui.spacePress.button))) return false;
+    deferredRenders.add(id);
+    return true;
+  }
+  function flushDeferredRenders() {
+    if (ui.press || ui.spacePress) return;
+    const pending = [...deferredRenders];
+    deferredRenders.clear();
+    const renders = { tela: renderTela, painel: renderPanelBody, vitrine: renderDock, argolas: renderRings,
+      placa: () => renderHud(true) };
+    for (const id of pending) renders[id]();
+  }
+
   // Redesenhar troca o HTML inteiro: com o jogador digitando o nome, escolhendo num select ou arrastando o volume,
   // o campo sumiria no meio. Fica para quando ele sair do campo (focusout).
   function busy(container) {
@@ -468,22 +627,49 @@
     return true;
   }
 
-  function renderTela() {
+  // Trocar o HTML remove o controle focado. O teclado continua no mesmo controle quando ele ainda existe na tela nova.
+  function keepFocus(container) {
+    const active = document.activeElement;
+    if (!active || !container?.contains?.(active) || (!active.id && !active.dataset?.action)) return () => {};
+    const id = active.id;
+    const identity = Object.entries(active.dataset || {}).filter(([key]) => key !== 'cost');
+    return () => {
+      if (active.isConnected !== false || (document.activeElement && document.activeElement !== document.body && document.activeElement !== active)) return;
+      if (ui.modal && !$('#janela')?.contains?.(active)) return;
+      const controls = container.querySelectorAll?.(id ? '[id]' : '[data-action]') || [];
+      const next = [...controls].find(control => !control.disabled && (id ? control.id === id
+        : identity.every(([key, value]) => control.dataset[key] === value)));
+      if (!next?.focus) return;
+      // Restaurar o cartão depois de um prêmio não seleciona a janela que estava atrás de outra.
+      restoringFocus = true;
+      try { next.focus({ preventScroll: true }); }
+      finally { restoringFocus = false; }
+    };
+  }
+
+  function renderTela(force = false) {
     if (!ui.tela.open) return;
+    if (deferRender('tela', $('#tela'))) return;
     const body = $('#tela-corpo');
-    if (busy(body)) return;
+    if (!force && busy(body)) return;
+    const restoreFocus = keepFocus($('#tela'));
     const scroll = body.scrollTop;
     body.innerHTML = UI.tela(engine, context());
     body.scrollTop = scroll;
     $('#tela-titulo').textContent = UI.telaName(ui.tela.id);
     $('#tela').classList.toggle('modo-teste', ui.tela.id === 'teste');
     refreshLive(true);
+    // Uma carta ou cartela nova pode aumentar a altura depois de abrir ou arrastar a janela.
+    placeWindow($('#tela'), 'telaPos');
+    restoreFocus();
   }
 
   function renderPanelBody() {
     if (!ui.open) return;
+    if (deferRender('painel', $('#painel'))) return;
     const body = $('#painel-corpo');
     if (busy(body)) return;
+    const restoreFocus = keepFocus($('#painel'));
     const ctx = context();
     $('#painel-abas').innerHTML = UI.tabs(engine, ctx);
     const scroll = body.scrollTop;
@@ -491,27 +677,36 @@
     body.scrollTop = scroll;
     $('#painel-titulo').textContent = `${engine.state.name} · ${engine.tier().name}`;
     refreshLive(true);
+    restoreFocus();
   }
 
   function renderDock() {
     if (!ui.dock.open) return;
+    if (deferRender('vitrine', $('#vitrine'))) return;
     ui.dock.full = engine.bellyFull();
     const dock = $('#vitrine');
+    const restoreFocus = keepFocus(dock);
     const scroll = dock.querySelector?.('.vitrine-corpo')?.scrollLeft || 0;
     dock.innerHTML = UI.vitrine(engine, context());
     const body = dock.querySelector?.('.vitrine-corpo');
     if (body) body.scrollLeft = scroll;
     refreshLive(true);
     placeDock();
+    restoreFocus();
   }
 
   function renderRings() {
+    if (deferRender('argolas', $('#argolas'))) return;
+    const restoreFocus = keepFocus($('#argolas'));
     if (ui.rings.open) $('#argolas-info').innerHTML = UI.argolas(engine, context());
     refreshLive(true);
+    if (ui.rings.open) placeWindow($('#argolas'), 'ringsPos');
+    restoreFocus();
   }
 
   // A placa só é refeita quando muda de forma; os números mudam no lugar, sem perder cliques.
   function renderHud(force = false) {
+    if (deferRender('placa', $('#placa'))) return;
     const s = engine.state;
     const ready = s.outings.filter((_, i) => engine.outingState(i) === 'pronto').length;
     const key = [engine.tierIndex(), s.size, s.fishing.unlocked && s.fishing.ready, s.mail.ready, ready,
@@ -520,10 +715,11 @@
       engine.specialDay()?.id, engine.daysToSaoJoao(), s.leilao?.active ? `${s.leilao.active.leader}:${s.leilao.active.price}` : '', !!s.saco?.active,
       !!s.cold?.active, !!s.visitor?.active, !!(s.fotografo?.active && !s.fotografo.active.shot), !!(s.burro?.active && !s.burro.active.pinned), !!s.fantasia?.judgeAt,
       `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha'),
-      engine.goalsReady(), ui.open && ui.tab, ui.debug, engine.houseInfo().open, casaVisible(), ui.janelas?.signature() || ''].join('|');
+      engine.hortaBuffs().map(buff => `${buff.crop}${buff.until}`).join(','), engine.goalsReady(), ui.open && ui.tab, ui.debug, engine.houseInfo().open, casaVisible(), ui.janelas?.signature() || ''].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
     const placa = $('#placa');
+    const restoreFocus = keepFocus(placa);
     placa.innerHTML = UI.hud(engine, context());
     // A placa cresce para cima com os selos (leilão, prato servido...): mudou a altura, reposiciona para ela não sair da tela.
     if (placa.offsetHeight && placa.offsetHeight !== ui.placaHeight) {
@@ -532,6 +728,7 @@
       if (!first) placeFesta();
     }
     refreshLive(true);
+    restoreFocus();
   }
 
   function refreshLive(force = false) {
@@ -548,6 +745,11 @@
       } else if (key === 'fame') node.textContent = UI.compact(s.fame);
       else if (key === 'zoom') node.textContent = zoomLabel();
       else if (key in balances) node.textContent = UI.compact(balances[key]);
+    }
+    const productionNodes = document.querySelectorAll('[data-production]');
+    if (productionNodes.length) {
+      const values = UI.productionValues(engine);
+      for (const node of productionNodes) node.textContent = values[node.dataset.production];
     }
     // Felicidade da Mandioca: barrinhas, o quanto o Rebolado vale e a dica da linha na placa.
     const mood = engine.mood();
@@ -589,8 +791,12 @@
     for (const node of document.querySelectorAll('.placa .barra.fama i')) {
       node.style.width = `${Math.min(100, 100 * s.fame / Math.max(1, engine.fameNeed()))}%`;
     }
+    const at = now();
     for (const node of document.querySelectorAll('[data-until]')) {
-      node.textContent = UI.duration(Number(node.dataset.until) - now());
+      node.textContent = UI.duration(Number(node.dataset.until) - at);
+    }
+    for (const node of document.querySelectorAll('[data-progress-start][data-progress-end]')) {
+      node.style.width = `${UI.timeProgress(Number(node.dataset.progressStart), Number(node.dataset.progressEnd), at)}%`;
     }
     for (const node of document.querySelectorAll('[data-cost]')) {
       const lacking = balances[node.dataset.currency] < Number(node.dataset.cost);
@@ -606,18 +812,21 @@
     $('#painel').hidden = false;
     renderWindows();
     placeWindow($('#painel'), 'panelPos');
+    raiseWindow($('#painel'));
     focusable();
   }
 
   // Telas de jogo: cada botão da placa abre a sua; clicar de novo no mesmo botão fecha.
   function openTela(id, toggle = true) {
-    if (ui.tela.open && ui.tela.id === id) { if (toggle) closeTela(); return; }
+    if (ui.tela.open && ui.tela.id === id) { if (toggle) closeTela(); else raiseWindow($('#tela')); return; }
     ui.tela.id = id;
     ui.tela.open = true;
     $('#tela').hidden = false;
-    renderTela();
+    // O canvas conserva o foco do campo anterior; uma troca pedida pelo jogador precisa substituir essa tela.
+    renderTela(true);
     placeWindow($('#tela'), 'telaPos');
     renderHud(true);
+    raiseWindow($('#tela'));
     focusable();
   }
 
@@ -652,10 +861,12 @@
     ui.dock.open = true;
     $('#vitrine').hidden = false;
     renderDock();
+    raiseWindow($('#vitrine'));
     if (ui.open) placeWindow($('#painel'), 'panelPos');
   }
 
   function closeDock() {
+    if (ui.hold?.button.closest?.('#vitrine')) stopHold();
     ui.dock.open = false;
     ui.preview = null;
     $('#vitrine').hidden = true;
@@ -666,10 +877,12 @@
     $('#argolas').hidden = false;
     renderRings();
     placeWindow($('#argolas'), 'ringsPos');
+    raiseWindow($('#argolas'));
     focusable();
   }
 
   function closeRings() {
+    if (ui.hold?.button.closest?.('#argolas')) stopHold();
     if (ui.rings.playing) endRound();
     ui.rings.open = false;
     $('#argolas').hidden = true;
@@ -769,12 +982,15 @@
 
   // Segurar o botão: compra de novo e de novo (melhoria de atributo ou ficha), cada vez um pouco mais agudo.
   function startHold(button) {
+    wakeGame();
     stopHold();
     const kind = button.dataset.hold;
     const stat = button.dataset.stat;
-    const hold = { count: 0, kind, timer: null, interval: null };
+    const hold = { count: 0, kind, button, timer: null, interval: null };
     const buy = () => {
       if (ui.hold !== hold) return;
+      if (button.isConnected === false) { stopHold(); return; }
+      if (wakeGame()) return;
       if (kind === 'ficha' ? engine.buyTicket() : engine.buyLevel(stat)) {
         hold.count++;
         tocar(kind === 'ficha' ? 'moeda' : 'nivel', { pitch: Math.min(hold.count - 1, 12) });
@@ -842,7 +1058,7 @@
   // No PC, quem abre a festa nova é o Electron, numa janela nova (desktop/main.js explica por que não recarregar).
   function changeLanguage(choice) {
     if (!choice || choice === language.choice) return;
-    save();
+    if (!save()) return;
     if (desktop?.setLanguage) { desktop.setLanguage(choice); return; }
     try {
       sessionStorage.setItem(REOPEN_KEY, 'ajustes');
@@ -897,7 +1113,13 @@
     }
     if (a === 'vitrine') { if (ui.dock.open) closeDock(); else openDock(); return; }
     if (a === 'vitrine-fechar') { closeDock(); return; }
-    if (a === 'vitrine-cat') { ui.dock.cat = d.cat; ui.preview = null; renderDock(); return; }
+    if (a === 'vitrine-cat') {
+      if (ui.hold?.button.closest?.('#vitrine')) stopHold();
+      ui.dock.cat = d.cat;
+      ui.preview = null;
+      renderDock();
+      return;
+    }
     if (a === 'vitrine-lado') { ui.dock.side = d.side; ui.preview = null; renderDock(); return; }
     if (a === 'vitrine-item') { dockItem(d.id); return; }
     if (a === 'vitrine-conjunto') { dockSet(d.id); return; }
@@ -984,7 +1206,7 @@
       // Liga na hora (sem esperar o desktop responder), para o próprio clique já soar.
       const on = d.value === 'on';
       ui.settings.sound = on;
-      som?.set({ enabled: on });
+      som?.set({ enabled: on && !ui.settings.hidden });
       changeSettings({ sound: on });
       if (on) tocar('moeda');
       else ui.tocou = true;
@@ -1007,6 +1229,7 @@
       if (!engine.newYear()) return;
       closeModal();
       forgetRound();
+      ui.janelas?.reset();
       save();
       renderHud(true);
       renderWindows();
@@ -1050,14 +1273,24 @@
       return;
     }
     // Com a janela de escolher arquivo aberta, a festa fica desabilitada (o mouse não chega nela, e não é defeito).
-    if (a === 'importar') { ui.picking = true; $('#importar').click(); return; }
+    if (a === 'importar') {
+      importRequest++;
+      ui.picking = true;
+      const input = $('#importar');
+      input.value = '';
+      input.click();
+      return;
+    }
     if (a === 'reiniciar') {
       if (!confirm(t('app.restartConfirm'))) return;
-      engine = new GameEngine(data);
+      importRequest++;
+      $('#importar').value = '';
+      const restarted = new GameEngine(data);
+      if (!saveReplacement(restarted, 'app.restartNotSaved')) return;
+      engine = restarted;
       ui.janelas?.setEngine(engine);
       ui.tab = 'festa';
       forgetRound();
-      save();
       renderHud(true);
       renderWindows();
       renderDock();
@@ -1066,6 +1299,7 @@
 
   // Depois de reiniciar ou importar outra festa, nada da festa anterior fica na tela.
   function forgetRound() {
+    gameGeneration++;
     dropPointer();
     closeModal();
     ui.lastLetter = null;
@@ -1075,6 +1309,8 @@
     ui.rings.result = null;
     ui.game?.reset();
     ui.festa?.reset?.();
+    ui.casa?.reset?.();
+    renderRings();
     lastFrame = performance.now();
   }
 
@@ -1212,7 +1448,7 @@
     'prize-ready': 'aviso', 'letter-ready': 'pombo', 'outing-done': 'aviso', crasher: 'penetra', request: 'pedido',
     'size-up': 'convidado', 'flare-start': 'fogo', 'cook-ready': 'aviso', 'house-room': 'crescer', 'house-resident': 'convidado' };
   // Acontecimentos que mudam o que as janelas mostram: prenda pronta, carta chegando, turma voltando do rolê...
-  const REFRESH_EVENTS = new Set(['bingo-win', 'bingo-lost', 'goal-done', 'learn', 'grow', 'tier-up', 'fishing-open', 'prize-ready', 'letter-ready', 'outing-done', 'legendary', 'item',
+  const REFRESH_EVENTS = new Set(['bingo-win', 'bingo-lost', 'goal-done', 'learn', 'grow', 'tier-up', 'fishing-open', 'prize-ready', 'letter-ready', 'outing-done', 'legendary', 'item', 'equip',
     'achievement', 'cook-ready', 'cook-end', 'cook-served', 'cook-start']);
 
   // Nome da prenda do leilão: o item ou os minutos de Animação.
@@ -1244,7 +1480,7 @@
     const quiet = performance.now() < ui.quietUntil;
     const leveled = events.some(event => event.type === 'tier-up');
     for (const event of events) {
-      if (REFRESH_EVENTS.has(event.type)) refresh = true;
+      if (REFRESH_EVENTS.has(event.type) || (event.type === 'mini' && event.mini === 'horta' && event.kind === 'harvest')) refresh = true;
       // Um porte novo já tem a sua fanfarra: o "convidado novo" do mesmo instante fica quieto.
       const sound = EVENT_SOUNDS[event.type] || (event.type === 'step' && event.crit ? 'cobra' : null);
       if (sound && !quiet && !(leveled && event.type === 'size-up')) tocar(sound);
@@ -1266,7 +1502,7 @@
         toast(t(event.kind === 'page' ? 'mini.cordel.newPage' : 'mini.cordel.pageDone', { title }), 'ouro');
       } else if (event.type === 'cook-ready') toast(t('app.cookReady', { dish: engine.recipe(event.id)?.name || event.id }), 'ouro');
       else if (event.type === 'outing-done') {
-        toast(t('app.outingDone', { name: engine.chars[engine.state.outings[event.index].char]?.name || t('app.someone') }));
+        toast(t('app.outingDone', { name: engine.chars[event.id]?.name || t('app.someone') }));
       } else if (event.type === 'special-day') {
         toast(t('app.specialDay', { name: t(`day.${event.id}`), v: Math.round(event.bonus * 100) }), 'ouro');
       } else if (event.type === 'contest') {
@@ -1350,16 +1586,21 @@
       }
     }
     if (refresh) renderWindows();
+    // Prêmios automáticos (Mata, casamento, leilão) mudam o inventário sem passar pelos cliques da loja.
+    // Uma compra segurada já refaz a loja ao terminar; preservar seus botões até soltar evita perder o gesto.
+    if (!ui.hold && events.some(event => event.type === 'item')) renderDock();
     // Número do bingo: só a janela do bingo muda (as outras não são refeitas a cada número, para não engolir cliques).
-    else if (ui.tela.open && ui.tela.id === 'bingo' && events.some(event => event.type.startsWith('bingo-'))) renderTela();
+    if (!refresh && ui.tela.open && ui.tela.id === 'bingo' && events.some(event => event.type.startsWith('bingo-'))) renderTela();
   }
 
   // --- Foco: a placa só aparece enquanto o jogo tem foco (o último clique foi na festa) -----------------
   // Quem volta para a festa depois de um tempo fora (5 min ou mais) ganha um "Oi!" da Mandioca.
   const GREET_AFTER = 5 * 60 * 1000;
-  function setFocused(value) {
-    // Perdeu o foco no meio de um arrasto: o soltar do botão não vai chegar aqui.
-    if (!value && (ui.drag || ui.hold)) dropPointer();
+  function setFocused(value, request) {
+    // Um snapshot feito antes do último clique pode chegar depois dele: não cancela o gesto recém-iniciado.
+    if (typeof request === 'number' && request < ui.focusRequest) return;
+    // Perdeu o foco no meio do gesto: o soltar do botão não vai chegar aqui.
+    if (!value && (ui.drag || ui.hold || ui.press || ui.spacePress)) dropPointer();
     // A placa aparece ou some: o próximo aviso do cursor reavalia a área que recebe cliques.
     if (value !== ui.focused) ui.interactive = null;
     if (value && !ui.focused && ui.blurAt && now() - ui.blurAt >= GREET_AFTER) ui.festa?.greet?.();
@@ -1371,8 +1612,9 @@
   }
 
   function focusGame() {
+    ui.focusRequest++;
     if (!ui.focused) setFocused(true);
-    desktop?.focusGame?.();
+    desktop?.focusGame?.(ui.focusRequest);
   }
 
   // --- Mouse: clique vazado, arrastos, prévia e cliques --------------------------------------------------
@@ -1401,8 +1643,9 @@
       // Foco e estado do clique também reenviam o cursor parado: isso não é falta de movimento nativo.
       if (!moved) ui.deafSince = 0;
     }
-    // Durante arrasto ou compra segurada a janela segue clicável, para o soltar do botão chegar aqui.
-    if (ui.drag || ui.hold) {
+    // Durante o gesto a janela segue clicável, para o soltar do botão chegar aqui.
+    if (ui.drag || ui.hold || ui.press) {
+      setInteractive(true);
       if (moved) checkDeaf(actual);
       return;
     }
@@ -1417,9 +1660,18 @@
     document.body.classList.toggle('sobre-festa', !!found.region || !!found.ui);
   }
 
+  // Fechar uma janela pode deixar o ponto transparente sem mover o mouse nem mudar o cursor do main.
+  function refreshCursor(event) {
+    const mouse = event?.detail !== 0 && Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY);
+    const x = mouse ? event.clientX : ui.cursorX;
+    const y = mouse ? event.clientY : ui.cursorY;
+    if (Number.isFinite(x) && Number.isFinite(y)) hover(x, y);
+  }
+
   // Autocura do clique: o vigia do Electron mostra o cursor passeando em cima do jogo e a janela diz que aceita o clique,
   // mas nenhum movimento de verdade chega à página: a janela quebrou (acontece depois do repouso do Windows) e todo clique
-  // vaza para o que está atrás. Passados DEAF_MS assim, pede uma janela nova (no máximo uma vez a cada REPAIR_EVERY; o Electron só troca com a festa fixada por cima).
+  // vaza para o que está atrás. Passados DEAF_MS assim, pede uma janela nova (no máximo uma vez a cada REPAIR_EVERY;
+  // o Electron só troca com a festa em foco ou fixada por cima).
   const DEAF_MS = 3000;
   const REPAIR_EVERY = 300000;
   function checkDeaf(overGame) {
@@ -1431,7 +1683,7 @@
     ui.deafSince = 0;
     desktop.logError?.('a festa parou de receber o mouse: pedindo uma janela nova');
     dropPointer();
-    save();
+    if (!save()) return;
     desktop.repair();
   }
 
@@ -1481,14 +1733,37 @@
   });
 
   function throwRing() {
+    wakeGame();
     if (ui.game?.throwRing(performance.now())) tocar('arremesso');
+  }
+
+  // Cada dispositivo tem seu ponteiro primário: o mouse também é primário enquanto um dedo arrasta.
+  // Guarda um clique recusado por tipo até ele chegar ou começar um gesto novo do mesmo dispositivo.
+  const ignoredPointerClicks = new Map();
+  const pointerType = event => event?.pointerType || 'mouse';
+  function foreignPointer(event) {
+    return !!(ui.pointer && (ui.drag || ui.hold || ui.press) && event?.pointerId !== undefined &&
+      (event.pointerId !== ui.pointer.id || pointerType(event) !== ui.pointer.type));
   }
 
   document.addEventListener('pointerdown', event => {
     pointerReceived();
+    // O gesto pertence ao primeiro toque; outro dedo não troca o alvo nem inicia uma compra paralela.
+    if (event.isPrimary === false) return;
     if (event.button !== undefined && event.button !== 0) return;
+    if (foreignPointer(event)) {
+      ignoredPointerClicks.set(pointerType(event), event.pointerId);
+      event.preventDefault();
+      return;
+    }
+    ignoredPointerClicks.delete(pointerType(event));
+    ui.pointer = event.pointerId === undefined ? null : { id: event.pointerId, type: pointerType(event) };
+    ui.cancelledClick = false;
+    raiseWindow(event.target.closest?.('.casa, .painel, .minijogo, #vitrine'));
+    if (ui.press) { ui.press = null; flushDeferredRenders(); }
     // A janela só recebe clique em cima da festa ou das janelas do jogo: qualquer clique aqui dá foco ao jogo.
     focusGame();
+    setInteractive(true);
     som?.unlock();
     const hold = event.target.closest?.('[data-hold]');
     if (hold && !hold.disabled) { startHold(hold); event.preventDefault(); return; }
@@ -1499,7 +1774,9 @@
       return;
     }
     // Barra de volume: a janela segue clicável até soltar, mesmo com o mouse fora do painel.
-    if (event.target.matches?.('input[type="range"]')) { ui.drag = { kind: 'barra', x: event.clientX, y: event.clientY }; return; }
+    if (event.target.matches?.('input[type="range"]')) { ui.drag = { kind: 'barra', x: event.clientX, y: event.clientY, start: ui.settings.volume }; return; }
+    const control = event.target.closest?.('[data-action]');
+    if (control && !control.disabled) ui.press = { button: control };
     if (event.target.closest?.('#argolas-canvas')) { throwRing(); return; }
     const found = hitAt(event.clientX, event.clientY);
     if (found.region) {
@@ -1525,8 +1802,12 @@
       return;
     }
     // As janelas extras arrastam pelo fundo; só o clique sem arrastar é da janela (um bicho que reage, um canteiro que planta...).
+    const scene = event.target.closest?.('.casa-cena');
+    const nativeScroll = event.pointerType === 'touch' && !!scene &&
+      (scene.scrollWidth > scene.clientWidth || scene.scrollHeight > scene.clientHeight);
     const miniDrag = ui.janelas?.dragStart(event.target, event);
     if (miniDrag) {
+      miniDrag.nativeScroll = nativeScroll;
       ui.drag = miniDrag;
       event.preventDefault();
       return;
@@ -1537,7 +1818,7 @@
     if (house && event.target.id === 'casa-cena') return;
     if (house && !event.target.closest('button, .ajuda-painel')) {
       const hit = ui.casa?.hit(event.clientX, event.clientY);
-      ui.drag = { kind: 'casa', x: event.clientX, y: event.clientY, index: hit ? hit.index : null,
+      ui.drag = { kind: 'casa', nativeScroll, x: event.clientX, y: event.clientY, index: hit ? hit.index : null,
         start: { left: parseFloat(house.style.left) || 0, bottom: parseFloat(house.style.bottom) || 0 }, moved: false };
       event.preventDefault();
       return;
@@ -1551,24 +1832,48 @@
     }
   });
 
-  // Arrasto ou compra segurada que perdeu o soltar do botão (Alt+Tab, repouso, janela do Windows por cima): sem isso o
-  // `hover` ficaria ignorando o mouse para sempre e a janela presa no último estado (engolindo ou vazando todo clique).
+  function persistDrag(drag) {
+    if (drag?.nativeScroll) return;
+    // O volume já mudou pelo input; um gesto interrompido pode não receber o change nativo.
+    if (drag?.kind === 'barra') {
+      if (ui.settings.volume !== drag.start) changeSettings({ volume: ui.settings.volume });
+      return;
+    }
+    if (!drag?.moved) return;
+    const fields = { festa: ['x', 'lift'], zoom: ['zoom', 'x', 'placa'], placa: ['placa'], casa: ['casa'] }[drag.kind];
+    if (fields) changeSettings(Object.fromEntries(fields.map(key => [key, ui.settings[key]])));
+    else if (drag.kind === 'mini') ui.janelas?.dragEnd(drag, performance.now());
+  }
+
+  // Arrasto ou compra segurada que perdeu o soltar do botão (Alt+Tab, repouso, janela do Windows por cima): guarda o
+  // lugar que já ficou na tela e libera o mouse, sem executar o clique de um gesto interrompido.
   function dropPointer() {
-    stopHold();
+    const drag = ui.drag;
     ui.drag = null;
+    ui.pointer = null;
+    if (ui.press) ui.cancelledClick = true;
+    ui.press = null;
+    // Espaço ativa o botão nativo ao soltar a tecla, mesmo se houve repouso antes do keyup.
+    if (ui.spacePress) ui.cancelledSpace = true;
+    ui.spacePress = null;
+    stopHold();
     hideZoomGuide();
+    persistDrag(drag);
+    flushDeferredRenders();
   }
 
   document.addEventListener('pointermove', event => {
     pointerReceived();
+    if (event.isPrimary === false || foreignPointer(event)) return;
     // O esquerdo foi solto, mesmo que outro botão continue apertado ou o pointerup não tenha chegado.
-    if ((ui.drag || ui.hold) && event.buttons !== undefined && !(event.buttons & 1)) { dropPointer(); return; }
+    if ((ui.drag || ui.hold || ui.press) && event.buttons !== undefined && !(event.buttons & 1)) { dropPointer(); return; }
     const drag = ui.drag;
     if (!drag || drag.kind === 'barra') return;
     const dx = event.clientX - drag.x;
     const dy = event.clientY - drag.y;
     if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
-    if (!drag.moved) return;
+    // Nas cenas que precisam rolar, o dedo pertence ao navegador desde o primeiro movimento.
+    if (!drag.moved || drag.nativeScroll) return;
     if (drag.kind === 'zoom') {
       // Se bateu no limite, o arrasto recomeça dali: voltar o mouse já diminui, sem trecho morto.
       const factor = 2 ** ((dx - dy) / 160);
@@ -1580,10 +1885,14 @@
       const left = clamp(drag.start.left + dx, 0, maxLeft(size));
       ui.settings.x = (left + size.width / 2) / innerWidth;
       ui.settings.lift = clamp(drag.start.lift - dy, 0, maxLift(size));
+      // Descarta o trecho que passou da borda: voltar o ponteiro já traz a festa de volta.
+      drag.start.left = left - dx;
+      drag.start.lift = ui.settings.lift + dy;
       placeFesta();
     } else if (drag.kind === 'vitrine') {
       ui.dock.dx = drag.start + dx;
       placeDock();
+      drag.start = ui.dock.dx - dx;
     } else if (drag.kind === 'mini') {
       ui.janelas?.dragMove(drag, dx, dy);
     } else if (drag.kind === 'casa') {
@@ -1592,6 +1901,8 @@
       const h = element.offsetHeight || 300;
       const left = clamp(drag.start.left + dx, 6, Math.max(6, innerWidth - w - 6));
       const bottom = clamp(drag.start.bottom - dy, 6, Math.max(6, innerHeight - h - 6));
+      drag.start.left = left - dx;
+      drag.start.bottom = bottom + dy;
       ui.settings.casa = { dx: Math.round(left - ui.anchor.left), dy: Math.round(bottom - ui.anchor.lift) };
       placeCasa();
     } else if (drag.kind === 'placa') {
@@ -1601,6 +1912,8 @@
       const h = (placa.offsetHeight || 120) * zoom;
       const left = clamp(drag.start.left + dx, 6, Math.max(6, innerWidth - w - 6));
       const bottom = clamp(drag.start.bottom - dy, 6, Math.max(6, innerHeight - h - 6));
+      drag.start.left = left - dx;
+      drag.start.bottom = bottom + dy;
       ui.settings.placa = { dx: Math.round(left - ui.anchor.left), dy: Math.round(bottom - ui.anchor.lift) };
       placeFesta();
     } else {
@@ -1608,6 +1921,8 @@
       const base = windowBase();
       const x = clamp(drag.start.x + dx, 8, Math.max(8, innerWidth - (element.offsetWidth || 780) - 8));
       const y = clamp(drag.start.y + dy, 8, Math.max(8, innerHeight - (element.offsetHeight || 560) - 8));
+      drag.start.x = x - dx;
+      drag.start.y = y - dy;
       ui[drag.key] = { dx: x - base.x, dy: y - base.y, auto: false };
       placeWindow(element, drag.key);
     }
@@ -1615,55 +1930,81 @@
 
   document.addEventListener('pointerup', event => {
     pointerReceived();
+    if (event.isPrimary === false || foreignPointer(event)) return;
     if (event.button !== undefined && event.button !== 0) {
-      if (event.buttons === 0) dropPointer();
+      // Soltar outro botão só encerra um gesto do mouse; uma tecla pressionada continua independente dele.
+      if (event.buttons === 0 && (ui.drag || ui.hold || ui.press)) dropPointer();
       return;
+    }
+    ui.pointer = null;
+    const press = ui.press;
+    if (press) {
+      if (event.target?.closest?.('[data-action]') !== press.button) { ui.press = null; flushDeferredRenders(); }
+      else setTimeout(() => {
+        if (ui.press === press) { ui.press = null; flushDeferredRenders(); }
+      }, 0);
     }
     stopHold();
     const drag = ui.drag;
     ui.drag = null;
     if (!drag) return;
+    if (drag.kind === 'zoom') hideZoomGuide();
+    if (drag.moved) { persistDrag(drag); return; }
     if (drag.kind === 'zoom') {
-      hideZoomGuide();
-      if (drag.moved) changeSettings({ zoom: ui.settings.zoom, x: ui.settings.x, placa: ui.settings.placa });
-      else { setZoom(1, true); tocar('clique'); }
-    } else if (drag.kind === 'placa') {
-      if (drag.moved) changeSettings({ placa: ui.settings.placa });
+      setZoom(1, true); tocar('clique');
     } else if (drag.kind === 'mini') {
       comSom(() => ui.janelas?.dragEnd(drag, performance.now()), null);
     } else if (drag.kind === 'casa') {
-      if (drag.moved) changeSettings({ casa: ui.settings.casa });
-      else if (drag.index !== null) comSom(() => ui.casa?.poke(drag.index, performance.now()), null);
+      // A cena pode ter sido rolada ou redimensionada enquanto o botão estava apertado.
+      if (drag.index !== null && casaVisible() && ui.casa?.hit(drag.x, drag.y)?.index === drag.index) {
+        comSom(() => ui.casa.poke(drag.index, performance.now()), null);
+      }
     }
     else if (drag.kind === 'festa') {
-      if (drag.moved) changeSettings({ x: ui.settings.x, lift: ui.settings.lift });
-      else comSom(() => festaClick(drag.region, { x: drag.x, y: drag.y }), null);
+      // Crescimento, redimensionamento ou outra janela podem trocar o alvo sem o mouse se mover.
+      if (hitAt(drag.x, drag.y).region === drag.region) {
+        comSom(() => festaClick(drag.region, { x: drag.x, y: drag.y }), null);
+      }
     }
   });
   // O navegador cancelou o ponteiro (começou um arrasto nativo, por exemplo): nada fica preso "arrastando".
-  document.addEventListener('pointercancel', () => {
-    stopHold();
-    ui.drag = null;
-    hideZoomGuide();
+  document.addEventListener('pointercancel', event => {
+    if (event?.isPrimary !== false && !foreignPointer(event)) dropPointer();
   });
 
   document.addEventListener('wheel', event => {
     if (!event.target.closest?.('[data-action="zoom-alca"]')) return;
     event.preventDefault();
+    if (!event.deltaY) return;
     setZoom(ui.settings.zoom * 1.12 ** (-Math.sign(event.deltaY)), true);
-    showZoomGuide(700);
+    showZoomGuide(ui.drag?.kind === 'zoom' ? 0 : 700);
   }, { passive: false });
 
   document.addEventListener('click', event => {
-    const button = event.target.closest?.('[data-action]');
-    // Botão de segurar já comprou no pointerdown; pelo teclado (Enter ou espaço, detail 0) ele age como um clique.
-    if (!button || button.tagName === 'SELECT' || button.disabled || (button.dataset.hold && event.detail !== 0)) return;
-    if (button.dataset.action === 'zoom-alca') {
-      // O mouse já foi tratado no pointerup; pelo teclado (Enter ou espaço), o botão volta a 100%.
-      if (event.detail === 0) comSom(() => setZoom(1, true));
+    const ignored = event.pointerId !== undefined && ignoredPointerClicks.get(pointerType(event)) === event.pointerId;
+    if (event.detail > 0 && (ignored || foreignPointer(event))) {
+      if (ignored) ignoredPointerClicks.delete(pointerType(event));
+      event.preventDefault?.();
       return;
     }
-    comSom(() => act(button));
+    ui.press = null;
+    if (event.detail === 0) ui.spacePress = null;
+    try {
+      // O Chromium ainda pode emitir click ao soltar um botão cujo gesto foi cancelado por blur, Escape ou repouso.
+      if (event.detail > 0 && ui.cancelledClick) { ui.cancelledClick = false; event.preventDefault?.(); return; }
+      const button = event.target.closest?.('[data-action]');
+      // Botão de segurar já comprou no pointerdown; pelo teclado (Enter ou espaço, detail 0) ele age como um clique.
+      if (!button || button.tagName === 'SELECT' || button.disabled || (button.dataset.hold && event.detail !== 0)) return;
+      if (button.dataset.action === 'zoom-alca') {
+        // O mouse já foi tratado no pointerup; pelo teclado (Enter ou espaço), o botão volta a 100%.
+        if (event.detail === 0) comSom(() => setZoom(1, true));
+        return;
+      }
+      comSom(() => act(button));
+    } finally {
+      flushDeferredRenders();
+      refreshCursor(event);
+    }
   });
 
   document.addEventListener('change', event => {
@@ -1674,8 +2015,10 @@
     }
   });
 
+  // O nome já pertence ao save enquanto é digitado; fechar ou dormir pode acontecer antes de change.
   // O volume muda enquanto a barra anda; só vai para as preferências ao soltar (change).
   document.addEventListener('input', event => {
+    if (event.target.id === 'nome') { engine.rename(event.target.value); saveLater(); return; }
     if (event.target.id !== 'volume') return;
     const volume = Number(event.target.value) / 100;
     ui.settings.volume = volume;
@@ -1694,8 +2037,16 @@
   // Segredo: digitar "yeye" com o jogo em foco chama o Rafael para a festa (ou, se ele já está lá, faz ele gritar de novo).
   const YEYE = 'yeye';
   document.addEventListener('keydown', event => {
-    // Os atalhos do jogo não podem consumir a digitação nem a ativação dos controles nativos.
-    const editing = event.target?.isContentEditable || event.target?.closest?.('input, select, textarea, [contenteditable=""], [contenteditable="true"]');
+    if (event.key === ' ') {
+      if (event.repeat && ui.cancelledSpace) { event.preventDefault(); return; }
+      if (!event.repeat) {
+        ui.cancelledSpace = false;
+        const button = event.target?.closest?.('button[data-action]');
+        ui.spacePress = button && !button.disabled ? { button } : null;
+      }
+    }
+    // Os atalhos do jogo não podem consumir a digitação, a leitura dos avisos ou os controles nativos.
+    const editing = event.target?.isContentEditable || event.target?.closest?.('input, select, textarea, [contenteditable=""], [contenteditable="true"], [role="dialog"], .ajuda-painel');
     if (editing && event.key !== 'Escape') return;
     if (ui.focused && !event.ctrlKey && !event.altKey && !event.metaKey && !event.repeat && typeof event.key === 'string' && /^[a-z]$/i.test(event.key)) {
       ui.yeye = (ui.yeye + event.key.toLowerCase()).slice(-YEYE.length);
@@ -1722,40 +2073,74 @@
       if (ui.segredo === SEGREDO) { ui.segredo = ''; toggleDebug(); return; }
     } else if (event.key !== 'Shift') ui.segredo = '';
     if (event.key !== 'Escape') return;
-    comSom(() => {
-      if (ui.modal) closeModal();
-      else if (ui.rings.open) closeRings();
-      else if (ui.tela.open) closeTela();
-      else if (ui.open) closePanel();
-      else if (ui.dock.open) closeDock();
-    }, null);
+    // Escape também interrompe o arrasto: fechar a janela não pode deixar seu gesto ativo por trás dela.
+    if (ui.drag || ui.hold || ui.press || ui.spacePress) dropPointer();
+    comSom(closeFrontWindow, null);
+    refreshCursor();
   });
 
-  $('#importar').addEventListener('cancel', () => { ui.picking = false; });
+  document.addEventListener('keyup', event => {
+    if (event.key !== ' ') return;
+    if (ui.cancelledSpace) {
+      event.preventDefault();
+      // Cancelar o keyup também deixa o :active nativo preso. Limpa-o sem perder a navegação pelo teclado.
+      const button = event.target?.closest?.('button[data-action]');
+      if (button === document.activeElement && button?.blur && button?.focus) {
+        restoringFocus = true;
+        try { button.blur(); button.focus({ preventScroll: true }); }
+        finally { restoringFocus = false; }
+      }
+    }
+    ui.cancelledSpace = false;
+    const press = ui.spacePress;
+    if (press) setTimeout(() => {
+      if (ui.spacePress === press) { ui.spacePress = null; flushDeferredRenders(); }
+    }, 0);
+  });
+
+  document.addEventListener('focusin', event => {
+    if (!restoringFocus) raiseWindow(event.target.closest?.('.casa, .painel, .minijogo, #vitrine'));
+  });
+
+  $('#importar').addEventListener('cancel', () => { importRequest++; ui.picking = false; });
   $('#importar').addEventListener('change', async event => {
     ui.picking = false;
-    const file = event.target.files[0];
+    const request = ++importRequest;
+    const generation = gameGeneration;
+    const target = event.target;
+    const file = target.files[0];
     if (!file) return;
     try {
-      const imported = new GameEngine(data, JSON.parse(await file.text()));
+      const text = await file.text();
+      // Outra seleção, cancelamento ou festa nova abandona esta leitura sem abrir um aviso atrasado.
+      if (request !== importRequest || generation !== gameGeneration) return;
+      const state = JSON.parse(text);
+      if (!state || typeof state !== 'object' || Array.isArray(state)) throw new Error('Save inválido.');
+      new GameEngine(data, state); // valida antes de pedir para substituir a festa atual
       if (!confirm(t('app.importConfirm'))) return;
+      // A leitura é assíncrona: conclui o campo que o jogador abriu nesse intervalo ainda na festa antiga.
+      document.activeElement?.blur?.();
+      // A espera na confirmação também conta como tempo fora do save escolhido, com um único teto de horas.
+      const imported = new GameEngine(data, state);
+      if (!saveReplacement(imported, 'app.importNotSaved')) return;
       engine = imported;
       ui.janelas?.setEngine(engine);
       forgetRound();
-      save();
       renderHud(true);
       renderWindows();
       renderDock();
       toast(t('app.imported'));
-    } catch (_) { toast(t('app.importFailed'), 'erro'); }
-    finally { event.target.value = ''; }
+    } catch (_) {
+      if (request === importRequest && generation === gameGeneration) toast(t('app.importFailed'), 'erro');
+    }
+    finally { if (request === importRequest) target.value = ''; }
   });
 
   addEventListener('resize', () => {
     scaleFesta();
     placeFesta();
   });
-  addEventListener('beforeunload', save);
+  addEventListener('beforeunload', () => { dropPointer(); save(); });
 
   if (desktop) {
     desktop.onCommand(command => {
@@ -1764,27 +2149,41 @@
       else if (command === 'argolas') openRings();
       else if (command === 'foto') act({ dataset: { action: 'foto' } });
       else if (command === 'retrato') act({ dataset: { action: 'retrato' } });
-      // O computador vai dormir: salva agora.
-      else if (command === 'salvar') save();
-      else if (command?.settings) applySettings(command.settings);
-      else if (typeof command?.foco === 'boolean') setFocused(command.foco);
+      // O computador vai dormir: encerra o gesto antes de salvar, sem esperar o soltar do mouse na volta.
+      else if (command === 'salvar') { dropPointer(); save(); }
+      else if (command?.settings) receiveSettingsSnapshot(command.settings);
+      else if (typeof command?.foco === 'boolean') setFocused(command.foco, command.focusRequest);
       // O Electron conta onde o cursor está de tempos em tempos: se o repasse do mouse do Windows falhar, a festa
       // continua sabendo quando o cursor passa por cima dela.
-      else if (command?.cursor) hover(command.cursor.x, command.cursor.y, command.cursor.interactive);
+      else if (command?.cursor) {
+        const cursor = command.cursor;
+        if (typeof cursor.focusRequest === 'number' && cursor.focusRequest < ui.focusRequest) return;
+        if (typeof cursor.focused === 'boolean' && cursor.focused !== ui.focused) setFocused(cursor.focused, cursor.focusRequest);
+        hover(cursor.x, cursor.y, cursor.interactive);
+      }
     });
   }
 
   // --- Laço --------------------------------------------------------------------------------------------
   let lastFrame = performance.now();
+  // O primeiro evento depois do repouso pode chegar antes do próximo quadro. Paga a pausa antes de mudar bônus ou gastar.
+  function wakeGame(t = performance.now()) {
+    const woke = engine.wake();
+    if (!woke) return null;
+    lastFrame = Math.max(lastFrame, t);
+    // O temporizador de uma compra pode voltar antes do quadro: a repetição termina junto com a pausa.
+    if (ui.hold) stopHold();
+    if (woke.cheer >= 1) {
+      toast(I18N.t('app.wake', { time: UI.duration(woke.seconds * 1000), n: UI.compact(woke.cheer) }), 'ouro');
+      saveLater();
+    }
+    return woke;
+  }
   function frame(t) {
     const delta = Math.max(0, (t - lastFrame) / 1000);
     lastFrame = Math.max(lastFrame, t);
     // Voltando do repouso (ou de muito tempo com a festa escondida): o tempo parado rende como jogo fechado.
-    const woke = engine.wake();
-    if (woke && woke.cheer >= 1) {
-      toast(I18N.t('app.wake', { time: UI.duration(woke.seconds * 1000), n: UI.compact(woke.cheer) }), 'ouro');
-      saveLater();
-    }
+    const woke = wakeGame(t);
     let remaining = woke ? 0 : Math.min(delta, desktop ? 30 : 1);
     while (remaining > 0) { const step = Math.min(remaining, 0.25); engine.tick(step); remaining -= step; }
     const events = engine.drainEvents();
@@ -1794,7 +2193,7 @@
       ui.janelas?.onEvents(events, t);
       notify(events);
       // Conquista salva logo: o save leva a lista para a Steam.
-      if (events.some(event => ['size-up', 'tier-up', 'fished', 'outing-done', 'achievement'].includes(event.type))) saveLater();
+      if (events.some(event => ['size-up', 'tier-up', 'fished', 'outing-done', 'achievement', 'item'].includes(event.type))) saveLater();
     }
     if (ui.saveSoon && t >= ui.saveSoon) { ui.saveSoon = 0; save(); }
     if (t - ui.lastSave > 30000) save();
@@ -1882,6 +2281,8 @@
       size: () => ({ width: innerWidth, height: innerHeight }),
       t: (key, vars) => t(key, vars),
       sound: (name, options) => tocar(name, options),
+      raise: raiseWindow,
+      focused: () => ui.focused !== false && !document.hidden,
       toast: (text, kind) => toast(text, kind)
     });
     ui.janelas.restore();
@@ -1898,7 +2299,7 @@
   }
   applySettings(ui.settings);
   if (desktop) {
-    desktop.getSettings().then(applySettings).catch(error => toast(error.message, 'erro'));
+    desktop.getSettings().then(receiveSettingsSnapshot).catch(error => toast(error.message, 'erro'));
     setInterval(() => safely(() => frame(performance.now())), 250);
   }
   if (loadError) toast(t('app.saveIgnored'), 'erro');

@@ -13,6 +13,35 @@
 
     function nextStar(from = tools.now()) { return from + tools.between(...tools.cfg().starEvery) * 1000; }
 
+    function refillRockets(now) {
+      const s = tools.state();
+      const c = tools.cfg();
+      if (s.rockets >= c.rocketMax || !s.rocketAt) s.rocketAt = now;
+      else {
+        const n = Math.floor((now - s.rocketAt) / (c.rocketEvery * 1000));
+        if (n > 0) {
+          s.rockets = Math.min(c.rocketMax, s.rockets + n);
+          s.rocketAt = s.rockets >= c.rocketMax ? now : s.rocketAt + n * c.rocketEvery * 1000;
+        }
+      }
+    }
+
+    function updateVolley(now) {
+      const s = tools.state();
+      const c = tools.cfg();
+      s.volley = s.volley.filter(at => at <= now && now - at <= c.volleyMs);
+      return s.volley.length;
+    }
+
+    function expireStar(now) {
+      const s = tools.state();
+      if (!s.star || now < s.star.until) return false;
+      s.star = null;
+      s.starAt = nextStar(now);
+      tools.emit('star-gone');
+      return true;
+    }
+
     return {
       fresh() {
         return { rockets: tools.cfg().rocketMax, rocketAt: 0, volley: [], finaleAt: 0, fired: 0, finales: 0, starAt: 0, star: null, wishes: 0, simpatiaAt: 0,
@@ -30,7 +59,7 @@
         // A estrela cadente não espera o jogo fechado: ao voltar, a próxima vem com calma.
         return { rockets: int(raw.rockets, 0, c.rocketMax, c.rocketMax), rocketAt: clamp(finite(raw.rocketAt), 0, now), volley: [],
           finaleAt: clamp(finite(raw.finaleAt), 0, now + c.finaleWait * 1000), fired: int(raw.fired, 0, 1e9, 0), finales: int(raw.finales, 0, 1e9, 0),
-          starAt: clamp(finite(raw.starAt), 0, now + c.starEvery[1] * 1000), star: null, wishes: int(raw.wishes, 0, 1e9, 0),
+          starAt: tools.object(raw.star) ? nextStar(now) : clamp(finite(raw.starAt), 0, now + c.starEvery[1] * 1000), star: null, wishes: int(raw.wishes, 0, 1e9, 0),
           simpatiaAt: clamp(finite(raw.simpatiaAt), 0, now + c.simpatiaWait * 1000), cards, simpatias: int(raw.simpatias, 0, 1e9, 0) };
       },
 
@@ -50,16 +79,10 @@
         const s = tools.state();
         const c = tools.cfg();
         const now = tools.now();
-        if (s.rockets >= c.rocketMax || !s.rocketAt) s.rocketAt = now;
-        else {
-          const n = Math.floor((now - s.rocketAt) / (c.rocketEvery * 1000));
-          if (n > 0) {
-            s.rockets = Math.min(c.rocketMax, s.rockets + n);
-            s.rocketAt = s.rockets >= c.rocketMax ? now : s.rocketAt + n * c.rocketEvery * 1000;
-          }
-        }
+        refillRockets(now);
+        updateVolley(now);
         if (s.star) {
-          if (now >= s.star.until) { s.star = null; s.starAt = nextStar(now); tools.emit('star-gone'); }
+          expireStar(now);
           return;
         }
         if (!s.starAt) s.starAt = nextStar(now);
@@ -73,10 +96,11 @@
         const s = tools.state();
         const c = tools.cfg();
         const now = tools.now();
-        const recent = s.volley.filter(at => now - at <= c.volleyMs).length;
+        refillRockets(now);
+        const recent = updateVolley(now);
         return { rockets: s.rockets, rocketMax: c.rocketMax, rocketIn: s.rockets >= c.rocketMax ? 0 : Math.max(0, (s.rocketAt + c.rocketEvery * 1000 - now) / 1000),
           volley: recent, volleyNeed: c.volley, finaleIn: Math.max(0, (s.finaleAt - now) / 1000),
-          star: s.star ? { seed: s.star.seed, left: Math.max(0, (s.star.until - now) / 1000), progress: clamp((now - s.star.born) / (s.star.until - s.star.born), 0, 1) } : null,
+          star: s.star ? { born: s.star.born, seed: s.star.seed, left: Math.max(0, (s.star.until - now) / 1000), progress: clamp((now - s.star.born) / (s.star.until - s.star.born), 0, 1) } : null,
           simpatiaIn: Math.max(0, (s.simpatiaAt - now) / 1000), cards: s.cards ? { ids: s.cards.ids.slice(), picked: s.cards.picked } : null,
           wishes: s.wishes, fired: s.fired, simpatias: s.simpatias };
       },
@@ -86,11 +110,12 @@
         const s = tools.state();
         const c = tools.cfg();
         const now = tools.now();
+        refillRockets(now);
         if (s.rockets <= 0) return { ok: false, reason: 'empty' };
         if (s.rockets >= c.rocketMax) s.rocketAt = now;
         s.rockets--;
         s.fired++;
-        s.volley = s.volley.filter(at => now - at <= c.volleyMs);
+        updateVolley(now);
         s.volley.push(now);
         const reward = tools.reward({ cheer: c.rocketCheer });
         const shape = tools.pick(SHAPES);
@@ -110,6 +135,7 @@
       wish() {
         const s = tools.state();
         const c = tools.cfg();
+        expireStar(tools.now());
         if (!s.star) return { ok: false, reason: 'none' };
         const pick = c.wishes[Math.floor(tools.rng() * c.wishes.length) % c.wishes.length];
         s.star = null;
@@ -139,14 +165,12 @@
         const s = tools.state();
         const c = tools.cfg();
         if (!s.cards || s.cards.picked !== null) return { ok: false, reason: 'none' };
-        if (!(index >= 0 && index < 3)) return { ok: false, reason: 'card' };
+        if (!Number.isInteger(index) || !(index >= 0 && index < 3)) return { ok: false, reason: 'card' };
         s.cards.picked = index;
         const entry = simpatia(s.cards.ids[index]);
         const reward = tools.reward(entry.reward || {});
         if (entry.frenzy) {
-          const r = engine.state.runtime;
-          r.frenzyLeft = Math.max(r.frenzyLeft || 0, entry.frenzy);
-          engine.emit('frenzy-start', { mult: engine.cfg.frenzyMult, seconds: entry.frenzy });
+          engine.startFrenzy(entry.frenzy, true);
           reward.frenzy = entry.frenzy;
         }
         s.simpatiaAt = tools.now() + c.simpatiaWait * 1000;

@@ -1,0 +1,9007 @@
+{
+  "electron": "44.4.5",
+  "pid": 36784,
+  "results": [
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 880,
+        "top": 230,
+        "right": 1274,
+        "bottom": 710,
+        "width": 394,
+        "height": 480
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 434,
+        "top": 100,
+        "right": 859.40625,
+        "bottom": 302,
+        "width": 425.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 407,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 74,
+        "top": 564,
+        "right": 387.84375,
+        "bottom": 710,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 602,
+        "top": 564,
+        "right": 864.59375,
+        "bottom": 710,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 122,
+        "top": 384,
+        "right": 380.59375,
+        "bottom": 542,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 98,
+        "top": 220,
+        "right": 406.328125,
+        "bottom": 374,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 1010,
+        "top": 44,
+        "right": 1265.203125,
+        "bottom": 206,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 98,
+        "top": 8,
+        "right": 406.125,
+        "bottom": 210,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 616,
+        "top": 321,
+        "right": 941.078125,
+        "bottom": 483,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 616,
+        "top": 321,
+        "right": 908.453125,
+        "bottom": 483,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 880,
+        "top": 230,
+        "right": 1274,
+        "bottom": 710,
+        "width": 394,
+        "height": 480
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 492,
+        "bottom": 368,
+        "width": 466,
+        "height": 362
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 448,
+        "height": 320,
+        "scrollHeight": 320,
+        "canvasWidth": 448,
+        "canvasHeight": 320
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 360,
+        "width": 546,
+        "height": 354
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 312,
+        "scrollHeight": 312,
+        "canvasWidth": 528,
+        "canvasHeight": 312
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 360,
+        "width": 546,
+        "height": 354
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 312,
+        "scrollHeight": 312,
+        "canvasWidth": 528,
+        "canvasHeight": 312
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 396,
+        "width": 546,
+        "height": 390
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 348,
+        "scrollHeight": 348,
+        "canvasWidth": 528,
+        "canvasHeight": 348
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 384,
+        "width": 546,
+        "height": 378
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 336,
+        "scrollHeight": 336,
+        "canvasWidth": 528,
+        "canvasHeight": 336
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 492,
+        "bottom": 368,
+        "width": 466,
+        "height": 362
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 448,
+        "height": 320,
+        "scrollHeight": 320,
+        "canvasWidth": 448,
+        "canvasHeight": 320
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 390,
+        "top": 24,
+        "right": 794,
+        "bottom": 470,
+        "width": 404,
+        "height": 446
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 603.40625,
+        "bottom": 243,
+        "width": 425.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 407,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 68,
+        "top": 324,
+        "right": 381.84375,
+        "bottom": 470,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 97,
+        "right": 440.59375,
+        "bottom": 243,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 85,
+        "right": 436.59375,
+        "bottom": 243,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 89,
+        "right": 486.328125,
+        "bottom": 243,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 433.203125,
+        "bottom": 243,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 486.125,
+        "bottom": 243,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 503.078125,
+        "bottom": 243,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 470.453125,
+        "bottom": 243,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 582,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 603.40625,
+        "bottom": 243,
+        "width": 425.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 407,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 256,
+        "width": 370,
+        "height": 250
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 208,
+        "scrollHeight": 208,
+        "canvasWidth": 352,
+        "canvasHeight": 208
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 256,
+        "width": 370,
+        "height": 250
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 208,
+        "scrollHeight": 208,
+        "canvasWidth": 352,
+        "canvasHeight": 208
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 280,
+        "width": 370,
+        "height": 274
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 232,
+        "scrollHeight": 232,
+        "canvasWidth": 352,
+        "canvasHeight": 232
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 272,
+        "width": 370,
+        "height": 266
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 224,
+        "scrollHeight": 224,
+        "canvasWidth": 352,
+        "canvasHeight": 224
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 486.125,
+        "bottom": 243,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 230,
+        "top": 24,
+        "right": 634,
+        "bottom": 350,
+        "width": 404,
+        "height": 326
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 284,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 443.40625,
+        "bottom": 208,
+        "width": 425.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 407,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 331.84375,
+        "bottom": 152,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 280.59375,
+        "bottom": 152,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 276.59375,
+        "bottom": 164,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 326.328125,
+        "bottom": 160,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 273.203125,
+        "bottom": 168,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 326.125,
+        "bottom": 208,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 343.078125,
+        "bottom": 168,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 310.453125,
+        "bottom": 168,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 422,
+        "bottom": 332,
+        "width": 404,
+        "height": 326
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 284,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 443.40625,
+        "bottom": 208,
+        "width": 425.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 407,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 331.84375,
+        "bottom": 152,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 280.59375,
+        "bottom": 152,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 276.59375,
+        "bottom": 164,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 326.328125,
+        "bottom": 160,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 273.203125,
+        "bottom": 168,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 326.125,
+        "bottom": 208,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 343.078125,
+        "bottom": 168,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 310.453125,
+        "bottom": 168,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 200,
+        "bottom": 486,
+        "width": 394,
+        "height": 480
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 185,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 123.84375,
+        "bottom": 403,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 72.59375,
+        "bottom": 403,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 245,
+        "right": 68.59375,
+        "bottom": 403,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 249,
+        "right": 118.328125,
+        "bottom": 403,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 65.203125,
+        "bottom": 403,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 201,
+        "right": 118.125,
+        "bottom": 403,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 135.078125,
+        "bottom": 403,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 102.453125,
+        "bottom": 403,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 200,
+        "bottom": 486,
+        "width": 394,
+        "height": 480
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 185,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 123.84375,
+        "bottom": 403,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 72.59375,
+        "bottom": 403,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 245,
+        "right": 68.59375,
+        "bottom": 403,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 249,
+        "right": 118.328125,
+        "bottom": 403,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 65.203125,
+        "bottom": 403,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 201,
+        "right": 118.125,
+        "bottom": 403,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 135.078125,
+        "bottom": 403,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 102.453125,
+        "bottom": 403,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 210,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 25,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 123.84375,
+        "bottom": 243,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 72.59375,
+        "bottom": 243,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 85,
+        "right": 68.59375,
+        "bottom": 243,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 89,
+        "right": 118.328125,
+        "bottom": 243,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 65.203125,
+        "bottom": 243,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 41,
+        "right": 118.125,
+        "bottom": 243,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 135.078125,
+        "bottom": 243,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 102.453125,
+        "bottom": 243,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 210,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 25,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 123.84375,
+        "bottom": 243,
+        "width": 313.84375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 296,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 72.59375,
+        "bottom": 243,
+        "width": 262.59375,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 245,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 85,
+        "right": 68.59375,
+        "bottom": 243,
+        "width": 258.59375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 89,
+        "right": 118.328125,
+        "bottom": 243,
+        "width": 308.328125,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 65.203125,
+        "bottom": 243,
+        "width": 255.203125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 237,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 41,
+        "right": 118.125,
+        "bottom": 243,
+        "width": 308.125,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 290,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 135.078125,
+        "bottom": 243,
+        "width": 325.078125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 307,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "pt-BR",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 102.453125,
+        "bottom": 243,
+        "width": 292.453125,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 274,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 880,
+        "top": 230,
+        "right": 1274,
+        "bottom": 710,
+        "width": 394,
+        "height": 480
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 616,
+        "top": 281,
+        "right": 1052.296875,
+        "bottom": 483,
+        "width": 436.296875,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 418,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 602,
+        "top": 564,
+        "right": 869.421875,
+        "bottom": 710,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 122,
+        "top": 564,
+        "right": 376.421875,
+        "bottom": 710,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 50,
+        "top": 384,
+        "right": 373.84375,
+        "bottom": 542,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 554,
+        "top": 100,
+        "right": 857.546875,
+        "bottom": 254,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 386,
+        "top": 284,
+        "right": 605.84375,
+        "bottom": 446,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 74,
+        "top": 172,
+        "right": 380.40625,
+        "bottom": 374,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 962,
+        "top": 44,
+        "right": 1272.71875,
+        "bottom": 206,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 616,
+        "top": 321,
+        "right": 971.703125,
+        "bottom": 483,
+        "width": 355.703125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 338,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 880,
+        "top": 230,
+        "right": 1274,
+        "bottom": 710,
+        "width": 394,
+        "height": 480
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 492,
+        "bottom": 368,
+        "width": 466,
+        "height": 362
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 448,
+        "height": 320,
+        "scrollHeight": 320,
+        "canvasWidth": 448,
+        "canvasHeight": 320
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 360,
+        "width": 546,
+        "height": 354
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 312,
+        "scrollHeight": 312,
+        "canvasWidth": 528,
+        "canvasHeight": 312
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 360,
+        "width": 546,
+        "height": 354
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 312,
+        "scrollHeight": 312,
+        "canvasWidth": 528,
+        "canvasHeight": 312
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 396,
+        "width": 546,
+        "height": 390
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 348,
+        "scrollHeight": 348,
+        "canvasWidth": 528,
+        "canvasHeight": 348
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 384,
+        "width": 546,
+        "height": 378
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 336,
+        "scrollHeight": 336,
+        "canvasWidth": 528,
+        "canvasHeight": 336
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 492,
+        "bottom": 368,
+        "width": 466,
+        "height": 362
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 448,
+        "height": 320,
+        "scrollHeight": 320,
+        "canvasWidth": 448,
+        "canvasHeight": 320
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 390,
+        "top": 24,
+        "right": 794,
+        "bottom": 470,
+        "width": 404,
+        "height": 446
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 614.296875,
+        "bottom": 243,
+        "width": 436.296875,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 418,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 116,
+        "top": 324,
+        "right": 383.421875,
+        "bottom": 470,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 97,
+        "right": 432.421875,
+        "bottom": 243,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 85,
+        "right": 501.84375,
+        "bottom": 243,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 89,
+        "right": 481.546875,
+        "bottom": 243,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 397.84375,
+        "bottom": 243,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 484.40625,
+        "bottom": 243,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 488.71875,
+        "bottom": 243,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 533.703125,
+        "bottom": 243,
+        "width": 355.703125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 338,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 582,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 614.296875,
+        "bottom": 243,
+        "width": 436.296875,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 418,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 256,
+        "width": 370,
+        "height": 250
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 208,
+        "scrollHeight": 208,
+        "canvasWidth": 352,
+        "canvasHeight": 208
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 256,
+        "width": 370,
+        "height": 250
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 208,
+        "scrollHeight": 208,
+        "canvasWidth": 352,
+        "canvasHeight": 208
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 280,
+        "width": 370,
+        "height": 274
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 232,
+        "scrollHeight": 232,
+        "canvasWidth": 352,
+        "canvasHeight": 232
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 272,
+        "width": 370,
+        "height": 266
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 224,
+        "scrollHeight": 224,
+        "canvasWidth": 352,
+        "canvasHeight": 224
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 484.40625,
+        "bottom": 243,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 230,
+        "top": 24,
+        "right": 634,
+        "bottom": 350,
+        "width": 404,
+        "height": 326
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 284,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 454.296875,
+        "bottom": 208,
+        "width": 436.296875,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 418,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 285.421875,
+        "bottom": 152,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 272.421875,
+        "bottom": 152,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 341.84375,
+        "bottom": 164,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 321.546875,
+        "bottom": 160,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 237.84375,
+        "bottom": 168,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 324.40625,
+        "bottom": 208,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 328.71875,
+        "bottom": 168,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 373.703125,
+        "bottom": 168,
+        "width": 355.703125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 338,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 422,
+        "bottom": 332,
+        "width": 404,
+        "height": 326
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 284,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 454.296875,
+        "bottom": 208,
+        "width": 436.296875,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 418,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 285.421875,
+        "bottom": 152,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 272.421875,
+        "bottom": 152,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 341.84375,
+        "bottom": 164,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 321.546875,
+        "bottom": 160,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 237.84375,
+        "bottom": 168,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 324.40625,
+        "bottom": 208,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 328.71875,
+        "bottom": 168,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 373.703125,
+        "bottom": 168,
+        "width": 355.703125,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 338,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 200,
+        "bottom": 486,
+        "width": 394,
+        "height": 480
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 185,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 77.421875,
+        "bottom": 403,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 64.421875,
+        "bottom": 403,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 245,
+        "right": 133.84375,
+        "bottom": 403,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 249,
+        "right": 113.546875,
+        "bottom": 403,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 29.84375,
+        "bottom": 403,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": false,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 201,
+        "right": 116.40625,
+        "bottom": 403,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 120.71875,
+        "bottom": 403,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 233,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 170
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 200,
+        "bottom": 486,
+        "width": 394,
+        "height": 480
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 185,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 77.421875,
+        "bottom": 403,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 64.421875,
+        "bottom": 403,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 245,
+        "right": 133.84375,
+        "bottom": 403,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 249,
+        "right": 113.546875,
+        "bottom": 403,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 29.84375,
+        "bottom": 403,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": false,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 201,
+        "right": 116.40625,
+        "bottom": 403,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 120.71875,
+        "bottom": 403,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 233,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 170
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 210,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 25,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 77.421875,
+        "bottom": 243,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 64.421875,
+        "bottom": 243,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 85,
+        "right": 133.84375,
+        "bottom": 243,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 89,
+        "right": 113.546875,
+        "bottom": 243,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 29.84375,
+        "bottom": 243,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": false,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 41,
+        "right": 116.40625,
+        "bottom": 243,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 120.71875,
+        "bottom": 243,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 73,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 170
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 210,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 25,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 77.421875,
+        "bottom": 243,
+        "width": 267.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 249,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 64.421875,
+        "bottom": 243,
+        "width": 254.421875,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 236,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 85,
+        "right": 133.84375,
+        "bottom": 243,
+        "width": 323.84375,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 89,
+        "right": 113.546875,
+        "bottom": 243,
+        "width": 303.546875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 286,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 29.84375,
+        "bottom": 243,
+        "width": 219.84375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": false,
+      "closeAccessible": true,
+      "scene": {
+        "width": 202,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 41,
+        "right": 116.40625,
+        "bottom": 243,
+        "width": 306.40625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 288,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 120.71875,
+        "bottom": 243,
+        "width": 310.71875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 293,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "en",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 73,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 170
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 880,
+        "top": 230,
+        "right": 1274,
+        "bottom": 710,
+        "width": 394,
+        "height": 480
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 616,
+        "top": 281,
+        "right": 1037.8125,
+        "bottom": 483,
+        "width": 421.8125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 404,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 564,
+        "right": 384.59375,
+        "bottom": 710,
+        "width": 358.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 341,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 602,
+        "top": 564,
+        "right": 860.640625,
+        "bottom": 710,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 1010,
+        "top": 48,
+        "right": 1273.765625,
+        "bottom": 206,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 554,
+        "top": 100,
+        "right": 856.46875,
+        "bottom": 254,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 242,
+        "top": 212,
+        "right": 529.734375,
+        "bottom": 374,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 616,
+        "top": 281,
+        "right": 934.640625,
+        "bottom": 483,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 218,
+        "top": 44,
+        "right": 542.46875,
+        "bottom": 206,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 74,
+        "top": 380,
+        "right": 366.90625,
+        "bottom": 542,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 880,
+        "top": 230,
+        "right": 1274,
+        "bottom": 710,
+        "width": 394,
+        "height": 480
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 492,
+        "bottom": 368,
+        "width": 466,
+        "height": 362
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 448,
+        "height": 320,
+        "scrollHeight": 320,
+        "canvasWidth": 448,
+        "canvasHeight": 320
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 360,
+        "width": 546,
+        "height": 354
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 312,
+        "scrollHeight": 312,
+        "canvasWidth": 528,
+        "canvasHeight": 312
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 360,
+        "width": 546,
+        "height": 354
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 312,
+        "scrollHeight": 312,
+        "canvasWidth": 528,
+        "canvasHeight": 312
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 396,
+        "width": 546,
+        "height": 390
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 348,
+        "scrollHeight": 348,
+        "canvasWidth": 528,
+        "canvasHeight": 348
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 384,
+        "width": 546,
+        "height": 378
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 336,
+        "scrollHeight": 336,
+        "canvasWidth": 528,
+        "canvasHeight": 336
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 492,
+        "bottom": 368,
+        "width": 466,
+        "height": 362
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 448,
+        "height": 320,
+        "scrollHeight": 320,
+        "canvasWidth": 448,
+        "canvasHeight": 320
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 26,
+        "top": 6,
+        "right": 572,
+        "bottom": 408,
+        "width": 546,
+        "height": 402
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 528,
+        "height": 360,
+        "scrollHeight": 360,
+        "canvasWidth": 528,
+        "canvasHeight": 360
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 390,
+        "top": 24,
+        "right": 794,
+        "bottom": 470,
+        "width": 404,
+        "height": 446
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 599.8125,
+        "bottom": 243,
+        "width": 421.8125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 404,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 97,
+        "right": 536.59375,
+        "bottom": 243,
+        "width": 358.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 341,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 116,
+        "top": 324,
+        "right": 374.640625,
+        "bottom": 470,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 85,
+        "right": 441.765625,
+        "bottom": 243,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 89,
+        "right": 480.46875,
+        "bottom": 243,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 465.734375,
+        "bottom": 243,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 496.640625,
+        "bottom": 243,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 502.46875,
+        "bottom": 243,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 81,
+        "right": 470.90625,
+        "bottom": 243,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 582,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 599.8125,
+        "bottom": 243,
+        "width": 421.8125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 404,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 256,
+        "width": 370,
+        "height": 250
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 208,
+        "scrollHeight": 208,
+        "canvasWidth": 352,
+        "canvasHeight": 208
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 256,
+        "width": 370,
+        "height": 250
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 208,
+        "scrollHeight": 208,
+        "canvasWidth": 352,
+        "canvasHeight": 208
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 280,
+        "width": 370,
+        "height": 274
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 232,
+        "scrollHeight": 232,
+        "canvasWidth": 352,
+        "canvasHeight": 232
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 272,
+        "width": 370,
+        "height": 266
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 224,
+        "scrollHeight": 224,
+        "canvasWidth": 352,
+        "canvasHeight": 224
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 41,
+        "right": 496.640625,
+        "bottom": 243,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 800,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 178,
+        "top": 6,
+        "right": 548,
+        "bottom": 288,
+        "width": 370,
+        "height": 282
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 352,
+        "height": 240,
+        "scrollHeight": 240,
+        "canvasWidth": 352,
+        "canvasHeight": 240
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 230,
+        "top": 24,
+        "right": 634,
+        "bottom": 350,
+        "width": 404,
+        "height": 326
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 284,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 439.8125,
+        "bottom": 208,
+        "width": 421.8125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 404,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 376.59375,
+        "bottom": 152,
+        "width": 358.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 341,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 276.640625,
+        "bottom": 152,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 281.765625,
+        "bottom": 164,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 320.46875,
+        "bottom": 160,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 305.734375,
+        "bottom": 168,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 336.640625,
+        "bottom": 208,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 342.46875,
+        "bottom": 168,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 310.90625,
+        "bottom": 168,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 422,
+        "bottom": 332,
+        "width": 404,
+        "height": 326
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 284,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 439.8125,
+        "bottom": 208,
+        "width": 421.8125,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 404,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 376.59375,
+        "bottom": 152,
+        "width": 358.59375,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 341,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 276.640625,
+        "bottom": 152,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 281.765625,
+        "bottom": 164,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 320.46875,
+        "bottom": 160,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 305.734375,
+        "bottom": 168,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 336.640625,
+        "bottom": 208,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 342.46875,
+        "bottom": 168,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 640,
+        "height": 360,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": 18,
+        "top": 6,
+        "right": 310.90625,
+        "bottom": 168,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": true,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 200,
+        "bottom": 486,
+        "width": 394,
+        "height": 480
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 185,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 241,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 68.640625,
+        "bottom": 403,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 245,
+        "right": 73.765625,
+        "bottom": 403,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 249,
+        "right": 112.46875,
+        "bottom": 403,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 97.734375,
+        "bottom": 403,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 201,
+        "right": 128.640625,
+        "bottom": 403,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 134.46875,
+        "bottom": 403,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 102.90625,
+        "bottom": 403,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 200,
+        "bottom": 486,
+        "width": 394,
+        "height": 480
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 438,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 185,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 241,
+        "right": 160,
+        "bottom": 403,
+        "width": 354,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 257,
+        "right": 68.640625,
+        "bottom": 403,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 245,
+        "right": 73.765625,
+        "bottom": 403,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 249,
+        "right": 112.46875,
+        "bottom": 403,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 97.734375,
+        "bottom": 403,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 201,
+        "right": 128.640625,
+        "bottom": 403,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 134.46875,
+        "bottom": 403,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 640,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 241,
+        "right": 102.90625,
+        "bottom": 403,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 210,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 25,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 81,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 68.640625,
+        "bottom": 243,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 85,
+        "right": 73.765625,
+        "bottom": 243,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 89,
+        "right": 112.46875,
+        "bottom": 243,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 97.734375,
+        "bottom": 243,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 41,
+        "right": 128.640625,
+        "bottom": 243,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 134.46875,
+        "bottom": 243,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 0.25,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 102.90625,
+        "bottom": 243,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "casa",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 6,
+        "right": 210,
+        "bottom": 452,
+        "width": 404,
+        "height": 446
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 376,
+        "height": 404,
+        "scrollHeight": 438,
+        "canvasWidth": 376,
+        "canvasHeight": 438
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-cordel",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 25,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 218
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bichos",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -194,
+        "top": 81,
+        "right": 160,
+        "bottom": 243,
+        "width": 354,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 336,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-aquario",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 97,
+        "right": 68.640625,
+        "bottom": 243,
+        "width": 258.640625,
+        "height": 146
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 241,
+        "height": 104,
+        "scrollHeight": 104,
+        "canvasWidth": 176,
+        "canvasHeight": 104
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-horta",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 85,
+        "right": 73.765625,
+        "bottom": 243,
+        "width": 263.765625,
+        "height": 158
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 246,
+        "height": 116,
+        "scrollHeight": 116,
+        "canvasWidth": 176,
+        "canvasHeight": 116
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-fogueira",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 89,
+        "right": 112.46875,
+        "bottom": 243,
+        "width": 302.46875,
+        "height": 154
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 284,
+        "height": 112,
+        "scrollHeight": 112,
+        "canvasWidth": 176,
+        "canvasHeight": 112
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-palco",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 97.734375,
+        "bottom": 243,
+        "width": 287.734375,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 270,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-mata",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 41,
+        "right": 128.640625,
+        "bottom": 243,
+        "width": 318.640625,
+        "height": 202
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 301,
+        "height": 160,
+        "scrollHeight": 160,
+        "canvasWidth": 224,
+        "canvasHeight": 160
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-ceu",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 134.46875,
+        "bottom": 243,
+        "width": 324.46875,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 306,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    },
+    {
+      "language": "es",
+      "zoom": 3,
+      "id": "mini-bairro",
+      "viewport": {
+        "width": 360,
+        "height": 480,
+        "dpr": 1
+      },
+      "hidden": false,
+      "box": {
+        "left": -190,
+        "top": 81,
+        "right": 102.90625,
+        "bottom": 243,
+        "width": 292.90625,
+        "height": 162
+      },
+      "inside": false,
+      "closeVisible": true,
+      "closeAccessible": true,
+      "scene": {
+        "width": 275,
+        "height": 120,
+        "scrollHeight": 120,
+        "canvasWidth": 176,
+        "canvasHeight": 120
+      },
+      "canvasFitsWidth": true
+    }
+  ],
+  "errors": []
+}

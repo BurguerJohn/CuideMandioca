@@ -1,0 +1,142 @@
+{
+  "cases": [
+    {
+      "language": "pt",
+      "mode": "continuous",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "pt",
+      "mode": "continuous",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "pt",
+      "mode": "reload-win",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "pt",
+      "mode": "reload-win",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "pt",
+      "mode": "reload-fight",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "pt",
+      "mode": "reload-fight",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "pt",
+      "mode": "defeats",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "mode": "continuous",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "mode": "continuous",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "mode": "reload-win",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "mode": "reload-win",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "mode": "reload-fight",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "mode": "reload-fight",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "mode": "defeats",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "mode": "continuous",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "mode": "continuous",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "mode": "reload-win",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "mode": "reload-win",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "mode": "reload-fight",
+      "companion": "",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "mode": "reload-fight",
+      "companion": "galinha",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "mode": "defeats",
+      "companion": "",
+      "passed": true
+    }
+  ],
+  "actions": 7665,
+  "steps": 479820,
+  "reloads": 1875,
+  "pauses": 2739,
+  "newYears": 21,
+  "wins": 2703,
+  "firstBosses": 360,
+  "trainingBosses": 180,
+  "defeats": 18,
+  "kills": 6609,
+  "focused": 1764,
+  "failures": []
+}

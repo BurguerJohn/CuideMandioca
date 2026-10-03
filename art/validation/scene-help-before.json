@@ -1,0 +1,61 @@
+{
+  "electron": "44.4.5",
+  "pid": 49040,
+  "results": [
+    {
+      "viewport": {
+        "width": 360,
+        "height": 240
+      },
+      "previous": {
+        "x": 56,
+        "y": 284
+      },
+      "resident": 9,
+      "canvasTarget": true,
+      "reacted": true,
+      "titleVisible": false,
+      "helpAtStart": true,
+      "scrollAtStart": false,
+      "restored": true,
+      "reopenedAtStart": false
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 360
+      },
+      "previous": {
+        "x": 56,
+        "y": 164
+      },
+      "resident": 9,
+      "canvasTarget": true,
+      "reacted": true,
+      "titleVisible": false,
+      "helpAtStart": true,
+      "scrollAtStart": false,
+      "restored": true,
+      "reopenedAtStart": false
+    },
+    {
+      "viewport": {
+        "width": 640,
+        "height": 360
+      },
+      "previous": {
+        "x": 0,
+        "y": 154
+      },
+      "resident": 9,
+      "canvasTarget": true,
+      "reacted": true,
+      "titleVisible": false,
+      "helpAtStart": true,
+      "scrollAtStart": false,
+      "restored": true,
+      "reopenedAtStart": false
+    }
+  ],
+  "errors": []
+}

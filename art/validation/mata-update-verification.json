@@ -1,0 +1,47 @@
+{
+  "changes": [
+    "freeze the forest fight while its window is closed, the party is hidden, or the game loses focus",
+    "resume the same live battle without accumulating time spent closed",
+    "keep manual pause independent of window visibility",
+    "increase creature health and damage, boss strength and stage growth while reducing recovery"
+  ],
+  "fullTests": 669,
+  "failedTests": 0,
+  "syntaxChecked": 43,
+  "diffChecked": true,
+  "balanceCases": 24,
+  "progressReductionOverTenMinutes": 0.5229885057471264,
+  "nativeLanguages": [
+    {
+      "language": "pt-BR",
+      "nativeClicks": 6,
+      "closedClock": 2.000000000000001,
+      "reopenedClock": 3.599999999999995,
+      "manualPausePreserved": true
+    },
+    {
+      "language": "en",
+      "nativeClicks": 6,
+      "closedClock": 2.000000000000001,
+      "reopenedClock": 3.649999999999995,
+      "manualPausePreserved": true
+    },
+    {
+      "language": "es",
+      "nativeClicks": 6,
+      "closedClock": 2.000000000000001,
+      "reopenedClock": 3.649999999999995,
+      "manualPausePreserved": true
+    }
+  ],
+  "nativeHarnessUsesSimulatedDesktopFocusAndVisibility": true,
+  "activeRoundHandoffPassed": true,
+  "removedProfiles": 3,
+  "package": {
+    "runtimeFiles": 40,
+    "styleFiles": 1,
+    "htmlFiles": 1,
+    "htmlReferences": 36,
+    "packagedAt": "2026-10-03T13:36:51.105Z"
+  }
+}

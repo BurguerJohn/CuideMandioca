@@ -1,0 +1,409 @@
+{
+  "pid": 15888,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-help-keyboard-profile-15888-yJTZY3",
+  "electron": "44.4.5",
+  "cases": [
+    {
+      "id": "casa",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "casa-fechar",
+          "visible": true,
+          "height": 103,
+          "content": 427
+        },
+        {
+          "reading": true,
+          "active": "casa-ajuda",
+          "visible": true,
+          "height": 103,
+          "content": 427
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 89.5999984741211,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "casa-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "cordel",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 103,
+          "content": 289
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 103,
+          "content": 289
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 89.5999984741211,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "bichos",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 78,
+          "content": 289
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 78,
+          "content": 289
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 68,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "aquario",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 78,
+          "content": 424
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 78,
+          "content": 424
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 68,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "horta",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 88,
+          "content": 694
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 88,
+          "content": 694
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 76.80000305175781,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "fogueira",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 85,
+          "content": 475
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 85,
+          "content": 475
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 73.5999984741211,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "palco",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 91,
+          "content": 441
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 91,
+          "content": 441
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 79.19999694824219,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "mata",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 103,
+          "content": 779
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 103,
+          "content": 779
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 89.5999984741211,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "ceu",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 91,
+          "content": 356
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 91,
+          "content": 356
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 79.19999694824219,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    },
+    {
+      "id": "bairro",
+      "tabs": [
+        {
+          "reading": false,
+          "active": "mini-fechar",
+          "visible": true,
+          "height": 91,
+          "content": 339
+        },
+        {
+          "reading": true,
+          "active": "mini-ajuda",
+          "visible": true,
+          "height": 91,
+          "content": 339
+        }
+      ],
+      "before": {
+        "left": 3,
+        "scroll": 0
+      },
+      "after": {
+        "left": 3,
+        "scroll": 79.19999694824219,
+        "visible": true,
+        "documentFocused": true
+      },
+      "escaped": {
+        "helpClosed": true,
+        "ownerOpen": true,
+        "returnFocused": true,
+        "active": "mini-ajuda"
+      },
+      "reopened": {
+        "visible": true,
+        "left": 3
+      }
+    }
+  ],
+  "errors": [],
+  "stage": "space-bairro",
+  "outsideFocus": [
+    {
+      "id": "casa",
+      "kept": true
+    },
+    {
+      "id": "bairro",
+      "kept": true
+    }
+  ]
+}

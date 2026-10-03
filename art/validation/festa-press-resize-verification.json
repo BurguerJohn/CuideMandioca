@@ -1,0 +1,57 @@
+{
+  "pid": 22252,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-22252-Jfz2Oo",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": true,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "press": {
+    "before": {
+      "point": {
+        "x": 939,
+        "y": 718
+      },
+      "hit": "fogueira",
+      "canvasHit": true,
+      "viewport": {
+        "width": 1104,
+        "height": 819
+      }
+    },
+    "resized": {
+      "viewport": {
+        "width": 1000,
+        "height": 851
+      },
+      "hit": "festa",
+      "region": "fogueira"
+    },
+    "after": {
+      "open": false,
+      "id": "correio",
+      "dragging": false
+    },
+    "fresh": {
+      "point": {
+        "x": 864,
+        "y": 750
+      },
+      "hit": "fogueira",
+      "canvasHit": true,
+      "viewport": {
+        "width": 1000,
+        "height": 851
+      }
+    },
+    "reopened": {
+      "open": true,
+      "id": "fogueira"
+    }
+  }
+}

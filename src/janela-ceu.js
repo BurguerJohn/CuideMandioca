@@ -194,7 +194,7 @@
       base.g.fillRect(Math.round(x) - 2, Math.round(y), 5, 1);
       base.g.fillRect(Math.round(x), Math.round(y) - 2, 1, 5);
       if (Math.floor(now / 200) % 2 === 0) base.spawn('brilho', x - 2, y - 3, now);
-      base.region('estrela', x - 9, y - 9, 18, 18, { tip: tr('mini.ceu.tipStar') });
+      base.region('estrela', x - 9, y - 9, 18, 18, { born: info.star.born, seed: sd, tip: tr('mini.ceu.tipStar') });
     }
 
     // As 3 cartas da simpatia (de costas; depois de escolher, as faces) e o resultado.
@@ -240,8 +240,8 @@
       drawLauncher(info, now);
       drawTable(info, now);
       base.drawParticles(now);
-      base.drawSays(now);
       if (info.cards) drawCards(info, now);
+      base.drawSays(now);
       return true;
     }
 
@@ -265,6 +265,8 @@
         return true;
       }
       if (found?.id === 'estrela') {
+        // Ao reabrir antes do próximo desenho, a região antiga não pode resgatar outra estrela.
+        if (found.born !== info.star?.born || found.seed !== info.star?.seed) return true;
         const got = model.wish();
         if (got.ok) {
           hooks.sound?.('sino');

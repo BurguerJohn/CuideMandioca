@@ -1,0 +1,2655 @@
+{
+  "cases": [
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 22,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 32,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 42,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 52,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 62,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 72,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "pt-BR",
+      "level": 82,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 22,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 32,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 42,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 52,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 62,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 72,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "en",
+      "level": 82,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 22,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 32,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 42,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 52,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 62,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 72,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 0,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 0,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 0,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 1,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 1,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 1,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 2,
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 2,
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    },
+    {
+      "language": "es",
+      "level": 82,
+      "waters": 2,
+      "mode": "reload-growth",
+      "passed": true,
+      "result": {
+        "distinctCrops": 5,
+        "totalHarvests": 10,
+        "permanentBonus": 0.5,
+        "openPlots": 10,
+        "year": 2
+      }
+    }
+  ],
+  "actions": 8541,
+  "reloads": 7131,
+  "newYears": 189,
+  "harvests": 1890,
+  "failures": []
+}

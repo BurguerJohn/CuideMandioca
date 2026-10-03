@@ -1,0 +1,219 @@
+{
+  "completedAt": "2026-10-03T12:19:32.729Z",
+  "cases": [
+    {
+      "surface": "vitrine",
+      "edge": "left",
+      "pointer": "touch",
+      "pid": 13532,
+      "file": "drag-limit-vitrine-left-verification.json",
+      "passed": true,
+      "first": 8,
+      "reversed": 28,
+      "released": 28
+    },
+    {
+      "surface": "vitrine",
+      "edge": "right",
+      "pointer": "touch",
+      "pid": 35416,
+      "file": "drag-limit-vitrine-right-verification.json",
+      "passed": true,
+      "first": 350,
+      "reversed": 330,
+      "released": 330
+    },
+    {
+      "surface": "festa",
+      "edge": "left",
+      "pointer": "touch",
+      "pid": 45756,
+      "file": "drag-limit-festa-left-verification.json",
+      "passed": true,
+      "first": 0,
+      "reversed": 20,
+      "released": 20
+    },
+    {
+      "surface": "festa",
+      "edge": "top",
+      "pointer": "touch",
+      "pid": 51836,
+      "file": "drag-limit-festa-top-verification.json",
+      "passed": true,
+      "first": -96.20000457763672,
+      "reversed": -76.20000457763672,
+      "released": -76.20000457763672
+    },
+    {
+      "surface": "placa",
+      "edge": "right",
+      "pointer": "touch",
+      "pid": 54172,
+      "file": "drag-limit-placa-right-verification.json",
+      "passed": true,
+      "first": 898,
+      "reversed": 878,
+      "released": 878
+    },
+    {
+      "surface": "placa",
+      "edge": "bottom",
+      "pointer": "touch",
+      "pid": 45144,
+      "file": "drag-limit-placa-bottom-verification.json",
+      "passed": true,
+      "first": 592.7200317382812,
+      "reversed": 572.7200317382812,
+      "released": 572.7200317382812
+    },
+    {
+      "surface": "bichos",
+      "edge": "left",
+      "pointer": "touch",
+      "pid": 50496,
+      "file": "drag-limit-bichos-left-verification.json",
+      "passed": true,
+      "first": 6,
+      "reversed": 26,
+      "released": 26
+    },
+    {
+      "surface": "bichos",
+      "edge": "bottom",
+      "pointer": "touch",
+      "pid": 54256,
+      "file": "drag-limit-bichos-bottom-verification.json",
+      "passed": true,
+      "first": 606,
+      "reversed": 586,
+      "released": 586
+    },
+    {
+      "surface": "casa",
+      "edge": "left",
+      "pointer": "touch",
+      "pid": 14104,
+      "file": "drag-limit-casa-left-verification.json",
+      "passed": true,
+      "first": 6,
+      "reversed": 26,
+      "released": 26
+    },
+    {
+      "surface": "casa",
+      "edge": "bottom",
+      "pointer": "touch",
+      "pid": 14176,
+      "file": "drag-limit-casa-bottom-verification.json",
+      "passed": true,
+      "first": 620.4000244140625,
+      "reversed": 600.4000244140625,
+      "released": 600.4000244140625
+    },
+    {
+      "surface": "painel",
+      "edge": "top",
+      "pointer": "touch",
+      "pid": 18032,
+      "file": "drag-limit-painel-top-verification.json",
+      "passed": true,
+      "first": 8,
+      "reversed": 28,
+      "released": 28
+    },
+    {
+      "surface": "painel",
+      "edge": "right",
+      "pointer": "touch",
+      "pid": 57212,
+      "file": "drag-limit-painel-right-verification.json",
+      "passed": true,
+      "first": 296,
+      "reversed": 276,
+      "released": 276
+    },
+    {
+      "surface": "tela",
+      "edge": "left",
+      "pointer": "touch",
+      "pid": 18104,
+      "file": "drag-limit-tela-left-verification.json",
+      "passed": true,
+      "first": 8,
+      "reversed": 28,
+      "released": 28
+    },
+    {
+      "surface": "tela",
+      "edge": "bottom",
+      "pointer": "touch",
+      "pid": 32792,
+      "file": "drag-limit-tela-bottom-verification.json",
+      "passed": true,
+      "first": 472,
+      "reversed": 452,
+      "released": 452
+    },
+    {
+      "surface": "argolas",
+      "edge": "top",
+      "pointer": "touch",
+      "pid": 41660,
+      "file": "drag-limit-argolas-top-verification.json",
+      "passed": true,
+      "first": 8,
+      "reversed": 28,
+      "released": 28
+    },
+    {
+      "surface": "argolas",
+      "edge": "right",
+      "pointer": "touch",
+      "pid": 52764,
+      "file": "drag-limit-argolas-right-verification.json",
+      "passed": true,
+      "first": 536,
+      "reversed": 516,
+      "released": 516
+    },
+    {
+      "surface": "vitrine",
+      "edge": "left",
+      "pointer": "mouse",
+      "pid": 48636,
+      "file": "drag-limit-vitrine-left-mouse-verification.json",
+      "passed": true,
+      "first": 8,
+      "reversed": 28,
+      "released": 28
+    },
+    {
+      "surface": "casa",
+      "edge": "bottom",
+      "pointer": "mouse",
+      "pid": 30752,
+      "file": "drag-limit-casa-bottom-mouse-verification.json",
+      "passed": true,
+      "first": 620.4000244140625,
+      "reversed": 600.4000244140625,
+      "released": 600.4000244140625
+    }
+  ],
+  "before": {
+    "pid": 34992,
+    "first": 8,
+    "reversed": 8,
+    "file": "drag-limit-vitrine-left-before.json"
+  },
+  "unitDirectionalCases": 62,
+  "fullTests": 661,
+  "syntaxFiles": 43,
+  "packagedAt": "2026-10-03T12:09:16.395Z",
+  "packageVerified": {
+    "runtimeFiles": 40,
+    "styleFiles": 1,
+    "htmlFiles": 1,
+    "htmlReferences": 36
+  }
+}

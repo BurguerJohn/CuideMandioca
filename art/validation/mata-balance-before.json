@@ -1,0 +1,212 @@
+{
+  "secondsPerCase": 600,
+  "cases": [
+    {
+      "level": 15,
+      "seed": 7,
+      "best": 1,
+      "wins": 41,
+      "defeats": 8,
+      "stage": 2
+    },
+    {
+      "level": 15,
+      "seed": 17,
+      "best": 0,
+      "wins": 39,
+      "defeats": 9,
+      "stage": 1
+    },
+    {
+      "level": 15,
+      "seed": 29,
+      "best": 0,
+      "wins": 39,
+      "defeats": 9,
+      "stage": 1
+    },
+    {
+      "level": 30,
+      "seed": 7,
+      "best": 4,
+      "wins": 46,
+      "defeats": 6,
+      "stage": 5
+    },
+    {
+      "level": 30,
+      "seed": 17,
+      "best": 4,
+      "wins": 44,
+      "defeats": 5,
+      "stage": 5
+    },
+    {
+      "level": 30,
+      "seed": 29,
+      "best": 4,
+      "wins": 44,
+      "defeats": 5,
+      "stage": 5
+    },
+    {
+      "level": 50,
+      "seed": 7,
+      "best": 7,
+      "wins": 54,
+      "defeats": 4,
+      "stage": 8
+    },
+    {
+      "level": 50,
+      "seed": 17,
+      "best": 7,
+      "wins": 52,
+      "defeats": 4,
+      "stage": 8
+    },
+    {
+      "level": 50,
+      "seed": 29,
+      "best": 7,
+      "wins": 53,
+      "defeats": 4,
+      "stage": 8
+    },
+    {
+      "level": 80,
+      "seed": 7,
+      "best": 13,
+      "wins": 71,
+      "defeats": 1,
+      "stage": 14
+    },
+    {
+      "level": 80,
+      "seed": 17,
+      "best": 13,
+      "wins": 69,
+      "defeats": 1,
+      "stage": 14
+    },
+    {
+      "level": 80,
+      "seed": 29,
+      "best": 12,
+      "wins": 68,
+      "defeats": 2,
+      "stage": 13
+    },
+    {
+      "level": 120,
+      "seed": 7,
+      "best": 17,
+      "wins": 89,
+      "defeats": 1,
+      "stage": 18
+    },
+    {
+      "level": 120,
+      "seed": 17,
+      "best": 17,
+      "wins": 89,
+      "defeats": 1,
+      "stage": 18
+    },
+    {
+      "level": 120,
+      "seed": 29,
+      "best": 17,
+      "wins": 89,
+      "defeats": 0,
+      "stage": 18
+    },
+    {
+      "level": 200,
+      "seed": 7,
+      "best": 23,
+      "wins": 119,
+      "defeats": 0,
+      "stage": 24
+    },
+    {
+      "level": 200,
+      "seed": 17,
+      "best": 23,
+      "wins": 119,
+      "defeats": 0,
+      "stage": 24
+    },
+    {
+      "level": 200,
+      "seed": 29,
+      "best": 23,
+      "wins": 119,
+      "defeats": 0,
+      "stage": 24
+    },
+    {
+      "level": 300,
+      "seed": 7,
+      "best": 25,
+      "wins": 129,
+      "defeats": 0,
+      "stage": 26
+    },
+    {
+      "level": 300,
+      "seed": 17,
+      "best": 25,
+      "wins": 129,
+      "defeats": 0,
+      "stage": 26
+    },
+    {
+      "level": 300,
+      "seed": 29,
+      "best": 25,
+      "wins": 129,
+      "defeats": 0,
+      "stage": 26
+    },
+    {
+      "level": 500,
+      "seed": 7,
+      "best": 27,
+      "wins": 138,
+      "defeats": 0,
+      "stage": 28
+    },
+    {
+      "level": 500,
+      "seed": 17,
+      "best": 27,
+      "wins": 138,
+      "defeats": 0,
+      "stage": 28
+    },
+    {
+      "level": 500,
+      "seed": 29,
+      "best": 27,
+      "wins": 138,
+      "defeats": 0,
+      "stage": 28
+    }
+  ],
+  "foe": {
+    "hp": 90,
+    "atk": 5.5,
+    "hpGrowth": 1.1,
+    "atkGrowth": 1.09,
+    "step": 0.08,
+    "bossHp": 4,
+    "bossAtk": 1.5,
+    "crowdShare": 0.6,
+    "escortShare": 0.5
+  },
+  "recovery": {
+    "restHeal": 0.35,
+    "restDef": 0.5
+  }
+}

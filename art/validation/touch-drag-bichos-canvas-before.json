@@ -1,0 +1,197 @@
+{
+  "pid": 53324,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-53324-iDqQOx",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "bichos",
+    "scrolling": false,
+    "canvas": true,
+    "prepared": {
+      "point": {
+        "x": 1046,
+        "y": 784
+      },
+      "touchAction": "auto",
+      "expectedDrag": "mini",
+      "delta": {
+        "x": -50,
+        "y": -25
+      },
+      "scrollHeight": 166,
+      "clientHeight": 166
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 784,
+      "top": 602,
+      "scrollTop": 0,
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 784,
+      "top": 602,
+      "scrollTop": 0,
+      "drag": "mini",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6330.400000095367,
+          "x": 1046,
+          "y": 784,
+          "button": 0,
+          "buttons": 1,
+          "target": "CANVAS",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6331.299999952316,
+          "x": 1046,
+          "y": 784,
+          "target": "CANVAS",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "firstMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 764,
+      "top": 592,
+      "scrollTop": 0,
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6330.400000095367,
+          "x": 1046,
+          "y": 784,
+          "button": 0,
+          "buttons": 1,
+          "target": "CANVAS",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6331.299999952316,
+          "x": 1046,
+          "y": 784,
+          "target": "CANVAS",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11334,
+          "x": 1026,
+          "y": 774,
+          "button": -1,
+          "buttons": 1,
+          "target": "CANVAS",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11334.700000047684,
+          "x": 1026,
+          "y": 774,
+          "target": "CANVAS",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointercancel",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11337.299999952316,
+          "x": 0,
+          "y": 0,
+          "button": 0,
+          "buttons": 0,
+          "target": "CANVAS",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false,
+            "dx": 211,
+            "dy": 20
+          }
+        }
+      }
+    }
+  },
+  "error": "AssertionError [ERR_ASSERTION]: o evento nativo chegou à página: pointermove\n    at touch (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:250:14)\n    at async C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:271:5"
+}

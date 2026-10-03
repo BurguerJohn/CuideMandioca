@@ -1,0 +1,415 @@
+{
+  "pid": 24176,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-24176-9AGDX8",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "bichos",
+    "scrolling": true,
+    "canvas": false,
+    "prepared": {
+      "point": {
+        "x": 560,
+        "y": 105
+      },
+      "touchAction": "auto",
+      "expectedDrag": "mini",
+      "scrollAxis": "y",
+      "viewport": {
+        "width": 604,
+        "height": 124,
+        "dpr": 1.25
+      },
+      "delta": {
+        "x": 25,
+        "y": -60
+      },
+      "scrollHeight": 83,
+      "clientHeight": 48
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 285,
+      "top": 29.200000762939453,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 285,
+      "top": 29.200000762939453,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6309.799999952316,
+          "x": 560,
+          "y": 105,
+          "button": 0,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6310.599999904633,
+          "x": 560,
+          "y": 105,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "firstMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 285,
+      "top": 29.200000762939453,
+      "scrollTop": 10.399999618530273,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6309.799999952316,
+          "x": 560,
+          "y": 105,
+          "button": 0,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6310.599999904633,
+          "x": 560,
+          "y": 105,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 10314.399999856949,
+          "x": 570,
+          "y": 81,
+          "button": -1,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 10314.599999904633,
+          "x": 570,
+          "y": 81,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointercancel",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 10314.699999809265,
+          "x": 0,
+          "y": 0,
+          "button": 0,
+          "buttons": 0,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "lastMoved": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 285,
+      "top": 29.200000762939453,
+      "scrollTop": 35.20000076293945,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6309.799999952316,
+          "x": 560,
+          "y": 105,
+          "button": 0,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6310.599999904633,
+          "x": 560,
+          "y": 105,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 10314.399999856949,
+          "x": 570,
+          "y": 81,
+          "button": -1,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 10314.599999904633,
+          "x": 570,
+          "y": 81,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointercancel",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 10314.699999809265,
+          "x": 0,
+          "y": 0,
+          "button": 0,
+          "buttons": 0,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 15318.699999809265,
+          "x": 585,
+          "y": 45,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "ended": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 285,
+      "top": 29.200000762939453,
+      "scrollTop": 35.20000076293945,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6309.799999952316,
+          "x": 560,
+          "y": 105,
+          "button": 0,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6310.599999904633,
+          "x": 560,
+          "y": 105,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 10314.399999856949,
+          "x": 570,
+          "y": 81,
+          "button": -1,
+          "buttons": 1,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 10314.599999904633,
+          "x": 570,
+          "y": 81,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "pointercancel",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 10314.699999809265,
+          "x": 0,
+          "y": 0,
+          "button": 0,
+          "buttons": 0,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 15318.699999809265,
+          "x": 585,
+          "y": 45,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        },
+        {
+          "type": "touchend",
+          "trusted": true,
+          "at": 19336.799999952316,
+          "x": 585,
+          "y": 45,
+          "target": "DIV",
+          "owner": "mini-bichos",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "minis": {
+          "bichos": {
+            "hidden": false
+          }
+        }
+      }
+    },
+    "saved": {
+      "minis": {
+        "bichos": {
+          "hidden": false
+        }
+      }
+    }
+  }
+}

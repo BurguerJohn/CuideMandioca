@@ -495,7 +495,11 @@
         const samples = noise.getChannelData(0);
         for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
       } catch (_) {
+        try { ctx?.close?.()?.catch(() => {}); } catch (_) { /* liberar o contexto também pode falhar */ }
         ctx = null;
+        master = null;
+        noise = null;
+        bus = null;
       }
       return ctx;
     }

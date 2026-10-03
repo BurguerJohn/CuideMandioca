@@ -7,6 +7,109 @@ const UI = require('../src/ui.js');
 const ctx = (engine, extra = {}) => ({ tab: 'festa', shopCat: 'chapeu', poleFraction: 0.1, settings: { scale: 3, pinned: true, hud: 'sempre' },
   desktop: true, icon: () => '', now: Date.now(), ...extra });
 
+test('o prêmio importado do Bingo conserva os valores válidos sem impedir de mostrar o resultado', () => {
+  const now = 1000000;
+  const source = new GameEngine(data, null, { now: () => now, rng: () => 0 });
+  while (source.state.size < 10) source.addFame(source.fameNeed() - source.state.fame);
+  source.state.tickets = 100;
+  assert.equal(source.buyBingo(), true);
+  while (!source.state.bingo.round.result) source.drawBingo();
+  assert.equal(source.state.bingo.round.result, 'bingo');
+  const original = source.exportState();
+  const originalPrize = original.bingo.round.prize;
+  for (const field of ['tickets', 'amount']) {
+    for (const value of [undefined, null, {}, [], { toString: null, valueOf: null }, '3', true, -1, NaN, Infinity]) {
+      const saved = structuredClone(original);
+      saved.bingo.round.prize[field] = value;
+      const loaded = new GameEngine(data, saved, { now: () => now, rng: () => 0 });
+      let html;
+      assert.doesNotThrow(() => { html = UI.tela(loaded, ctx(loaded, { tela: 'bingo', now })); }, field);
+      assert.doesNotMatch(html, /NaN|Infinity|\[object Object\]/);
+      assert.deepEqual(loaded.state.bingo.round.prize, { ...originalPrize, [field]: 0 });
+      assert.equal(loaded.state.tickets, original.tickets, 'limpar o resultado não cobra nem paga o prêmio de novo');
+      assert.equal(loaded.state.cheer, original.cheer);
+      assert.equal(loaded.state.stats.bingos, 1);
+      const reloaded = new GameEngine(data, loaded.exportState(), { now: () => now, rng: () => 0 });
+      assert.deepEqual(reloaded.state.bingo.round.prize, loaded.state.bingo.round.prize);
+      assert.equal(reloaded.buyBingo(), true, 'a próxima rodada continua disponível');
+    }
+  }
+  for (const prize of [null, 'prêmio', [], { toString: null, valueOf: null }]) {
+    const saved = structuredClone(original);
+    saved.bingo.round.prize = prize;
+    const loaded = new GameEngine(data, saved, { now: () => now, rng: () => 0 });
+    assert.doesNotThrow(() => UI.tela(loaded, ctx(loaded, { tela: 'bingo', now })));
+    assert.equal(loaded.state.tickets, original.tickets);
+  }
+  const loaded = new GameEngine(data, original, { now: () => now, rng: () => 0 });
+  assert.deepEqual(loaded.state.bingo.round.prize, originalPrize, 'uma vitória normal conserva o prêmio completo');
+  assert.deepEqual(loaded.state.bingo.round.card, original.bingo.round.card);
+  assert.deepEqual(loaded.state.bingo.round.drawn, original.bingo.round.drawn);
+});
+
+test('a barra da cozinha conserva o tempo da panela quando a Canjica sai para um rolê', () => {
+  let clock = 1000000;
+  const engine = new GameEngine(data, null, { now: () => clock, rng: () => 0.5 });
+  engine.state.size = 30;
+  engine.state.crew.canjica = { level: 1 };
+  engine.addItem('fogao-lenha');
+  engine.equip('fogao-lenha', 'direita');
+  engine.state.wood = 100;
+  assert.equal(engine.cook('pamonha'), true);
+  const pot = engine.state.cozinha.pot;
+  clock += (pot.readyAt - pot.startAt) / 4;
+  const progress = () => Number(UI.tela(engine, ctx(engine, { tela: 'cozinha', now: clock }))
+    .match(/<div class="barra fogo"><i[^>]*style="width:([^%]+)%"/)[1]);
+  assert.equal(progress(), 25);
+  assert.equal(engine.startOuting(0, 'canjica'), true);
+  assert.equal(progress(), 25, 'a saída da cozinheira não altera o intervalo já reservado para esta panela');
+});
+
+test('o rolê com carroça começa em zero e mantém seu intervalo depois de trocar o enfeite', () => {
+  let clock = 1000000;
+  const engine = new GameEngine(data, null, { now: () => clock, rng: () => 0.5 });
+  engine.state.size = 30;
+  engine.state.crew.cenoura = { level: 1 };
+  engine.addItem('carroca');
+  engine.equip('carroca', 'direita');
+  assert.equal(engine.startOuting(0, 'cenoura'), true);
+  const outing = engine.state.outings[0];
+  const duration = outing.endsAt - clock;
+  const progress = () => Number(UI.tela(engine, ctx(engine, { tela: 'roles', now: clock }))
+    .match(/<div class="barra "><i[^>]*style="width:([^%]+)%"/)[1]);
+  assert.equal(progress(), 0, 'a viagem reduzida não parece já estar em andamento no instante da partida');
+  clock += duration / 4;
+  engine.addItem('barraca-comidas');
+  assert.equal(engine.equip('barraca-comidas', 'direita'), true);
+  assert.equal(progress(), 25, 'trocar o enfeite não recalcula a duração da viagem que já partiu');
+});
+
+test('a descrição do rolê mostra a duração efetiva e conserva a viagem contratada após trocar a carroça', () => {
+  for (const withCart of [true, false]) {
+    const engine = new GameEngine(data, null, { now: () => 1000000, rng: () => 0.5 });
+    engine.state.size = 30;
+    engine.state.crew.cenoura = { level: 1 };
+    engine.addItem('carroca');
+    if (withCart) engine.equip('carroca', 'direita');
+    const info = () => UI.tela(engine, ctx(engine, { tela: 'roles', now: engine.now() }))
+      .match(/<h3>.*?<\/h3><p class="miudo">([^<]*)<\/p>/)[1];
+    const before = info();
+    assert.equal(engine.startOuting(0, 'cenoura'), true);
+    const outing = engine.state.outings[0];
+    const travelTime = outing.endsAt - outing.startAt;
+    assert.ok(before.includes(UI.duration(travelTime)), 'antes de enviar, a descrição combina com o prazo que será reservado');
+    assert.equal(engine.equip(withCart ? 'mastro' : 'carroca', 'direita'), true);
+    assert.ok(info().includes(UI.duration(travelTime)), 'a descrição da viagem em andamento não muda com o enfeite');
+    const loaded = new GameEngine(data, engine.exportState(), { now: () => engine.now(), rng: () => 0.5 });
+    const restored = UI.tela(loaded, ctx(loaded, { tela: 'roles', now: loaded.now() }))
+      .match(/<h3>.*?<\/h3><p class="miudo">([^<]*)<\/p>/)[1];
+    assert.ok(restored.includes(UI.duration(travelTime)), 'o prazo da viagem também vale depois de recarregar');
+    engine.cancelOuting(0);
+    const nextTime = data.outings[0].minutes * 60000 * (withCart ? 1 : 0.85);
+    assert.ok(info().includes(UI.duration(nextTime)), 'com o posto livre, o tempo volta a refletir o enfeite atual');
+  }
+});
+
 test('o painel tem só números e ajustes; as telas de jogo montam e as trancadas explicam o porte', () => {
   const engine = new GameEngine(data);
   for (const tab of UI.TABS) assert.ok(UI.panel(engine, ctx(engine, { tab: tab.id })).length > 50, tab.id);
@@ -127,6 +230,24 @@ test('histórico mostra o gráfico dos desbloqueios e o diário filtrável', () 
     'compras seguidas viram uma linha só');
 });
 
+test('o diário mostra a meta concluída e suas fichas depois do resgate e de recarregar', () => {
+  const engine = new GameEngine(data, null, { now: () => 1000000, rng: () => 0 });
+  engine.updateGoals();
+  const goal = engine.state.goals[0];
+  assert.equal(goal.type, 'steps');
+  for (let i = 0; i < goal.target; i++) engine.step();
+  const reward = engine.claimGoal(0);
+  assert.ok(reward);
+  const text = `Meta cumprida: +${reward.tickets} fichas`;
+  assert.ok(UI.panel(engine, ctx(engine, { tab: 'historico', logFilter: 'tudo' })).includes(text),
+    'o resgate tem uma descrição de meta, em vez do identificador interno do contador');
+  const loaded = new GameEngine(data, engine.exportState(), { now: () => 1000000, rng: () => 0 });
+  const html = UI.panel(loaded, ctx(loaded, { tab: 'historico', logFilter: 'tudo' }));
+  assert.ok(html.includes(text), 'o acontecimento continua legível após reabrir');
+  assert.equal(loaded.state.log.filter(entry => entry.type === 'goal').length, 1);
+  assert.equal(loaded.state.log.find(entry => entry.type === 'goal').id, 'steps');
+});
+
 test('o gráfico do histórico volta ao quintal quando começa um novo São João', () => {
   const engine = new GameEngine(data, null, { rng: () => 0.5 });
   engine.state.stats.playtime = 120;
@@ -237,6 +358,87 @@ test('a placa ganha o botão da casa da Mandioca do convidado 100 em diante, e o
   assert.match(log, /Macaxeira se mudou para a casa/);
 });
 
+test('o histórico carregado descarta cômodos e moradores inválidos sem perder a festa ou as entradas válidas', () => {
+  const source = new GameEngine(data, null, { now: () => 1000000, rng: () => 0.5 });
+  source.rename('Casa preservada');
+  source.state.cheer = 321;
+  const saved = source.exportState();
+  const rooms = data.house.rooms.length;
+  const residents = rooms * (data.house.perRoom - 1);
+  const valid = [...saved.log,
+    { type: 'casa-comodo', t: 10, room: 0 }, { type: 'casa-comodo', t: 11, room: rooms - 1 },
+    { type: 'casa-morador', t: 12, index: 0 }, { type: 'casa-morador', t: 13, index: residents - 1 }];
+  saved.log = [...valid];
+  for (const [type, field, limit] of [['casa-comodo', 'room', rooms], ['casa-morador', 'index', residents]]) {
+    for (const value of [undefined, null, -1, 0.5, '0', {}, limit, Number.MAX_VALUE]) {
+      saved.log.push({ type, t: 14, [field]: value });
+    }
+  }
+  const loaded = new GameEngine(data, saved, { now: () => 1000000, rng: () => 0.5 });
+  let html;
+  assert.doesNotThrow(() => { html = UI.panel(loaded, ctx(loaded, { tab: 'historico', logFilter: 'tudo' })); });
+  assert.match(html, /A casa ganhou um cômodo: Sala/);
+  assert.match(html, /Macaxeira se mudou para a casa/);
+  assert.deepEqual(loaded.state.log, valid, 'o diário conserva inclusive os últimos cômodos e moradores da casa completa');
+  assert.equal(loaded.state.name, 'Casa preservada');
+  assert.equal(loaded.state.cheer, 321);
+  const reloaded = new GameEngine(data, loaded.exportState(), { now: () => 1000000, rng: () => 0.5 });
+  assert.deepEqual(reloaded.state.log, valid, 'os registros descartados não voltam no próximo save');
+});
+
+test('o histórico importado descarta marcos incompletos sem gerar coordenadas inválidas no gráfico', () => {
+  const source = new GameEngine(data, null, { now: () => 1000000, rng: () => 0.5 });
+  source.rename('Histórico preservado');
+  while (source.state.size < 12) source.addFame(source.fameNeed() - source.state.fame);
+  const saved = source.exportState();
+  const valid = [...saved.log,
+    { type: 'inicio', t: 1, size: 1 },
+    { type: 'tier', t: 2, tier: data.tiers.length - 1 },
+    { type: 'grow', t: 3, stage: data.config.growthAt.length }];
+  saved.log = [...valid];
+  for (const type of ['size', 'inicio']) {
+    for (const size of [undefined, null, 0, -1, 0.5, '3', {}, Number.MAX_VALUE]) saved.log.push({ type, t: 4, size });
+  }
+  for (const [type, field, max] of [['tier', 'tier', data.tiers.length - 1], ['grow', 'stage', data.config.growthAt.length]]) {
+    for (const value of [undefined, null, -1, 0.5, '1', {}, max + 1]) saved.log.push({ type, t: 5, [field]: value });
+  }
+  saved.log.push({ type: 'size', t: -1, size: 3 });
+  const loaded = new GameEngine(data, saved, { now: () => 1000000, rng: () => 0.5 });
+  for (const logFilter of ['desbloqueios', 'tudo']) {
+    const html = UI.panel(loaded, ctx(loaded, { tab: 'historico', logFilter }));
+    assert.doesNotMatch(html, /NaN|Infinity/, `${logFilter}: a curva e seus marcos têm coordenadas finitas`);
+    assert.match(html, /2º convidado chegou e trouxe: Pé de milho/);
+  }
+  assert.deepEqual(loaded.state.log, valid);
+  assert.equal(loaded.state.name, source.state.name);
+  assert.equal(loaded.state.size, source.state.size);
+  assert.deepEqual(new GameEngine(data, loaded.exportState(), { now: () => 1000000, rng: () => 0.5 }).state.log, valid);
+});
+
+test('objetos ou listas em registros importados não impedem o diário nem apagam os acontecimentos válidos', () => {
+  const source = new GameEngine(data, null, { now: () => 1000000, rng: () => 0.5 });
+  while (source.state.size < 12) source.addFame(source.fameNeed() - source.state.fame);
+  source.state.cheer = 10000;
+  source.buyLevel('rebolado');
+  source.buyLevel('rebolado');
+  source.openLetter();
+  source.addItem('chapeu-coco');
+  const saved = source.exportState();
+  const valid = [...saved.log];
+  const records = [['item', 'id'], ['letter', 'tickets'], ['level', 'key'], ['debug', 'op'], ['year', 'bonus'], ['rings', 'mult']];
+  for (const [type, field] of records) {
+    for (const value of [{}, [], { toString: null, valueOf: null }]) saved.log.push({ type, t: 6, [field]: value });
+  }
+  const loaded = new GameEngine(data, saved, { now: () => 1000000, rng: () => 0.5 });
+  let html;
+  assert.doesNotThrow(() => { html = UI.panel(loaded, ctx(loaded, { tab: 'historico', logFilter: 'tudo' })); });
+  assert.match(html, /Rebolado: nível 1 → 3/);
+  assert.ok(html.includes(source.items['chapeu-coco'].name));
+  assert.deepEqual(loaded.state.log, valid, 'as compras e os desbloqueios da partida continuam no diário');
+  assert.equal(loaded.state.cheer, source.state.cheer);
+  assert.deepEqual(new GameEngine(data, loaded.exportState(), { now: () => 1000000, rng: () => 0.5 }).state.log, valid);
+});
+
 test('o botão de uma janela com coisa pendente pisca e mostra o número (o das outras não)', () => {
   const engine = new GameEngine(data);
   while (engine.state.size < 30) engine.addFame(engine.fameNeed() - engine.state.fame);
@@ -248,4 +450,15 @@ test('o botão de uma janela com coisa pendente pisca e mostra o número (o das 
   assert.equal((html.match(/data-mini="bichos"[^>]*>[\s\S]*?<\/button>/)[0].match(/selo-botao/g) || []).length, 0);
   assert.match(botoes(1), /1 página da história para completar/);
   assert.doesNotMatch(botoes(0), /chama" data-action="mini"|páginas da história/);
+});
+
+test('placa e painel: o bônus de 10 min da horta aparece como selo com o tempo e o bônus fixo entra no painel da festa', () => {
+  const engine = new GameEngine(data);
+  assert.doesNotMatch(UI.hud(engine, ctx(engine)), /Milho: Animação/);
+  engine.state.minis.horta.buffs = { milho: engine.now() + 5 * 60000, abobora: engine.now() + 9 * 60000 };
+  engine.state.minis.horta.harvested = { milho: 1, abobora: 2 };
+  const hud = UI.hud(engine, ctx(engine));
+  assert.match(hud, /Milho: Animação \+10%/);
+  assert.match(hud, /Abóbora: Chance de cobra \+15%/);
+  assert.match(UI.panel(engine, ctx(engine, { tab: 'festa' })), /Horta \(bônus fixo\)[^]*\+20%/);
 });

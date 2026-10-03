@@ -1,0 +1,119 @@
+{
+  "fixes": [
+    "preserve wheel and control zoom changes during an active drag",
+    "retain a wheel resize on release",
+    "keep the zoom guide visible during an active drag"
+  ],
+  "reproducedBeforeFix": [
+    {
+      "scenario": "press",
+      "pid": 46720,
+      "beforeWheel": 0.5,
+      "afterWheel": 0.56,
+      "released": 1,
+      "guideVisibleDuringGesture": false
+    },
+    {
+      "scenario": "drag",
+      "pid": 42276,
+      "beforeWheel": 0.513166891945212,
+      "afterWheel": 0.5747469189786375,
+      "released": 0.5176324619206888,
+      "guideVisibleDuringGesture": false
+    }
+  ],
+  "nativeCases": 7,
+  "native": [
+    {
+      "scenario": "press",
+      "direction": "in",
+      "pid": 12324,
+      "beforeWheel": 0.5,
+      "afterWheel": 0.56,
+      "released": 0.56,
+      "saved": 0.56,
+      "guideVisibleDuringGesture": true,
+      "freshClick": 1
+    },
+    {
+      "scenario": "press",
+      "direction": "out",
+      "pid": 19636,
+      "beforeWheel": 0.5,
+      "afterWheel": 0.4464285714285714,
+      "released": 0.4464285714285714,
+      "saved": 0.4464285714285714,
+      "guideVisibleDuringGesture": true,
+      "freshClick": 1
+    },
+    {
+      "scenario": "drag",
+      "direction": "in",
+      "pid": 20680,
+      "beforeWheel": 0.513166891945212,
+      "afterWheel": 0.5747469189786375,
+      "afterMovement": 0.5797483573511715,
+      "released": 0.5797483573511715,
+      "saved": 0.5797483573511715,
+      "guideVisibleDuringGesture": true,
+      "freshClick": 1
+    },
+    {
+      "scenario": "drag",
+      "direction": "out",
+      "pid": 50836,
+      "beforeWheel": 0.513166891945212,
+      "afterWheel": 0.45818472495108215,
+      "afterMovement": 0.462171841000615,
+      "released": 0.462171841000615,
+      "saved": 0.462171841000615,
+      "guideVisibleDuringGesture": true,
+      "freshClick": 1
+    },
+    {
+      "scenario": "wheel-only",
+      "direction": "in",
+      "pid": 17948,
+      "beforeWheel": 0.5,
+      "afterWheel": 0.56,
+      "released": 0.56,
+      "saved": 0.56,
+      "guideVisibleDuringGesture": false,
+      "freshClick": 1
+    },
+    {
+      "scenario": "cancel",
+      "direction": "in",
+      "pid": 54616,
+      "beforeWheel": 0.5,
+      "afterWheel": 0.56,
+      "released": 0.56,
+      "saved": 0.56,
+      "guideVisibleDuringGesture": true,
+      "freshClick": 1
+    },
+    {
+      "scenario": "horizontal",
+      "direction": "in",
+      "pid": 16708,
+      "beforeWheel": 0.5,
+      "afterWheel": 0.5,
+      "released": 1,
+      "saved": 1,
+      "guideVisibleDuringGesture": false,
+      "freshClick": 1
+    }
+  ],
+  "fullTests": 664,
+  "failedTests": 0,
+  "syntaxChecked": 43,
+  "diffChecked": true,
+  "removedProfiles": 9,
+  "package": {
+    "runtimeFiles": 40,
+    "styleFiles": 1,
+    "htmlFiles": 1,
+    "htmlReferences": 36,
+    "packagedAt": "2026-10-03T12:34:45.246Z"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "pid": 50308,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-50308-hMT8Ho",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": true,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touch": {
+    "phase": "prepare",
+    "points": {
+      "zoom": {
+        "x": 481,
+        "y": 791
+      },
+      "ticket": {
+        "x": 344,
+        "y": 390
+      }
+    },
+    "before": {
+      "tickets": 94,
+      "zoom": 0.5,
+      "held": false,
+      "drag": null,
+      "events": []
+    }
+  },
+  "mixed": {
+    "phase": "touch-start",
+    "before": {
+      "tickets": 94,
+      "zoom": 0.5,
+      "held": false,
+      "drag": null,
+      "events": []
+    },
+    "primary": {
+      "tickets": 94,
+      "zoom": 0.5,
+      "held": false,
+      "drag": "zoom",
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 4456.299999952316,
+          "button": 0,
+          "buttons": 1,
+          "action": "zoom-alca",
+          "x": 481,
+          "y": 791
+        }
+      ]
+    },
+    "hovered": {
+      "tickets": 94,
+      "zoom": 0.5,
+      "held": false,
+      "drag": null,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 4456.299999952316,
+          "button": 0,
+          "buttons": 1,
+          "action": "zoom-alca",
+          "x": 481,
+          "y": 791
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 1,
+          "pointerType": "mouse",
+          "primary": true,
+          "trusted": true,
+          "at": 7438.399999856949,
+          "button": -1,
+          "buttons": 0,
+          "action": "ficha",
+          "hold": "ficha",
+          "x": 344,
+          "y": 390
+        }
+      ]
+    }
+  },
+  "error": "AssertionError [ERR_ASSERTION]: passar o mouse sem botão não cancela o arrasto do dedo\n\nnull !== 'zoom'\n\n    at C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:406:14"
+}

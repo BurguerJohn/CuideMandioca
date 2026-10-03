@@ -62,9 +62,9 @@
       this.cfg = data.config;
       this.rng = options.rng || Math.random;
       this.clock = options.now || (() => Date.now());
-      this.stats = Object.fromEntries(data.stats.map(stat => [stat.id, stat]));
-      this.items = Object.fromEntries(data.items.map(item => [item.id, item]));
-      this.chars = Object.fromEntries(data.chars.map(char => [char.id, char]));
+      this.stats = Object.assign(Object.create(null), Object.fromEntries(data.stats.map(stat => [stat.id, stat])));
+      this.items = Object.assign(Object.create(null), Object.fromEntries(data.items.map(item => [item.id, item])));
+      this.chars = Object.assign(Object.create(null), Object.fromEntries(data.chars.map(char => [char.id, char])));
       this.validate();
       this.sceneryPlan = planScenery(data.scenery, SCENERY_PLAN);
       this.minis = new Minis.Minis(this);
@@ -97,7 +97,7 @@
         inventory: [],
         equipped: { ...this.data.equipped },
         crew: {},
-        outings: this.data.outings.map(() => ({ char: null, endsAt: 0 })),
+        outings: this.data.outings.map(() => ({ char: null, startAt: 0, endsAt: 0 })),
         fishing: { ready: 0, nextAt: 0, unlocked: false },
         mail: { ready: 1, nextAt: now + this.letterInterval() },
         request: { active: null, nextAt: 0 },
@@ -139,8 +139,10 @@
 
     freshRuntime() {
       return { stamina: this.stats.folego.base, dancing: true, lift: 0, flareWait: this.cfg.flareEvery,
-        flareLeft: 0, emberLeft: 0, lastStep: 0, dance: 'forro', danceLeft: this.cfg.danceSteps, frenzyLeft: 0,
-        pokeAt: 0, popAt: 0, quadrilhaLeft: 0, callIn: 0, calls: 0, weddingLeft: 0, rice: 0, riceAt: 0, announceAt: 0, cobraLeft: 0, cobraDir: 1 };
+        flareLeft: 0, flareUntil: 0, emberLeft: 0, emberUntil: 0, lastStep: 0, dance: 'forro', danceLeft: this.cfg.danceSteps,
+        frenzyLeft: 0, frenzyUntil: 0,
+        pokeAt: 0, popAt: 0, quadrilhaLeft: 0, quadrilhaUntil: 0, callIn: 0, calls: 0, weddingLeft: 0, weddingUntil: 0,
+        rice: 0, riceAt: 0, announceAt: 0, cobraLeft: 0, cobraUntil: 0, cobraDir: 1, daysAnnounced: [] };
     }
 
     load(raw) {
@@ -158,7 +160,10 @@
       if (!Array.isArray(s.goals)) invalid('goals');
       if (!Number.isInteger(s.ticketLevel) || s.ticketLevel < 1) invalid('ticketLevel');
       for (const id of STATS) {
-        if (!Number.isInteger(s.levels[id]) || s.levels[id] < 1) throw new Error('Nível inválido no save.');
+        const level = s.levels[id];
+        const stat = this.stats[id];
+        const paidCost = level > 1 ? Math.round(stat.price * stat.growth ** (level - 2)) : 0;
+        if (!Number.isInteger(level) || level < 1 || !Number.isFinite(paidCost)) throw new Error('Nível inválido no save.');
       }
       s.levels = Object.fromEntries(STATS.map(id => [id, s.levels[id]]));
       for (const field of ['cheer', 'tickets', 'wood', 'fame']) {
@@ -170,7 +175,9 @@
       s.inventory = [...new Set((s.inventory || []).filter(id => this.items[id]))];
       s.equipped = Object.fromEntries(SLOTS.map(slot => {
         const id = s.equipped?.[slot];
-        return [slot, this.items[id] && this.owned(id, s) ? id : this.data.equipped[slot]];
+        const category = slot === 'esquerda' || slot === 'direita' ? 'lado' : slot;
+        // Ser um item conhecido e próprio não basta: cada espaço só desenha a sua categoria.
+        return [slot, this.items[id]?.cat === category && this.owned(id, s) ? id : this.data.equipped[slot]];
       }));
       const crew = {};
       for (const [id, entry] of Object.entries(s.crew || {})) {
@@ -184,7 +191,8 @@
         const char = this.chars[entry.char] && crew[entry.char] ? entry.char : null;
         if (char && away.has(char)) invalid('outings');
         if (char) away.add(char);
-        return { char, endsAt: finite(entry.endsAt) };
+        const endsAt = char ? finite(entry.endsAt) : 0;
+        return { char, startAt: char ? Math.min(finite(entry.startAt), endsAt) : 0, endsAt };
       });
       s.stats = { ...base.stats, ...s.stats };
       for (const field of Object.keys(base.stats)) {
@@ -215,7 +223,11 @@
       // A corrida de saco não volta no meio: a próxima continua agendada.
       s.saco = { active: null, nextAt: Math.max(0, finite(raw.saco?.nextAt)) };
       // Leilão no meio: o lance guardado volta para o bolso e o próximo leilão continua agendado.
-      s.tickets += Math.max(0, Math.floor(finite(raw.leilao?.active?.held)));
+      const auctionHeld = raw.leilao?.active?.held;
+      if (auctionHeld != null) {
+        if (!Number.isInteger(auctionHeld) || auctionHeld < 0 || !Number.isFinite(s.tickets + auctionHeld)) invalid('leilao.active.held');
+        s.tickets += auctionHeld;
+      }
       s.leilao = { active: null, nextAt: Math.max(0, finite(raw.leilao?.nextAt)) };
       s.cold = { active: null, nextAt: Math.max(0, finite(raw.cold?.nextAt)) };
       s.visitor = { active: null, nextAt: Math.max(0, finite(raw.visitor?.nextAt)) };
@@ -247,22 +259,46 @@
       this.albumBackfill(s);
       s.yearStart = Math.max(0, finite(raw.yearStart));
       s.records = { maior: Number.isFinite(raw.records?.maior) ? raw.records.maior : null, size: Math.max(s.size, Math.floor(finite(raw.records?.size, 1))) };
-      s.daily = { day: typeof raw.daily?.day === 'string' ? raw.daily.day : null, streak: clamp(Math.floor(finite(raw.daily?.streak)), 0, 999) };
+      // O teto do prêmio diário não limita a sequência de visitas que o save conserva.
+      s.daily = { day: typeof raw.daily?.day === 'string' ? raw.daily.day : null, streak: clamp(Math.floor(finite(raw.daily?.streak)), 0, Number.MAX_SAFE_INTEGER) };
       s.setsWorn = Array.isArray(raw.setsWorn) ? [...new Set(raw.setsWorn)].filter(id => this.data.sets.some(set => set.id === id)) : [];
       delete s.stats.bestPole;
       const known = new Set(this.data.achievements.map(entry => entry.id));
       s.achievements = Array.isArray(s.achievements) ? [...new Set(s.achievements)].filter(id => known.has(id)) : [];
       const cost = Math.floor(finite(s.rings?.cost, this.cfg.ringCost));
-      s.rings = { cost: clamp(cost, this.cfg.ringCost, this.cfg.ringCost * 2 ** 12), nextAt: finite(s.rings?.nextAt) };
+      s.rings = { cost: Math.max(cost, this.cfg.ringCost), nextAt: finite(s.rings?.nextAt) };
+      // Argolas interrompidas pela troca de janela/carga: só a entrada volta; os acertos ainda não tinham sido pagos.
+      const ringHeld = raw.rings?.held;
+      if (ringHeld != null) {
+        if (!Number.isInteger(ringHeld) || ringHeld < this.cfg.ringCost || !Number.isFinite(s.tickets + ringHeld)) invalid('rings.held');
+        s.tickets += ringHeld;
+      }
+      // O diário é opcional: seus valores entram nos textos, no gráfico e nos índices da casa.
+      const validLog = entry => {
+        if (!object(entry) || typeof entry.type !== 'string' || !Number.isFinite(entry.t) || entry.t < 0) return false;
+        if (!Object.values(entry).every(value => value == null || typeof value === 'string' ||
+          typeof value === 'boolean' || Number.isFinite(value))) return false;
+        if (entry.type === 'size' || entry.type === 'inicio') return Number.isSafeInteger(entry.size) && entry.size >= 1;
+        if (entry.type === 'tier') return Number.isInteger(entry.tier) && entry.tier >= 0 && entry.tier < this.data.tiers.length;
+        if (entry.type === 'grow') return Number.isInteger(entry.stage) && entry.stage >= 0 && entry.stage <= this.cfg.growthAt.length;
+        if (entry.type === 'casa-comodo') {
+          return Number.isInteger(entry.room) && entry.room >= 0 && entry.room < this.data.house.rooms.length;
+        }
+        if (entry.type === 'casa-morador') {
+          return Number.isInteger(entry.index) && entry.index >= 0 &&
+            entry.index < this.data.house.rooms.length * (this.data.house.perRoom - 1);
+        }
+        return true;
+      };
       s.log = Array.isArray(raw.log)
-        ? raw.log.filter(entry => entry && typeof entry.type === 'string' && Number.isFinite(entry.t)).slice(-LOG_CAP)
+        ? raw.log.filter(validLog).slice(-LOG_CAP).map(entry => ({ ...entry }))
         : [{ t: Math.round(finite(s.stats.playtime)), type: 'inicio', size: s.size }];
       s.runtime = { ...this.freshRuntime(), dancing: true };
       this.state = s;
       s.minis = this.minis.load(raw.minis);
       s.runtime.stamina = this.maxStamina();
       this.staggerDue(s);
-      this.catchUp(finite(s.lastSeen, this.now()));
+      this.catchUp(finite(s.lastSeen, this.now()), raw);
       return s;
     }
 
@@ -283,15 +319,44 @@
     offlineRate() { return this.cfg.offlineRate * (1 + this.effect('offline')); }
 
     // Enquanto o jogo esteve fechado, a festa rendeu no ritmo de offlineRate(), até 12 horas (cfg.offlineCapHours).
-    catchUp(lastSeen) {
+    catchUp(lastSeen, saved = this.state) {
       const away = (this.now() - lastSeen) / 1000;
       const seconds = Math.min(away, this.cfg.offlineCapHours * 3600);
       if (seconds < 60) return;
       const bunny = this.effect('offline');
-      // Amor e Barriga foram baixando enquanto isso: rende pela média do humor no período, não pelo de agora.
-      let mood = 0;
-      for (let i = 0; i < 12; i++) mood += this.moodFactor(this.mood(lastSeen + (i + 0.5) / 12 * seconds * 1000)) / 12;
-      const cheer = this.cheerPerSecond() / this.moodFactor() * mood * seconds * this.offlineRate();
+      // O load das janelas descarta bônus vencidos. Para o tempo fora, ainda vale o trecho em que a colheita/prato existia.
+      // Nenhum relógio salvo pode reconstruir mais que uma duração inteira a partir da última visita.
+      const horta = this.data.minis?.horta;
+      const hortaBuffs = {};
+      for (const crop of horta?.crops || []) {
+        const until = finite(saved.minis?.horta?.buffs?.[crop.id]);
+        if (crop.buff && until > lastSeen) hortaBuffs[crop.id] = Math.min(until, lastSeen + horta.buffMinutes * MINUTE);
+      }
+      const served = saved.cozinha?.buff;
+      const recipe = this.recipe(served?.id);
+      const cookBuff = recipe && finite(served.until) > lastSeen
+        ? { id: recipe.id, until: Math.min(served.until, lastSeen + recipe.buffMinutes * MINUTE) } : null;
+      const bonuses = { hortaBuffs, cookBuff };
+      const end = lastSeen + seconds * 1000;
+      // Mantém as 12 amostras de humor; separa também cada expiração para nunca estender um bônus a toda a ausência.
+      const boundaries = [lastSeen, end];
+      for (let i = 1; i < 12; i++) boundaries.push(lastSeen + i / 12 * seconds * 1000);
+      const midnight = new Date(lastSeen);
+      midnight.setHours(24, 0, 0, 0);
+      while (midnight.getTime() < end) {
+        boundaries.push(midnight.getTime());
+        midnight.setDate(midnight.getDate() + 1);
+      }
+      for (const until of [...Object.values(hortaBuffs), cookBuff?.until]) {
+        if (until > lastSeen && until < end) boundaries.push(until);
+      }
+      boundaries.sort((a, b) => a - b);
+      let cheer = 0;
+      for (let i = 1; i < boundaries.length; i++) {
+        const start = boundaries[i - 1];
+        const stop = boundaries[i];
+        if (stop > start) cheer += this.cheerPerSecond((start + stop) / 2, bonuses) * (stop - start) / 1000 * this.offlineRate();
+      }
       // Com o jogo fechado a festa só rende Animação: a barra de convidados não anda (os convidados novos só chegam com o jogo aberto).
       this.offline = true;
       this.earn(cheer, false);
@@ -316,11 +381,21 @@
     }
 
     exportState() {
+      // O presente e a nota de eventos já encerrados precisam entrar no save antes de descartar a cena na carga.
+      this.updateRuntimeTimers(this.now());
+      this.updateCold();
+      // Um arremate já concluído pertence ao save; só o lance ainda em disputa volta ao carregar.
+      this.updateLeilao();
+      // O show descartado na carga pode já ter terminado desde o último quadro: suas estrelas e prêmios ficam.
+      if (this.miniOpen('palco')) this.mini('palco').tick();
       // Parada há mais de um minuto (computador dormindo): o save guarda quando ela parou de verdade, e ao abrir de novo
       // esse tempo conta como tempo fora.
       const stale = this.lastTick && this.now() - this.lastTick >= WAKE_GAP;
       this.state.lastSeen = stale ? this.lastTick : this.now();
-      return copy(this.state);
+      const saved = copy(this.state);
+      saved.minis = this.minis.save(saved.minis);
+      if (this.round) saved.rings.held = this.round.cost;
+      return saved;
     }
 
     emit(type, detail = {}) {
@@ -467,6 +542,7 @@
           note = 'Chegou um pedido';
         } else if (op === 'quadrilha' || op === 'concurso') {
           s.runtime.quadrilhaLeft = this.cfg.quadrilhaSeconds;
+          s.runtime.quadrilhaUntil = now + this.cfg.quadrilhaSeconds * 1000;
           s.runtime.callIn = 0;
           s.runtime.calls = 0;
           s.runtime.contest = op === 'concurso';
@@ -567,6 +643,7 @@
       if (s.pote.active) s.pote.active.hitAt = back(s.pote.active.hitAt);
       s.kissAt = back(s.kissAt);
       for (const key of ['pokeAt', 'popAt', 'riceAt', 'cartAt', 'flagAt', 'compadreAt', 'announceAt']) s.runtime[key] = back(s.runtime[key]);
+      for (const key of ['flareUntil', 'emberUntil', 'frenzyUntil', 'quadrilhaUntil', 'weddingUntil', 'cobraUntil']) s.runtime[key] = back(s.runtime[key]);
       s.humor.at = back(s.humor.at);
       s.humor.holdUntil = back(s.humor.holdUntil);
       this.minis.shift(ms);
@@ -583,14 +660,17 @@
       if (race) for (const key of ['start', 'at', 'fallUntil']) race[key] = back(race[key]);
       const auction = s.leilao.active;
       if (auction) for (const key of ['born', 'bidAt', 'rivalAt']) auction[key] = back(auction[key]);
-      if (s.cold.active) for (const key of ['born', 'until', 'saleAt']) s.cold.active[key] = back(s.cold.active[key]);
+      if (s.cold.active) for (const key of ['born', 'until', 'saleAt', 'at']) s.cold.active[key] = back(s.cold.active[key]);
       if (s.visitor.active) for (const key of ['born', 'until']) s.visitor.active[key] = back(s.visitor.active[key]);
       if (s.fotografo.active) for (const key of ['born', 'until', 'leaveAt']) s.fotografo.active[key] = back(s.fotografo.active[key]);
       if (s.burro.active) {
         for (const key of ['born', 'until']) s.burro.active[key] = back(s.burro.active[key]);
         if (s.burro.active.pinned) s.burro.active.pinned.at = back(s.burro.active.pinned.at);
       }
-      s.outings.forEach(entry => { entry.endsAt = back(entry.endsAt); });
+      s.outings.forEach(entry => {
+        if (entry.char) entry.startAt -= ms;
+        entry.endsAt = back(entry.endsAt);
+      });
     }
 
     drainEvents() {
@@ -619,6 +699,7 @@
     }
 
     addFame(amount) {
+      this.settleContest();
       const s = this.state;
       const before = this.tierIndex();
       s.fame += amount;
@@ -736,7 +817,7 @@
     }
 
     // Turma e postos
-    hasChar(id) { return !!this.state.crew[id]; }
+    hasChar(id) { return !!this.chars[id] && !!this.state.crew[id]; }
     charLevel(id) { return this.state.crew[id]?.level || 0; }
     awayOuting(id) { return this.state.outings.findIndex(entry => entry.char === id); }
     postOpen(postId) {
@@ -868,7 +949,7 @@
       s.stats.goals++;
       const others = s.goals.filter((_, i) => i !== index).map(entry => entry.type);
       s.goals[index] = this.newGoal([...others, goal.type]);
-      this.record('goal', { type: goal.type, tickets: reward.tickets });
+      this.record('goal', { id: goal.type, tickets: reward.tickets });
       if (s.stats.goals >= 10) this.unlock('metodica');
       return reward;
     }
@@ -889,25 +970,25 @@
       return { stage, total, goal, last: stage >= this.cfg.growthAt.length, bonus: this.cfg.growthBonus * stage };
     }
     maxStamina() { return this.statValue('folego') + this.effect('stamina'); }
-    speed() { return this.statValue('ritmo') * (1 + this.effect('speed')); }
-    recovery() {
+    speed(at = this.now(), bonuses) { return this.statValue('ritmo') * (1 + this.effect('speed') + this.hortaBuff('speed', at, bonuses?.hortaBuffs)); }
+    recovery(at = this.now(), bonuses) {
       const food = this.isPlaced('barraca-comidas') ? 0.1 : 0;
-      return this.maxStamina() / this.cfg.restSeconds * this.statValue('refresco') * (1 + this.effect('recovery') + food);
+      return this.maxStamina() / this.cfg.restSeconds * this.statValue('refresco') * (1 + this.effect('recovery') + this.hortaBuff('recovery', at, bonuses?.hortaBuffs) + food);
     }
     collection() {
       const extras = this.state.inventory.map(id => this.items[id]);
       const sides = extras.filter(item => item.cat === 'lado').length;
       return (extras.length - sides) * this.cfg.cosmeticBonus + sides * this.cfg.sideBonus;
     }
-    multiplier() {
+    multiplier(at = this.now(), bonuses) {
       const b = this.state.bonfire;
       return (1 + this.cfg.sizeBonus * this.state.size) * (1 + this.collection()) * (1 + this.effect('cheer')) *
         (1 + this.cfg.heatPerLevel * b.calor) * (1 + this.cfg.growthBonus * this.growthStage()) *
-        (1 + this.danceBonus()) * (1 + this.setBonus()) * (1 + this.albumBonus()) * (1 + this.visitorBonus()) * (1 + this.tradition()) * (1 + this.trioBonus()) * (1 + (this.specialDay()?.bonus || 0)) * (this.legendary() ? 2 : 1) *
-        (1 + this.cookBonus());
+        (1 + this.danceBonus()) * (1 + this.setBonus()) * (1 + this.albumBonus()) * (1 + this.visitorBonus()) * (1 + this.tradition()) * (1 + this.trioBonus()) * (1 + (this.specialDay(at)?.bonus || 0)) * (this.legendary() ? 2 : 1) *
+        (1 + this.cookBonus(at, bonuses?.cookBuff)) * (1 + this.hortaBonus()) * (1 + this.hortaBuff('cheer', at, bonuses?.hortaBuffs));
     }
     // O Rebolado de cada passo, com a felicidade da Mandioca (×0,5 a ×1,25) e todos os bônus.
-    stepValue() { return this.statValue('rebolado') * this.moodFactor() * this.multiplier(); }
+    stepValue(at = this.now(), bonuses) { return this.statValue('rebolado') * this.moodFactor(this.mood(at)) * this.multiplier(at, bonuses); }
 
     // --- Felicidade da Mandioca: Amor e Barriga ------------------------------------------------------------------------
     // Os dois agora (ou na hora `at`): o que está guardado menos o que baixou desde a última conta.
@@ -978,9 +1059,9 @@
       this.emit('feed', { id });
       return { ok: true, cost, food };
     }
-    cheerPerSecond() {
+    cheerPerSecond(at = this.now(), bonuses) {
       const stamina = this.maxStamina();
-      return this.stepValue() * stamina / (stamina / this.speed() + stamina / this.recovery());
+      return this.stepValue(at, bonuses) * stamina / (stamina / this.speed(at, bonuses) + stamina / this.recovery(at, bonuses));
     }
 
     // Treino: dança, cansa, descansa, recomeça.
@@ -989,29 +1070,44 @@
       dt = Math.min(dt, 1);
       const s = this.state;
       const r = s.runtime;
+      // Um evento pode nascer neste quadro. O prazo real mede só o tempo que passou desde o início dele.
+      const remaining = kind => r[`${kind}Until`]
+        ? Math.max(0, (r[`${kind}Until`] - this.now()) / 1000) : r[`${kind}Left`] - dt;
       s.stats.playtime += dt;
       this.lastTick = this.now();
       this.updateTimers(this.now());
       this.minis.tick(dt);
       this.updateGoals();
-      if (!r.dayAnnounced && this.specialDay()) { r.dayAnnounced = true; this.emit('special-day', { id: this.specialDay().id, bonus: this.specialDay().bonus }); }
+      const day = this.specialDay();
+      if (day) {
+        // O aviso de uma celebração não bloqueia as próximas nem repete o bônus de julho a cada dia.
+        const occasion = `${new Date(this.now()).getFullYear()}:${day.id}`;
+        if (!r.daysAnnounced.includes(occasion)) {
+          r.daysAnnounced.push(occasion);
+          this.emit('special-day', { id: day.id, bonus: day.bonus });
+        }
+      }
       if (s.bonfire.labareda > 0) {
         if (r.flareLeft > 0) {
-          r.flareLeft -= dt;
-          if (r.flareLeft <= 0) { r.flareLeft = 0; this.emit('flare-end'); }
+          r.flareLeft = remaining('flare');
+          if (r.flareLeft <= 0) { r.flareLeft = 0; r.flareUntil = 0; this.emit('flare-end'); }
         } else if ((r.flareWait -= dt) <= 0) {
           r.flareWait = this.cfg.flareEvery;
           r.flareLeft = this.flareDuration();
+          r.flareUntil = this.now() + r.flareLeft * 1000;
           this.emit('flare-start');
         }
       }
-      if (r.emberLeft > 0) r.emberLeft = Math.max(0, r.emberLeft - dt);
+      if (r.emberLeft > 0) {
+        r.emberLeft = Math.max(0, remaining('ember'));
+        if (!r.emberLeft) r.emberUntil = 0;
+      }
       if (r.frenzyLeft > 0) {
-        r.frenzyLeft -= dt;
-        if (r.frenzyLeft <= 0) { r.frenzyLeft = 0; this.emit('frenzy-end'); }
+        r.frenzyLeft = remaining('frenzy');
+        if (r.frenzyLeft <= 0) { r.frenzyLeft = 0; r.frenzyUntil = 0; this.emit('frenzy-end'); }
       }
       if (r.quadrilhaLeft > 0) {
-        r.quadrilhaLeft -= dt;
+        r.quadrilhaLeft = remaining('quadrilha');
         if ((r.callIn -= dt) <= 0 && r.quadrilhaLeft > 1.5) {
           r.callIn = this.cfg.callEvery;
           const n = r.calls++;
@@ -1019,21 +1115,16 @@
           if (n % 8 === 4 && !(r.cobraLeft > 0) && this.rng() < this.cfg.cobraChance) this.startCobra();
         }
         if (r.quadrilhaLeft <= 0) {
-          r.quadrilhaLeft = 0;
-          this.emit('quadrilha-end');
-          // Quadrilha de concurso: os jurados dão nota. Senão, às vezes tem casamento.
-          if (r.contest) { r.contest = false; this.judgeContest(); }
-          // No dia de Santo Antônio, o casamenteiro, o casamento na roça sai com o dobro da chance.
-          else if (this.rng() < this.cfg.weddingChance * (this.specialDay()?.id === 'antonio' ? 2 : 1)) this.startWedding();
+          this.endQuadrilha(r.quadrilhaUntil || this.now());
         }
       }
       if (r.cobraLeft > 0) {
-        r.cobraLeft -= dt;
+        r.cobraLeft = remaining('cobra');
         // Fugiu: "é mentira!".
-        if (r.cobraLeft <= 0) { r.cobraLeft = 0; this.emit('cobra-end'); }
+        if (r.cobraLeft <= 0) { r.cobraLeft = 0; r.cobraUntil = 0; this.emit('cobra-end'); }
       }
       if (r.weddingLeft > 0) {
-        r.weddingLeft -= dt;
+        r.weddingLeft = remaining('wedding');
         if (r.weddingLeft <= 0) this.endWedding();
       }
       const bingo = s.bingo.round;
@@ -1062,7 +1153,10 @@
         if (r.stamina >= this.maxStamina()) {
           r.stamina = this.maxStamina();
           r.dancing = true;
-          if (s.bonfire.brasa > 0) r.emberLeft = this.cfg.emberFor;
+          if (s.bonfire.brasa > 0) {
+            r.emberLeft = this.cfg.emberFor;
+            r.emberUntil = this.now() + this.cfg.emberFor * 1000;
+          }
           this.emit('rest-end');
         }
       }
@@ -1072,11 +1166,11 @@
       const s = this.state;
       const r = s.runtime;
       let value = this.stepValue();
-      if (r.flareLeft > 0) value *= 1 + this.cfg.flarePerLevel * s.bonfire.labareda;
-      if (r.emberLeft > 0) value *= 1 + this.cfg.emberPerLevel * s.bonfire.brasa;
-      if (r.frenzyLeft > 0) value *= this.cfg.frenzyMult;
-      if (r.quadrilhaLeft > 0) value *= 1 + this.quadrilhaBonus();
-      const cobra = this.effect('crit');
+      if (this.runtimeActive('flare')) value *= 1 + this.cfg.flarePerLevel * s.bonfire.labareda;
+      if (this.runtimeActive('ember')) value *= 1 + this.cfg.emberPerLevel * s.bonfire.brasa;
+      if (this.runtimeActive('frenzy')) value *= this.cfg.frenzyMult;
+      if (this.runtimeActive('quadrilha')) value *= 1 + this.quadrilhaBonus();
+      const cobra = this.effect('crit') + this.hortaBuff('crit');
       const crit = cobra > 0 && this.rng() < cobra;
       if (crit) value *= this.cfg.cobraMult;
       this.earn(value);
@@ -1110,8 +1204,8 @@
     }
 
     flareDuration() { return this.cfg.flareFor * (1 + this.effect('flare')); }
-    get flareActive() { return this.state.runtime.flareLeft > 0; }
-    get emberActive() { return this.state.runtime.emberLeft > 0; }
+    get flareActive() { return this.runtimeActive('flare'); }
+    get emberActive() { return this.runtimeActive('ember'); }
 
     // Fichas e loja
     ticketCost() {
@@ -1152,6 +1246,14 @@
     equip(id, side) {
       const item = this.items[id];
       if (!item || !this.owned(id)) return false;
+      // A roupa no fim do prazo é a julgada: uma troca antes do próximo tique já é para o concurso seguinte.
+      const now = this.now();
+      this.settleContest(now);
+      if (this.state.fantasia.judgeAt && now >= this.state.fantasia.judgeAt) this.judgeFantasia();
+      if (item.cat === 'lado') {
+        this.updateCold(now);
+        this.updateIntervalRewards(now);
+      }
       const e = this.state.equipped;
       const before = this.activeSet()?.id;
       if (item.cat === 'lado') {
@@ -1184,10 +1286,62 @@
       const poet = this.state?.crew ? 1 - Math.min(0.6, this.effect('letter')) : 1;
       return this.cfg.letterMinutes * MINUTE * fast * poet;
     }
+    updateReserve(clock, cap, interval, event, now = this.now()) {
+      if (clock.ready >= cap) { clock.nextAt = 0; return; }
+      if (!clock.nextAt) clock.nextAt = now + interval();
+      while (clock.nextAt && now >= clock.nextAt && clock.ready < cap) {
+        clock.ready++;
+        clock.nextAt = clock.ready < cap ? clock.nextAt + interval() : 0;
+        this.emit(event);
+      }
+    }
+    // Uma troca de posto não muda o ritmo dos intervalos que passaram nem o prazo que já estava reservado.
+    updateIntervalRewards(now = this.now()) {
+      this.settleContest(now);
+      const s = this.state;
+      if (s.fishing.unlocked) this.updateReserve(s.fishing, this.cfg.prizeCap, () => this.fishingInterval(), 'prize-ready', now);
+      this.updateReserve(s.mail, this.cfg.letterCap, () => this.letterInterval(), 'letter-ready', now);
+      this.updateRingCost(now);
+    }
     between([low, high]) { return (low + (high - low) * this.rng()) * 1000; }
+
+    runtimeActive(kind, now = this.now()) {
+      const r = this.state.runtime;
+      return r[`${kind}Left`] > 0 && (!r[`${kind}Until`] || now < r[`${kind}Until`]);
+    }
+
+    settleContest(now = this.now()) {
+      const r = this.state.runtime;
+      if (r.contest && r.quadrilhaLeft > 0 && !this.runtimeActive('quadrilha', now)) this.endQuadrilha(r.quadrilhaUntil);
+    }
+
+    updateRuntimeTimers(now) {
+      const r = this.state.runtime;
+      for (const kind of ['flare', 'ember', 'frenzy', 'cobra']) {
+        if (r[`${kind}Left`] > 0 && !this.runtimeActive(kind, now)) {
+          r[`${kind}Left`] = 0;
+          r[`${kind}Until`] = 0;
+          if (kind !== 'ember') this.emit(`${kind}-end`);
+        }
+      }
+      if (r.weddingLeft > 0 && !this.runtimeActive('wedding', now)) this.endWedding();
+      if (r.quadrilhaLeft > 0 && !this.runtimeActive('quadrilha', now)) this.endQuadrilha(r.quadrilhaUntil);
+    }
+
+    endQuadrilha(at = this.now()) {
+      const r = this.state.runtime;
+      r.quadrilhaLeft = 0;
+      r.quadrilhaUntil = 0;
+      this.emit('quadrilha-end');
+      // Quadrilha de concurso: os jurados dão nota. Senão, às vezes tem casamento.
+      if (r.contest) { r.contest = false; this.judgeContest(); }
+      // Uma pausa não desloca o começo da cerimônia: só vale o trecho que ainda não passou.
+      else if (this.rng() < this.cfg.weddingChance * (this.specialDay(at)?.id === 'antonio' ? 2 : 1)) this.startWedding(false, at);
+    }
 
     updateTimers(now) {
       const s = this.state;
+      this.updateRuntimeTimers(now);
       const tier = this.tierIndex();
       if (tier >= 1 && !s.fishing.unlocked) {
         s.fishing = { ready: 1, nextAt: now + this.fishingInterval(), unlocked: true };
@@ -1197,13 +1351,7 @@
       for (const [clock, cap, interval] of [[s.fishing, this.cfg.prizeCap, () => this.fishingInterval()],
         [s.mail, this.cfg.letterCap, () => this.letterInterval()]]) {
         if (clock === s.fishing && !clock.unlocked) continue;
-        if (clock.ready >= cap) { clock.nextAt = 0; continue; }
-        if (!clock.nextAt) clock.nextAt = now + interval();
-        while (clock.nextAt && now >= clock.nextAt && clock.ready < cap) {
-          clock.ready++;
-          clock.nextAt = clock.ready < cap ? clock.nextAt + interval() : 0;
-          this.emit(clock === s.fishing ? 'prize-ready' : 'letter-ready');
-        }
+        this.updateReserve(clock, cap, interval, clock === s.fishing ? 'prize-ready' : 'letter-ready', now);
       }
       // Cozinha: o prato no fogo fica pronto na hora marcada; o servido para de valer quando acaba o tempo.
       const kitchen = s.cozinha;
@@ -1274,7 +1422,10 @@
         if (!p.active) {
           if (!p.nextAt) p.nextAt = now + this.between(this.cfg.sacoEvery);
           // Com o cavalete do rabo no burro na beira da pista, a corrida espera ele sair.
-          if (now >= p.nextAt) { if (s.burro?.active) p.nextAt = now + 30000; else this.startSaco(now); }
+          if (now >= p.nextAt) {
+            if (s.burro?.active && now < s.burro.active.until) p.nextAt = now + 30000;
+            else this.startSaco(now);
+          }
         }
       }
       if (tier >= 1) {
@@ -1287,26 +1438,7 @@
       }
       if (tier >= this.cfg.leilaoMinTier) {
         const p = s.leilao;
-        const a = p.active;
-        if (a && a.rivalAt && now >= a.rivalAt) {
-          // A plateia cobre (ou abre, se ninguém deu lance), até o teto dela.
-          a.rivalAt = 0;
-          const bid = this.leilaoNext();
-          if (bid <= a.max) {
-            if (a.leader === 'voce') { s.tickets += a.held; a.held = 0; }
-            a.price = bid;
-            a.leader = 'plateia';
-            a.bidAt = now;
-            a.calls = 0;
-            this.emit('leilao-bid', { who: 'plateia', price: bid });
-          }
-        }
-        if (a && a.leader && now >= a.bidAt + (a.calls + 1) * this.cfg.leilaoCall * 1000) {
-          // Ninguém cobriu: "dou-lhe uma, dou-lhe duas..." e, na terceira, vendido.
-          a.calls++;
-          if (a.calls < 3) this.emit('leilao-call', { n: a.calls, price: a.price, leader: a.leader });
-          else this.sellLeilao();
-        }
+        this.updateLeilao(now);
         if (!p.active) {
           if (!p.nextAt) p.nextAt = now + this.between(this.cfg.leilaoEvery);
           if (now >= p.nextAt) this.startLeilao(now);
@@ -1330,6 +1462,7 @@
           if (!q.nextAt) q.nextAt = now + this.between(this.cfg.quadrilhaEvery);
           if (now >= q.nextAt) {
             s.runtime.quadrilhaLeft = this.cfg.quadrilhaSeconds;
+            s.runtime.quadrilhaUntil = now + this.cfg.quadrilhaSeconds * 1000;
             s.runtime.callIn = 0;
             s.runtime.calls = 0;
             s.runtime.contest = tier >= this.cfg.contestMinTier && this.rng() < this.cfg.contestChance;
@@ -1341,13 +1474,17 @@
       // Chuva de São João: agenda, trovões durante a chuva e, quando ela para, o arco-íris com o pote de ouro.
       const w = s.weather;
       if (w.rain) {
-        if (!w.thunderAt) w.thunderAt = now + 6000 + this.rng() * 14000;
-        if (now >= w.thunderAt) { w.thunderAt = now + 8000 + this.rng() * 16000; this.emit('thunder'); }
         if (now >= w.rain.until) {
+          const born = w.rain.until;
+          const until = born + this.cfg.rainbowSeconds * 1000;
           w.rain = null;
           w.thunderAt = 0;
-          w.rainbow = { born: now, until: now + this.cfg.rainbowSeconds * 1000, side: this.rng() < 0.5 ? 0 : 1 };
-          this.emit('rain-end');
+          // A chuva acabou na hora marcada, inclusive durante o repouso. O pote não ganha um prazo novo na volta.
+          w.rainbow = now < until ? { born, until, side: this.rng() < 0.5 ? 0 : 1 } : null;
+          if (w.rainbow) this.emit('rain-end');
+        } else {
+          if (!w.thunderAt) w.thunderAt = now + 6000 + this.rng() * 14000;
+          if (now >= w.thunderAt) { w.thunderAt = now + 8000 + this.rng() * 16000; this.emit('thunder'); }
         }
       } else if (w.rainbow) {
         if (now >= w.rainbow.until) { w.rainbow = null; this.emit('rainbow-gone'); }
@@ -1365,19 +1502,7 @@
       if (tier >= this.cfg.coldMinTier) {
         const c = s.cold;
         if (c.active) {
-          if (this.quentaoOn() && now >= c.active.saleAt && now <= c.active.until) {
-            c.active.saleAt = now + this.cfg.coldSale * 1000;
-            c.active.sold++;
-            s.tickets += 1;
-            s.stats.quentao++;
-            if (s.stats.quentao >= 20) this.unlock('quentao');
-            this.emit('quentao', { sold: c.active.sold });
-          }
-          if (now >= c.active.until) {
-            const sold = c.active.sold;
-            c.active = null;
-            this.emit('cold-end', { sold });
-          }
+          this.updateCold(now);
         } else if (!w.rain) {
           if (!c.nextAt) c.nextAt = now + this.between(this.cfg.coldEvery);
           if (now >= c.nextAt) this.startCold(now);
@@ -1389,7 +1514,10 @@
         if (!v.active) {
           if (!v.nextAt) v.nextAt = now + this.between(this.cfg.visitorEvery);
           // Um visitante de cada vez: com o fotógrafo montado, o Sanfoneiro espera um pouco.
-          if (now >= v.nextAt) { if (s.fotografo?.active) v.nextAt = now + 60000; else this.startVisitor(now); }
+          if (now >= v.nextAt) {
+            if (s.fotografo?.active && now < s.fotografo.active.until) v.nextAt = now + 60000;
+            else this.startVisitor(now);
+          }
         }
       }
       if (tier >= this.cfg.fantasiaMinTier) {
@@ -1418,16 +1546,11 @@
           if (now >= f.nextAt) { if (s.visitor.active) f.nextAt = now + 60000; else this.startFotografo(now); }
         }
       }
-      const rings = s.rings;
-      while (rings.cost > this.cfg.ringCost && rings.nextAt && now >= rings.nextAt) {
-        rings.cost = Math.max(this.cfg.ringCost, rings.cost / 2);
-        rings.nextAt = rings.cost > this.cfg.ringCost ? rings.nextAt + this.ringCooldown() : 0;
-        this.emit('rings-cheaper', { cost: rings.cost });
-      }
+      this.updateRingCost(now);
       s.outings.forEach((entry, index) => {
         if (entry.char && entry.endsAt && now >= entry.endsAt && !entry.announced) {
           entry.announced = true;
-          this.emit('outing-done', { index });
+          this.emit('outing-done', { index, id: entry.char });
         }
       });
     }
@@ -1435,9 +1558,12 @@
     // Pescaria
     fish() {
       const s = this.state;
-      if (!s.fishing.unlocked || s.fishing.ready <= 0) return null;
+      if (!s.fishing.unlocked) return null;
+      const now = this.now();
+      this.updateReserve(s.fishing, this.cfg.prizeCap, () => this.fishingInterval(), 'prize-ready', now);
+      if (s.fishing.ready <= 0) return null;
       s.fishing.ready--;
-      if (!s.fishing.nextAt) s.fishing.nextAt = this.now() + this.fishingInterval();
+      if (!s.fishing.nextAt) s.fishing.nextAt = now + this.fishingInterval();
       let char;
       if (s.stats.fished === 0) char = this.chars.milho;
       else {
@@ -1452,6 +1578,7 @@
       }
       s.stats.fished++;
       this.unlock('primeira-prenda');
+      this.updateIntervalRewards(now);
       const entry = s.crew[char.id];
       let result;
       if (!entry) {
@@ -1478,12 +1605,18 @@
       return this.now() >= entry.endsAt ? 'pronto' : 'fora';
     }
     availableForOuting() { return this.data.chars.filter(char => this.hasChar(char.id) && this.awayOuting(char.id) < 0); }
+    outingTime(index) {
+      return this.data.outings[index].minutes * MINUTE * (this.isPlaced('carroca') ? 0.85 : 1);
+    }
     startOuting(index, charId) {
       const entry = this.state.outings[index];
       if (!entry || entry.char || !this.outingOpen(index) || !this.hasChar(charId) || this.awayOuting(charId) >= 0) return false;
+      const now = this.now();
+      this.updateIntervalRewards(now);
       entry.char = charId;
       // A Carroça Enfeitada num dos lados leva a turma: o rolê volta 15% mais rápido.
-      entry.endsAt = this.now() + this.data.outings[index].minutes * MINUTE * (this.isPlaced('carroca') ? 0.85 : 1);
+      entry.startAt = now;
+      entry.endsAt = entry.startAt + this.outingTime(index);
       entry.announced = false;
       this.emit('outing-start', { index, id: charId });
       return true;
@@ -1491,7 +1624,9 @@
     cancelOuting(index) {
       const entry = this.state.outings[index];
       if (!entry?.char || this.outingState(index) !== 'fora') return false;
+      this.updateIntervalRewards();
       entry.char = null;
+      entry.startAt = 0;
       entry.endsAt = 0;
       return true;
     }
@@ -1502,6 +1637,7 @@
     claimOuting(index) {
       const entry = this.state.outings[index];
       if (!entry?.char || this.outingState(index) !== 'pronto') return null;
+      this.updateIntervalRewards();
       const outing = this.data.outings[index];
       const wood = this.outingWood(index, entry.char);
       this.state.wood += wood;
@@ -1512,6 +1648,7 @@
       }
       const char = this.chars[entry.char];
       entry.char = null;
+      entry.startAt = 0;
       entry.endsAt = 0;
       this.state.stats.outings++;
       this.record('outing', { id: char.id, wood });
@@ -1546,9 +1683,11 @@
     // Correio elegante
     openLetter() {
       const s = this.state;
+      const now = this.now();
+      this.updateReserve(s.mail, this.cfg.letterCap, () => this.letterInterval(), 'letter-ready', now);
       if (s.mail.ready <= 0) return null;
       s.mail.ready--;
-      if (!s.mail.nextAt) s.mail.nextAt = this.now() + this.letterInterval();
+      if (!s.mail.nextAt) s.mail.nextAt = now + this.letterInterval();
       // O Espantalho Galã num dos lados: cada carta rende uma ficha a mais.
       const tickets = this.cfg.letterTickets + this.tierIndex() + (this.isPlaced('espantalho') ? 1 : 0) +
         (this.specialDay()?.id === 'namorados' ? 1 : 0);
@@ -1710,7 +1849,16 @@
     // replantada (volta a broto, porque as melhorias recomeçam).
     newYear() {
       if (!this.canNewYear()) return false;
+      this.settleContest();
+      // O presente de uma cerimônia já encerrada fica na festa antiga antes de ela recomeçar.
+      if (this.state.runtime.weddingLeft > 0 && !this.runtimeActive('wedding')) this.endWedding();
+      this.updateCold();
+      this.updateLeilao();
+      if (this.state.fantasia.judgeAt && this.now() >= this.state.fantasia.judgeAt) this.judgeFantasia();
+      // O Palco recomeça no novo ano, depois de pagar a música que já terminou na festa antiga.
+      if (this.miniOpen('palco')) this.mini('palco').tick();
       const old = this.state;
+      this.updateReserve(old.mail, this.cfg.letterCap, () => this.letterInterval(), 'letter-ready');
       const next = this.fresh();
       for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt', 'humor', 'rafael']) {
         next[key] = old[key];
@@ -1718,6 +1866,8 @@
       next.year = (old.year || 1) + 1;
       // A história do cordel fica: página lida e prêmio recebido não se perdem de um ano para o outro.
       if (old.minis?.cordel) next.minis.cordel = old.minis.cordel;
+      // O bônus fixo da horta também: as plantas já colhidas continuam valendo (a horta em si recomeça).
+      if (old.minis?.horta?.harvested) next.minis.horta.harvested = old.minis.horta.harvested;
       next.yearStart = old.stats.playtime;
       // Rodadas no meio: a entrada volta (elas acabam com a festa). O lance guardado do leilão também.
       if (old.bingo?.round && !old.bingo.round.result) next.tickets += old.bingo.round.cost;
@@ -1727,9 +1877,12 @@
       const equipped = { ...old.equipped };
       // Barraca que ainda não abriu no quintal volta a ser o enfeite de sempre.
       for (const side of ['esquerda', 'direita']) {
-        if ((this.items[equipped[side]]?.tier || 0) > 0) equipped[side] = this.data.equipped[side];
+        if ((this.items[equipped[side]]?.tier || 0) > 0) {
+          const other = side === 'esquerda' ? 'direita' : 'esquerda';
+          const initial = this.data.equipped;
+          equipped[side] = initial[side] === equipped[other] ? initial[other] : initial[side];
+        }
       }
-      if (equipped.esquerda === equipped.direita) equipped.direita = this.data.equipped.direita;
       next.equipped = equipped;
       this.state = next;
       this.lastTick = this.now();
@@ -1747,13 +1900,16 @@
     // Uma rodada salva que não faça sentido (save antigo ou mexido) vira nenhuma rodada.
     cleanBingo(round) {
       if (!round || !Array.isArray(round.card) || round.card.length !== 9 || !Array.isArray(round.drawn)) return null;
-      const card = round.card.map(n => Math.floor(finite(n)));
-      if (card.some((n, i) => (i === 4 ? n !== 0 : n < 1 || n > this.cfg.bingoMax))) return null;
-      return { card, drawn: round.drawn.filter(n => Number.isInteger(n) && n >= 1 && n <= this.cfg.bingoMax),
+      const card = Array.from(round.card);
+      if (card.some((n, i) => !Number.isInteger(n) || (i === 4 ? n !== 0 : n < 1 || n > this.cfg.bingoMax)) || new Set(card).size !== 9) return null;
+      // O prêmio salvo é o recibo do que já foi pago, mostrado na tela ao reabrir a cartela.
+      const prize = round.prize && typeof round.prize === 'object' && !Array.isArray(round.prize)
+        ? { tickets: Math.max(0, Math.floor(finite(round.prize.tickets))), amount: Math.max(0, finite(round.prize.amount)) } : null;
+      return { card, drawn: [...new Set(round.drawn.filter(n => Number.isInteger(n) && n >= 1 && n <= this.cfg.bingoMax))],
         wait: clamp(finite(round.wait, this.cfg.bingoEvery), 0, this.cfg.bingoEvery),
         rival: clamp(Math.floor(finite(round.rival, this.cfg.bingoRival[1])), 1, this.cfg.bingoRival[1]),
         line: round.line === true, result: ['bingo', 'rival'].includes(round.result) ? round.result : null,
-        cost: Math.max(0, Math.floor(finite(round.cost))), prize: round.prize && typeof round.prize === 'object' ? { ...round.prize } : null };
+        cost: Math.max(0, Math.floor(finite(round.cost))), prize };
     }
 
     // Compra uma cartela nova: 8 números sorteados (o meio é livre) e o sorteio em que a plateia vai gritar BINGO.
@@ -1950,6 +2106,7 @@
     startCobra() {
       const r = this.state.runtime;
       r.cobraLeft = this.cfg.cobraSeconds;
+      r.cobraUntil = this.now() + this.cfg.cobraSeconds * 1000;
       r.cobraDir = this.rng() < 0.5 ? 1 : -1;
       this.emit('cobra', { dir: r.cobraDir, seconds: this.cfg.cobraSeconds });
     }
@@ -1958,8 +2115,9 @@
     catchCobra() {
       const s = this.state;
       const r = s.runtime;
-      if (!(r.cobraLeft > 0)) return null;
+      if (!this.runtimeActive('cobra')) return null;
       r.cobraLeft = 0;
+      r.cobraUntil = 0;
       const amount = Math.max(50, this.cheerPerSecond() * this.cfg.cobraCheer) * (1 + this.effect('feast'));
       this.earn(amount);
       s.stats.cobras++;
@@ -2015,7 +2173,7 @@
     serve() {
       const s = this.state;
       const pot = s.cozinha.pot;
-      const recipe = pot && pot.ready && this.recipe(pot.id);
+      const recipe = pot && (pot.ready || this.now() >= pot.readyAt) && this.recipe(pot.id);
       if (!recipe) return null;
       s.cozinha.pot = null;
       s.cozinha.buff = { id: recipe.id, until: this.now() + recipe.buffMinutes * 60000 };
@@ -2024,9 +2182,33 @@
       this.emit('cook-served', { id: recipe.id, bonus: recipe.bonus, minutes: recipe.buffMinutes });
       return { id: recipe.id, bonus: recipe.bonus, minutes: recipe.buffMinutes };
     }
-    cookBonus() {
-      const served = this.state.cozinha?.buff;
-      return served && this.now() < served.until ? this.recipe(served.id)?.bonus || 0 : 0;
+    cookBonus(at = this.now(), served = this.state.cozinha?.buff) {
+      return served && at < served.until ? this.recipe(served.id)?.bonus || 0 : 0;
+    }
+
+    // Horta (janela de plantar): cada planta já colhida uma vez deixa `permanentPct`% de Animação para sempre (fica de um ano para o
+    // outro) e cada colheita dá o bônus da planta por `buffMinutes` min (colher a mesma de novo recomeça a contagem dela; as de plantas
+    // diferentes somam).
+    hortaBonus() {
+      const c = this.data.minis?.horta;
+      const harvested = this.state.minis?.horta?.harvested;
+      if (!c || !harvested) return 0;
+      return c.permanentPct / 100 * c.crops.filter(crop => harvested[crop.id] > 0).length;
+    }
+    hortaBuffs() {
+      const c = this.data.minis?.horta;
+      const buffs = this.state.minis?.horta?.buffs;
+      if (!c || !buffs) return [];
+      const now = this.now();
+      return c.crops.filter(crop => crop.buff && buffs[crop.id] > now).map(crop => ({ crop: crop.id, kind: crop.buff.kind, value: crop.buff.value,
+        until: buffs[crop.id] }));
+    }
+    hortaBuff(kind, at = this.now(), buffs = this.state.minis?.horta?.buffs) {
+      const c = this.data.minis?.horta;
+      if (!c || !buffs) return 0;
+      let sum = 0;
+      for (const crop of c.crops) if (crop.buff?.kind === kind && buffs[crop.id] > at) sum += crop.buff.value;
+      return sum;
     }
 
     // Compadres de fogueira: o casal recita os versos dos dois lados da fogueira (quando, quem decide é o desenho da festa)
@@ -2165,9 +2347,36 @@
 
     startCold(now = this.now()) {
       const s = this.state;
-      s.cold.active = { born: now, until: now + this.cfg.coldSeconds * 1000, saleAt: now + this.cfg.coldSale * 1000, sold: 0 };
+      s.cold.active = { born: now, until: now + this.cfg.coldSeconds * 1000, saleAt: now + this.cfg.coldSale * 1000, at: now, sold: 0 };
       s.cold.nextAt = 0;
       this.emit('cold', { quentao: this.quentaoOn() });
+    }
+
+    // Cada venda segue o prazo original; o último quadro pode chegar pouco depois do fim do frio.
+    // A pausa de um minuto já conta como repouso: os goles desse intervalo não foram vendidos.
+    updateCold(now = this.now()) {
+      const s = this.state;
+      const a = s.cold.active;
+      if (!a) return;
+      const interval = this.cfg.coldSale * 1000;
+      const due = Math.max(0, Math.floor((Math.min(now, a.until) - a.saleAt) / interval) + 1);
+      if (due) {
+        a.saleAt += due * interval;
+        if (now - a.at < WAKE_GAP && this.quentaoOn()) {
+          for (let i = 0; i < due; i++) {
+            a.sold++;
+            s.tickets++;
+            s.stats.quentao++;
+            if (s.stats.quentao >= 20) this.unlock('quentao');
+            this.emit('quentao', { sold: a.sold });
+          }
+        }
+      }
+      a.at = now;
+      if (now >= a.until) {
+        s.cold.active = null;
+        this.emit('cold-end', { sold: a.sold });
+      }
     }
 
     // Dica do alto-falante, quando tem uma que ajuda: bingo aberto sem cartela, argolas no preço mínimo ou quantos
@@ -2189,8 +2398,36 @@
       return a ? (a.leader ? a.price + 1 : a.base) : 0;
     }
 
+    // Resolve pelo horário marcado: uma pausa não adia o lance da plateia nem as chamadas já vencidas.
+    updateLeilao(now = this.now()) {
+      const s = this.state;
+      while (s.leilao.active) {
+        const a = s.leilao.active;
+        const rivalAt = a.rivalAt || Infinity;
+        const callAt = a.leader ? a.bidAt + (a.calls + 1) * this.cfg.leilaoCall * 1000 : Infinity;
+        if (Math.min(rivalAt, callAt) > now) return;
+        if (rivalAt <= callAt) {
+          a.rivalAt = 0;
+          const bid = this.leilaoNext();
+          if (bid <= a.max) {
+            if (a.leader === 'voce') { s.tickets += a.held; a.held = 0; }
+            a.price = bid;
+            a.leader = 'plateia';
+            a.bidAt = rivalAt;
+            a.calls = 0;
+            this.emit('leilao-bid', { who: 'plateia', price: bid });
+          }
+        } else {
+          a.calls++;
+          if (a.calls < 3) this.emit('leilao-call', { n: a.calls, price: a.price, leader: a.leader });
+          else this.sellLeilao();
+        }
+      }
+    }
+
     bidLeilao() {
       const s = this.state;
+      this.updateLeilao();
       const a = s.leilao.active;
       if (!a) return { active: false };
       if (a.leader === 'voce') return { active: true, leading: true, price: a.price };
@@ -2229,6 +2466,17 @@
       return { winner: 'voce', price: a.price, prize: a.prize };
     }
 
+    startFrenzy(seconds, keepLonger = false) {
+      if (!Number.isFinite(seconds) || seconds <= 0) return;
+      const r = this.state.runtime;
+      const now = this.now();
+      const remaining = keepLonger && this.runtimeActive('frenzy', now)
+        ? Math.min(r.frenzyLeft, r.frenzyUntil ? (r.frenzyUntil - now) / 1000 : r.frenzyLeft) : 0;
+      r.frenzyLeft = Math.max(seconds, remaining);
+      r.frenzyUntil = now + r.frenzyLeft * 1000;
+      this.emit('frenzy-start', { kind: 'frenzy', mult: this.cfg.frenzyMult, seconds: r.frenzyLeft });
+    }
+
     // Balão de sorte: um prêmio sorteado para quem pegou o balão dourado (frenesi, Animação, fichas ou lenha).
     claimBalloon() {
       const s = this.state;
@@ -2241,9 +2489,8 @@
       const tier = this.tierIndex();
       let result;
       if (roll < 0.35) {
-        s.runtime.frenzyLeft = this.cfg.frenzySeconds;
+        this.startFrenzy(this.cfg.frenzySeconds);
         result = { kind: 'frenzy', mult: this.cfg.frenzyMult, seconds: this.cfg.frenzySeconds };
-        this.emit('frenzy-start', result);
       } else if (roll < 0.7) {
         const amount = Math.max(50, this.cheerPerSecond() * this.cfg.balloonCheer);
         this.earn(amount);
@@ -2263,11 +2510,11 @@
     }
 
     // Dia de Santo Antônio (13/06), São João (24/06) ou São Pedro (29/06) no relógio do computador: a festa rende mais.
-    // O dia é conferido de hora em hora, não a cada passo.
-    specialDay() {
-      const hour = Math.floor(this.now() / 3600000);
-      if (this.dayCache?.hour !== hour) {
-        const date = new Date(this.now());
+    // O cache acompanha o dia local, inclusive ao consultar uma amostra do tempo fora.
+    specialDay(at = this.now()) {
+      const date = new Date(at);
+      const offset = date.getTimezoneOffset();
+      if (!this.dayCache || this.dayCache.offset !== offset || at < this.dayCache.start || at >= this.dayCache.end) {
         const month = this.cfg.specialDays.filter(entry => entry.month === date.getMonth() + 1);
         // Aniversário da festa: todo ano, no dia em que ela começou (depois dos dias de santo, antes do mês inteiro).
         const born = this.state?.bornAt ? new Date(this.state.bornAt) : null;
@@ -2275,7 +2522,11 @@
         const birthday = born && years > 0 && born.getMonth() === date.getMonth() && born.getDate() === date.getDate()
           ? { id: 'aniversario', bonus: this.cfg.birthdayBonus, years } : null;
         const day = month.find(entry => entry.day === date.getDate()) || birthday || month.find(entry => entry.day == null) || null;
-        this.dayCache = { hour, day };
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(date);
+        end.setHours(24, 0, 0, 0);
+        this.dayCache = { start: start.getTime(), end: end.getTime(), offset, day };
       }
       return this.dayCache.day;
     }
@@ -2289,20 +2540,24 @@
 
     // Casamento na roça: os noivos e o padre entram na pista e o jogador joga arroz neles (clique). Só da Festa da Cidade
     // em diante, que tem pista para eles; `force` (botão de teste) ignora isso.
-    startWedding(force = false) {
+    startWedding(force = false, at = this.now()) {
       const r = this.state.runtime;
-      if (r.weddingLeft > 0 || (!force && this.tierIndex() < this.cfg.weddingMinTier)) return false;
-      r.weddingLeft = this.cfg.weddingSeconds;
+      const until = at + this.cfg.weddingSeconds * 1000;
+      const seconds = Math.min(this.cfg.weddingSeconds, (until - this.now()) / 1000);
+      if (!(seconds > 0) || this.runtimeActive('wedding') || (!force && this.tierIndex() < this.cfg.weddingMinTier)) return false;
+      if (r.weddingLeft > 0) this.endWedding();
+      r.weddingLeft = seconds;
+      r.weddingUntil = until;
       r.rice = 0;
       r.riceAt = 0;
-      this.emit('wedding', { seconds: this.cfg.weddingSeconds, rice: this.cfg.weddingRice });
+      this.emit('wedding', { seconds, rice: this.cfg.weddingRice });
       return true;
     }
 
     // Um punhado de arroz nos noivos: no máximo um a cada riceCooldown segundos. `ready` diz se o grão contou.
     throwRice() {
       const r = this.state.runtime;
-      if (r.weddingLeft <= 0) return { ready: false, active: false };
+      if (!this.runtimeActive('wedding')) return { ready: false, active: false };
       const now = this.now();
       if (now - r.riceAt < this.cfg.riceCooldown * 1000) return { ready: false, active: true, n: r.rice };
       r.riceAt = now;
@@ -2316,7 +2571,9 @@
     endWedding() {
       const s = this.state;
       const r = s.runtime;
+      if (!(r.weddingLeft > 0 || r.weddingUntil)) return null;
       r.weddingLeft = 0;
+      r.weddingUntil = 0;
       const rice = r.rice;
       const share = Math.min(1, rice / this.cfg.weddingRice);
       const amount = Math.max(60, this.cheerPerSecond() * this.cfg.weddingCheer) * (0.4 + 0.6 * share);
@@ -2380,6 +2637,15 @@
     ringCost() { return this.state.rings.cost; }
     ringCooldown() { return this.cfg.ringCooldownMinutes * MINUTE * (1 - Math.min(0.6, this.effect('rings'))); }
 
+    updateRingCost(now = this.now()) {
+      const rings = this.state.rings;
+      while (rings.cost > this.cfg.ringCost && rings.nextAt && now >= rings.nextAt) {
+        rings.cost = Math.max(this.cfg.ringCost, rings.cost / 2);
+        rings.nextAt = rings.cost > this.cfg.ringCost ? rings.nextAt + this.ringCooldown() : 0;
+        this.emit('rings-cheaper', { cost: rings.cost });
+      }
+    }
+
     // Cada prêmio leva a folga da mira da sua garrafa: quanto melhor, mais certeira a argola precisa cair.
     ringPrize(kind, exclusives) {
       const tier = this.tierIndex();
@@ -2394,8 +2660,10 @@
     }
 
     startRings() {
+      if (this.round) return null;
+      this.updateRingCost();
       const cost = this.ringCost();
-      if (this.round || this.state.tickets < cost) return null;
+      if (this.state.tickets < cost) return null;
       this.state.tickets -= cost;
       this.state.rings = { cost: cost * 2, nextAt: this.now() + this.ringCooldown() };
       const exclusives = this.data.items.filter(item => item.source === 'argolas' && !this.owned(item.id));

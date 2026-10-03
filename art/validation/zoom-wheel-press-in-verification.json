@@ -1,0 +1,228 @@
+{
+  "pid": 12324,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-12324-AS1uiQ",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "zoomWheel": {
+    "case": "press",
+    "direction": "in",
+    "before": {
+      "zoom": 0.5,
+      "drag": null,
+      "moved": false,
+      "guideHidden": true,
+      "events": []
+    },
+    "pressed": {
+      "zoom": 0.5,
+      "drag": "zoom",
+      "moved": false,
+      "guideHidden": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 1,
+          "action": "zoom-alca"
+        }
+      ]
+    },
+    "beforeWheel": {
+      "zoom": 0.5,
+      "drag": "zoom",
+      "moved": false,
+      "guideHidden": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 1,
+          "action": "zoom-alca"
+        }
+      ]
+    },
+    "wheeled": {
+      "zoom": 0.56,
+      "drag": "zoom",
+      "moved": true,
+      "guideHidden": false,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 1,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "wheel",
+          "trusted": true,
+          "x": 481,
+          "y": 791,
+          "deltaX": 0,
+          "deltaY": -120,
+          "buttons": 1,
+          "action": "zoom-alca"
+        }
+      ]
+    },
+    "waited": {
+      "zoom": 0.56,
+      "drag": "zoom",
+      "moved": true,
+      "guideHidden": false,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 1,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "wheel",
+          "trusted": true,
+          "x": 481,
+          "y": 791,
+          "deltaX": 0,
+          "deltaY": -120,
+          "buttons": 1,
+          "action": "zoom-alca"
+        }
+      ]
+    },
+    "ended": {
+      "zoom": 0.56,
+      "drag": null,
+      "moved": false,
+      "guideHidden": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 1,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "wheel",
+          "trusted": true,
+          "x": 481,
+          "y": 791,
+          "deltaX": 0,
+          "deltaY": -120,
+          "buttons": 1,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "pointerup",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 0,
+          "action": "zoom-alca"
+        }
+      ]
+    },
+    "saved": 0.56,
+    "fresh": {
+      "zoom": 1,
+      "drag": null,
+      "moved": false,
+      "guideHidden": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 1,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "wheel",
+          "trusted": true,
+          "x": 481,
+          "y": 791,
+          "deltaX": 0,
+          "deltaY": -120,
+          "buttons": 1,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "pointerup",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 0,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 1,
+          "action": "zoom-alca"
+        },
+        {
+          "type": "pointerup",
+          "trusted": true,
+          "pointerType": "mouse",
+          "primary": true,
+          "x": 481,
+          "y": 791,
+          "buttons": 0,
+          "action": "zoom-alca"
+        }
+      ]
+    }
+  }
+}

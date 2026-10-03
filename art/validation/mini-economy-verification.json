@@ -1,0 +1,732 @@
+{
+  "cases": [
+    {
+      "name": "aquario-species-0-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-0-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-0-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-0-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-1-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-1-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-1-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-1-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-2-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-2-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-2-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-2-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-3-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-3-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-3-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-3-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-4-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-4-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-4-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-4-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-5-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-5-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-5-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-5-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-6-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-6-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-6-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-6-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-7-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-7-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-7-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-7-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-8-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-8-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-8-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-8-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-9-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-9-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-9-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-9-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-10-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-10-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-10-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-10-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-11-space-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-11-space-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 13,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-11-full-continuous",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-species-11-full-reload",
+      "actions": 24,
+      "result": {
+        "discoveries": 11,
+        "completions": 1,
+        "conversions": 24,
+        "fish": 14
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-lambari",
+      "actions": 2,
+      "result": {
+        "species": "lambari",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-piaba",
+      "actions": 2,
+      "result": {
+        "species": "piaba",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-tilapia",
+      "actions": 2,
+      "result": {
+        "species": "tilapia",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-acara",
+      "actions": 2,
+      "result": {
+        "species": "acara",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-bagre",
+      "actions": 2,
+      "result": {
+        "species": "bagre",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-traira",
+      "actions": 2,
+      "result": {
+        "species": "traira",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-pacu",
+      "actions": 2,
+      "result": {
+        "species": "pacu",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-tucunare",
+      "actions": 2,
+      "result": {
+        "species": "tucunare",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-dourado",
+      "actions": 2,
+      "result": {
+        "species": "dourado",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-pintado",
+      "actions": 2,
+      "result": {
+        "species": "pintado",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-piranha",
+      "actions": 2,
+      "result": {
+        "species": "piranha",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-fishing-full-pirarucu",
+      "actions": 2,
+      "result": {
+        "species": "pirarucu",
+        "repeatedDiscovery": false,
+        "convertedCaptures": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-bubbles-0",
+      "actions": 6,
+      "result": {
+        "popped": 6,
+        "repeatedPayout": false
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-bubbles-0.5",
+      "actions": 6,
+      "result": {
+        "popped": 6,
+        "repeatedPayout": false
+      },
+      "passed": true
+    },
+    {
+      "name": "aquario-bubbles-0.999",
+      "actions": 6,
+      "result": {
+        "popped": 6,
+        "repeatedPayout": false
+      },
+      "passed": true
+    },
+    {
+      "name": "bairro-visits-1",
+      "actions": 25,
+      "result": {
+        "paidTickets": 6,
+        "visits": 25,
+        "returnRestored": true
+      },
+      "passed": true
+    },
+    {
+      "name": "bairro-visits-3",
+      "actions": 25,
+      "result": {
+        "paidTickets": 6,
+        "visits": 25,
+        "returnRestored": true
+      },
+      "passed": true
+    },
+    {
+      "name": "bairro-visits-5",
+      "actions": 25,
+      "result": {
+        "paidTickets": 6,
+        "visits": 25,
+        "returnRestored": true
+      },
+      "passed": true
+    },
+    {
+      "name": "bairro-visits-8",
+      "actions": 25,
+      "result": {
+        "paidTickets": 6,
+        "visits": 25,
+        "returnRestored": true
+      },
+      "passed": true
+    },
+    {
+      "name": "bairro-visits-10",
+      "actions": 25,
+      "result": {
+        "paidTickets": 6,
+        "visits": 25,
+        "returnRestored": true
+      },
+      "passed": true
+    }
+  ],
+  "reloads": 817,
+  "actions": 1319,
+  "failures": []
+}

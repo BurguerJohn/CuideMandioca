@@ -1,0 +1,317 @@
+{
+  "pid": 52340,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-52340-qZJTnM",
+  "electron": "44.4.5",
+  "changes": [
+    {
+      "language": "en",
+      "before": {
+        "name": "Troca 0",
+        "tickets": 95,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 2,
+            "folego": 1,
+            "refresco": 1,
+            "ritmo": 1
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        }
+      },
+      "after": {
+        "name": "Troca 0",
+        "tickets": 95,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 2,
+            "folego": 1,
+            "refresco": 1,
+            "ritmo": 1
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        },
+        "language": "en",
+        "choice": "en",
+        "settingsOpen": true,
+        "shopOpen": true,
+        "zoom": 0.5
+      },
+      "requestPhase": "closing",
+      "oldDestroyed": true
+    },
+    {
+      "language": "es",
+      "before": {
+        "name": "Troca 1",
+        "tickets": 96,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 2,
+            "folego": 1,
+            "refresco": 1,
+            "ritmo": 1
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        }
+      },
+      "after": {
+        "name": "Troca 1",
+        "tickets": 96,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 2,
+            "folego": 1,
+            "refresco": 1,
+            "ritmo": 1
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        },
+        "language": "es",
+        "choice": "es",
+        "settingsOpen": true,
+        "shopOpen": true,
+        "zoom": 0.5
+      },
+      "requestPhase": "closing",
+      "oldDestroyed": true
+    },
+    {
+      "language": "pt-BR",
+      "before": {
+        "name": "Troca 2",
+        "tickets": 97,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 2,
+            "folego": 1,
+            "refresco": 1,
+            "ritmo": 1
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        }
+      },
+      "after": {
+        "name": "Troca 2",
+        "tickets": 97,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 2,
+            "folego": 1,
+            "refresco": 1,
+            "ritmo": 1
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        },
+        "language": "pt-BR",
+        "choice": "pt-BR",
+        "settingsOpen": true,
+        "shopOpen": true,
+        "zoom": 0.5
+      },
+      "requestPhase": "closing",
+      "oldDestroyed": true
+    }
+  ],
+  "errors": [],
+  "resizes": [
+    {
+      "width": 640,
+      "height": 360,
+      "dpr": 1.25,
+      "name": "Troca 2",
+      "windows": [
+        {
+          "id": "vitrine",
+          "inside": true
+        },
+        {
+          "id": "painel",
+          "inside": true
+        }
+      ],
+      "requested": {
+        "width": 640,
+        "height": 360
+      },
+      "nativeRequest": {
+        "x": 0,
+        "y": 0,
+        "width": 640,
+        "height": 360
+      },
+      "native": {
+        "x": 0,
+        "y": 0,
+        "width": 640,
+        "height": 360
+      }
+    },
+    {
+      "width": 360,
+      "height": 480,
+      "dpr": 1.25,
+      "name": "Troca 2",
+      "windows": [
+        {
+          "id": "vitrine",
+          "inside": true
+        },
+        {
+          "id": "painel",
+          "inside": true
+        }
+      ],
+      "requested": {
+        "width": 360,
+        "height": 480
+      },
+      "nativeRequest": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 480
+      },
+      "native": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 480
+      }
+    },
+    {
+      "width": 1100,
+      "height": 851,
+      "dpr": 1.25,
+      "name": "Troca 2",
+      "windows": [
+        {
+          "id": "vitrine",
+          "inside": true
+        },
+        {
+          "id": "painel",
+          "inside": true
+        }
+      ],
+      "requested": {
+        "width": 1100,
+        "height": 850
+      },
+      "nativeRequest": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 850
+      },
+      "native": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 851
+      }
+    }
+  ],
+  "windows": 4
+}

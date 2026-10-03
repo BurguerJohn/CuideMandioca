@@ -61,6 +61,32 @@ test('o estado das janelas vai no save e volta saneado', () => {
   assert.ok(back.state.minis.horta && typeof back.state.minis.horta === 'object');
 });
 
+test('índices inválidos não criam canteiros ou espetos fora do save nem travam a simpatia', () => {
+  const invalid = [0.5, '0', null, NaN, Infinity, -1, 99];
+  for (const [id, action] of [['horta', 'plant'], ['fogueira', 'put'], ['ceu', 'pick']]) {
+    const { engine, clock } = newEngine(100);
+    const model = engine.mini(id);
+    if (id === 'ceu') assert.equal(model.deal().ok, true);
+    events(engine);
+    const before = structuredClone(engine.state.minis[id]);
+    for (const index of invalid) {
+      assert.equal(model[action](index).ok, false, `${id}: recusa ${String(index)}`);
+      assert.deepEqual(engine.state.minis[id], before, `${id}: nenhum estado oculto ou carta inválida`);
+    }
+    assert.deepEqual(events(engine), [], 'as tentativas recusadas não produziram ações');
+    assert.equal(model[action](0).ok, true, `${id}: a ação normal continua disponível`);
+    const saved = engine.exportState();
+    const loaded = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+    if (id === 'ceu') {
+      assert.equal(loaded.state.minis.ceu.cards.picked, 0, 'a escolha válida foi salva');
+      assert.equal(loaded.mini('ceu').pick(1).ok, false, 'não permite receber outro prêmio');
+    } else {
+      const slots = id === 'horta' ? 'plots' : 'sticks';
+      assert.deepEqual(loaded.state.minis[id][slots], saved.minis[id][slots], `${id}: a ação válida não se perde ao reabrir`);
+    }
+  }
+});
+
 // --- Quintal dos Bichos ---------------------------------------------------------------------------------------------------
 test('bichos: só moram no quintal os que já chegaram à festa', () => {
   const { engine } = newEngine(12);
@@ -159,6 +185,35 @@ test('aquário: abre com peixinhos de saída (sem prêmio) e cada prenda da pesc
   assert.ok(events(engine).some(event => event.type === 'mini' && event.mini === 'aquario' && event.kind === 'new-fish'));
 });
 
+test('aquário: a primeira pescaria do novo ano cria o peixe mesmo antes da reinicialização por um quadro', () => {
+  for (const reload of [false, true]) {
+    const { engine: original, clock } = newEngine();
+    let engine = original;
+    const growTo = size => { while (engine.state.size < size) engine.addFame(engine.fameNeed() - engine.state.fame); };
+    growTo(100);
+    assert.equal(engine.state.minis.aquario.started, true);
+    assert.equal(engine.newYear(), true);
+    if (reload) engine = new GameEngine(data, engine.exportState(), { now: () => clock.t, rng: () => 0.5 });
+    growTo(10);
+    assert.equal(engine.miniOpen('aquario'), true, 'o recorde mantém o aquário aberto na festa nova');
+    assert.equal(engine.state.minis.aquario.started, false, 'nenhum quadro ou abertura da janela iniciou o tanque');
+    events(engine);
+    assert.ok(engine.fish());
+    assert.equal(engine.state.minis.aquario.started, true);
+    assert.equal(engine.state.minis.aquario.fish.length, data.minis.aquario.starter + 1,
+      `${reload}: os peixes de saída e a prenda pescada entram uma vez cada`);
+    assert.equal(events(engine).filter(event => event.type === 'mini' && event.mini === 'aquario' && event.kind === 'new-fish').length, 1);
+    engine.mini('aquario').info();
+    engine.mini('aquario').tick();
+    assert.equal(engine.state.minis.aquario.fish.length, data.minis.aquario.starter + 1, 'desenhar ou atualizar depois não repete a entrada');
+    clock.t = engine.state.fishing.nextAt;
+    assert.ok(engine.fish());
+    assert.equal(engine.state.minis.aquario.fish.length, data.minis.aquario.starter + 2);
+    const loaded = new GameEngine(data, engine.exportState(), { now: () => clock.t, rng: () => 0.5 });
+    assert.equal(loaded.mini('aquario').info().fish.length, data.minis.aquario.starter + 2, 'os dois peixes também ficam no save');
+  }
+});
+
 test('aquário: a ração faz o peixe menor crescer, acaba e volta com o tempo', () => {
   const { engine, clock, pass } = newEngine(18);
   const aquario = engine.mini('aquario');
@@ -233,6 +288,78 @@ test('aquário: tanque cheio vira ficha e o save volta saneado', () => {
   const back = new GameEngine(data, saved, { rng: () => 0.5 });
   assert.equal(back.mini('aquario').info().fish.length, c.tankMax, 'só espécies que existem');
   assert.equal(back.mini('aquario').info().food, 0);
+});
+
+test('aquário: capturas com tanque cheio ainda descobrem espécies e podem completar a coleção', () => {
+  const { engine, clock } = newEngine(18);
+  const aquario = engine.mini('aquario');
+  const c = data.minis.aquario;
+  aquario.info();
+  while (aquario.info().fish.length < c.tankMax) {
+    engine.state.fishing = { unlocked: true, ready: 1, nextAt: 0 };
+    assert.ok(engine.fish());
+  }
+  assert.equal(aquario.info().seen.includes('pirarucu'), false);
+  const back = new GameEngine(data, engine.exportState(), { rng: () => 0.999, now: () => clock.t });
+  const full = back.mini('aquario');
+  const before = back.state.tickets;
+  back.state.fishing = { unlocked: true, ready: 1, nextAt: 0 };
+  assert.ok(back.fish());
+  assert.equal(full.info().fish.length, c.tankMax, 'a captura continua convertida, sem ultrapassar o limite');
+  assert.ok(full.info().seen.includes('pirarucu'), 'a espécie capturada conta mesmo sem lugar no tanque');
+  assert.equal(back.state.tickets, before + 1 + c.discoverTickets);
+  events(back);
+  for (const species of c.species) full.addFish(species.id);
+  assert.deepEqual([full.info().seen.length, full.info().complete], [c.species.length, true]);
+  assert.equal(events(back).filter(event => event.kind === 'complete').length, 1);
+  const done = back.state.tickets;
+  full.addFish('pirarucu');
+  assert.equal(back.state.tickets, done + 1, 'repetida só rende a conversão');
+  assert.equal(events(back).filter(event => ['discover', 'complete'].includes(event.kind)).length, 0);
+});
+
+test('aquário: crescer outro peixe preserva o progresso das bolhas sem acelerar o tempo anterior', () => {
+  const { engine, clock } = newEngine(18);
+  const aquario = engine.mini('aquario');
+  const c = data.minis.aquario;
+  aquario.info();
+  for (let i = 0; i < c.growth[1]; i++) assert.ok(aquario.drop().ok);
+  assert.equal(aquario.info().adults, 1);
+  const firstAdultAt = clock.t;
+  clock.t += c.foodEvery * 5 * 1000;
+  engine.tick(0.1);
+  for (let i = 0; i < c.growth[1] - 1; i++) assert.ok(aquario.drop().ok);
+  clock.t = firstAdultAt + c.bubbleEvery / 2 * 1000;
+  engine.tick(0.1);
+  assert.equal(aquario.info().bubbles, 0, 'metade do intervalo com um adulto');
+  assert.ok(aquario.drop().grew);
+  engine.tick(0.1);
+  assert.equal(aquario.info().adults, 2);
+  assert.equal(aquario.info().bubbles, 0, 'o peixe recém-crescido não produz pelo tempo em que era pequeno');
+  clock.t += c.bubbleEvery / 4 * 1000;
+  engine.tick(0.1);
+  assert.equal(aquario.info().bubbles, 1, 'a metade restante leva metade do tempo com dois adultos');
+});
+
+test('aquário: ações atualizam ração e pausam o relógio enquanto as bolhas estão cheias', () => {
+  const { engine, clock } = newEngine(18);
+  const aquario = engine.mini('aquario');
+  const c = data.minis.aquario;
+  aquario.info();
+  for (let i = 0; i < c.foodMax; i++) assert.ok(aquario.drop().ok);
+  assert.equal(aquario.info().food, 0);
+  clock.t += c.foodEvery * 1000;
+  assert.equal(aquario.drop().ok, true, 'a ração que já voltou pode ser usada antes do próximo tique');
+  clock.t += c.bubbleEvery * c.bubbleMax * 1000;
+  engine.tick(0.1);
+  assert.equal(aquario.info().bubbles, c.bubbleMax);
+  clock.t += c.bubbleEvery * 1000;
+  assert.equal(aquario.pop().ok, true);
+  engine.tick(0.1);
+  assert.equal(aquario.info().bubbles, c.bubbleMax - 1, 'o tempo com o estoque cheio não cria bolha retroativa');
+  clock.t += c.bubbleEvery * 1000;
+  engine.tick(0.1);
+  assert.equal(aquario.info().bubbles, c.bubbleMax);
 });
 
 // --- Horta ----------------------------------------------------------------------------------------------------------------
@@ -580,6 +707,150 @@ test('palco: o save guarda as estrelas e o descanso, e esquece o show no meio', 
   assert.deepEqual(clean.state.minis.palco.best, { xote: 3 });
 });
 
+test('palco: salvar um show encerrado conserva as estrelas e o prêmio uma vez, sem premiar antes do prazo', () => {
+  for (const offset of [-1, 0, 1]) {
+    const { engine, clock } = newEngine(38);
+    const palco = engine.mini('palco');
+    const start = clock.t;
+    const notes = palco.chart('xote');
+    assert.equal(palco.start('xote').ok, true);
+    for (const note of notes) {
+      clock.t = start + note.t;
+      assert.equal(palco.hit(note.lane).judge, 'perfect');
+    }
+    const end = start + notes.at(-1).t + 1200;
+    clock.t = end + offset;
+    events(engine);
+    const cheer = engine.state.cheer;
+    const saved = engine.exportState();
+    const done = offset > 0;
+    assert.equal(saved.minis.palco.shows, done ? 1 : 0, `${offset}: a gravação respeita o instante de término do show`);
+    assert.equal(saved.minis.palco.best.xote || 0, done ? 3 : 0);
+    assert.equal(saved.tickets, done ? 1 + data.minis.palco.firstThree.tickets : 0);
+    assert.equal(saved.minis.palco.cooldownAt, done ? end + data.minis.palco.wait * 1000 : 0);
+    assert.equal(!!palco.info().show, !done, 'salvar antes do fim mantém a música ao vivo');
+    assert.equal(events(engine).filter(event => event.kind === 'show-end').length, done ? 1 : 0);
+    if (done) assert.ok(saved.cheer > cheer, 'a Animação do show também entra no save');
+    else assert.equal(saved.cheer, cheer);
+    assert.deepEqual(engine.exportState(), saved, 'salvar outra vez não repete o prêmio');
+    const loaded = new GameEngine(data, saved, { now: () => clock.t, rng: () => 0.5 });
+    loaded.mini('palco').tick();
+    assert.equal(loaded.state.tickets, saved.tickets);
+    assert.equal(loaded.state.minis.palco.shows, saved.minis.palco.shows);
+    assert.equal(loaded.state.minis.palco.best.xote || 0, done ? 3 : 0);
+    assert.equal(loaded.mini('palco').info().show, null, 'a carga só retoma o resultado permanente');
+  }
+});
+
+test('palco: começar um novo ano depois do show encerra o prêmio da festa antiga antes do reset', () => {
+  for (const offset of [-1, 1]) {
+    const { engine, clock } = newEngine(100);
+    const palco = engine.mini('palco');
+    const start = clock.t;
+    const notes = palco.chart('xote');
+    assert.equal(palco.start('xote').ok, true);
+    for (const note of notes) { clock.t = start + note.t; palco.hit(note.lane); }
+    clock.t = start + notes.at(-1).t + 1200 + offset;
+    events(engine);
+    assert.equal(engine.newYear(), true);
+    const tickets = offset > 0 ? 1 + data.minis.palco.firstThree.tickets : 0;
+    assert.equal(engine.state.tickets, tickets, `${offset}: só o show já encerrado deixa o prêmio para o próximo ano`);
+    assert.equal(engine.state.size, 1);
+    assert.equal(engine.state.minis.palco.show, null);
+    assert.equal(engine.state.minis.palco.shows, 0, 'o palco do novo ano começa vazio');
+    assert.equal(events(engine).filter(event => event.kind === 'show-end').length, offset > 0 ? 1 : 0);
+    engine.mini('palco').tick();
+    assert.equal(engine.state.tickets, tickets, 'o quadro seguinte não repete o pagamento');
+  }
+});
+
+test('palco: um clique entre tiques encerra o combo quando uma nota anterior venceu', () => {
+  const { engine, clock } = newEngine(38);
+  const palco = engine.mini('palco');
+  const start = clock.t;
+  const notes = palco.chart('xote');
+  palco.start('xote');
+  clock.t = start + notes[0].t;
+  assert.equal(palco.hit(notes[0].lane).combo, 1);
+  events(engine);
+  clock.t = start + notes[2].t;
+  assert.equal(palco.hit(notes[2].lane).combo, 1, 'a segunda nota perdida interrompe a sequência antes do novo acerto');
+  assert.equal(palco.info().show.notes[1].state, 'miss');
+  assert.equal(palco.info().show.maxCombo, 1);
+  assert.equal(events(engine).filter(event => event.kind === 'miss').length, 1);
+  engine.tick(0.1);
+  assert.equal(events(engine).filter(event => event.kind === 'miss').length, 0, 'o próximo tique não repete o erro');
+});
+
+test('palco: show vencido termina antes da próxima ação e o descanso conta da hora de término', () => {
+  for (const action of ['start', 'hit', 'abort']) {
+    const { engine, clock } = newEngine(38);
+    const palco = engine.mini('palco');
+    const notes = palco.chart('xote');
+    const start = clock.t;
+    palco.start('xote');
+    for (const note of notes) {
+      clock.t = start + note.t;
+      palco.hit(note.lane);
+    }
+    const end = start + notes.at(-1).t + 1200;
+    clock.t = end + (data.minis.palco.wait + 1) * 1000;
+    events(engine);
+    const got = action === 'start' ? palco.start('xote') : action === 'hit' ? palco.hit(0) : palco.abort();
+    assert.equal(engine.state.minis.palco.shows, 1, action);
+    assert.equal(palco.info().cooldown, 0, action);
+    assert.equal(events(engine).filter(event => event.kind === 'show-end').length, 1, action);
+    if (action === 'start') assert.deepEqual([got.ok, got.practice], [true, false]);
+    else {
+      assert.equal(got.ok, false, action);
+      assert.deepEqual([palco.info().last.aborted, palco.info().last.stars], [false, 3], action);
+    }
+  }
+});
+
+test('bichos: milho e presente vencidos ficam disponíveis no clique e após recarregar, sem esperar um tique', () => {
+  for (const reload of [false, true]) {
+    const { engine, clock } = newEngine(12);
+    let active = engine;
+    let bichos = active.mini('bichos');
+    const c = data.minis.bichos;
+    for (let i = 0; i < c.grainMax; i++) assert.ok(bichos.feed('galinha').ok);
+    assert.ok(bichos.collect('galinha').ok);
+    clock.t += c.grainEvery * c.grainMax * 1000;
+    assert.equal(bichos.info().grain, c.grainMax, 'a janela vê o milho que voltou desde o último quadro');
+    for (let i = 0; i < c.grainMax; i++) assert.ok(bichos.feed('galinha').ok);
+    assert.equal(bichos.info().pets.find(pet => pet.id === 'galinha').ready, false);
+    const saved = active.exportState();
+    clock.t = active.state.minis.bichos.pets.galinha.giftAt;
+    if (reload) {
+      active = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+      bichos = active.mini('bichos');
+    }
+    events(active);
+    assert.equal(bichos.info().pets.find(pet => pet.id === 'galinha').ready, true, 'o clique decide pelo presente disponível agora');
+    assert.ok(bichos.collect('galinha').ok);
+    assert.equal(bichos.collect('galinha').ok, false, 'o presente só é entregue uma vez');
+    active.tick(0.1);
+    const emitted = events(active);
+    assert.equal(emitted.filter(event => event.kind === 'gift-ready').length, 1);
+    assert.equal(emitted.filter(event => event.kind === 'gift').length, 1);
+    assert.equal(active.state.minis.bichos.gifts, 2);
+  }
+});
+
+test('bichos: colher no prazo atualiza o presente antes de verificar a disponibilidade', () => {
+  const { engine, clock, pass } = newEngine(12);
+  const bichos = engine.mini('bichos');
+  const c = data.minis.bichos;
+  for (let i = 0; i < c.grainMax; i++) bichos.feed('galinha');
+  bichos.collect('galinha');
+  pass(c.grainEvery * c.grainMax);
+  for (let i = 0; i < c.grainMax; i++) bichos.feed('galinha');
+  clock.t = engine.state.minis.bichos.pets.galinha.giftAt;
+  assert.equal(bichos.collect('galinha').ok, true, 'não exige consultar info nem esperar um quadro antes de colher');
+  assert.equal(bichos.collect('galinha').ok, false);
+});
+
 // --- Céu de São João ------------------------------------------------------------------------------------------------------
 test('céu: foguete gasta um da carga, rende Animação, volta com o tempo, e vários seguidos fazem a Grande Final', () => {
   const { engine, clock, pass } = newEngine(60);
@@ -607,6 +878,40 @@ test('céu: foguete gasta um da carga, rende Animação, volta com o tempo, e v�
   engine.state.minis.ceu.finaleAt = 0;
   engine.state.minis.ceu.volley = [];
   for (let i = 0; i < 5; i++) { assert.equal(ceu.launch().finale, null); clock.t += (c.volleyMs + 1000); }
+});
+
+test('céu: atrasar o relógio não revive disparos vencidos nem paga uma Grande Final antes de juntar foguetes novos', () => {
+  const c = data.minis.ceu;
+  for (const back of [60000, 30 * 60000]) for (const elapsed of [1000, c.volleyMs + 1000]) {
+    const { engine, clock } = newEngine(60);
+    const ceu = engine.mini('ceu');
+    const shotAt = clock.t;
+    for (let i = 0; i < c.volley - 1; i++) assert.equal(ceu.launch().ok, true);
+    assert.equal(ceu.info().volley, c.volley - 1);
+    clock.t += elapsed;
+    engine.tick(0.25);
+    assert.equal(ceu.info().volley, elapsed > c.volleyMs ? 0 : c.volley - 1);
+    const saved = engine.exportState();
+    clock.t -= back;
+    engine.tick(0.25);
+    const rewound = clock.t;
+    const loaded = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+    for (const current of [engine, loaded]) {
+      clock.t = rewound;
+      const sky = current.mini('ceu');
+      assert.equal(sky.info().volley, 0, 'disparos com timestamp no futuro não voltam a ser recentes');
+      clock.t = shotAt;
+      assert.equal(sky.info().volley, 0, 'a sequência descartada não reaparece quando o relógio alcança o timestamp antigo');
+      const tickets = current.state.tickets;
+      const shot = sky.launch();
+      assert.equal(shot.ok, true, 'o próximo foguete continua disponível');
+      assert.equal(shot.volley, 1, 'começa uma sequência nova');
+      assert.equal(shot.finale, null, 'um disparo novo não completa os disparos vencidos');
+      assert.equal(current.state.tickets, tickets);
+      assert.equal(current.state.minis.ceu.finales, 0);
+      assert.equal(current.state.minis.ceu.fired, c.volley);
+    }
+  }
 });
 
 test('céu: a estrela cadente aparece de vez em quando, o clique faz o pedido e, sem clique, ela some', () => {
@@ -663,6 +968,28 @@ test('céu: a simpatia dá 3 cartas diferentes, a escolhida rende o prêmio e a 
   other.state.minis.ceu.cards = { ids: ['banho', 'faca', 'ovo'], picked: null };
   assert.equal(other.mini('ceu').pick(0).reward.frenzy, 15);
   assert.ok(other.state.runtime.frenzyLeft >= 15);
+});
+
+test('céu: frenesi da simpatia respeita o relógio e preserva apenas a duração restante maior', () => {
+  for (const [initial, elapsed, remaining] of [[0, 0, 15], [60, 5, 55], [10, 11, 15]]) {
+    const { engine, clock } = newEngine(60);
+    if (initial) engine.startFrenzy(initial);
+    clock.t += elapsed * 1000;
+    events(engine);
+    engine.state.minis.ceu.cards = { ids: ['banho', 'faca', 'ovo'], picked: null };
+    assert.equal(engine.mini('ceu').pick(0).reward.frenzy, 15);
+    const runtime = engine.state.runtime;
+    assert.equal(runtime.frenzyLeft, remaining);
+    assert.equal(runtime.frenzyUntil, clock.t + remaining * 1000);
+    assert.equal(events(engine).filter(event => event.type === 'frenzy-start').length, 1, 'um único aviso de início');
+    clock.t += remaining * 1000 - 1;
+    assert.equal(engine.runtimeActive('frenzy'), true);
+    clock.t++;
+    assert.equal(engine.runtimeActive('frenzy'), false, 'o frenesi vence no prazo sem precisar de um tique');
+    const value = engine.stepValue();
+    engine.step();
+    assert.equal(runtime.lastStep, value, 'um passo depois do prazo não recebe o multiplicador');
+  }
 });
 
 test('céu: toda simpatia tem texto e prêmio, e o save guarda as cartas e esquece a estrela', () => {
@@ -750,6 +1077,11 @@ test('bairro: o save guarda as visitas e a espera e volta saneado', () => {
 
 // --- Mata Encantada (o auto battler, convidado 50) -------------------------------------------------------------------------------
 const mataRun = (engine, clock, seconds) => { for (let i = 0; i < seconds; i++) { clock.t += 1000; engine.tick(1); } };
+function newMataEngine(level = 50, save = null) {
+  const fixture = newEngine(level, save);
+  fixture.engine.mini('mata').setVisibilityCheck(() => true);
+  return fixture;
+}
 const strong = (engine, level = 300) => { for (const id of Object.keys(engine.state.levels)) engine.state.levels[id] = level; };
 const mood = (engine, clock, amor, barriga) => { engine.state.humor = { amor, barriga, at: clock.t }; };
 
@@ -772,14 +1104,52 @@ test('mata: abre com 50 convidados, tem 10 chefes e a lista de itens existe (e n
     assert.equal(item.price, 0);
   }
   assert.deepEqual(c.unlocks.map(entry => entry.stage), [...c.unlocks.map(entry => entry.stage)].sort((a, b) => a - b), 'liberam em ordem');
-  const { engine } = newEngine(49);
+  const { engine } = newMataEngine(49);
   assert.equal(engine.miniOpen('mata'), false);
   engine.state.records.size = 50;
   assert.equal(engine.miniOpen('mata'), true);
 });
 
-test('mata: os status vêm das melhorias, da comida, da felicidade e do bicho, que dá o mesmo bônus para todos', () => {
+test('mata: liberar o minigame ou carregar um save não inicia a luta sem uma janela visível', () => {
   const { engine, clock } = newEngine(50);
+  const mata = engine.mini('mata');
+  const before = structuredClone(engine.state.minis.mata);
+  engine.advance(120);
+  mata.tick(10);
+  assert.deepEqual(engine.state.minis.mata, before);
+  assert.equal(mata.info().hero, null);
+  assert.equal(mata.info().paused, true);
+  assert.deepEqual(mata.events(), []);
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { now: () => clock.t, rng: () => 0.5 });
+  back.advance(120);
+  assert.deepEqual(back.state.minis.mata, saved.minis.mata, 'a carga não autoriza luta em segundo plano');
+  assert.equal(back.mini('mata').info().hero, null);
+  assert.equal(back.mini('mata').info().auto, true, 'a pausa por visibilidade não altera a escolha do botão');
+});
+
+test('mata: os chefes exigem melhorias, mas a progressão continua possível com uma Mandioca preparada', () => {
+  const weak = newMataEngine(50);
+  strong(weak.engine, 30);
+  const mata = weak.engine.mini('mata');
+  for (let i = 0; i < 4000 && mata.info().phase !== 'lose'; i++) {
+    weak.clock.t += 50;
+    weak.engine.tick(0.05);
+  }
+  assert.equal(mata.info().phase, 'lose');
+  assert.equal(mata.info().boss, true, 'as criaturas comuns ainda permitem chegar ao primeiro chefe');
+  assert.equal(weak.engine.state.minis.mata.best, 0, 'o primeiro chefe barra os atributos baixos');
+  assert.equal(weak.engine.owned('cabelo-curupira'), false, 'perder não libera o troféu');
+  const prepared = newMataEngine(50);
+  strong(prepared.engine, 120);
+  mood(prepared.engine, prepared.clock, 100, 100);
+  mataRun(prepared.engine, prepared.clock, 300);
+  assert.ok(prepared.engine.state.minis.mata.best >= 3, 'melhorar os atributos permite superar vários chefes');
+  assert.equal(prepared.engine.owned('cabelo-curupira'), true);
+});
+
+test('mata: os status vêm das melhorias, da comida, da felicidade e do bicho, que dá o mesmo bônus para todos', () => {
+  const { engine, clock } = newMataEngine(50);
   const mata = engine.mini('mata');
   mood(engine, clock, 50, 50);
   const base = mata.stats();
@@ -829,7 +1199,7 @@ test('mata: os status vêm das melhorias, da comida, da felicidade e do bicho, q
 });
 
 test('mata: a Mandioca forte vence tudo, libera o item do chefe e passa de etapa (Barriga gasta, bicho ganha laço)', () => {
-  const { engine, clock } = newEngine(50);
+  const { engine, clock } = newMataEngine(50);
   strong(engine);
   mood(engine, clock, 50, 100);
   const mata = engine.mini('mata');
@@ -863,7 +1233,7 @@ test('mata: a Mandioca forte vence tudo, libera o item do chefe e passa de etapa
 });
 
 test('mata: a Mandioca fraca perde, a etapa recomeça e a teimosia cresce até o limite (e some quando se escolhe a etapa)', () => {
-  const { engine, clock } = newEngine(50);
+  const { engine, clock } = newMataEngine(50);
   const mata = engine.mini('mata');
   const s = engine.state.minis.mata;
   s.best = 30;
@@ -882,8 +1252,40 @@ test('mata: a Mandioca fraca perde, a etapa recomeça e a teimosia cresce até o
   assert.equal(s.teimosia, 0, 'escolher a etapa zera a teimosia');
 });
 
+test('mata: a derrota conserva a luta visível até recomeçar, enquanto o save retoma a primeira batalha', () => {
+  const { engine, clock } = newMataEngine(60);
+  strong(engine, 30);
+  const mata = engine.mini('mata');
+  for (let i = 0; i < 4000 && mata.info().phase !== 'lose'; i++) {
+    clock.t += 50;
+    engine.tick(0.05);
+  }
+  const lost = mata.info();
+  assert.equal(lost.phase, 'lose');
+  assert.equal(lost.wins, data.minis.mata.battles, 'a Mandioca venceu as quatro batalhas antes de perder para o chefe');
+  assert.ok(lost.enemies.some(enemy => enemy.boss && !enemy.dead));
+  assert.equal(lost.battle, data.minis.mata.battles, 'a cena ainda mostra a batalha do chefe');
+  assert.equal(lost.boss, true);
+  assert.equal(engine.state.minis.mata.battle, 0, 'o checkpoint já está preparado para recomeçar');
+  mata.setAuto(false);
+  clock.t += 1000;
+  engine.tick(1);
+  assert.equal(mata.info().battle, lost.battle, 'pausar o desmaio preserva a identificação da luta');
+  const back = new GameEngine(data, engine.exportState(), { rng: () => 0.5, now: () => clock.t });
+  assert.equal(back.mini('mata').info().battle, 0, 'reabrir abandona a derrota e retoma o checkpoint');
+  assert.equal(back.mini('mata').info().boss, false);
+  mata.setAuto(true);
+  for (let i = 0; i < 70 && mata.info().phase === 'lose'; i++) {
+    clock.t += 50;
+    engine.tick(0.05);
+  }
+  assert.equal(mata.info().phase, 'intro');
+  assert.equal(mata.info().battle, 0);
+  assert.equal(mata.info().boss, false, 'a identificação muda junto com a criatura da batalha nova');
+});
+
 test('mata: as setas só vão até a próxima etapa do recorde, e a pausa congela a batalha', () => {
-  const { engine, clock } = newEngine(50);
+  const { engine, clock } = newMataEngine(50);
   strong(engine);
   const mata = engine.mini('mata');
   const s = engine.state.minis.mata;
@@ -921,8 +1323,27 @@ test('mata: as setas só vão até a próxima etapa do recorde, e a pausa congel
   assert.ok(mata.info().clock !== frozen);
 });
 
+test('mata: escolher uma etapa descarta os eventos e o tempo parcial da batalha cancelada', () => {
+  const { engine, pass } = newMataEngine(60);
+  const mata = engine.mini('mata');
+  for (let i = 0; i < 4; i++) pass(1);
+  mata.tick(0.04);
+  const old = mata.events();
+  assert.ok(old.some(event => event.kind === 'hit'), 'a batalha antiga tem golpes para a janela consumir');
+  const seq = old.at(-1).seq;
+  assert.equal(mata.select(2), false, 'uma escolha trancada não cancela a batalha');
+  assert.deepEqual(mata.events(), old);
+  engine.state.minis.mata.best = 1;
+  assert.equal(mata.step(1), true);
+  assert.deepEqual(mata.events(), [], 'nenhum golpe antigo toca na nova etapa');
+  mata.tick(0.02);
+  assert.equal(mata.info().hero, null, 'o resto de um tique antigo não avança a etapa nova');
+  mata.tick(0.05);
+  assert.ok(mata.events(seq).some(event => event.kind === 'begin' && event.stage === 2), 'a sequência dos eventos novos continua após o cancelamento');
+});
+
 test('mata: o clique numa criatura faz a Mandioca bater nela primeiro', () => {
-  const { engine } = newEngine(50);
+  const { engine } = newMataEngine(50);
   strong(engine);
   const mata = engine.mini('mata');
   const s = engine.state.minis.mata;
@@ -944,7 +1365,7 @@ test('mata: o clique numa criatura faz a Mandioca bater nela primeiro', () => {
 });
 
 test('mata: o Boi-Bumbá ressuscita uma vez (e só então cai) e a etapa seguinte repete o primeiro chefe, mais forte', () => {
-  const { engine } = newEngine(50);
+  const { engine } = newMataEngine(50);
   strong(engine, 500);
   const mata = engine.mini('mata');
   const s = engine.state.minis.mata;
@@ -969,10 +1390,10 @@ test('mata: o Boi-Bumbá ressuscita uma vez (e só então cai) e a etapa seguint
 });
 
 test('mata: os golpes especiais pegam a Mandioca (o aviso vem antes) e o fogo machuca a cada segundo', () => {
-  const { engine } = newEngine(50);
+  const { engine } = newMataEngine(50);
   const mata = engine.mini('mata');
   const s = engine.state.minis.mata;
-  engine.state.levels.folego = 400;
+  engine.state.levels.folego = 3000;
   s.best = 23;
   assert.equal(mata.select(24), true);
   assert.equal(mata.spec(24).boss, 'boitata');
@@ -991,7 +1412,7 @@ test('mata: os golpes especiais pegam a Mandioca (o aviso vem antes) e o fogo ma
 });
 
 test('mata: o save guarda a etapa, o recorde e as criaturas derrotadas, e volta saneado (a batalha em andamento não vai)', () => {
-  const { engine, clock } = newEngine(50);
+  const { engine, clock } = newMataEngine(50);
   const mata = engine.mini('mata');
   const pet = mata.info().pets[0].id;
   const s = engine.state.minis.mata;
@@ -1021,8 +1442,53 @@ test('mata: o save guarda a etapa, o recorde e as criaturas derrotadas, e volta 
   assert.equal(new GameEngine(data, garbage, { rng: () => 0.5, now: () => clock.t }).state.minis.mata.stage, 1);
 });
 
+test('mata: salvar durante a comemoração retoma a próxima batalha sem perder o avanço já premiado', () => {
+  for (const mode of ['battle', 'first-boss', 'training-boss']) {
+    const { engine, clock } = newMataEngine(50);
+    strong(engine);
+    const mata = engine.mini('mata');
+    const state = engine.state.minis.mata;
+    if (mode !== 'battle') state.battle = data.minis.mata.battles;
+    if (mode === 'training-boss') state.best = 1;
+    for (let i = 0; i < 2000 && mata.info().phase !== 'win'; i++) {
+      clock.t += 50;
+      mata.tick(0.05);
+    }
+    assert.equal(mata.info().phase, 'win', `${mode}: a batalha terminou e pagou seu prêmio`);
+    const wins = state.wins;
+    const tickets = engine.state.tickets;
+    const cheer = engine.state.cheer;
+    const live = [state.stage, state.battle];
+    const saved = engine.exportState();
+    assert.equal(mata.info().phase, 'win', 'salvar conserva a comemoração na sessão atual');
+    assert.deepEqual([state.stage, state.battle], live, 'a projeção do save não avança o estado vivo antes da comemoração');
+    assert.deepEqual(engine.exportState().minis.mata, saved.minis.mata, 'exportar de novo mantém o mesmo checkpoint');
+    const expected = mode === 'battle' ? [1, 1] : mode === 'first-boss' ? [2, 0] : [1, 0];
+    const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+    assert.deepEqual([back.state.minis.mata.stage, back.state.minis.mata.battle], expected,
+      `${mode}: a carga não reabre a batalha já vencida`);
+    assert.equal(back.state.minis.mata.wins, wins);
+    assert.equal(back.state.tickets, tickets, 'a vitória salva não paga fichas de novo');
+    assert.equal(back.state.cheer, cheer, 'a vitória salva não paga Animação de novo');
+    const again = new GameEngine(data, back.exportState(), { rng: () => 0.5, now: () => clock.t });
+    assert.deepEqual([again.state.minis.mata.stage, again.state.minis.mata.battle], expected, 'uma segunda carga conserva o checkpoint');
+    assert.equal(again.state.minis.mata.wins, wins);
+    assert.equal(again.state.tickets, tickets);
+    assert.equal(again.state.cheer, cheer);
+    clock.t += 1650;
+    mata.tick(1.65);
+    assert.deepEqual([state.stage, state.battle], expected, 'continuar sem recarregar chega ao mesmo checkpoint');
+    assert.equal(state.wins, wins, 'a comemoração não paga outra vitória');
+    back.mini('mata').setVisibilityCheck(() => true);
+    back.mini('mata').tick(0.05);
+    assert.deepEqual(back.mini('mata').probe().fight, {
+      phase: 'intro', n: expected[0], battle: expected[1]
+    }, 'a batalha nova nasce no checkpoint restaurado');
+  }
+});
+
 test('mata: o tempo passa de uma vez (advance) e a batalha acompanha sem travar nem gerar números estranhos', () => {
-  const { engine } = newEngine(50);
+  const { engine } = newMataEngine(50);
   strong(engine, 120);
   engine.advance(900);
   const s = engine.state.minis.mata;
@@ -1034,7 +1500,7 @@ test('mata: o tempo passa de uma vez (advance) e a batalha acompanha sem travar 
 });
 
 test('mata: o São João do ano que vem descarta a batalha em andamento (nada de recorde nem troféu emprestado do ano velho)', () => {
-  const { engine, clock } = newEngine(100);
+  const { engine, clock } = newMataEngine(100);
   strong(engine, 900);
   const mata = engine.mini('mata');
   const s = engine.state.minis.mata;
@@ -1190,11 +1656,233 @@ test('cordel: as páginas liberadas que ainda não tiveram a ação contam como 
 });
 
 test('mata: com a Barriga parada (comida da fogueira) as batalhas não gastam Barriga', () => {
-  const { engine, clock } = newEngine(50);
+  const { engine, clock } = newMataEngine(50);
   strong(engine);
   mood(engine, clock, 50, 100);
   engine.fillBelly(2);
   mataRun(engine, clock, 60);
   assert.ok(engine.mini('mata').info().wins >= 3 || engine.state.minis.mata.wins >= 3, 'lutou');
   assert.equal(engine.mood().barriga, engine.cfg.moodMax, 'a Barriga continua 100%');
+});
+
+// Planta e colhe `id` no canteiro `slot` (o tempo da planta passa de uma vez).
+function harvestCrop(engine, clock, id, slot = 0) {
+  const horta = engine.mini('horta');
+  assert.equal(horta.plant(slot, id).ok, true, `planta ${id}`);
+  clock.t += data.minis.horta.crops.find(entry => entry.id === id).minutes * 60000 + 1;
+  return horta.harvest(slot);
+}
+
+test('horta: cada planta colhida pela primeira vez deixa +10% de Animação para sempre (uma vez por planta, com as 5 vai a +50%)', () => {
+  const { engine, clock } = newEngine(22);
+  const c = data.minis.horta;
+  const base = engine.multiplier();
+  assert.equal(engine.hortaBonus(), 0);
+  // O bônus de 10 min da colheita passa antes de medir só o fixo.
+  const fixed = () => { clock.t += c.buffMinutes * 60000 + 1000; return engine.multiplier() / base; };
+  const first = harvestCrop(engine, clock, 'milho');
+  assert.deepEqual([first.first, first.permanent, first.total], [true, 10, 10]);
+  assert.ok(Math.abs(fixed() - 1.1) < 1e-9, 'milho: ×1,1');
+  const again = harvestCrop(engine, clock, 'milho');
+  assert.deepEqual([again.first, again.permanent], [false, 0], 'colher de novo não soma');
+  assert.ok(Math.abs(fixed() - 1.1) < 1e-9);
+  assert.equal(harvestCrop(engine, clock, 'amendoim').total, 20);
+  assert.ok(Math.abs(fixed() - 1.2) < 1e-9, 'duas plantas: ×1,2');
+  for (const id of ['batata-doce', 'mandioca', 'abobora']) harvestCrop(engine, clock, id);
+  assert.ok(Math.abs(fixed() - 1.5) < 1e-9, 'as 5 plantas: ×1,5');
+  assert.ok(Math.abs(engine.hortaBonus() - 0.5) < 1e-9);
+  assert.equal(engine.mini('horta').info().bonus, engine.hortaBonus());
+  // O save lembra, e um save mexido não inventa plantas.
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+  assert.ok(Math.abs(back.hortaBonus() - 0.5) < 1e-9, 'o save guarda o bônus fixo');
+  for (const lixo of ['x', -3, null, [1], { milho: -1, abobora: 'sim', fantasma: 9 }]) {
+    const messy = JSON.parse(JSON.stringify(saved));
+    messy.minis.horta.harvested = lixo;
+    const clean = new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.t });
+    const bonus = clean.hortaBonus();
+    assert.ok(Number.isFinite(bonus) && bonus >= 0 && bonus <= 0.5 + 1e-9, `harvested ${JSON.stringify(lixo)}: ${bonus}`);
+  }
+});
+
+test('horta: toda colheita dá o bônus da planta por 10 min (Animação, Ritmo, Refresco); a mesma planta recomeça a contagem e plantas diferentes somam', () => {
+  const { engine, clock } = newEngine(22);
+  const c = data.minis.horta;
+  const ten = c.buffMinutes * 60000;
+  assert.deepEqual(c.crops.map(entry => entry.buff.kind), ['cheer', 'speed', 'recovery', 'cheer', 'crit']);
+  // Milho (Animação +10%): vale 10 min e depois acaba.
+  const base = engine.multiplier();
+  const got = harvestCrop(engine, clock, 'milho');
+  assert.ok(Math.abs(engine.multiplier() / base - 1.21) < 1e-9, 'milho: ×1,1 do fixo vezes ×1,1 de 10 min');
+  assert.deepEqual(got.buff, { kind: 'cheer', value: 0.1, minutes: 10 });
+  assert.equal(engine.hortaBuff('cheer'), 0.1);
+  assert.deepEqual(engine.hortaBuffs().map(buff => buff.crop), ['milho']);
+  // Mandioca (Animação +25%) soma com o milho; colher o milho de novo só recomeça a contagem dele.
+  const milhoAntes = engine.hortaBuffs().find(buff => buff.crop === 'milho').until;
+  engine.mini('horta').plant(1, 'mandioca');
+  engine.mini('horta').plant(2, 'milho');
+  clock.t += c.crops[3].minutes * 60000 + 1;
+  engine.mini('horta').harvest(1);
+  assert.ok(Math.abs(engine.hortaBuff('cheer') - 0.25) < 1e-9, 'o milho de antes já acabou (a mandioca demora mais que 10 min)');
+  engine.mini('horta').harvest(2);
+  assert.ok(Math.abs(engine.hortaBuff('cheer') - 0.35) < 1e-9, 'plantas diferentes somam');
+  const milhoDepois = engine.hortaBuffs().find(buff => buff.crop === 'milho').until;
+  assert.ok(milhoDepois > milhoAntes, 'colher o milho de novo recomeça a contagem dele');
+  harvestCrop(engine, clock, 'milho', 3);
+  assert.ok(Math.abs(engine.hortaBuff('cheer') - 0.35) < 1e-9, 'a mesma planta não soma duas vezes');
+  // Depois dos 10 min nenhum vale; amendoim (Ritmo +15%) e batata-doce (Refresco +50%).
+  clock.t += ten + 1000;
+  assert.equal(engine.hortaBuffs().length, 0, 'depois dos 10 min nenhum vale');
+  const speed0 = engine.speed();
+  const rest0 = engine.recovery();
+  harvestCrop(engine, clock, 'amendoim');
+  assert.ok(Math.abs(engine.speed() / speed0 - 1.15) < 1e-9, 'Ritmo +15%');
+  clock.t += ten + 1000;
+  harvestCrop(engine, clock, 'batata-doce', 1);
+  assert.ok(Math.abs(engine.recovery() / rest0 - 1.5) < 1e-9, 'Refresco +50%');
+  assert.ok(Math.abs(engine.speed() / speed0 - 1) < 1e-9, 'o Ritmo do amendoim já acabou');
+});
+
+test('horta: o bônus da abóbora é a chance de “Olha a cobra!” (passo ×3) por 10 min, o save guarda e não aceita lixo nem eternidade', () => {
+  const clock = { t: 1_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.1, now: () => clock.t });
+  engine.state.size = 22;
+  engine.state.records.size = 22;
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  horta.plant(0, 'abobora');
+  clock.t += c.crops[4].minutes * 60000 + 1;
+  engine.state.humor = { amor: 50, barriga: 50, at: clock.t, holdUntil: 0 };
+  engine.step();
+  const normal = engine.state.runtime.lastStep;
+  assert.ok(horta.harvest(0).ok);
+  assert.equal(engine.hortaBuff('crit'), 0.15);
+  engine.step();
+  assert.ok(Math.abs(engine.state.runtime.lastStep / normal - data.config.cobraMult * 1.1) < 1e-9, 'com a sorte de 10% e o bônus de 15% o passo vira ×3 (e ×1,1 do bônus fixo da abóbora)');
+  // O save guarda a contagem; o que sobra do bônus é limitado a 10 min.
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+  assert.equal(back.hortaBuff('crit'), 0.15, 'o save guarda o bônus que ainda vale');
+  for (const lixo of [1e18, 'x', NaN, -5, null]) {
+    const messy = JSON.parse(JSON.stringify(saved));
+    messy.minis.horta.buffs = { abobora: lixo, fantasma: clock.t + 1e9 };
+    const clean = new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.t });
+    const left = (clean.hortaBuffs()[0]?.until ?? clock.t) - clock.t;
+    assert.ok(left >= 0 && left <= c.buffMinutes * 60000, `buffs ${lixo}: ${left}`);
+    assert.ok(clean.hortaBuffs().every(buff => buff.crop !== 'fantasma'));
+  }
+  clock.t += c.buffMinutes * 60000 + 1;
+  assert.equal(engine.hortaBuff('crit'), 0, 'passados os 10 min acaba');
+});
+
+test('céu: foguete reabastecido no prazo exato pode ser lançado antes do próximo tique', () => {
+  for (const reload of [false, true]) for (const readFirst of [false, true]) {
+    const { engine, clock } = newEngine(100);
+    const cfg = data.minis.ceu;
+    for (let i = 0; i < cfg.rocketMax; i++) assert.equal(engine.mini('ceu').launch().ok, true);
+    assert.equal(engine.state.minis.ceu.rockets, 0);
+    clock.t += cfg.rocketEvery * 1000;
+    const active = reload ? new GameEngine(data, engine.exportState(), { rng: () => 0.5, now: () => clock.t }) : engine;
+    const ceu = active.mini('ceu');
+    if (readFirst) assert.equal(ceu.info().rockets, 1, 'o status já mostra a carga disponível');
+    assert.equal(ceu.launch().ok, true, `lança sem tique (reload=${reload}, info=${readFirst})`);
+    assert.equal(ceu.info().rockets, 0);
+    assert.equal(ceu.info().rockets, 0, 'ler de novo não reabastece duas vezes');
+    assert.equal(ceu.info().rocketIn, cfg.rocketEvery);
+  }
+});
+
+test('horta: água reabastecida no prazo exato pode regar antes do próximo tique', () => {
+  for (const reload of [false, true]) for (const readFirst of [false, true]) {
+    const { engine, clock } = newEngine(100);
+    const cfg = data.minis.horta;
+    const horta = engine.mini('horta');
+    for (let i = 0; i < cfg.waterMax; i++) {
+      assert.equal(horta.plant(i, 'milho').ok, true);
+      assert.equal(horta.water(i).ok, true);
+    }
+    assert.equal(engine.state.minis.horta.water, 0);
+    clock.t += cfg.waterEvery * 1000;
+    const active = reload ? new GameEngine(data, engine.exportState(), { rng: () => 0.5, now: () => clock.t }) : engine;
+    const current = active.mini('horta');
+    if (readFirst) assert.equal(current.info().water, 1, 'o status já mostra a água disponível');
+    assert.equal(current.water(0).ok, true, `rega sem tique (reload=${reload}, info=${readFirst})`);
+    assert.equal(current.info().water, 0);
+    assert.equal(current.info().water, 0, 'ler de novo não reabastece duas vezes');
+    assert.equal(active.state.minis.horta.waterAt, clock.t);
+  }
+});
+
+for (const [id, activeKey, nextKey, interval] of [
+  ['ceu', 'star', 'starAt', 'starEvery'], ['horta', 'crow', 'crowAt', 'crowEvery']
+]) test(`${id}: recarregar durante uma visita fugaz não cria outra imediatamente`, () => {
+  const { engine, clock } = newEngine(100);
+  const cfg = data.minis[id];
+  if (id === 'horta') engine.mini(id).plant(0, 'abobora');
+  engine.tick(0.1);
+  clock.t = engine.state.minis[id][nextKey];
+  engine.tick(0.1);
+  assert.ok(engine.state.minis[id][activeKey], 'a visita apareceu pelo relógio normal');
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+  back.tick(0.1);
+  assert.equal(back.state.minis[id][activeKey], null, 'a visita antiga não volta no primeiro quadro');
+  const untilNext = back.state.minis[id][nextKey] - clock.t;
+  assert.ok(untilNext >= cfg[interval][0] * 1000 && untilNext <= cfg[interval][1] * 1000, 'a próxima visita espera o intervalo configurado');
+  assert.ok(!events(back).some(event => event.mini === id && event.kind === activeKey));
+  const scheduled = back.state.minis[id][nextKey];
+  const again = new GameEngine(data, back.exportState(), { rng: () => 0.5, now: () => clock.t });
+  assert.equal(again.state.minis[id][nextKey], scheduled, 'reabrir enquanto espera preserva o prazo');
+});
+
+test('céu: pedir à estrela depois do prazo não dá prêmio mesmo antes do próximo tique', () => {
+  const { engine, clock } = newEngine(60);
+  const ceu = engine.mini('ceu');
+  engine.state.minis.ceu.starAt = clock.t - 1;
+  engine.tick(0.1);
+  assert.ok(ceu.info().star);
+  events(engine);
+  const before = { tickets: engine.state.tickets, cheer: engine.state.cheer, love: engine.state.humor.amor, wood: engine.state.wood };
+  clock.t = engine.state.minis.ceu.star.until;
+  assert.deepEqual(ceu.wish(), { ok: false, reason: 'none' });
+  assert.equal(engine.state.minis.ceu.wishes, 0);
+  assert.equal(ceu.info().star, null);
+  assert.deepEqual({ tickets: engine.state.tickets, cheer: engine.state.cheer, love: engine.state.humor.amor, wood: engine.state.wood }, before);
+  engine.tick(0.1);
+  assert.equal(events(engine).filter(event => event.kind === 'star-gone').length, 1);
+});
+
+test('horta: corvo com prazo vencido come antes de um clique de espantar ou colher', () => {
+  for (const action of ['scare', 'harvest', 'water', 'plant']) {
+    const { engine, clock } = newEngine(30);
+    const horta = engine.mini('horta');
+    horta.plant(0, 'milho');
+    engine.state.minis.horta.crowAt = clock.t - 1;
+    engine.tick(0.1);
+    assert.equal(horta.info().crow.plot, 0);
+    events(engine);
+    const before = { tickets: engine.state.tickets, cheer: engine.state.cheer };
+    clock.t = engine.state.minis.horta.plots[0].readyAt;
+    const got = horta[action](0);
+    assert.equal(got.ok, action === 'plant', action);
+    assert.equal(engine.state.minis.horta.eaten, 1, action);
+    assert.equal(engine.state.minis.horta.scared, 0, action);
+    assert.equal(horta.info().crow, null, action);
+    assert.equal(horta.info().plots[0].crop, action === 'plant' ? 'milho' : null, action);
+    assert.deepEqual({ tickets: engine.state.tickets, cheer: engine.state.cheer }, before, action);
+    engine.tick(0.1);
+    assert.equal(events(engine).filter(event => event.kind === 'crow-ate').length, 1, action);
+  }
+});
+
+test('mata: o ano novo descarta eventos da batalha anterior e preserva a sequência dos próximos', () => {
+  const { engine, clock } = newMataEngine(100);
+  const mata = engine.mini('mata');
+  mataRun(engine, clock, 4);
+  assert.ok(mata.events(0).some(event => event.kind === 'hit'), 'a janela aberta tem golpes ainda não exibidos');
+  const seen = mata.info().seq;
+  assert.equal(engine.newYear(), true);
+  assert.deepEqual(mata.events(0), [], 'a janela não repete os golpes do ano anterior ao reaparecer');
+  engine.tick(0.1);
+  assert.ok(mata.events(seen).some(event => event.kind === 'begin'), 'quem já viu a sequência antiga recebe a batalha nova');
 });

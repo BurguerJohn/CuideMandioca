@@ -1,0 +1,48 @@
+{
+  "electron": "44.4.5",
+  "pid": 44680,
+  "restored": true,
+  "results": [
+    {
+      "help": false,
+      "target": {
+        "tag": "BUTTON",
+        "action": "fechar-janela",
+        "mini": null
+      },
+      "overlapping": true,
+      "accessible": true,
+      "miniVisible": true,
+      "helpVisible": false
+    },
+    {
+      "help": true,
+      "target": {
+        "tag": "BUTTON",
+        "action": "fechar-janela",
+        "mini": null
+      },
+      "overlapping": true,
+      "accessible": true,
+      "miniVisible": true,
+      "helpVisible": true
+    },
+    {
+      "screen": "painel",
+      "target": {
+        "tag": "BUTTON",
+        "action": "fechar",
+        "mini": null
+      },
+      "overlapping": true,
+      "accessible": true,
+      "miniVisible": true
+    }
+  ],
+  "escape": {
+    "panelClosed": true,
+    "helpClosed": true,
+    "sceneHidden": true
+  },
+  "errors": []
+}

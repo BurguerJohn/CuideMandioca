@@ -1,0 +1,114 @@
+{
+  "pid": 19720,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-19720-6Z07Uf",
+  "activeRounds": true,
+  "electron": "44.4.5",
+  "changes": [
+    {
+      "language": "en",
+      "before": {
+        "name": "Troca 0",
+        "tickets": 94,
+        "year": 1,
+        "interrupted": {
+          "cost": 1,
+          "mataCheckpoint": {
+            "stage": 1,
+            "battle": 1,
+            "best": 0,
+            "auto": false,
+            "companion": "",
+            "teimosia": 0,
+            "wins": 1,
+            "bosses": 0,
+            "defeats": 0,
+            "kills": {
+              "mao-de-cabelo": 1
+            }
+          },
+          "palcoShows": 0,
+          "palcoStars": 0,
+          "palcoBest": {},
+          "liveMataPhase": "win",
+          "livePalco": true
+        },
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        }
+      },
+      "after": {
+        "name": "Troca 0",
+        "tickets": 95,
+        "year": 1,
+        "gameplay": {
+          "inventory": [
+            "palha-furada"
+          ],
+          "equipped": {
+            "chapeu": "palha-furada",
+            "mao": "bandeirinha",
+            "tecido": "xadrez-vermelho",
+            "terreiro": "terra-batida",
+            "esquerda": "fardo",
+            "direita": "mastro",
+            "varal": "varal-colorido"
+          },
+          "levels": {
+            "rebolado": 30,
+            "folego": 30,
+            "refresco": 30,
+            "ritmo": 30
+          },
+          "crew": {
+            "milho": {
+              "level": 1
+            }
+          }
+        },
+        "language": "en",
+        "choice": "en",
+        "settingsOpen": true,
+        "shopOpen": true,
+        "zoom": 0.5
+      },
+      "requestPhase": "closing",
+      "oldDestroyed": true
+    }
+  ],
+  "errors": [],
+  "rounds": [
+    {
+      "language": "en",
+      "refunded": 1,
+      "checkpoint": {
+        "stage": 1,
+        "battle": 1,
+        "wins": 1
+      },
+      "unfinishedShowAwarded": false
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n96 !== 94\n\n    at C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\window-handoff-probe.cjs:149:12"
+}

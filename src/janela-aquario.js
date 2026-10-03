@@ -79,13 +79,18 @@
           flake.y = Math.min(flake.y1, flake.y + 16 * dt);
           if (flake.y >= flake.y1) flake.landed = true;
         }
-        if (flake.life > 9) flakes.splice(i, 1);
+        if (flake.life > 9) {
+          flakes.splice(i, 1);
+          for (const f of fishes.values()) if (f.eating === flake) f.eating = null;
+        }
       }
     }
 
     function eat(f, flake, now) {
-      flakes.splice(flakes.indexOf(flake), 1);
+      const index = flakes.indexOf(flake);
       f.eating = null;
+      if (index < 0) return;
+      flakes.splice(index, 1);
       f.joy = 1.2;
       base.spawn('bolha', f.x + f.dir * 6, f.y - 3, now);
       hooks.sound?.(flake.grew ? 'crescer' : 'bola');
@@ -100,10 +105,10 @@
       const sheet = meta.peixes;
       const frame = (speciesIndex(f.species) * 3 + f.stage) * 2 + (Math.floor(now / 1000 * 4 + f.phase) % 2);
       const bob = Math.sin(now / 700 + f.phase) * 0.8;
-      const x = f.x - sheet.w / 2;
-      const y = f.y - sheet.h / 2 + bob - (f.joy > 0 ? Math.sin(f.joy * 6) * 1.2 : 0);
+      const x = Math.round(f.x - sheet.w / 2);
+      const y = Math.round(f.y - sheet.h / 2 + bob - (f.joy > 0 ? Math.sin(f.joy * 6) * 1.2 : 0));
       base.sprite(sheet, frame, x, y, { flip: f.dir < 0 });
-      base.region(`fish:${f.id}`, x + 3, y + 3, sheet.w - 6, sheet.h - 6, { fish: f.id,
+      base.region(`fish:${f.id}`, x, y, sheet.w, sheet.h, { fish: f.id,
         tip: tr('mini.aquario.fishTip', { name: nameOf(f.species), size: tr(`mini.aquario.size.${f.stage}`) }) });
     }
 
@@ -116,7 +121,7 @@
         const x = bubble.x + Math.sin(now / 900 + bubble.phase) * 2;
         const y = bubble.y + bob;
         base.sprite(meta.ouro, Math.floor(now / 300 + i) % 2, x - 5, y - 5);
-        base.region(`ouro:${i}`, x - 7, y - 7, 14, 14, { ouro: i, tip: tr('mini.aquario.bubbleTip') });
+        base.region(`ouro:${i}`, x - 7, y - 7, 14, 14, { ouro: i, bubble, tip: tr('mini.aquario.bubbleTip') });
       });
     }
 
@@ -169,12 +174,14 @@
       const found = base.hit(clientX, clientY);
       const point = base.toArt(clientX, clientY);
       if (found?.ouro !== undefined) {
+        const bubble = found.bubble;
+        if (!bubbles.includes(bubble)) return true;
         const got = model.pop();
         if (got.ok) {
+          bubbles.splice(bubbles.indexOf(bubble), 1);
           hooks.sound?.('moeda');
-          const bubble = bubbles[found.ouro];
-          const x = bubble ? bubble.x : point.x;
-          const y = bubble ? bubble.y : point.y;
+          const x = bubble.x;
+          const y = bubble.y;
           base.spawn('estrela', x - 4, y - 4, now);
           base.spawn('brilho', x + 3, y - 6, now);
           if (got.reward.cheer) base.say(tr('gain.cheer', { n: Math.round(got.reward.cheer) }), x, y - 8, now, '#ffe27a');
@@ -212,8 +219,8 @@
             base.say(nameOf(event.species), Math.max(40, Math.min(W - 40, b.x)), b.y + 12, now, event.isNew ? '#9ef05a' : '#fff8e8');
           }
           hooks.sound?.('pesca');
-          if (event.isNew) hooks.toast?.(tr('mini.aquario.newSpecies', { name: nameOf(event.species) }), 'ouro');
-        } else if (event.kind === 'bubble') hooks.sound?.('aviso');
+        } else if (event.kind === 'discover') hooks.toast?.(tr('mini.aquario.newSpecies', { name: nameOf(event.species) }), 'ouro');
+        else if (event.kind === 'bubble') hooks.sound?.('aviso');
         else if (event.kind === 'complete') hooks.toast?.(tr('mini.aquario.complete'), 'ouro');
       }
     }

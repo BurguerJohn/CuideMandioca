@@ -88,6 +88,7 @@
 
       // Para a janela desenhar: os bichos que já moram no quintal, com o estado de cada um.
       info() {
+        this.tick();
         const { pets, chicks } = present();
         const now = tools.now();
         return { chicks, grain: tools.state().grain, grainMax: tools.cfg().grainMax,
@@ -112,6 +113,7 @@
 
       // Jogar um grão de milho para o bicho: gasta um grão e enche mais o laço dele.
       feed(id) {
+        this.tick();
         const pet = find(id);
         const s = tools.state();
         const c = tools.cfg();
@@ -128,6 +130,7 @@
 
       // Pegar o presente do bicho (o laço cheio): o prêmio dele, e o laço recomeça.
       collect(id) {
+        this.tick();
         const pet = find(id);
         const c = tools.cfg();
         if (!pet) return { ok: false, reason: 'absent' };

@@ -9,18 +9,27 @@
   const registerView = (id, create) => { views[id] = create; };
 
   // `opts`: { document, engine, sprites, anchor(), settings(), changeSettings(partial), placaRect(), size() ({width, height} da
-  // tela), t(key, vars), sound(name), toast(text, kind), focused() }.
+  // tela), t(key, vars), sound(name), toast(text, kind), raise(element), focused() }.
   function create(opts) {
     const { document, sprites } = opts;
     let engine = opts.engine;
     const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
     const windows = new Map();      // id -> { id, element, canvas, view, status, drawnAt }
     let lastSignature = '';
+    let restoredState = null;
 
     const settingsOf = id => opts.settings().minis?.[id] || null;
     const entryOf = id => engine.data.minis.windows.find(entry => entry.id === id);
     // Visível: a janela já abriu, a pessoa não escondeu e a festa não está escondida.
     const visible = id => !!windows.get(id) && engine.miniOpen(id) && settingsOf(id)?.hidden === false && !opts.settings().hidden;
+
+    // A Mata só luta enquanto sua janela aparece; os outros modelos mantêm seus próprios relógios.
+    function bindVisibility() {
+      for (const [id, model] of Object.entries(engine.minis.api)) {
+        model.setVisibilityCheck?.(() => visible(id) && opts.focused?.() !== false);
+      }
+    }
+    bindVisibility();
 
     // Cria o retângulo da janela (uma vez só, na primeira vez que ela precisa aparecer).
     function ensure(id) {
@@ -34,7 +43,7 @@
       element.dataset.mini = id;
       element.innerHTML = `<div class="casa-topo"><h2></h2><span class="casa-contagem"></span>` +
         `<button class="ajuda" data-action="mini-ajuda" data-mini="${id}" aria-label="${opts.t('help.button')}" title="${opts.t('help.button')}">?</button>` +
-        `<button class="fechar" data-action="mini-fechar" data-mini="${id}" aria-label="${opts.t('hud.fechar')}">×</button></div>` +
+        `<button class="fechar" data-action="mini-fechar" data-mini="${id}" aria-label="${opts.t('mini.hide')}">×</button></div>` +
         `<div class="casa-cena"></div>`;
       const canvas = document.createElement('canvas');
       const scene = element.querySelector ? element.querySelector('.casa-cena') : null;
@@ -60,7 +69,8 @@
         engine: () => engine,
         place: () => place(id)
       });
-      const item = { id, element, canvas, view, status: '', drawnAt: 0, help, helpTitle, helpText, helpClose, helpOpen: false };
+      const item = { id, element, canvas, scene, view, status: '', drawnAt: 0, help, helpTitle, helpText, helpClose,
+        helpOpen: false, helpScroll: null, gestureVersion: 0 };
       windows.set(id, item);
       canvas.addEventListener?.('mousemove', event => {
         const found = view.hit?.(event.clientX, event.clientY);
@@ -81,17 +91,42 @@
     function setHelp(id, open) {
       const item = windows.get(id);
       if (!item) return false;
+      const returnFocus = !open && item.helpOpen && item.help.contains?.(document.activeElement);
+      if (open && !item.helpOpen) {
+        item.gestureVersion++;
+        if (item.scene) item.helpScroll = { x: item.scene.scrollLeft || 0, y: item.scene.scrollTop || 0 };
+      }
       item.helpOpen = !!open;
       if (item.helpOpen) {
+        item.scene?.classList?.add('ajuda-aberta');
+        if (item.scene) { item.scene.scrollLeft = 0; item.scene.scrollTop = 0; }
         item.helpTitle.textContent = `${title(id)}: ${opts.t('help.title')}`;
         item.helpText.textContent = opts.t(`mini.help.${id}`, helpVars(id));
         item.helpClose.textContent = opts.t('help.close');
       }
       item.help.hidden = !item.helpOpen;
+      if (item.helpOpen) item.help.scrollTop = 0;
+      if (!item.helpOpen && item.scene) {
+        item.scene.classList?.remove('ajuda-aberta');
+        if (item.helpScroll) {
+          item.scene.scrollLeft = item.helpScroll.x; item.scene.scrollTop = item.helpScroll.y;
+          item.helpScroll = null;
+        }
+      }
+      if (returnFocus && visible(id)) {
+        const trigger = item.element.querySelector?.('button[data-action="mini-ajuda"]');
+        if (!trigger?.disabled) trigger?.focus?.({ preventScroll: true });
+      }
       return item.helpOpen;
     }
     const toggleHelp = id => setHelp(id, !windows.get(id)?.helpOpen);
     const helpOpen = id => !!windows.get(id)?.helpOpen;
+
+    function windowSize(item) {
+      const canvas = item.view.size();
+      return { width: Math.max(item.element.offsetWidth || 0, canvas.width + 12),
+        height: Math.max(item.element.offsetHeight || 0, canvas.height + 38) };
+    }
 
     // Põe a janela onde ela cabe: onde a pessoa arrastou (contando a partir da festa) ou um lugar livre ao lado da festa,
     // sem cobrir a placa (é nela que fica o botão da janela) nem outra janela aberta.
@@ -99,8 +134,11 @@
       const item = windows.get(id);
       if (!item) return;
       const on = visible(id);
+      const wasHidden = item.element.hidden;
+      if (!on && !item.element.hidden) item.gestureVersion++;
       item.element.hidden = !on;
       if (!on) return;
+      if (wasHidden) opts.raise?.(item.element);
       const screen = opts.size();
       item.view.setScale(3 * (opts.settings().zoom || 1), { width: screen.width * 0.5, height: screen.height * 0.8 });
       const heading = item.element.querySelector?.('h2');
@@ -108,9 +146,7 @@
       const counter = item.element.querySelector?.('.casa-contagem');
       const status = item.view.status?.(engine) || '';
       if (counter && status !== item.status) { counter.textContent = status; item.status = status; }
-      const canvasSize = item.view.size();
-      const w = Math.max(item.element.offsetWidth || 0, canvasSize.width + 12);
-      const h = Math.max(item.element.offsetHeight || 0, canvasSize.height + 38);
+      const { width: w, height: h } = windowSize(item);
       const a = opts.anchor() || { left: 0, width: 0, lift: 0, top: 0 };
       const custom = settingsOf(id);
       let left;
@@ -123,6 +159,8 @@
       bottom = clamp(bottom, 6, Math.max(6, screen.height - h - 6));
       item.element.style.left = `${Math.round(left)}px`;
       item.element.style.bottom = `${Math.round(bottom)}px`;
+      item.scene?.classList?.toggle('cena-arrastavel', !(item.scene.scrollWidth > item.scene.clientWidth ||
+        item.scene.scrollHeight > item.scene.clientHeight));
     }
 
     // Retângulos (em pixels da tela) que a janela `id` não deve cobrir: a placa, a casa e as outras janelas abertas.
@@ -164,6 +202,8 @@
     function setHidden(id, hidden) {
       const minis = { ...(opts.settings().minis || {}) };
       minis[id] = { ...(minis[id] || {}), hidden };
+      // O desktop responde depois: o próximo clique ou mini-open já precisa enxergar esta mudança.
+      opts.settings().minis = minis;
       opts.changeSettings({ minis });
       if (!hidden) ensure(id);
       else setHelp(id, false);
@@ -191,6 +231,9 @@
 
     // Eventos do motor: a janela que acabou de abrir aparece sozinha (e avisa); todas as janelas recebem os eventos.
     function onEvents(events, now) {
+      // O ano novo usa o mesmo motor; efeitos, cliques e avisos anteriores a ele ficam no ano que terminou.
+      const newYear = events.findLastIndex(event => event.type === 'new-year');
+      if (newYear >= 0) { reset(); events = events.slice(newYear + 1); }
       for (const event of events) {
         if (event.type !== 'mini-open') continue;
         const item = ensure(event.id);
@@ -213,10 +256,20 @@
     // placa) e as do novo reaparecem conforme os convidados dele.
     function setEngine(next) {
       if (!next || next === engine) return;
+      for (const model of Object.values(engine.minis.api)) model.setVisibilityCheck?.(null);
+      engine = next;
+      bindVisibility();
+      reset();
+    }
+
+    function reset() {
+      // A ação pode restaurar as cenas antes do quadro que entrega new-year. Esse evento ainda filtra o lote,
+      // mas não apaga uma ajuda ou um gesto que a pessoa começou nas janelas já restauradas.
+      if (restoredState === engine.state) return;
       for (const item of windows.values()) item.element.remove?.();
       windows.clear();
-      engine = next;
       restore();
+      restoredState = engine.state;
     }
 
     // Janelas abertas na carga do jogo: já abertas pela pessoa na última vez ficam como estavam.
@@ -234,32 +287,37 @@
       if (target.closest('button') || target.closest('.ajuda-painel')) return null;
       const id = element.dataset?.mini;
       const item = windows.get(id);
-      if (!item) return null;
+      if (!item || !visible(id) || item.helpOpen) return null;
       // A barra de rolagem da cena é do navegador: o fundo em volta é que arrasta.
       if (target.classList?.contains('casa-cena')) return null;
-      const found = item.view.hit?.(event.clientX, event.clientY) || null;
-      return { kind: 'mini', id, x: event.clientX, y: event.clientY, found,
+      const onCanvas = target === item.canvas;
+      const found = onCanvas ? item.view.hit?.(event.clientX, event.clientY) || null : null;
+      return { kind: 'mini', id, item, version: item.gestureVersion, x: event.clientX, y: event.clientY, found, onCanvas,
         start: { left: parseFloat(element.style.left) || 0, bottom: parseFloat(element.style.bottom) || 0 }, moved: false };
     }
     function dragMove(drag, dx, dy) {
       const item = windows.get(drag.id);
-      if (!item) return;
+      if (!item || item !== drag.item || item.gestureVersion !== drag.version || !visible(drag.id) || item.helpOpen) return;
       const screen = opts.size();
-      const w = item.element.offsetWidth || 300;
-      const h = item.element.offsetHeight || 300;
+      const { width: w, height: h } = windowSize(item);
       const left = clamp(drag.start.left + dx, 6, Math.max(6, screen.width - w - 6));
       const bottom = clamp(drag.start.bottom - dy, 6, Math.max(6, screen.height - h - 6));
+      drag.start.left = left - dx;
+      drag.start.bottom = bottom + dy;
       const a = opts.anchor();
       const minis = { ...(opts.settings().minis || {}) };
       minis[drag.id] = { ...(minis[drag.id] || {}), hidden: false, dx: Math.round(left - a.left), dy: Math.round(bottom - a.lift) };
       opts.settings().minis = minis;
       place(drag.id);
     }
-    // Soltou: se arrastou, guarda a posição; se foi só um clique, a janela trata (um bicho que reage, um canteiro que planta...).
+    // Soltou: se arrastou, guarda a posição; se foi um clique no canvas, a cena trata. A moldura só serve para arrastar.
     function dragEnd(drag, now) {
       if (drag.moved) { opts.changeSettings({ minis: opts.settings().minis }); return; }
       const item = windows.get(drag.id);
-      item?.view.click?.(drag.x, drag.y, now);
+      if (!item || item !== drag.item || item.gestureVersion !== drag.version || !visible(drag.id) || item.helpOpen) return;
+      if (!drag.onCanvas) return;
+      if (item.view.hit?.(drag.x, drag.y)?.id !== drag.found?.id) return;
+      item.view.click?.(drag.x, drag.y, now);
     }
 
     function probe() {
@@ -267,7 +325,7 @@
     }
 
     return { ensure, place, placeAll, toggle, close, setHidden, draw, onEvents, items, signature, restore, dragStart, dragMove, dragEnd,
-      visible, probe, windows, setHelp, toggleHelp, helpOpen, setEngine };
+      visible, probe, windows, setHelp, toggleHelp, helpOpen, setEngine, reset };
   }
 
   root.ArraiaJanelas = { create, registerView, views };

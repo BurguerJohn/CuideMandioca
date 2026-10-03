@@ -76,6 +76,29 @@
       return entry;
     };
 
+    function reset() {
+      engineRef = null;
+      layout = null;
+      layoutKey = '';
+      pops.clear();
+      reacts.clear();
+      nextFx.clear();
+      whoCache.clear();
+      particles.length = 0;
+      says.length = 0;
+      regions.length = 0;
+      lastDraw = 0;
+      view.width = 0;
+      view.height = 0;
+      view.applied = '';
+      g.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function useEngine(engine) {
+      if (engineRef !== engine) reset();
+      engineRef = engine;
+    }
+
     function applyScale() {
       if (!view.width) return;
       const dpr = root.devicePixelRatio || 1;
@@ -306,12 +329,12 @@
         const { image, sx } = frameOf(person.design, pose.frame);
         const x = spot.x + meta.salas.slots[person.slot] - 14;
         const y = spot.y + meta.salas.pe - 33;
-        if (ready(image)) {
+        if (ready(image) && pose.alpha > 0) {
           g.globalAlpha = pose.alpha;
           g.drawImage(image, sx, 0, meta.moradores.w, meta.moradores.h, x, y + pose.lift, meta.moradores.w, meta.moradores.h);
           g.globalAlpha = 1;
+          regions.push({ id: `casa-morador:${i}`, x, y: y + pose.lift - 4, w: meta.moradores.w, h: meta.moradores.h + 4, index: i, who: person });
         }
-        regions.push({ id: `casa-morador:${i}`, x, y: y - 4, w: meta.moradores.w, h: meta.moradores.h + 4, index: i, who: person });
       }
     }
 
@@ -328,7 +351,7 @@
     }
 
     function draw(engine, now) {
-      engineRef = engine;
+      useEngine(engine);
       if (!meta) return false;
       const info = engine.houseInfo();
       if (!info.open) return false;
@@ -387,7 +410,9 @@
 
     // Um cômodo ou morador novo chegou: festa de chegada (poeira, brilho e som).
     function onEvents(engine, events, now) {
-      engineRef = engine;
+      const newYear = events.findLastIndex(event => event.type === 'new-year');
+      if (newYear >= 0) { reset(); events = events.slice(newYear + 1); }
+      useEngine(engine);
       if (!meta) return;
       const info = engine.houseInfo();
       const current = info.open ? plan(info.rooms, engine.data.house.columns, rw, rh) : null;
@@ -415,7 +440,7 @@
         particles: particles.length, says: says.length, pops: pops.size, reacts: reacts.size, physical: view.physical };
     }
 
-    return { draw, setScale, size, areas, hit, poke, onEvents, probe };
+    return { draw, reset, setScale, size, areas, hit, poke, onEvents, probe };
   }
 
   root.ArraiaCasa = { create, plan, SIDE, SKY, WALL, ROOF, GROUND };

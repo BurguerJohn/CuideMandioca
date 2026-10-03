@@ -1,0 +1,96 @@
+﻿{
+    "cases":  [
+                  {
+                      "file":  "touch-drag-vitrine-body-verification.json",
+                      "pid":  49712,
+                      "area":  "body",
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  350,
+                                     "scrollLeft":  0,
+                                     "tickets":  null,
+                                     "ownsCard":  null
+                                 },
+                      "after":  {
+                                    "left":  300,
+                                    "scrollLeft":  0,
+                                    "tickets":  null,
+                                    "ownsCard":  null
+                                },
+                      "freshTap":  {
+
+                                   },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-vitrine-details-verification.json",
+                      "pid":  9464,
+                      "area":  "details",
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  350,
+                                     "scrollLeft":  0,
+                                     "tickets":  null,
+                                     "ownsCard":  null
+                                 },
+                      "after":  {
+                                    "left":  300,
+                                    "scrollLeft":  0,
+                                    "tickets":  null,
+                                    "ownsCard":  null
+                                },
+                      "freshTap":  {
+
+                                   },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-scroll-vitrine-verification.json",
+                      "pid":  19888,
+                      "area":  "",
+                      "scrolling":  true,
+                      "before":  {
+                                     "left":  8,
+                                     "scrollLeft":  0,
+                                     "tickets":  null,
+                                     "ownsCard":  null
+                                 },
+                      "after":  {
+                                    "left":  8,
+                                    "scrollLeft":  106.4000015258789,
+                                    "tickets":  null,
+                                    "ownsCard":  null
+                                },
+                      "freshTap":  {
+
+                                   },
+                      "finalDrag":  null
+                  },
+                  {
+                      "file":  "touch-drag-vitrine-card-verification.json",
+                      "pid":  25192,
+                      "area":  "card",
+                      "scrolling":  false,
+                      "before":  {
+                                     "left":  350,
+                                     "scrollLeft":  0,
+                                     "tickets":  94,
+                                     "ownsCard":  false
+                                 },
+                      "after":  {
+                                    "left":  350,
+                                    "scrollLeft":  0,
+                                    "tickets":  94,
+                                    "ownsCard":  false
+                                },
+                      "freshTap":  {
+                                       "tickets":  89,
+                                       "ownsCard":  true
+                                   },
+                      "finalDrag":  null
+                  }
+              ],
+    "count":  4,
+    "tests":  650,
+    "packagedAt":  "2026-10-03T10:56:58.462Z"
+}

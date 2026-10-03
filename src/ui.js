@@ -58,6 +58,15 @@
     return number(value);
   }
 
+  function productionValues(engine) {
+    const yieldNumber = value => value < 1000 ? number(value, 2) : compact(value);
+    return {
+      step: yieldNumber(engine.stepValue()), speed: number(engine.speed(), 2),
+      stamina: t('party.staminaValue', { n: number(engine.maxStamina()) }),
+      rest: `${number(engine.maxStamina() / engine.recovery(), 1)} s`, rate: yieldNumber(engine.cheerPerSecond())
+    };
+  }
+
   function duration(ms) {
     const seconds = Math.max(0, Math.ceil(ms / 1000));
     const h = Math.floor(seconds / 3600);
@@ -90,9 +99,19 @@
       `${esc(label)} <span class="preco">${icon}${compact(cost)}</span></button>`;
   }
 
-  function bar(value, max, kind = '') {
+  function bar(value, max, kind = '', attrs = '') {
     const width = Math.max(0, Math.min(100, 100 * value / Math.max(max, 1e-9)));
-    return `<div class="barra ${kind}"><i style="width:${width}%"></i></div>`;
+    return `<div class="barra ${kind}"><i${attrs} style="width:${width}%"></i></div>`;
+  }
+
+  function timeProgress(startAt, endAt, now) {
+    if (endAt <= startAt) return now >= endAt ? 100 : 0;
+    return Math.max(0, Math.min(100, 100 * (now - startAt) / (endAt - startAt)));
+  }
+
+  function timedBar(startAt, endAt, now, kind = '') {
+    return bar(timeProgress(startAt, endAt, now), 100, kind,
+      ` data-progress-start="${startAt}" data-progress-end="${endAt}"`);
   }
 
   function header(title, subtitle, right = '') {
@@ -175,6 +194,9 @@
       s.fantasia?.judgeAt ? `<span class="selo ouro" title="${esc(t('hud.fantasiaTitle'))}">${esc(t('hud.fantasia'))}</span>` : '',
       engine.cookBonus() > 0 ? `<span class="selo ouro" title="${esc(t('hud.cookTitle'))}">${esc(t('hud.cook', { dish: engine.recipe(s.cozinha.buff.id).name,
         v: Math.round(engine.cookBonus() * 100) }))} ${until(s.cozinha.buff.until, ctx.now)}</span>` : '',
+      ...engine.hortaBuffs().map(buff => `<span class="selo verde" title="${esc(t('hud.hortaTitle', { m: engine.data.minis.horta.buffMinutes }))}">` +
+        `${esc(t('hud.horta', { crop: engine.data.minis.horta.crops.find(entry => entry.id === buff.crop)?.name || buff.crop,
+          effect: t(`horta.buff.${buff.kind}`, { v: Math.round(buff.value * 100) }) }))} ${until(buff.until, ctx.now)}</span>`),
       s.cold?.active ? `<span class="selo azul" title="${esc(t(engine.quentaoOn() ? 'hud.coldQuentao' : 'hud.coldTitle'))}">${esc(t('hud.cold'))}</span>` : ''
     ].join('');
     return `<div class="placa-linha">` +
@@ -383,9 +405,10 @@
       [t('party.set'), engine.activeSet() ? `+${percent(engine.setBonus())}` : '—'],
       [t('party.tradition'), engine.tradition() ? `+${percent(engine.tradition())}` : '—'],
       [t('party.trio'), engine.trioBonus() ? `+${percent(engine.trioBonus())}` : '—'],
+      [t('party.horta'), engine.hortaBonus() ? `+${percent(engine.hortaBonus())}` : '—'],
       [t('party.legendary'), engine.legendary() ? '×2' : '—']
     ];
-    const rest = engine.maxStamina() / engine.recovery();
+    const production = productionValues(engine);
     return header(s.name, esc(t('party.subtitle', { tier: engine.tier().name, n: s.size }))) +
       `<div class="grade2"><div class="cartao"><div class="rotulo">${esc(t('party.tier'))}</div>` +
       `<h3>${esc(engine.tier().name)}</h3>${bar(s.fame, engine.fameNeed(), 'fama')}` +
@@ -403,11 +426,11 @@
       `<div class="botoes"><button class="btn claro" data-action="foto">${ctx.icon('ui:foto')} ${esc(t('party.photo'))}</button>` +
       `<button class="btn claro" data-action="retrato">${ctx.icon('ui:foto')} ${esc(t('party.portrait'))}</button></div></div></div>` +
       `<div class="cartao"><div class="rotulo">${esc(t('party.yield'))}</div><div class="numeros">` +
-      [[t('party.perStep'), compact(engine.stepValue())], [t('party.stepsPerSecond'), number(engine.speed(), 2)],
-        [t('party.stamina'), t('party.staminaValue', { n: number(engine.maxStamina(), 0) })], [t('party.rest'), `${number(rest, 1)} s`],
-        [t('party.perSecond'), compact(engine.cheerPerSecond())],
+      [[t('party.perStep'), production.step, 'step'], [t('party.stepsPerSecond'), production.speed, 'speed'],
+        [t('party.stamina'), production.stamina, 'stamina'], [t('party.rest'), production.rest, 'rest'],
+        [t('party.perSecond'), production.rate, 'rate'],
         [t('party.offline'), t('party.offlineValue', { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours })]]
-        .map(([label, value]) => `<div><span>${esc(label)}</span><b>${esc(value)}</b></div>`).join('') +
+        .map(([label, value, key]) => `<div><span>${esc(label)}</span><b${key ? ` data-production="${key}"` : ''}>${esc(value)}</b></div>`).join('') +
       `</div><p class="miudo">${esc(t('party.offlineHint', { v: Math.round(engine.offlineRate() * 100), h: engine.cfg.offlineCapHours }))}</p>` +
       `<div class="rotulo">${esc(t('party.multipliers'))}</div><div class="numeros">` +
       pieces.map(([label, value]) => `<div><span>${esc(label)}</span><b>${value}</b></div>`).join('') + `</div></div>` +
@@ -494,6 +517,7 @@
         const entry = engine.state.outings[index];
         const state = engine.outingState(index);
         const open = engine.outingOpen(index);
+        const travelTime = entry.char ? entry.endsAt - entry.startAt : engine.outingTime(index);
         let body;
         if (!open) body = lockNote(engine, outing.tier);
         else if (state === 'livre') {
@@ -502,9 +526,8 @@
             `<button class="btn" data-action="role-enviar" data-index="${index}">${esc(t('outing.send'))}</button></div>`
             : `<p class="miudo">${esc(t('outing.nobody'))}</p>`;
         } else if (state === 'fora') {
-          const total = outing.minutes * 60000;
           body = `<p>${t('outing.back', { name: esc(engine.chars[entry.char].name), time: until(entry.endsAt, ctx.now) })}</p>` +
-            bar(total - (entry.endsAt - ctx.now), total) +
+            timedBar(entry.startAt, entry.endsAt, ctx.now) +
             `<div class="botoes"><button class="btn claro" data-action="role-cancelar" data-index="${index}">${esc(t('outing.recall'))}</button></div>`;
         } else {
           body = `<p>${esc(t('outing.returned', { name: engine.chars[entry.char].name }))}</p><div class="botoes">` +
@@ -513,7 +536,7 @@
         const prize = outing.item ? t('outing.prize', { chance: percent(outing.chance), item: engine.items[outing.item].name }) : '';
         return `<div class="cartao"><div class="linha">${ctx.icon('ui:role', 'grande')}<div><h3>${esc(outing.name)}</h3>` +
           // Com alguém no rolê, a lenha que essa pessoa traz de verdade (a raridade dela multiplica a lenha do rolê).
-          `<p class="miudo">${esc(t('outing.info', { time: duration(outing.minutes * 60000),
+          `<p class="miudo">${esc(t('outing.info', { time: duration(travelTime),
             n: entry.char && engine.chars[entry.char] ? engine.outingWood(index, entry.char) : outing.wood, prize }))}</p></div></div>${body}</div>`;
       }).join('')}</div>`;
   }
@@ -548,9 +571,8 @@
       status = `<div class="linha">${ctx.icon(`ui:prato-${pot.id}`, 'grande')}<p><b>${esc(t('cook.ready', { dish: dish(pot.id) }))}</b></p></div>` +
         `<div class="botoes"><button class="btn verde grande" data-action="servir">${esc(t('cook.serve'))}</button></div>`;
     } else if (pot) {
-      const total = engine.cookTime(engine.recipe(pot.id));
       status = `<div class="linha">${ctx.icon(`ui:prato-${pot.id}`, 'grande')}<p>${t('cook.cooking', { dish: esc(dish(pot.id)), time: until(pot.readyAt, ctx.now) })}</p></div>` +
-        bar(total - (pot.readyAt - ctx.now), total, 'fogo');
+        timedBar(pot.startAt, pot.readyAt, ctx.now, 'fogo');
     } else status = `<p>${esc(t('cook.empty'))}</p>`;
     const served = engine.cookBonus() > 0 ? `<p class="miudo">${t('cook.active', { dish: esc(dish(s.cozinha.buff.id)),
       v: Math.round(engine.cookBonus() * 100), time: until(s.cozinha.buff.until, ctx.now) })}</p>` : '';
@@ -702,6 +724,8 @@
       [t('stats.bingos'), number(s.stats.bingos)], [t('stats.contests'), `${number(s.stats.contestWins)}/${number(s.stats.contests)}`]
     ];
     const zoom = Math.round((st.zoom || 1) * 100);
+    const customPositions = st.placa || st.casa || Object.values(st.minis || {})
+      .some(entry => Number.isFinite(entry?.dx) && Number.isFinite(entry?.dy));
     const scale = ZOOMS.map(value => `<button class="chip ${Math.abs(zoom - value) < 3 ? 'ativa' : ''}" data-action="zoom" ` +
       `data-value="${value / 100}">${value}%</button>`).join('');
     // O idioma vem primeiro: quem abriu o jogo num idioma que não lê precisa achar isso sem procurar.
@@ -721,7 +745,7 @@
       ['sempre', 'passar'].map(mode => `<button class="chip ${st.hud === mode ? 'ativa' : ''}" data-action="placa" ` +
         `data-value="${mode}">${esc(t(mode === 'sempre' ? 'settings.signAlways' : 'settings.signHover'))}</button>`).join('') +
       `</div><p class="miudo">${esc(t('settings.signHint'))}</p>` +
-      (st.placa || st.casa ? `<div class="botoes"><button class="btn claro" data-action="placa-auto">${esc(t('settings.signAuto'))}</button></div>` : '') +
+      (customPositions ? `<div class="botoes"><button class="btn claro" data-action="placa-auto">${esc(t('settings.signAuto'))}</button></div>` : '') +
       `</div><div class="cartao"><div class="rotulo">${esc(t('settings.numbers'))}</div><div class="numeros">` +
       stats.map(([label, value]) => `<div><span>${esc(label)}</span><b>${value}</b></div>`).join('') + `</div></div></div>` +
       `<div class="cartao"><div class="rotulo">${esc(t('settings.game'))}</div><p class="miudo">${esc(t('settings.saveHint'))}</p>` +
@@ -980,5 +1004,5 @@
   }
 
   return { TABS, TELAS, DOCK, hud, moodTitle, tabs, panel, tela, telaName, vitrine, argolas, compact, duration, percent, number, esc,
-    logText, debugText, t };
+    logText, debugText, productionValues, timeProgress, t };
 });

@@ -1,0 +1,27 @@
+{
+  "electron": "44.4.5",
+  "pid": 48928,
+  "keyboard": {
+    "purchased": true,
+    "focusPreserved": true,
+    "documentFocused": true,
+    "weddingStarted": true,
+    "rice": 10
+  },
+  "before": {
+    "panel": 2,
+    "dock": 1
+  },
+  "after": {
+    "panel": 1,
+    "dock": 2
+  },
+  "giftReceived": true,
+  "focusPreserved": true,
+  "selected": {
+    "panel": 1,
+    "dock": 2
+  },
+  "panelVisible": true,
+  "errors": []
+}

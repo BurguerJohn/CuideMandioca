@@ -210,6 +210,7 @@
     function click(clientX, clientY, now = 0) {
       if (!engineRef || turn) return false;
       const model = engineRef.mini('cordel');
+      if (shown !== model.info().page) return false;
       const found = base.hit(clientX, clientY);
       if (!found) return false;
       if (found.prev || found.next) {

@@ -18,11 +18,13 @@
     const starIndex = fx.ids.indexOf('estrela');
     let engineRef = null;
     let drawnNotes = 0;
+    let shownMode = null;
     const reactUntil = [0, 0, 0];
     const flash = [0, 0, 0];
 
     const songName = id => engineRef?.data.minis.palco.songs.find(entry => entry.id === id)?.name || id;
     const laneAt = x => Math.max(0, Math.min(2, Math.floor(x / (W / 3))));
+    const modeOf = info => info.last ? 'result' : info.show ? 'show' : 'menu';
 
     function panel(x, y, w, h) {
       base.g.fillStyle = 'rgba(14, 10, 30, 0.86)';
@@ -141,6 +143,7 @@
       base.drawSays(now);
       if (info.last) drawResult(info, now);
       else if (!info.show) drawMenu(info, now);
+      shownMode = modeOf(info);
       return true;
     }
 
@@ -148,6 +151,7 @@
       if (!engineRef) return false;
       const model = engineRef.mini('palco');
       const info = model.info();
+      if (shownMode !== modeOf(info)) return true;
       if (info.last) { model.ack(); hooks.sound?.('clique'); return true; }
       const found = base.hit(clientX, clientY);
       if (!info.show) {

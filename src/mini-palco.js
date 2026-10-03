@@ -93,7 +93,7 @@
           }
         }
         const lastNote = s.show.notes[s.show.notes.length - 1];
-        if (at > lastNote.t + 1200) finish(s, now);
+        if (at > lastNote.t + 1200) finish(s, s.show.startAt + lastNote.t + 1200);
       },
 
       info() {
@@ -111,6 +111,7 @@
 
       // Começar uma música (aberta): no descanso do palco é só ensaio, sem prêmio.
       start(id) {
+        this.tick();
         const s = tools.state();
         const c = tools.cfg();
         const index = c.songs.findIndex(entry => entry.id === id);
@@ -126,6 +127,7 @@
 
       // Um clique na pista: acerta a nota mais antiga da pista que está dentro da janela de tempo.
       hit(lane) {
+        this.tick();
         const s = tools.state();
         const c = tools.cfg();
         if (!s.show) return { ok: false, reason: 'idle' };
@@ -143,6 +145,7 @@
 
       // Parar o show no meio (sem prêmio, sem descanso).
       abort() {
+        this.tick();
         const s = tools.state();
         if (!s.show) return { ok: false };
         finish(s, tools.now(), true);

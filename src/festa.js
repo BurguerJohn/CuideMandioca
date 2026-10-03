@@ -12,7 +12,7 @@
     Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111',
     2: '111001111100111', 3: '111001111001111', 4: '101101111001001', 5: '111100111001111',
     6: '111100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001111',
-    '+': '000010111010000', '-': '000000111000000', '.': '000000000000010', ',': '000000000010100',
+    '%': '101001010100101', '+': '000010111010000', '-': '000000111000000', '.': '000000000000010', ',': '000000000010100',
     '!': '010010010000010', '?': '111001011000010', ':': '000010000010000', ' ': '000000000000000'
   };
   const INK = '#120906';
@@ -134,8 +134,15 @@
       const image = new Image();
       pending++;
       image.onload = () => { pending--; };
-      image.src = src;
       images[name] = image;
+      image.onerror = () => {
+        // Uma folha sem dados não impede todas as outras de aparecer nem é enviada ao drawImage.
+        const blank = document.createElement('canvas');
+        blank.width = blank.height = 1;
+        images[name] = blank;
+        pending--;
+      };
+      image.src = src;
     }
     // Ícones do painel que a festa também desenha (a figurinha nova do Álbum), carregados só quando precisa.
     const iconImages = {};
@@ -1411,9 +1418,9 @@
         const phase = (seed % 100) / 100;
         const steps = crowd.steps || 2;
         const beat = Math.floor(now / (760 / steps) + phase * steps) % steps;
-        const entries = flipEvery ? [[0, false], [13, true]] : [[0, (seed >> 3) % 2 === 0]];
+        const entries = flipEvery ? [[0, false], [13, true]] : [[0, (seed >>> 3) % 2 === 0]];
         for (const [dx, flip] of entries) {
-          const type = flipEvery ? (dx ? 1 : 0) : (seed >> 5) % 2;
+          const type = flipEvery ? (dx ? 1 : 0) : (seed >>> 5) % 2;
           let x = guest.x + dx;
           if (weave) x += Math.round((guest.index % 2 ? 1 : -1) * Math.sin(now / 620 + guest.index * 0.9) * 9 * weave);
           const move = dancing && fx.callMove && now - fx.callMove.at < 3500 ? fx.callMove : null;
@@ -2162,7 +2169,7 @@
     // Guarda-chuva das pessoas da festa quando chove (a maioria abre um).
     function guestUmbrella(seed, x, top, joke = false) {
       if (joke ? seed % 4 === 0 : fx.wx.rain < 0.15 || seed % 3 === 0) return;
-      g.drawImage(umbrella((seed >> 4) % FLAGS.length, 9), Math.round(x + 5), Math.round(top - 4));
+      g.drawImage(umbrella((seed >>> 4) % FLAGS.length, 9), Math.round(x + 5), Math.round(top - 4));
     }
 
     // Lua de verdade: a fase vem do relógio (mês lunar de 29,53 dias a partir de uma lua nova conhecida). 0 = nova,
@@ -4187,9 +4194,11 @@
       'tier-up': 'estrela', 'bingo-win': 'estrela', 'leilao-sold': 'estrela', 'saco-end': 'estrela', 'pote-break': 'estrela',
       grow: 'estrela', learn: 'estrela', legendary: 'estrela', contest: 'estrela', poke: 'feliz', equip: 'feliz', 'cobra-caught': 'feliz', foto: 'estrela', 'burro-pin': 'feliz', compadres: 'coracao', 'flag-caught': 'feliz', 'cook-served': 'coracao', feed: 'feliz' };
     function onEvents(engine, events, now = root.performance?.now?.() || 0) {
-      if (Array.isArray(events) && events.some(event => event.type === 'new-year')) {
+      const newYear = Array.isArray(events) ? events.findLastIndex(event => event.type === 'new-year') : -1;
+      if (newYear >= 0) {
         reset();
         draw(engine, now);
+        events = events.slice(newYear);
       }
       // O Rafael chamado (ou digitando "yeye" de novo): grita assim que for desenhado.
       if (Array.isArray(events) && events.some(event => event.type === 'rafael')) fx.rafael.shout = now;

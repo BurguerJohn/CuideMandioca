@@ -1,0 +1,141 @@
+{
+  "cases": [
+    {
+      "language": "pt-BR",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 2,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "pt-BR",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 2,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "pt-BR",
+      "mode": "new-year-before-prize",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 22,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "pt-BR",
+      "mode": "new-year-after-prize",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 22,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "en",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 2,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "en",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 2,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "en",
+      "mode": "new-year-before-prize",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 22,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "en",
+      "mode": "new-year-after-prize",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 22,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "es",
+      "mode": "continuous",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 2,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "es",
+      "mode": "reload-each",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 2,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "es",
+      "mode": "new-year-before-prize",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 22,
+        "tickets": 13
+      }
+    },
+    {
+      "language": "es",
+      "mode": "new-year-after-prize",
+      "passed": true,
+      "result": {
+        "completed": 20,
+        "pending": 0,
+        "year": 22,
+        "tickets": 13
+      }
+    }
+  ],
+  "actions": 1728,
+  "reloads": 474,
+  "newYears": 132,
+  "completedPages": 240,
+  "failures": []
+}

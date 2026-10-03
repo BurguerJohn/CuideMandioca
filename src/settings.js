@@ -28,10 +28,12 @@
   function minisSettings(value) {
     const result = {};
     if (!value || typeof value !== 'object') return result;
-    for (const [id, entry] of Object.entries(value).slice(0, 32)) {
+    let count = 0;
+    for (const [id, entry] of Object.entries(value)) {
       if (!/^[a-z][a-z0-9-]{0,24}$/.test(id) || !entry || typeof entry !== 'object') continue;
       const spot = placaOffset(entry);
       result[id] = { hidden: entry.hidden !== false, ...(spot || {}) };
+      if (++count === 32) break;
     }
     return result;
   }

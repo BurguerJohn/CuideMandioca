@@ -1,0 +1,2198 @@
+{
+  "cases": [
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "perfect-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "good-early",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "good-late",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "mixed",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "tick",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "save",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "half",
+      "method": "new-year",
+      "passed": true
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "new-year",
+      "passed": true
+    }
+  ],
+  "actions": 37779,
+  "reloads": 864,
+  "newYears": 96,
+  "shows": 1056,
+  "practices": 168,
+  "aborted": 168,
+  "notes": 35019,
+  "firstPrizes": 108,
+  "failures": [
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "pt-BR",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "en",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 0,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ {}\n- {\n-   xote: 0\n- }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 1,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   baiao: 0,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 2,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'forro-ouro': 0,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "tick",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    },
+    {
+      "language": "es",
+      "songIndex": 3,
+      "profile": "miss",
+      "method": "save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n-   'arrasta-pe': 0,\n    'forro-ouro': 1,\n    baiao: 1,\n    xote: 1\n  }\n\n    at Object.reload (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:81:72)\n    at Object.<anonymous> (C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\palco-progression-audit.cjs:211:14)\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "seeds": 12,
+  "actions": 12000,
+  "reloads": 480,
+  "newYears": 60,
+  "rewards": 440,
+  "failures": []
+}

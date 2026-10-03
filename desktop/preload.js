@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld('arraiaDesktop', Object.freeze({
   // A janela parou de receber o mouse (depois do repouso): o jogo abre uma nova.
   repair: () => ipcRenderer.send('desktop:repair'),
   setFocusable: focusable => ipcRenderer.send('desktop:set-focusable', focusable),
-  focusGame: () => ipcRenderer.send('desktop:focus-game'),
+  focusGame: request => ipcRenderer.send('desktop:focus-game', request),
   logError: text => ipcRenderer.send('desktop:log-error', String(text).slice(0, 4000)),
   quit: () => ipcRenderer.send('desktop:quit'),
   onCommand: callback => ipcRenderer.on('desktop:command', (_event, command) => callback(command))

@@ -1,0 +1,278 @@
+{
+  "cases": [
+    {
+      "name": "mail-1-continuous",
+      "result": {
+        "letters": 4,
+        "paid": 12
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-1-reload",
+      "result": {
+        "letters": 4,
+        "paid": 12
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-10-continuous",
+      "result": {
+        "letters": 4,
+        "paid": 16
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-10-reload",
+      "result": {
+        "letters": 4,
+        "paid": 16
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-25-continuous",
+      "result": {
+        "letters": 4,
+        "paid": 20
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-25-reload",
+      "result": {
+        "letters": 4,
+        "paid": 20
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-50-continuous",
+      "result": {
+        "letters": 4,
+        "paid": 24
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-50-reload",
+      "result": {
+        "letters": 4,
+        "paid": 24
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-100-continuous",
+      "result": {
+        "letters": 4,
+        "paid": 28
+      },
+      "passed": true
+    },
+    {
+      "name": "mail-100-reload",
+      "result": {
+        "letters": 4,
+        "paid": 28
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-galinha-continuous",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "tickets": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-galinha-reload",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "tickets": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-gato-continuous",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "cheer": 90
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-gato-reload",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "cheer": 90
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-bode-continuous",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "belly": 25
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-bode-reload",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "belly": 25
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-caramelo-continuous",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "wood": 3
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-caramelo-reload",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "wood": 3
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-papagaio-continuous",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "tickets": 1,
+          "love": 4
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-papagaio-reload",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "tickets": 1,
+          "love": 4
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-jegue-continuous",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "wood": 4,
+          "tickets": 1
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-jegue-reload",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "wood": 4,
+          "tickets": 1
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-boi-continuous",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "cheer": 300,
+          "tickets": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "gift-boi-reload",
+      "result": {
+        "gifts": 2,
+        "reward": {
+          "cheer": 300,
+          "tickets": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "photographer-arrival--1",
+      "result": {
+        "paid": 0,
+        "pictures": 0
+      },
+      "passed": true
+    },
+    {
+      "name": "photographer-arrival-0",
+      "result": {
+        "paid": 6,
+        "pictures": 1
+      },
+      "passed": true
+    },
+    {
+      "name": "photographer-arrival-1",
+      "result": {
+        "paid": 6,
+        "pictures": 1
+      },
+      "passed": true
+    },
+    {
+      "name": "photographer-departure--1",
+      "result": {
+        "pictures": 1
+      },
+      "passed": true
+    },
+    {
+      "name": "photographer-departure-0",
+      "result": {
+        "pictures": 0
+      },
+      "passed": true
+    },
+    {
+      "name": "photographer-departure-1",
+      "result": {
+        "pictures": 0
+      },
+      "passed": true
+    }
+  ],
+  "reloads": 216,
+  "actions": 466,
+  "failures": []
+}

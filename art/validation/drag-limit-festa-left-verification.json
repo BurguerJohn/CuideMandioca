@@ -1,0 +1,436 @@
+{
+  "pid": 45756,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-45756-vMHf6p",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "mixedKeyboardButtons": false,
+  "keyboardRedraw": false,
+  "cardSpaceRepeat": false,
+  "languageGestures": false,
+  "multiTouch": false,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "touchDrag": {
+    "phase": "prepare",
+    "surface": "festa",
+    "scrolling": false,
+    "canvas": false,
+    "area": "",
+    "dragLimit": true,
+    "limitEdge": "left",
+    "pointerType": "touch",
+    "prepared": {
+      "point": {
+        "x": 843,
+        "y": 787
+      },
+      "touchAction": "none",
+      "expectedDrag": "festa",
+      "scrollAxis": "y",
+      "viewport": {
+        "width": 1104,
+        "height": 819,
+        "dpr": 1.25
+      },
+      "delta": {
+        "x": -827,
+        "y": 0
+      },
+      "scrollHeight": 326,
+      "clientHeight": 326
+    },
+    "before": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 553,
+      "top": 492.8000183105469,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [],
+      "prefs": {
+        "x": 0.72,
+        "lift": 0
+      }
+    },
+    "pressed": {
+      "x": 0.72,
+      "lift": 0,
+      "left": 553,
+      "top": 492.8000183105469,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "festa",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6745.600000143051,
+          "x": 843,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6746.5,
+          "x": 843,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "x": 0.72,
+        "lift": 0
+      }
+    },
+    "firstMoved": {
+      "x": 0.21884057971014495,
+      "lift": 0,
+      "left": 0,
+      "top": 492.8000183105469,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "festa",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6745.600000143051,
+          "x": 843,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6746.5,
+          "x": 843,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11747.700000047684,
+          "x": 16,
+          "y": 787,
+          "button": -1,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11748.299999952316,
+          "x": 16,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "x": 0.21884057971014495,
+        "lift": 0
+      }
+    },
+    "lastMoved": {
+      "x": 0.23695652173913045,
+      "lift": 0,
+      "left": 20,
+      "top": 492.8000183105469,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": "festa",
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6745.600000143051,
+          "x": 843,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6746.5,
+          "x": 843,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11747.700000047684,
+          "x": 16,
+          "y": 787,
+          "button": -1,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11748.299999952316,
+          "x": 16,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16755.400000095367,
+          "x": 36,
+          "y": 787,
+          "button": -1,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16755.700000047684,
+          "x": 36,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "x": 0.23695652173913045,
+        "lift": 0
+      }
+    },
+    "ended": {
+      "x": 0.23695652173913045,
+      "lift": 0,
+      "left": 20,
+      "top": 492.8000183105469,
+      "scrollTop": 0,
+      "scrollLeft": 0,
+      "category": "melhorias",
+      "tickets": 94,
+      "ownsCard": false,
+      "equipped": {
+        "chapeu": "palha-furada",
+        "mao": "bandeirinha",
+        "tecido": "xadrez-vermelho",
+        "terreiro": "terra-batida",
+        "esquerda": "fardo",
+        "direita": "mastro",
+        "varal": "varal-colorido"
+      },
+      "drag": null,
+      "mousePress": false,
+      "focused": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 6745.600000143051,
+          "x": 843,
+          "y": 787,
+          "button": 0,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "at": 6746.5,
+          "x": 843,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 11747.700000047684,
+          "x": 16,
+          "y": 787,
+          "button": -1,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 11748.299999952316,
+          "x": 16,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "pointermove",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 16755.400000095367,
+          "x": 36,
+          "y": 787,
+          "button": -1,
+          "buttons": 1,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchmove",
+          "trusted": true,
+          "at": 16755.700000047684,
+          "x": 36,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "pointerup",
+          "pointerId": 2,
+          "pointerType": "touch",
+          "primary": true,
+          "trusted": true,
+          "at": 20761.799999952316,
+          "x": 36,
+          "y": 787,
+          "button": 0,
+          "buttons": 0,
+          "target": "CANVAS",
+          "connected": true
+        },
+        {
+          "type": "touchend",
+          "trusted": true,
+          "at": 20764.10000014305,
+          "x": 36,
+          "y": 787,
+          "target": "CANVAS",
+          "connected": true
+        }
+      ],
+      "prefs": {
+        "x": 0.23695652173913045,
+        "lift": 0
+      }
+    },
+    "saved": {
+      "x": 0.23695652173913045,
+      "lift": 0
+    }
+  }
+}

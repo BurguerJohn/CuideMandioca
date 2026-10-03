@@ -1,0 +1,183 @@
+{
+  "electron": "44.4.5",
+  "pid": 21876,
+  "results": [
+    {
+      "viewport": {
+        "width": 360,
+        "height": 240
+      },
+      "previous": {
+        "x": 56,
+        "y": 284
+      },
+      "resident": 9,
+      "canvasTarget": true,
+      "reacted": true,
+      "scrollGesture": {
+        "oldResident": 19,
+        "newResident": null,
+        "freshResident": 51,
+        "cancelled": true,
+        "freshWorks": true
+      },
+      "titleVisible": true,
+      "helpAtStart": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "viewport": {
+        "width": 360,
+        "height": 360
+      },
+      "previous": {
+        "x": 56,
+        "y": 164
+      },
+      "resident": 9,
+      "canvasTarget": true,
+      "reacted": true,
+      "scrollGesture": {
+        "oldResident": 19,
+        "newResident": 49,
+        "freshResident": 49,
+        "cancelled": true,
+        "freshWorks": true
+      },
+      "titleVisible": true,
+      "helpAtStart": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "viewport": {
+        "width": 640,
+        "height": 360
+      },
+      "previous": {
+        "x": 0,
+        "y": 154
+      },
+      "resident": 9,
+      "canvasTarget": true,
+      "reacted": true,
+      "scrollGesture": {
+        "oldResident": 19,
+        "newResident": 49,
+        "freshResident": 49,
+        "cancelled": true,
+        "freshWorks": true
+      },
+      "titleVisible": true,
+      "helpAtStart": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    }
+  ],
+  "minis": [
+    {
+      "id": "cordel",
+      "previous": {
+        "x": 0,
+        "y": 76
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "bichos",
+      "previous": {
+        "x": 0,
+        "y": 20
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "aquario",
+      "previous": {
+        "x": 0,
+        "y": 20
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "horta",
+      "previous": {
+        "x": 0,
+        "y": 32
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "fogueira",
+      "previous": {
+        "x": 0,
+        "y": 28
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "palco",
+      "previous": {
+        "x": 0,
+        "y": 36
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "mata",
+      "previous": {
+        "x": 0,
+        "y": 76
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "ceu",
+      "previous": {
+        "x": 0,
+        "y": 36
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    },
+    {
+      "id": "bairro",
+      "previous": {
+        "x": 0,
+        "y": 36
+      },
+      "titleVisible": true,
+      "scrollAtStart": true,
+      "restored": true,
+      "reopenedAtStart": true
+    }
+  ],
+  "errors": []
+}

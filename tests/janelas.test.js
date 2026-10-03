@@ -26,9 +26,9 @@ function setup(level, options = {}) {
   const host = globalThis.ArraiaJanelas.create({
     document: globalThis.document, engine, sprites: bundle,
     anchor: () => ({ left: 400, width: 800, lift: 20, top: 100 }),
-    settings: () => settings, changeSettings: partial => Object.assign(settings, partial),
+    settings: () => settings, changeSettings: options.changeSettings || (partial => Object.assign(settings, partial)),
     placaRect: () => null, size: () => ({ width: 1600, height: 1000 }),
-    t: options.t || (key => key), sound: name => sounds.push(name), toast: text => toasts.push(text)
+    t: options.t || (key => key), sound: name => sounds.push(name), toast: text => toasts.push(text), focused: options.focused
   });
   return { host, engine, settings, sounds, toasts, clock, bundle };
 }
@@ -78,6 +78,29 @@ test('janela que acabou de abrir aparece sozinha e avisa; a festa escondida esco
   assert.equal(host.windows.get('bichos').element.hidden, true, 'festa escondida: janelas escondidas');
 });
 
+test('janelas abertas no mesmo quadro preservam todas as preferências enquanto o desktop ainda responde', () => {
+  const pending = [];
+  const { host, engine, settings } = setup(5, { changeSettings: partial => pending.push(partial) });
+  engine.state.records.size = 40;
+  const ids = ['cordel', 'bichos', 'aquario', 'horta'];
+  host.onEvents(ids.map(id => ({ type: 'mini-open', id })), 1000);
+  for (const id of ids) assert.equal(host.visible(id), true, `${id} aparece sem depender da resposta IPC`);
+  for (const partial of pending) Object.assign(settings, partial);
+  for (const id of ids) assert.equal(host.visible(id), true, `${id} continua aberta quando as respostas chegam`);
+  assert.deepEqual(Object.keys(settings.minis).sort(), [...ids].sort(), 'o último mapa preserva as aberturas anteriores');
+});
+
+test('dois cliques para abrir e fechar uma janela funcionam antes de a resposta do desktop chegar', () => {
+  const pending = [];
+  const { host, settings } = setup(20, { changeSettings: partial => pending.push(partial) });
+  host.toggle('bichos');
+  host.toggle('bichos');
+  for (const partial of pending) Object.assign(settings, partial);
+  host.place('bichos');
+  assert.equal(host.visible('bichos'), false, 'o segundo clique fecha, em vez de pedir para abrir de novo');
+  assert.equal(settings.minis.bichos.hidden, true);
+});
+
 test('janela arrastada guarda onde ficou em relação à festa e volta para lá', () => {
   const { host, settings } = setup(20, { minis: { bichos: { hidden: false } } });
   host.restore();
@@ -93,6 +116,112 @@ test('janela arrastada guarda onde ficou em relação à festa e volta para lá'
   host.place('bichos');
   assert.equal(settings.minis.bichos.dx, moved.dx);
   assert.equal(item.element.style.left, `${Math.max(6, Math.round(400 + moved.dx))}px`);
+});
+
+test('recuar da borda retoma imediatamente o arrasto de todas as janelas extras', () => {
+  for (const id of data.minis.windows.map(entry => entry.id)) for (const axis of ['x', 'y']) for (const direction of [-1, 1]) {
+    const { host, settings } = setup(125, { minis: { [id]: { hidden: false } } });
+    host.restore();
+    const item = host.windows.get(id);
+    assert.ok(item, id);
+    const target = { closest: selector => selector === '.mini' ? item.element : null, classList: { contains: () => false } };
+    const drag = host.dragStart(target, { clientX: 100, clientY: 100 });
+    const move = amount => host.dragMove(drag, axis === 'x' ? amount : 0, axis === 'y' ? -amount : 0);
+    const position = () => parseFloat(item.element.style[axis === 'x' ? 'left' : 'bottom']);
+    const delta = direction * 4000;
+    move(delta);
+    const edge = position();
+    assert.ok(Number.isFinite(edge), id + ': measurable position');
+    move(delta - direction * 10);
+    assert.equal(position(), edge - direction * 10, `${id}/${axis}/${direction}: reversing by 10 moves by 10`);
+    move(delta - direction * 20);
+    assert.equal(position(), edge - direction * 20);
+    for (let i = 1; i <= 20; i++) move(delta - direction * (20 + i / 10));
+    assert.equal(position(), edge - direction * 22, 'fractional movements accumulate across frames');
+    drag.moved = true;
+    host.dragEnd(drag, 2000);
+    host.place(id);
+    assert.equal(position(), edge - direction * 22, 'the saved position survives placement');
+    assert.ok(Number.isFinite(settings.minis[id].dx) && Number.isFinite(settings.minis[id].dy));
+  }
+});
+
+test('clicar na moldura do quintal permite arrastar sem jogar milho na cena', () => {
+  const { host, engine } = setup(31, { minis: { bichos: { hidden: false } } });
+  host.restore();
+  host.draw(1000);
+  const item = host.windows.get('bichos');
+  const rect = item.canvas.getBoundingClientRect();
+  const grain = engine.mini('bichos').info().grain;
+  item.element.closest = item.canvas.closest = selector => selector === '.mini' ? item.element : null;
+  const frameDrag = host.dragStart(item.element, { clientX: rect.left - 4, clientY: rect.top + rect.height * 0.8 });
+  assert.equal(frameDrag.kind, 'mini', 'a moldura continua sendo alça para arrastar');
+  host.dragEnd(frameDrag, 1000);
+  assert.equal(engine.mini('bichos').info().grain, grain, 'clique fora do canvas não alimenta um bicho');
+  assert.equal(item.view.probe().grains, 0);
+  const sceneDrag = host.dragStart(item.canvas, { clientX: rect.left + rect.width * 0.4, clientY: rect.top + rect.height * 0.8 });
+  host.dragEnd(sceneDrag, 1000);
+  assert.equal(engine.mini('bichos').info().grain, grain - 1, 'o clique no chão do canvas ainda alimenta');
+  assert.equal(item.view.probe().grains, 1);
+});
+
+test('a ajuda abre desde o início e devolve a rolagem da cena ao fechar ou esconder o minijogo', () => {
+  const { host } = setup(20, { minis: { bichos: { hidden: false } } });
+  host.restore();
+  const item = host.windows.get('bichos');
+  item.scene = globalThis.document.createElement('div');
+  item.scene.scrollLeft = 50; item.scene.scrollTop = 140;
+  let helpScroll = 80;
+  Object.defineProperty(item.help, 'scrollTop', { get: () => helpScroll,
+    set: value => { if (!item.help.hidden) helpScroll = value; } });
+  host.setHelp('bichos', true);
+  assert.equal(item.scene.scrollLeft, 0);
+  assert.equal(item.scene.scrollTop, 0);
+  assert.equal(item.help.scrollTop, 0, 'o texto começa no topo depois de ficar visível');
+  item.help.scrollTop = 120;
+  host.setHelp('bichos', true);
+  assert.equal(item.help.scrollTop, 0);
+  host.setHelp('bichos', false);
+  assert.equal(item.scene.scrollLeft, 50);
+  assert.equal(item.scene.scrollTop, 140, 'abrir a ajuda novamente não troca a posição guardada');
+  host.setHelp('bichos', true);
+  host.close('bichos');
+  assert.equal(item.help.hidden, true);
+  assert.equal(item.scene.scrollLeft, 50);
+  assert.equal(item.scene.scrollTop, 140, 'esconder o minijogo também termina a ajuda e restaura a cena');
+});
+
+test('abrir a ajuda ou esconder a janela ou a festa cancela o clique e o arrasto já iniciados na cena', () => {
+  const cases = ['help', 'hide', 'all'].flatMap(cancel => [false, true].flatMap(reopen => [false, true].map(moved => ({ cancel, reopen, moved }))));
+  for (const { cancel, reopen, moved } of cases) {
+      const { host, engine, settings } = setup(31, { minis: { bichos: { hidden: false } } });
+      host.restore();
+      host.draw(1000);
+      const item = host.windows.get('bichos');
+      item.canvas.closest = selector => selector === '.mini' ? item.element : null;
+      const rect = item.canvas.getBoundingClientRect();
+      const grain = engine.mini('bichos').info().grain;
+      const event = { clientX: rect.left + rect.width * 0.4, clientY: rect.top + rect.height * 0.8 };
+      const interrupted = host.dragStart(item.canvas, event);
+      if (moved) { interrupted.moved = true; host.dragMove(interrupted, 5, 5); }
+      if (cancel === 'help') { host.setHelp('bichos', true); if (reopen) host.setHelp('bichos', false); }
+      else if (cancel === 'hide') { host.close('bichos'); if (reopen) host.setHidden('bichos', false); }
+      else {
+        settings.hidden = true;
+        host.placeAll();
+        if (reopen) { settings.hidden = false; host.placeAll(); }
+      }
+      const before = { ...settings.minis.bichos };
+      if (moved) host.dragMove(interrupted, -40, 25);
+      assert.deepEqual(settings.minis.bichos, before, 'o gesto cancelado não move nem reabre a janela');
+      host.dragEnd(interrupted, 1040);
+      assert.equal(engine.mini('bichos').info().grain, grain, `${cancel}/${reopen}: o soltar não joga milho atrás da ajuda ou da janela fechada`);
+      if (reopen) {
+        const next = host.dragStart(item.canvas, event);
+        host.dragEnd(next, 1080);
+        assert.equal(engine.mini('bichos').info().grain, grain - 1, 'um clique novo funciona depois de voltar à cena');
+      }
+  }
 });
 
 test('as preferências das janelas são saneadas', () => {
@@ -146,6 +275,47 @@ test('bichos: o quintal desenha, o bicho reage ao carinho, o milho chama o bicho
   assert.ok(sounds.includes('moeda'));
 });
 
+test('bichos: o centro do presente desenhado pode ser clicado sem cair no chão', () => {
+  const { host, engine, sounds } = setup(12, { minis: { bichos: { hidden: false } } });
+  const draws = [];
+  const make = document.createElement;
+  document.createElement = tag => {
+    const element = make(tag);
+    if (tag === 'canvas') {
+      const g = element.getContext('2d');
+      const drawImage = g.drawImage;
+      g.drawImage = (...args) => { draws.push(args); drawImage(...args); };
+      element.getContext = () => g;
+    }
+    return element;
+  };
+  try { host.restore(); } finally { document.createElement = make; }
+  const cat = engine.state.minis.bichos.pets.gato || (engine.state.minis.bichos.pets.gato = { petAt: 0, giftAt: 0 });
+  cat.bond = data.minis.bichos.bondMax;
+  cat.ready = true;
+  host.draw(1000);
+  const meta = bundle.janelas.bichos.presentes;
+  const giftId = data.minis.bichos.pets.find(pet => pet.id === 'gato').gift;
+  const gift = draws.find(args => args[0].value === bundle.images[meta.image] && args[1] === meta.ids.indexOf(giftId) * meta.w);
+  assert.ok(gift, 'o presente do gato foi desenhado');
+  const item = host.windows.get('bichos');
+  const rect = item.canvas.getBoundingClientRect();
+  const { width, height } = item.view.probe().size;
+  const x = rect.left + (gift[5] + gift[7] / 2) * rect.width / width;
+  const y = rect.top + (gift[6] + gift[8] / 2) * rect.height / height;
+  const grain = engine.mini('bichos').info().grain;
+  assert.equal(item.view.hit(x, y)?.pet, 'gato', 'a área do presente pertence ao gato');
+  item.view.click(x, y, 1000);
+  assert.equal(cat.ready, false, 'o clique entregou o presente');
+  assert.equal(engine.mini('bichos').info().grain, grain, 'o clique não jogou milho');
+  assert.ok(sounds.includes('moeda'));
+  item.view.click(x, y, 1001);
+  assert.equal(cat.bond, 0, 'repetir o clique no presente coletado não faz carinho fora do bicho');
+  host.draw(1040);
+  clickArea(host, 'bichos', 'pet:gato', 1040);
+  assert.equal(cat.bond, data.minis.bichos.petBond, 'o carinho no bicho continua funcionando');
+});
+
 test('bichos: sem milho o clique no chão não faz nada além do aviso, e o desenho não acumula efeitos', () => {
   const { host, engine, sounds } = setup(125, { minis: { bichos: { hidden: false } } });
   host.restore();
@@ -163,6 +333,71 @@ test('bichos: sem milho o clique no chão não faz nada além do aviso, e o dese
 });
 
 // --- Aquário --------------------------------------------------------------------------------------------------------------
+test('bichos: clicar no último pixel do pé do pintinho respeita a posição arredondada do desenho', () => {
+  const originalDpr = globalThis.devicePixelRatio;
+  try {
+    globalThis.devicePixelRatio = 1.25;
+    const { host, engine, sounds } = setup(12, { minis: { bichos: { hidden: false } } });
+    host.restore();
+    const item = host.windows.get('bichos');
+    item.view.setScale(3);
+    item.canvas.getBoundingClientRect = () => ({ left: 347, top: 115,
+      width: parseFloat(item.canvas.style.width), height: parseFloat(item.canvas.style.height) });
+    item.view.draw(engine, 1040);
+    const chick = item.view.probe().areas.find(area => area.id === 'chick:1');
+    const sheet = bundle.scenery.pintinho;
+    const x = Math.round(chick.x + 1) + 2.5;
+    const bottom = Math.round(chick.y + 2) + sheet.h;
+    const rect = item.canvas.getBoundingClientRect();
+    const size = item.view.probe().size;
+    // O pé opaco termina em y76; em DPR125% o último pixel da tela cai em y75,9375.
+    const clientX = Math.floor(rect.left + x * rect.width / size.width);
+    const clientY = Math.ceil(rect.top + bottom * rect.height / size.height) - 1;
+    assert.equal(item.view.hit(clientX, clientY)?.id, 'chick:1', 'o pé pertence ao pintinho, mesmo após arredondar para a grade de pixels');
+    const grain = engine.mini('bichos').info().grain;
+    item.view.click(clientX, clientY, 1040);
+    assert.equal(engine.mini('bichos').info().grain, grain, 'o clique no pé não joga milho no chão');
+    assert.equal(sounds.at(-1), 'pintinho');
+    assert.equal(item.view.probe().grains, 0);
+  } finally {
+    if (originalDpr === undefined) delete globalThis.devicePixelRatio;
+    else globalThis.devicePixelRatio = originalDpr;
+  }
+});
+
+test('bichos: o pé da galinha em movimento dá carinho sem gastar milho', () => {
+  const originalDpr = globalThis.devicePixelRatio;
+  try {
+    globalThis.devicePixelRatio = 1.25;
+    const { host, engine, sounds } = setup(12, { minis: { bichos: { hidden: false } } });
+    host.restore();
+    const item = host.windows.get('bichos');
+    item.view.setScale(3);
+    item.canvas.getBoundingClientRect = () => ({ left: 347, top: 115,
+      width: parseFloat(item.canvas.style.width), height: parseFloat(item.canvas.style.height) });
+    for (let now = 1040; now <= 11320; now += 40) item.view.draw(engine, now);
+    const pet = item.view.probe().areas.find(area => area.id === 'pet:galinha');
+    const sheet = bundle.scenery.galinha;
+    const rect = item.canvas.getBoundingClientRect();
+    const size = item.view.probe().size;
+    // A galinha está andando para a direita no quadro0: o pé opaco está em x3 da folha.
+    const x = Math.round(pet.x + 1) + 3.5;
+    const bottom = Math.round(pet.y + 6) + sheet.h;
+    const clientX = Math.floor(rect.left + x * rect.width / size.width);
+    const clientY = Math.ceil(rect.top + bottom * rect.height / size.height) - 1;
+    assert.equal(item.view.hit(clientX, clientY)?.id, 'pet:galinha');
+    const grain = engine.mini('bichos').info().grain;
+    item.view.click(clientX, clientY, 11320);
+    assert.equal(engine.mini('bichos').info().grain, grain);
+    assert.equal(engine.mini('bichos').info().pets[0].bond, data.minis.bichos.petBond, 'recebe o laço do carinho, sem o bônus de comida');
+    assert.equal(sounds.at(-1), 'carinho');
+    assert.equal(item.view.probe().grains, 0);
+  } finally {
+    if (originalDpr === undefined) delete globalThis.devicePixelRatio;
+    else globalThis.devicePixelRatio = originalDpr;
+  }
+});
+
 test('aquário: os peixes nadam, a ração cai e o peixe menor vem comer e crescer, e a bolha dourada rende Animação', () => {
   const { host, engine, sounds, toasts } = setup(30, { minis: { aquario: { hidden: false } } });
   host.restore();
@@ -214,6 +449,167 @@ test('aquário: os peixes nadam, a ração cai e o peixe menor vem comer e cresc
 });
 
 // --- Horta ----------------------------------------------------------------------------------------------------------------
+test('aquário: clicar na barbatana visível acompanha o nado e a escala sem jogar ração', () => {
+  const originalDpr = globalThis.devicePixelRatio;
+  try {
+    for (const dpr of [1, 1.25, 2]) {
+      globalThis.devicePixelRatio = dpr;
+      const { host, engine, clock, sounds } = setup(30, { minis: { aquario: { hidden: false } } });
+      const fishDraws = [];
+      const createElement = document.createElement;
+      document.createElement = tag => {
+        const element = createElement(tag);
+        if (tag === 'canvas') {
+          const g = element.getContext('2d');
+          const drawImage = g.drawImage;
+          let transform = { x: 0, scale: 1 };
+          const stack = [];
+          g.save = () => stack.push({ ...transform });
+          g.restore = () => { transform = stack.pop(); };
+          g.translate = x => { transform.x += x * transform.scale; };
+          g.scale = x => { transform.scale *= x; };
+          g.drawImage = (...args) => {
+            if (args[0].value === bundle.images[bundle.janelas.aquario.peixes.image]) {
+              fishDraws.push({ x: Math.min(transform.x + args[5] * transform.scale,
+                transform.x + (args[5] + args[7]) * transform.scale), y: args[6], flipped: transform.scale < 0 });
+            }
+            drawImage(...args);
+          };
+          element.getContext = () => g;
+        }
+        return element;
+      };
+      try { host.restore(); } finally { document.createElement = createElement; }
+      const model = engine.mini('aquario');
+      const config = data.minis.aquario;
+      // Cresce os peixes iniciais alimentando e esperando a reposição normal do pote.
+      for (let i = 0; i < config.starter * config.growth[1]; i++) {
+        if (!model.info().food) { clock.t += config.foodEvery * config.foodMax * 1000; model.tick(); }
+        assert.equal(model.drop().ok, true);
+      }
+      clock.t += config.foodEvery * config.foodMax * 1000;
+      model.tick();
+      assert.equal(model.info().fish[0].species, 'tilapia');
+      assert.equal(model.info().fish[0].stage, 2);
+      assert.equal(model.addFish('lambari').ok, true, 'um peixe novo ainda pode consumir ração se o clique errar');
+      const item = host.windows.get('aquario');
+      let now = 1000;
+      let previousX;
+      for (const scale of [2, 3]) {
+        item.view.setScale(scale, { width: scale === 2 ? 600 : 320, height: 500 });
+        item.canvas.getBoundingClientRect = () => ({ left: scale === 2 ? 347 : 73, top: 115,
+          width: parseFloat(item.canvas.style.width), height: parseFloat(item.canvas.style.height) });
+        fishDraws.length = 0;
+        item.view.draw(engine, now += 160);
+        const areas = item.view.probe().areas.filter(area => area.id.startsWith('fish:'));
+        const sprite = fishDraws[areas.findIndex(area => area.id === 'fish:1')];
+        assert.ok(sprite, 'a tilápia adulta foi desenhada');
+        // Pixel opaco da barbatana superior da tilápia nos dois quadros (x13, y1 da folha).
+        const x = sprite.x + (sprite.flipped ? 26 - 13.5 : 13.5);
+        const y = sprite.y + 1.5;
+        const rect = item.canvas.getBoundingClientRect();
+        const size = item.view.probe().size;
+        const clientX = rect.left + x * rect.width / size.width;
+        const clientY = rect.top + y * rect.height / size.height;
+        assert.equal(item.view.hit(clientX, clientY)?.id, 'fish:1', `DPR ${dpr}, escala ${scale}: a barbatana é parte do peixe`);
+        const food = model.info().food;
+        item.view.click(clientX, clientY, now);
+        assert.equal(model.info().food, food, 'acariciar o peixe não joga ração no tanque');
+        assert.equal(item.view.probe().flakes, 0);
+        assert.equal(sounds.at(-1), 'bolha');
+        if (previousX !== undefined) assert.notEqual(sprite.x, previousX, 'o alvo acompanha o peixe em movimento');
+        previousX = sprite.x;
+      }
+    }
+  } finally {
+    if (originalDpr === undefined) delete globalThis.devicePixelRatio;
+    else globalThis.devicePixelRatio = originalDpr;
+  }
+});
+
+test('aquário: comida expirada não faz o peixe apagar a ração seguinte', () => {
+  const { host, engine, sounds } = setup(30, { minis: { aquario: { hidden: false } } });
+  host.restore();
+  const state = engine.state.minis.aquario;
+  state.started = true;
+  state.fish = [{ id: 1, species: 'lambari', growth: 5, stage: 1 }];
+  state.nextId = 2;
+  const item = host.windows.get('aquario');
+  let now = 1000;
+  host.draw(now);
+  // Espera uma posição alcançada pelo próprio nado: nenhuma coordenada do peixe é injetada.
+  let corner;
+  for (let i = 0; i < 30000 && !corner; i++) {
+    host.draw(now += 40);
+    const fish = item.view.probe().areas.find(area => area.id === 'fish:1');
+    const x = fish.x + fish.w / 2;
+    const y = fish.y + fish.h / 2;
+    if ((x <= 12.001 || x >= 163.999) && y < 18.5) corner = x < 88 ? 164 : 12;
+  }
+  assert.ok(corner, 'o peixe alcançou uma extremidade perto da superfície');
+  const clickWater = (x, y) => {
+    const rect = item.canvas.getBoundingClientRect();
+    const size = item.view.probe().size;
+    item.view.click(rect.left + x * rect.width / size.width, rect.top + y * rect.height / size.height, now);
+  };
+  clickWater(corner, 71);
+  assert.equal(state.fish[0].stage, 2, 'essa ração torna o peixe adulto e mais lento');
+  for (let i = 0; i < 226; i++) host.draw(now += 40);
+  assert.equal(item.view.probe().flakes, 0, 'a ração venceu antes de o peixe chegar');
+  assert.ok(!sounds.includes('crescer'), 'o peixe ainda não comeu');
+  assert.equal(engine.mini('aquario').addFish('lambari').ok, true);
+  host.onEvents(engine.drainEvents(), now);
+  host.draw(now);
+  clickWater(corner === 12 ? 164 : 12, 71);
+  assert.equal(item.view.probe().flakes, 1);
+  for (let i = 0; i < 8; i++) host.draw(now += 40);
+  assert.equal(item.view.probe().flakes, 1, 'o adulto não remove a ração que pertence ao peixe novo');
+  assert.ok(!sounds.includes('crescer'), 'a comida expirada não gera uma chegada atrasada');
+});
+
+test('aquário: estourar uma bolha remove a clicada e não paga outra no mesmo desenho', () => {
+  const { host, engine } = setup(30, { minis: { aquario: { hidden: false } } });
+  host.restore();
+  engine.state.minis.aquario.fish = [{ id: 1, species: 'dourado', growth: 6, stage: 2 }];
+  engine.state.minis.aquario.bubbles = 2;
+  host.draw(1000);
+  const item = host.windows.get('aquario');
+  const gold = item.view.probe().areas.filter(area => area.id.startsWith('ouro:'));
+  assert.equal(gold.length, 2);
+  const rect = item.canvas.getBoundingClientRect();
+  const size = item.view.probe().size;
+  const x = rect.left + (gold[0].x + gold[0].w / 2) * rect.width / size.width;
+  const y = rect.top + (gold[0].y + gold[0].h / 2) * rect.height / size.height;
+  assert.equal(item.view.hit(x, y).ouro, 0);
+  item.view.click(x, y, 1000);
+  const cheer = engine.state.cheer;
+  item.view.click(x, y, 1001);
+  assert.equal(engine.state.minis.aquario.bubbles, 1, 'um clique repetido no mesmo desenho não estoura a outra bolha');
+  assert.equal(engine.state.cheer, cheer, 'a bolha clicada só entrega um prêmio');
+  host.draw(1040);
+  const remaining = item.view.probe().areas.find(area => area.id.startsWith('ouro:'));
+  assert.ok(Math.hypot(remaining.x - gold[1].x, remaining.y - gold[1].y) < 3, 'a bolha não clicada continua no lugar dela');
+  clickArea(host, 'aquario', remaining.id, 1040);
+  assert.equal(engine.state.minis.aquario.bubbles, 0, 'o clique na outra bolha funciona');
+});
+
+test('aquário: a descoberta avisa uma vez mesmo quando o tanque cheio converte a captura em ficha', () => {
+  const { host, engine, toasts } = setup(30, { minis: { aquario: { hidden: false } } });
+  host.restore();
+  host.draw(1000);
+  const aquario = engine.mini('aquario');
+  const known = aquario.info().seen[0];
+  while (aquario.info().fish.length < data.minis.aquario.tankMax) aquario.addFish(known);
+  engine.drainEvents();
+  const unseen = data.minis.aquario.species.find(species => !aquario.info().seen.includes(species.id)).id;
+  aquario.addFish(unseen);
+  host.onEvents(engine.drainEvents(), 1100);
+  assert.equal(toasts.filter(text => text === 'mini.aquario.newSpecies').length, 1, 'a ficha recebida ainda conta como descoberta');
+  aquario.addFish(unseen);
+  host.onEvents(engine.drainEvents(), 1200);
+  assert.equal(toasts.filter(text => text === 'mini.aquario.newSpecies').length, 1, 'capturar a mesma espécie não repete o aviso');
+});
+
 test('horta: escolhe a semente, planta, rega, colhe e espanta o corvo pelos cliques', () => {
   const { host, engine, sounds, toasts, clock } = setup(30, { minis: { horta: { hidden: false } } });
   host.restore();
@@ -259,6 +655,121 @@ test('horta: escolhe a semente, planta, rega, colhe e espanta o corvo pelos cliq
   clickArea(host, 'horta', 'corvo', now);
   assert.equal(horta.info().crow, null);
   assert.equal(engine.state.minis.horta.scared, 1);
+});
+
+test('horta: a última linha visível da planta rega e colhe o próprio canteiro nas duas fileiras', () => {
+  const originalDpr = globalThis.devicePixelRatio;
+  try {
+    for (const dpr of [1, 1.25, 2]) {
+      globalThis.devicePixelRatio = dpr;
+      for (const index of [0, 5]) {
+        const { host, engine, clock } = setup(80, { minis: { horta: { hidden: false } } });
+        host.restore();
+        const model = engine.mini('horta');
+        assert.equal(model.plant(index, 'milho').ok, true);
+        const item = host.windows.get('horta');
+        item.view.setScale(3, { width: 320, height: 500 });
+        item.canvas.getBoundingClientRect = () => ({ left: 73, top: 115,
+          width: parseFloat(item.canvas.style.width), height: parseFloat(item.canvas.style.height) });
+        const meta = bundle.janelas.horta;
+        // A linha29 da planta fica um pixel abaixo do solo e permanece opaca em todos os estágios.
+        const x = meta.colunas[index % 5] + 17.5;
+        const y = meta.linhas[Math.floor(index / 5)] + meta.canteiro[1] + 0.5;
+        item.view.draw(engine, 1040);
+        const rect = item.canvas.getBoundingClientRect();
+        const size = item.view.probe().size;
+        const clientX = rect.left + x * rect.width / size.width;
+        const clientY = rect.top + y * rect.height / size.height;
+        assert.equal(item.view.hit(clientX, clientY)?.id, `plot:${index}`, `DPR ${dpr}: o broto pertence ao próprio canteiro`);
+        const water = model.info().water;
+        item.view.click(clientX, clientY, 1040);
+        assert.equal(model.info().water, water - 1);
+        assert.equal(model.info().plots[index].waters, 1);
+        // Fica pronta pelo relógio, sem um tick entre a mudança de fase e o desenho.
+        clock.t = engine.state.minis.horta.plots[index].readyAt;
+        item.view.draw(engine, 1600);
+        assert.equal(model.info().plots[index].ready, true);
+        assert.equal(item.view.hit(clientX, clientY)?.id, `plot:${index}`);
+        item.view.click(clientX, clientY, 1600);
+        assert.equal(model.info().plots[index].crop, null, 'o clique colhe a planta que está visível');
+      }
+    }
+  } finally {
+    if (originalDpr === undefined) delete globalThis.devicePixelRatio;
+    else globalThis.devicePixelRatio = originalDpr;
+  }
+});
+
+test('horta: clicar nas patas do corvo durante o balanço espanta em vez de regar', () => {
+  const { host, engine, clock } = setup(30, { minis: { horta: { hidden: false } } });
+  host.restore();
+  const model = engine.mini('horta');
+  assert.equal(model.plant(0, 'abobora').ok, true);
+  model.tick();
+  clock.t = engine.state.minis.horta.crowAt;
+  model.tick();
+  assert.equal(model.info().crow?.plot, 0, 'o corvo veio visitar o único canteiro plantado');
+  const item = host.windows.get('horta');
+  item.view.setScale(2);
+  item.canvas.getBoundingClientRect = () => ({ left: 347, top: 115,
+    width: parseFloat(item.canvas.style.width), height: parseFloat(item.canvas.style.height) });
+  item.view.draw(engine, 1270); // Balanço +1: as patas opacas da linha15 chegam a y+4.
+  const meta = bundle.janelas.horta;
+  const rect = item.canvas.getBoundingClientRect();
+  const size = item.view.probe().size;
+  const clientX = rect.left + (meta.colunas[0] + 6 + 8.5) * rect.width / size.width;
+  const clientY = rect.top + (meta.linhas[0] + 4.5) * rect.height / size.height;
+  assert.equal(item.view.hit(clientX, clientY)?.id, 'corvo', 'a pata visível continua sendo parte do corvo');
+  const water = model.info().water;
+  item.view.click(clientX, clientY, 1270);
+  assert.equal(model.info().water, water);
+  assert.equal(model.info().crow, null);
+  assert.equal(engine.state.minis.horta.scared, 1);
+  item.view.draw(engine, 1310);
+  assert.equal(item.view.hit(clientX, clientY)?.id, 'plot:0', 'o clique volta à planta depois que o corvo vai embora');
+});
+
+test('horta: reabrir antes do próximo desenho não espanta um corvo novo pelo canteiro antigo', () => {
+  const { host, engine, clock } = setup(30, { minis: { horta: { hidden: false } } });
+  host.restore();
+  const model = engine.mini('horta');
+  const state = engine.state.minis.horta;
+  assert.equal(model.plant(0, 'abobora').ok, true);
+  model.tick();
+  clock.t = state.crowAt;
+  model.tick();
+  host.draw(1000);
+  const first = state.crow;
+  assert.equal(first.plot, 0);
+  const item = host.windows.get('horta');
+  item.canvas.closest = selector => selector === '.mini' ? item.element : null;
+  const probe = item.view.probe();
+  const area = probe.areas.find(entry => entry.id === 'corvo');
+  const rect = item.canvas.getBoundingClientRect();
+  const event = { clientX: rect.left + (area.x + area.w / 2) * rect.width / probe.size.width,
+    clientY: rect.top + (area.y + area.h / 2) * rect.height / probe.size.height };
+  assert.equal(model.plant(1, 'abobora').ok, true);
+  host.close('horta');
+  clock.t = first.until;
+  model.tick();
+  assert.equal(state.eaten, 1);
+  clock.t = state.crowAt;
+  model.tick();
+  const next = state.crow;
+  assert.equal(next.plot, 1, 'o segundo corvo pousou na outra planta, enquanto a janela estava fechada');
+  host.setHidden('horta', false);
+  const drag = host.dragStart(item.canvas, event);
+  assert.equal(drag.found.id, 'corvo');
+  const cheer = engine.state.cheer;
+  host.dragEnd(drag, 1040);
+  assert.equal(state.scared, 0, 'o desenho antigo não espanta o corvo de outro canteiro');
+  assert.equal(state.crow, next);
+  assert.equal(engine.state.cheer, cheer, 'não paga por um corvo que ainda não foi apresentado');
+  assert.equal(state.planted, 2, 'o clique antigo também não replanta o canteiro vazio');
+  host.draw(1080);
+  clickArea(host, 'horta', 'corvo', 1080);
+  assert.equal(state.scared, 1, 'o corvo desenhado continua respondendo ao clique');
+  assert.equal(model.info().crow, null);
 });
 
 // --- Fogueira de Perto ----------------------------------------------------------------------------------------------------
@@ -311,6 +822,58 @@ test('fogueira: lenha, escolher a comida, pôr no espeto, virar, tirar no ponto 
   assert.ok(view.probe().particles <= 160);
 });
 
+test('fogueira: o topo da chama alta também pula o fogo após mudar a escala e o DPR', () => {
+  const originalDpr = globalThis.devicePixelRatio;
+  try {
+    for (const dpr of [1, 1.25, 2]) {
+      globalThis.devicePixelRatio = dpr;
+      for (const wood of [4, 5]) {
+        const { host, engine } = setup(40, { minis: { fogueira: { hidden: false } } });
+        const fires = [];
+        const createElement = document.createElement;
+        document.createElement = tag => {
+          const element = createElement(tag);
+          if (tag === 'canvas') {
+            const g = element.getContext('2d');
+            const drawImage = g.drawImage;
+            g.drawImage = (...args) => {
+              if (Object.values(bundle.fires).some(sheet => args[0].value === bundle.images[sheet.image])) fires.push(args);
+              drawImage(...args);
+            };
+            element.getContext = () => g;
+          }
+          return element;
+        };
+        try { host.restore(); } finally { document.createElement = createElement; }
+        const item = host.windows.get('fogueira');
+        const model = engine.mini('fogueira');
+        engine.state.wood = wood;
+        for (let i = 0; i < wood; i++) assert.equal(model.addWood().ok, true);
+        item.view.setScale(2, { width: 600, height: 500 });
+        item.canvas.getBoundingClientRect = () => ({ left: 347, top: 115,
+          width: parseFloat(item.canvas.style.width), height: parseFloat(item.canvas.style.height) });
+        host.draw(1040);
+        assert.equal(fires.length, 1, 'a chama foi desenhada');
+        const [, , , , , x, y, w] = fires[0];
+        const size = item.view.probe().size;
+        const rect = item.canvas.getBoundingClientRect();
+        const clientX = rect.left + (x + w / 2) * rect.width / size.width;
+        const clientY = rect.top + (y + 2) * rect.height / size.height;
+        assert.equal(item.view.hit(clientX, clientY)?.id, 'fogo', `${wood} lenhas, DPR ${dpr}: a chama visível é clicável até o topo`);
+        item.view.click(clientX, clientY, 1040);
+        assert.equal(engine.state.minis.fogueira.jumped, 1, 'clicar na ponta da chama executa o salto');
+        assert.equal(item.view.probe().jumping, true);
+        model.tick(data.minis.fogueira.heatMax / data.minis.fogueira.heatLoss);
+        host.draw(1100);
+        assert.equal(item.view.hit(clientX, clientY), null, 'quando a chama apaga o topo deixa de receber o clique');
+      }
+    }
+  } finally {
+    if (originalDpr === undefined) delete globalThis.devicePixelRatio;
+    else globalThis.devicePixelRatio = originalDpr;
+  }
+});
+
 // --- Palco do Forró -------------------------------------------------------------------------------------------------------
 test('palco: escolhe a música, marca o ritmo nas pistas, vê o resultado e fecha', () => {
   const { host, engine, sounds, clock, toasts } = setup(40, { minis: { palco: { hidden: false } } });
@@ -358,6 +921,32 @@ test('palco: escolhe a música, marca o ritmo nas pistas, vê o resultado e fech
   assert.ok(view.probe().areas.some(area => area.id === 'musica:baiao'), 'o menu volta e a segunda música abriu');
   for (let i = 0; i < 3000; i++) host.draw((now += 33));
   assert.ok(view.probe().particles <= 160);
+});
+
+test('palco: o clique da pista não fecha um resultado que ainda não foi desenhado', () => {
+  for (const reopen of [false, true]) {
+    const { host, engine, clock } = setup(40, { minis: { palco: { hidden: false } } });
+    host.restore();
+    const view = host.windows.get('palco').view;
+    const palco = engine.mini('palco');
+    host.draw(1000);
+    clickArea(host, 'palco', 'musica:xote', 1000);
+    host.draw(1040);
+    const show = engine.state.minis.palco.show;
+    if (reopen) host.close('palco');
+    clock.t = show.startAt + show.notes.at(-1).t + 1201;
+    engine.tick(1);
+    const result = palco.info().last;
+    assert.ok(result);
+    if (reopen) host.setHidden('palco', false);
+    assert.ok(!view.probe().areas.some(area => area.id === 'resultado'));
+    clickArea(host, 'palco', 'pista:0', 1041);
+    assert.equal(palco.info().last, result, 'o resultado permanece até ser apresentado');
+    host.draw(1080);
+    assert.ok(view.probe().areas.some(area => area.id === 'resultado'));
+    clickArea(host, 'palco', 'resultado', 1080);
+    assert.equal(palco.info().last, null, 'o resultado apresentado ainda pode ser fechado');
+  }
 });
 
 // --- Céu de São João ------------------------------------------------------------------------------------------------------
@@ -416,6 +1005,108 @@ test('céu: foguete sobe onde se clica e estoura, a Grande Final vem com vários
   assert.ok(view.probe().particles <= 160 && view.probe().sparks <= 320);
 });
 
+test('soltar depois de a estrela sair do ponto pressionado não transforma o pedido em foguete', () => {
+  const { host, engine, clock } = setup(80, { minis: { ceu: { hidden: false } } });
+  host.restore();
+  engine.state.minis.ceu.starAt = clock.t - 1;
+  engine.tick(1);
+  host.draw(1000);
+  const item = host.windows.get('ceu');
+  item.canvas.closest = selector => selector === '.mini' ? item.element : null;
+  const probe = item.view.probe();
+  const star = probe.areas.find(area => area.id === 'estrela');
+  const rect = item.canvas.getBoundingClientRect();
+  const event = { clientX: rect.left + (star.x + star.w / 2) * rect.width / probe.size.width,
+    clientY: rect.top + (star.y + star.h / 2) * rect.height / probe.size.height };
+  const drag = host.dragStart(item.canvas, event);
+  assert.equal(drag.found.id, 'estrela');
+  const rockets = engine.mini('ceu').info().rockets;
+  clock.t += data.minis.ceu.starSeconds * 1000 / 3;
+  host.draw(2000);
+  assert.equal(item.view.hit(event.clientX, event.clientY).id, 'ceu', 'a estrela já saiu da posição pressionada');
+  host.dragEnd(drag, 2000);
+  assert.equal(engine.mini('ceu').info().rockets, rockets, 'um gesto sobre a estrela não gasta um foguete');
+  assert.equal(item.view.probe().shells, 0);
+  clickArea(host, 'ceu', 'estrela', 2000);
+  assert.equal(engine.state.minis.ceu.wishes, 1, 'clicar na posição nova da estrela ainda faz o pedido');
+});
+
+test('céu: reabrir antes do próximo desenho não aplica o clique da estrela antiga à seguinte', () => {
+  const { host, engine, clock } = setup(80, { minis: { ceu: { hidden: false } } });
+  host.restore();
+  const model = engine.mini('ceu');
+  const state = engine.state.minis.ceu;
+  state.starAt = clock.t - 1;
+  engine.tick(1);
+  host.draw(1000);
+  const item = host.windows.get('ceu');
+  item.canvas.closest = selector => selector === '.mini' ? item.element : null;
+  const probe = item.view.probe();
+  const oldArea = probe.areas.find(area => area.id === 'estrela');
+  const rect = item.canvas.getBoundingClientRect();
+  const event = { clientX: rect.left + (oldArea.x + oldArea.w / 2) * rect.width / probe.size.width,
+    clientY: rect.top + (oldArea.y + oldArea.h / 2) * rect.height / probe.size.height };
+  const previous = state.star;
+  host.close('ceu');
+  clock.t = previous.until;
+  engine.tick(1);
+  assert.equal(state.star, null, 'a estrela vista pela pessoa venceu enquanto a janela estava fechada');
+  clock.t = state.starAt;
+  engine.tick(1);
+  const next = state.star;
+  assert.ok(next && next.born > previous.born);
+  assert.equal(next.seed, previous.seed, 'a semente visual pode se repetir; o nascimento distingue cada estrela');
+  host.setHidden('ceu', false);
+  const drag = host.dragStart(item.canvas, event);
+  assert.equal(drag.found.id, 'estrela', 'o primeiro gesto ainda usa o desenho anterior');
+  const cheer = engine.state.cheer;
+  host.dragEnd(drag, 1040);
+  assert.equal(state.wishes, 0, 'a estrela nova precisa aparecer antes de poder receber o pedido');
+  assert.equal(state.star, next);
+  assert.equal(engine.state.cheer, cheer, 'o clique antigo não entrega prêmio');
+  assert.equal(item.view.probe().shells, 0, 'nem transforma o pedido em foguete');
+  host.draw(1080);
+  clickArea(host, 'ceu', 'estrela', 1080);
+  assert.equal(state.wishes, 1, 'o clique na estrela apresentada continua funcionando');
+  assert.equal(model.info().star, null);
+});
+
+test('céu: a recompensa da carta aparece por cima do painel da simpatia', () => {
+  const { host, engine } = setup(70, { minis: { ceu: { hidden: false } } });
+  const order = [];
+  const createElement = document.createElement;
+  const pixelText = ArraiaFesta.pixelText;
+  document.createElement = tag => {
+    const element = createElement(tag);
+    if (tag === 'canvas') {
+      const g = element.getContext('2d');
+      const drawImage = g.drawImage;
+      g.drawImage = (...args) => {
+        if (args[0].value === bundle.images[bundle.janelas.ceu.cartas.image]) order.push('carta');
+        drawImage(...args);
+      };
+      element.getContext = () => g;
+    }
+    return element;
+  };
+  ArraiaFesta.pixelText = (g, text, ...args) => { order.push(text); pixelText(g, text, ...args); };
+  try {
+    host.restore();
+    host.draw(1000);
+    clickArea(host, 'ceu', 'mesa', 1000);
+    host.draw(1040);
+    assert.equal(engine.mini('ceu').info().cards.ids[0], 'fogueira', 'esta carta rende lenha');
+    clickArea(host, 'ceu', 'carta:0', 1040);
+    order.length = 0;
+    host.draw(1080);
+    assert.equal(order.filter(entry => entry === 'carta').length, 3, 'as três faces foram reveladas');
+    assert.ok(order.indexOf('gain.wood') > order.lastIndexOf('carta'), 'o painel e as cartas não cobrem o texto da recompensa');
+  } finally {
+    document.createElement = createElement;
+    ArraiaFesta.pixelText = pixelText;
+  }
+});
+
 // --- Bairro ---------------------------------------------------------------------------------------------------------------
 test('bairro: cada integrante da turma mora numa casa e o clique visita quem está esperando', () => {
   const { host, engine, sounds, toasts } = setup(80, { minis: { bairro: { hidden: false } } });
@@ -461,6 +1152,8 @@ test('ajuda: cada janela tem um "?" que abre o como funciona (nos 3 idiomas, sem
         const item = host.windows.get(id);
         assert.equal(item.help.hidden, true, 'a ajuda começa fechada');
         assert.match(item.element.innerHTML, new RegExp(`data-action="mini-ajuda" data-mini="${id}"`), `${id}: botão ?`);
+        assert.ok(item.element.innerHTML.includes(`data-action="mini-fechar" data-mini="${id}" aria-label="${I18N.t('mini.hide')}"`),
+          `${id} (${lang}): o botão de esconder tem nome acessível traduzido`);
         assert.equal(host.toggleHelp(id), true);
         assert.equal(item.help.hidden, false);
         assert.equal(host.helpOpen(id), true);
@@ -487,6 +1180,166 @@ test('ajuda: cada janela tem um "?" que abre o como funciona (nos 3 idiomas, sem
 });
 
 // --- Mata Encantada (o auto battler) --------------------------------------------------------------------------------------------
+test('fechar a ajuda devolve o teclado ao botão da janela sem selecionar uma janela escondida ou outro campo', () => {
+  for (const id of data.minis.windows.map(entry => entry.id)) for (const mode of ['reading', 'elsewhere', 'hidden']) {
+    const { host } = setup(120, { minis: { [id]: { hidden: false } } });
+    host.restore();
+    const document = globalThis.document;
+    const item = host.windows.get(id);
+    const reader = {};
+    const outside = {};
+    const focusCalls = [];
+    const trigger = { focus(options) { focusCalls.push(options); document.activeElement = trigger; } };
+    item.element.querySelector = selector => selector === 'button[data-action="mini-ajuda"]' ? trigger : null;
+    item.help.contains = element => element === item.help || element === reader;
+    let hidden = true;
+    Object.defineProperty(item.help, 'hidden', { get: () => hidden, set(value) {
+      hidden = value;
+      if (value && item.help.contains(document.activeElement)) document.activeElement = document.body;
+    } });
+    host.setHelp(id, true);
+    document.activeElement = mode === 'elsewhere' ? outside : reader;
+    if (mode === 'hidden') host.close(id);
+    else host.setHelp(id, false);
+    assert.equal(item.help.hidden, true);
+    assert.equal(document.activeElement === (mode === 'reading' ? trigger : mode === 'elsewhere' ? outside : document.body), true, id + ': ' + mode);
+    assert.equal(focusCalls.length, Number(mode === 'reading'));
+    assert.equal(focusCalls[0]?.preventScroll, mode === 'reading' ? true : undefined);
+  }
+});
+
+test('mata: fechar e reabrir congela a mesma batalha em todas as fases, sem golpes ou prêmios escondidos', () => {
+  for (const phase of ['intro', 'fight', 'win', 'lose']) {
+    const { host, engine, clock } = setup(60, { minis: { mata: { hidden: false } } });
+    host.restore();
+    for (const id of Object.keys(engine.state.levels)) engine.state.levels[id] = phase === 'win' ? 200 : 1;
+    const mata = engine.mini('mata');
+    const tick = () => { clock.t += 50; engine.tick(0.05); };
+    tick();
+    for (let i = 0; i < 2000 && mata.info().phase !== phase; i++) tick();
+    assert.equal(mata.info().phase, phase);
+    const snapshot = () => {
+      const { hero, enemies, clock, t, phase, seq } = mata.info();
+      return structuredClone({ hero, enemies, clock, t, phase, seq, state: engine.state.minis.mata });
+    };
+    const before = snapshot();
+    host.close('mata');
+    assert.equal(mata.info().paused, true);
+    assert.equal(mata.info().auto, true);
+    engine.advance(60);
+    clock.t += 30000;
+    engine.tick(1);
+    mata.tick(10);
+    assert.deepEqual(snapshot(), before, `${phase}: vida, efeitos, alvos, relógios e prêmios ficam congelados`);
+    host.toggle('mata');
+    assert.equal(mata.info().paused, false);
+    tick();
+    assert.ok(mata.info().clock > before.clock, `${phase}: reabrir retoma sem recuperar o tempo fechado`);
+    assert.ok(mata.info().clock < before.clock + 0.1);
+  }
+});
+
+test('mata: esconder a festa e perder foco pausam imediatamente, e a pausa manual continua ao reabrir', () => {
+  let focused = true;
+  const { host, engine, settings, clock } = setup(60, { minis: { mata: { hidden: false } }, focused: () => focused });
+  host.restore();
+  const mata = engine.mini('mata');
+  const tick = () => { clock.t += 1000; engine.tick(1); };
+  tick();
+  const frozen = mata.info().clock;
+  settings.hidden = true;
+  tick();
+  assert.equal(mata.info().clock, frozen);
+  assert.equal(mata.info().paused, true);
+  settings.hidden = false;
+  focused = false;
+  tick();
+  assert.equal(mata.info().clock, frozen, 'a perda de foco funciona sem precisar redesenhar a janela');
+  focused = true;
+  tick();
+  assert.ok(mata.info().clock > frozen);
+  mata.setAuto(false);
+  const manuallyPaused = mata.info().clock;
+  host.close('mata');
+  host.toggle('mata');
+  tick();
+  assert.equal(mata.info().clock, manuallyPaused);
+  assert.equal(mata.info().auto, false, 'reabrir não desfaz a pausa escolhida no botão');
+  mata.setAuto(true);
+  tick();
+  assert.ok(mata.info().clock > manuallyPaused);
+});
+
+test('mata: restaurar preferências fechadas mantém a luta parada e trocar de partida desativa o motor anterior', () => {
+  const { host, engine, settings, clock } = setup(60, { minis: { mata: { hidden: true } } });
+  host.restore();
+  engine.tick(1);
+  assert.equal(engine.mini('mata').info().hero, null);
+  host.toggle('mata');
+  engine.tick(1);
+  const previousClock = engine.mini('mata').info().clock;
+  const next = new GameEngine(data, engine.exportState(), { now: () => clock.t, rng: () => 0.5 });
+  host.setEngine(next);
+  engine.tick(1);
+  assert.equal(engine.mini('mata').info().clock, previousClock, 'a interface nova não mantém a partida velha lutando');
+  next.tick(1);
+  assert.ok(next.mini('mata').info().clock > 0, 'a partida nova usa a visibilidade da janela restaurada');
+  host.close('mata');
+  const saved = next.exportState();
+  const reopened = new GameEngine(data, saved, { now: () => clock.t, rng: () => 0.5 });
+  host.setEngine(reopened);
+  reopened.advance(60);
+  assert.deepEqual(reopened.state.minis.mata, saved.minis.mata);
+  assert.equal(reopened.mini('mata').info().hero, null);
+  assert.equal(settings.minis.mata.hidden, true);
+});
+
+test('mata: clicar na criatura que está entrando seleciona o desenho, sem alvo no espaço vazio', () => {
+  const { host, engine } = setup(60, { minis: { mata: { hidden: false } } });
+  const meta = bundle.janelas.mata;
+  const draws = [];
+  const healthBars = [];
+  const createElement = document.createElement;
+  document.createElement = tag => {
+    const element = createElement(tag);
+    if (tag === 'canvas') {
+      const g = element.getContext('2d');
+      const drawImage = g.drawImage;
+      const fillRect = g.fillRect;
+      g.drawImage = (...args) => {
+        if (args[0].value === bundle.images[meta.comuns.image]) draws.push(args);
+        drawImage(...args);
+      };
+      g.fillRect = (...args) => {
+        if (args[2] === 22 && args[3] === 5) healthBars.push(args);
+        fillRect(...args);
+      };
+      element.getContext = () => g;
+    }
+    return element;
+  };
+  try { host.restore(); } finally { document.createElement = createElement; }
+  const item = host.windows.get('mata');
+  const mata = engine.mini('mata');
+  engine.tick(0.6);
+  assert.equal(mata.info().phase, 'intro');
+  host.draw(1000);
+  assert.equal(draws.length, 1, 'a primeira batalha tem uma criatura visível');
+  const [, , , , , x, y, w, h] = draws[0];
+  const probe = item.view.probe();
+  const rect = item.canvas.getBoundingClientRect();
+  const point = { clientX: rect.left + (x + w / 2) * rect.width / probe.size.width,
+    clientY: rect.top + (y + h / 2) * rect.height / probe.size.height };
+  const foe = mata.info().enemies[0];
+  assert.equal(item.view.hit(point.clientX, point.clientY)?.id, `foe:${foe.uid}`, 'a área acompanha a posição desenhada durante a entrada');
+  item.view.click(point.clientX, point.clientY, 1000);
+  assert.equal(mata.info().enemies[0].focus, true, 'clicar no desenho escolhe a criatura');
+  const area = item.view.probe().areas.find(entry => entry.id === `foe:${foe.uid}`);
+  assert.equal(area.x, x, 'o alvo não fica parado na posição de chegada');
+  assert.equal(healthBars.length, 1);
+  assert.equal(healthBars[0][0] + healthBars[0][2] / 2, x + w / 2, 'a barra de vida acompanha a criatura');
+});
+
 test('mata: a janela desenha a batalha e a lista de itens, e responde aos cliques (etapa, pausa, bichinho, alvo e itens)', () => {
   const { host, engine, sounds, toasts } = setup(60, { minis: { mata: { hidden: false } } });
   host.restore();
@@ -553,6 +1406,27 @@ test('mata: a vitória sobre o chefe mostra o cartaz e a lista de itens passa a 
   assert.equal(engine.mini('mata').info().unlocks[0].owned, true);
 });
 
+test('mata: perder para o chefe mantém seu nome e a identificação da batalha durante o desmaio', () => {
+  const { host, engine, clock } = setup(60, { minis: { mata: { hidden: false } } });
+  host.restore();
+  for (const id of Object.keys(engine.state.levels)) engine.state.levels[id] = 30;
+  const mata = engine.mini('mata');
+  for (let i = 0; i < 4000 && mata.info().phase !== 'lose'; i++) {
+    clock.t += 50;
+    engine.tick(0.05);
+  }
+  assert.equal(mata.info().phase, 'lose');
+  const boss = mata.info().enemies.find(enemy => enemy.boss);
+  assert.ok(boss, 'a derrota aconteceu na batalha do chefe');
+  const view = host.windows.get('mata').view;
+  assert.match(view.status(engine), /mini\.mata\.statusBoss$/, 'a janela identifica a luta que ainda está desenhando');
+  const labels = [];
+  const pixelText = globalThis.ArraiaFesta.pixelText;
+  globalThis.ArraiaFesta.pixelText = (g, value, ...args) => { labels.push(value); pixelText(g, value, ...args); };
+  try { host.draw(1000); } finally { globalThis.ArraiaFesta.pixelText = pixelText; }
+  assert.ok(labels.includes(data.minis.mata.bosses.find(entry => entry.id === boss.id).name), 'o nome permanece embaixo da criatura');
+});
+
 test('mata: o painel traz textos nos 3 idiomas (criaturas, golpes e dicas) e o desenho aguenta cada cenário e cada criatura', () => {
   const I18N = require('../src/i18n.js');
   const sheet = bundle.janelas.mata;
@@ -602,6 +1476,126 @@ test('mata: o painel traz textos nos 3 idiomas (criaturas, golpes e dicas) e o d
     for (let i = 0; i < 40; i++) { engine.tick(0.1); host.draw((now += 40)); }
     assert.ok(host.windows.get('mata').view.probe().areas.some(area => area.id.startsWith('foe:')), `etapa ${stage}: chefe na cena`);
   }
+});
+
+test('reset após ano novo invalida a Horta e a Mata antigas antes do próximo quadro', () => {
+  const { host, engine, settings, clock } = setup(200, { minis: {
+    horta: { hidden: false, dx: -200, dy: 110 }, mata: { hidden: false }, cordel: { hidden: true, dx: 25, dy: 30 }
+  } });
+  host.restore();
+  assert.equal(engine.mini('horta').plant(0).ok, true);
+  clock.t = engine.state.minis.horta.plots[0].readyAt;
+  host.draw(1000);
+  clickArea(host, 'mata', 'auto', 1000);
+  host.draw(1040);
+  assert.equal(engine.mini('horta').info().plots[0].ready, true, 'o canteiro antigo aparece pronto para colher');
+  assert.equal(engine.mini('mata').info().auto, false, 'a Mata antiga mostra o botão de retomar');
+  const prefs = structuredClone(settings.minis);
+  const items = host.items().map(({ id, visible }) => ({ id, visible }));
+  const old = ['horta', 'mata'].map(id => {
+    const item = host.windows.get(id);
+    const areaId = id === 'horta' ? 'plot:0' : 'auto';
+    const { areas, size } = item.view.probe();
+    const area = areas.find(entry => entry.id === areaId);
+    const rect = item.canvas.getBoundingClientRect();
+    const event = { clientX: rect.left + (area.x + area.w / 2) * rect.width / size.width,
+      clientY: rect.top + (area.y + area.h / 2) * rect.height / size.height };
+    item.canvas.closest = selector => selector === '.mini' ? item.element : null;
+    const drag = host.dragStart(item.canvas, event);
+    assert.equal(drag.found.id, areaId);
+    return { id, item, event, drag, left: item.element.style.left, bottom: item.element.style.bottom };
+  });
+
+  assert.equal(engine.newYear(), true);
+  host.reset();
+  for (const { id, item, event, drag, left, bottom } of old) {
+    const current = host.windows.get(id);
+    assert.notEqual(current, item, `${id}: a cena antiga saiu antes do quadro`);
+    assert.deepEqual(current.view.probe().areas, [], `${id}: nada antigo ficou clicável`);
+    assert.equal(current.element.style.left, left);
+    assert.equal(current.element.style.bottom, bottom);
+    assert.ok(!document.body.children.includes(item.element));
+    host.dragEnd(drag, 1041);
+    assert.equal(current.view.click(event.clientX, event.clientY, 1041), false, 'a cena nova aguarda seu primeiro desenho');
+  }
+  assert.equal(engine.mini('horta').info().plots[0].crop, null, 'soltar a colheita antiga não planta no ano novo');
+  assert.equal(engine.mini('mata').info().auto, true, 'soltar o botão Play antigo não pausa a luta nova');
+  assert.deepEqual(settings.minis, prefs);
+  assert.deepEqual(host.items().map(({ id, visible }) => ({ id, visible })), items);
+
+  const currentHorta = host.windows.get('horta');
+  host.reset();
+  assert.equal(host.windows.get('horta'), currentHorta, 'repetir reset no mesmo estado conserva a cena nova');
+  host.onEvents(engine.drainEvents(), 1042);
+  assert.deepEqual(settings.minis, prefs, 'reset repetido e evento do ano novo preservam as preferências');
+  assert.deepEqual(host.items().map(({ id, visible }) => ({ id, visible })), items);
+  host.draw(1080);
+  clickArea(host, 'horta', 'plot:0', 1080);
+  clickArea(host, 'mata', 'auto', 1080);
+  assert.equal(engine.mini('horta').info().plots[0].crop, 'milho', 'a cena recém-desenhada volta a plantar');
+  assert.equal(engine.mini('mata').info().auto, false, 'o botão de pausar novo funciona');
+});
+
+test('ano novo limpa os efeitos das janelas e preserva visibilidade e posição', () => {
+  const { host, engine, settings, sounds } = setup(100, { minis: {
+    ceu: { hidden: false, dx: -200, dy: 110 }, mata: { hidden: false }, cordel: { hidden: true, dx: 25, dy: 30 }
+  } });
+  host.restore();
+  let now = 1000;
+  host.draw(now);
+  for (let i = 0; i < data.minis.ceu.volley; i++) clickArea(host, 'ceu', 'ceu', now);
+  assert.equal(engine.state.minis.ceu.finales, 1, 'a Grande Final deixou foguetes agendados');
+  assert.equal(host.probe().ceu.shells, data.minis.ceu.volley);
+  engine.state.minis.mata.best = 1;
+  clickArea(host, 'mata', 'next', now);
+  assert.ok(host.probe().mata.banner, 'a troca de etapa mostra uma mensagem');
+  const prefs = structuredClone(settings.minis);
+  const { left, bottom } = host.windows.get('ceu').element.style;
+  const oldElements = [...host.windows.values()].map(item => item.element);
+
+  assert.equal(engine.newYear(), true);
+  host.onEvents(engine.drainEvents(), now);
+  assert.equal(host.probe().mata.banner, null, 'a mensagem da batalha antiga foi apagada');
+  sounds.length = 0;
+  for (let i = 0; i < 80; i++) host.draw((now += 40));
+  assert.equal(host.probe().ceu.shells, 0, 'não sobe nenhum foguete do ano anterior');
+  assert.equal(host.probe().ceu.sparks, 0, 'não sobram explosões do ano anterior');
+  assert.ok(!sounds.includes('estalo'), 'o show cancelado não estoura no ano seguinte');
+  assert.deepEqual(settings.minis, prefs);
+  assert.equal(host.windows.get('ceu').element.style.left, left);
+  assert.equal(host.windows.get('ceu').element.style.bottom, bottom);
+  assert.equal(host.visible('ceu'), true);
+  assert.equal(host.visible('mata'), true);
+  assert.equal(host.visible('cordel'), false);
+  assert.ok(oldElements.every(element => !document.body.children.includes(element)), 'as janelas antigas foram removidas do DOM');
+});
+
+test('ano novo descarta os eventos anteriores do lote e entrega os posteriores às janelas', () => {
+  const { host, engine, clock, sounds, toasts } = setup(11, { minis: {
+    bichos: { hidden: true }, ceu: { hidden: false }
+  } });
+  engine.state.cheer = 1e15;
+  while (engine.state.size < 100) engine.addFame(engine.fameNeed() - engine.state.fame);
+  host.restore();
+  engine.state.minis.ceu.starAt = clock.t - 1;
+  engine.tick(0.1);
+  assert.ok(engine.state.minis.ceu.star, 'o ano antigo tem uma estrela ainda não avisada');
+  assert.equal(engine.newYear(), true);
+  host.reset();
+  assert.equal(host.setHelp('ceu', true), true, 'a ajuda já pode abrir no ano novo antes do quadro');
+  const currentCeu = host.windows.get('ceu');
+  engine.tick(0.1);
+  clock.t = engine.state.minis.ceu.starAt;
+  engine.tick(0.1);
+  const batch = engine.drainEvents();
+  assert.equal(batch.filter(event => event.kind === 'star').length, 2, 'há uma estrela de cada ano no lote');
+  host.onEvents(batch, 1000);
+  assert.equal(host.windows.get('ceu'), currentCeu, 'o evento não recria a janela que já está no ano atual');
+  assert.equal(host.helpOpen('ceu'), true, 'a ajuda aberta depois do reset não se perde no primeiro quadro');
+  assert.equal(host.visible('bichos'), false, 'a abertura antiga não desfaz a preferência de esconder');
+  assert.equal(toasts.filter(text => text === 'mini.opened').length, 0, 'não avisa as aberturas antigas');
+  assert.equal(toasts.filter(text => text === 'mini.ceu.starToast').length, 1, 'avisa apenas a estrela do ano atual');
+  assert.equal(sounds.filter(sound => sound === 'aviso').length, 1);
 });
 
 test('reiniciar ou importar a festa troca o motor das janelas: os botões e as janelas do jogo velho somem e os do novo valem', () => {
@@ -682,6 +1676,22 @@ test('cordel: a janela desenha a página e as bolinhas, vira só as páginas lib
   assert.equal(engine.state.minis.cordel.done.quintal, true);
   assert.ok(engine.state.cheer > cheer0);
   assert.ok(view.probe().says >= 1);
+});
+
+test('cordel: clicar antes do quadro da virada não aplica o ponto da página antiga à nova', () => {
+  for (const navigation of ['next', 'pagina:2']) {
+    const { host, engine } = setup(35, { minis: { cordel: { hidden: false } } });
+    host.restore();
+    host.draw(1000);
+    clickArea(host, 'cordel', navigation, 1000);
+    assert.equal(engine.mini('cordel').info().page, 2);
+    assert.equal(host.probe().cordel.shown, 1, 'a arte antiga ainda está na tela');
+    clickArea(host, 'cordel', 'ponto', 1001);
+    assert.equal(engine.mini('cordel').info().list[1].clicks, 0, 'a página nova não foi clicada pelo ponto antigo');
+    for (let now = 1040; now <= 1400; now += 40) host.draw(now);
+    clickArea(host, 'cordel', 'ponto', 1400);
+    assert.equal(engine.mini('cordel').info().list[1].clicks, 1, 'o novo ponto funciona depois da virada');
+  }
 });
 
 test('cordel: as 20 páginas aparecem sem erro (arte, turma e Mandioca) e a arte tem tudo o que o jogo precisa', () => {

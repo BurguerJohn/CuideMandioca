@@ -85,6 +85,12 @@
       return Object.fromEntries(Object.entries(this.api).map(([id, model]) => [id, model.load(object(saved[id]) ? saved[id] : null)]));
     }
 
+    // Ajustes que só pertencem ao retrato do save, sem mudar a janela que continua aberta.
+    save(saved) {
+      for (const [id, model] of Object.entries(this.api)) model.save?.(saved[id]);
+      return saved;
+    }
+
     tick(dt) {
       for (const id of this.opened()) this.api[id].tick?.(dt);
     }

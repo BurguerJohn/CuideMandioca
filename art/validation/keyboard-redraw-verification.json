@@ -1,0 +1,50 @@
+{
+  "pid": 51604,
+  "profile": "C:\\Users\\Gabriel\\Downloads\\gog\\art\\validation\\electron-window-handoff-profile-51604-vNf32H",
+  "activeRounds": false,
+  "pickerReselect": false,
+  "photoDownloads": false,
+  "festaPressResize": false,
+  "wakeInput": false,
+  "wakeSave": false,
+  "suspendGesture": false,
+  "wakeHold": false,
+  "cancelledClick": false,
+  "cancelledKeyboard": false,
+  "keyboardRedraw": true,
+  "volumeGesture": false,
+  "volumeClose": false,
+  "volumeQuit": false,
+  "importFailure": false,
+  "replacementFailure": false,
+  "electron": "44.4.5",
+  "changes": [],
+  "errors": [],
+  "saves": [],
+  "keyboardUpdate": {
+    "pressed": {
+      "connected": true,
+      "active": true,
+      "focusedOriginal": true,
+      "mail": 1,
+      "open": false,
+      "screen": "correio"
+    },
+    "updated": {
+      "connected": true,
+      "active": true,
+      "focusedOriginal": true,
+      "mail": 2,
+      "open": false,
+      "screen": "correio"
+    },
+    "released": {
+      "connected": false,
+      "active": false,
+      "focusedOriginal": false,
+      "mail": 2,
+      "open": true,
+      "screen": "correio"
+    }
+  }
+}

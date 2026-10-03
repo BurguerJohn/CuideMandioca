@@ -1,0 +1,80 @@
+{
+  "electron": "44.4.5",
+  "pid": 14352,
+  "results": [
+    {
+      "screen": "correio",
+      "before": {
+        "left": 317,
+        "top": 432,
+        "right": 977,
+        "bottom": 770.6000061035156,
+        "width": 660,
+        "height": 338.6000061035156
+      },
+      "after": {
+        "left": 317,
+        "top": 336,
+        "right": 977,
+        "bottom": 771,
+        "width": 660,
+        "height": 435
+      },
+      "viewport": {
+        "width": 1002,
+        "height": 779
+      },
+      "visible": true
+    },
+    {
+      "screen": "bingo",
+      "before": {
+        "left": 317,
+        "top": 551,
+        "right": 977,
+        "bottom": 770.6000061035156,
+        "width": 660,
+        "height": 219.60000610351562
+      },
+      "after": {
+        "left": 317,
+        "top": 384,
+        "right": 977,
+        "bottom": 771.2000122070312,
+        "width": 660,
+        "height": 387.20001220703125
+      },
+      "viewport": {
+        "width": 1002,
+        "height": 779
+      },
+      "visible": true
+    },
+    {
+      "screen": "argolas",
+      "before": {
+        "left": 367,
+        "top": 252,
+        "right": 927,
+        "bottom": 771.4874877929688,
+        "width": 560,
+        "height": 519.4874877929688
+      },
+      "after": {
+        "left": 367,
+        "top": 28,
+        "right": 927,
+        "bottom": 771.4249877929688,
+        "width": 560,
+        "height": 743.4249877929688
+      },
+      "viewport": {
+        "width": 1002,
+        "height": 779
+      },
+      "completed": true,
+      "visible": true
+    }
+  ],
+  "errors": []
+}
