@@ -9,6 +9,11 @@
   const Minis = (typeof module === 'object' && module.exports)
     ? (() => { const api = require('./minis.js'); api.IDS.forEach(id => require(`./mini-${id}.js`)); return api; })()
     : globalThis.ArraiaMinis;
+  // Os prêmios dos minigames (src/premios.js).
+  const Premios = (typeof module === 'object' && module.exports) ? require('./premios.js') : globalThis.ArraiaPremios;
+  // Os eventos do mundo (src/mundo.js).
+  const Mundo = (typeof module === 'object' && module.exports) ? require('./mundo.js') : globalThis.ArraiaMundo;
+  const Looks = (typeof module === 'object' && module.exports) ? require('./looks.js') : globalThis.ArraiaLooks;
   const SAVE_VERSION = 1;
   const STATS = ['rebolado', 'folego', 'refresco', 'ritmo'];
   const BONFIRE = ['labareda', 'brasa', 'calor'];
@@ -68,6 +73,9 @@
       this.validate();
       this.sceneryPlan = planScenery(data.scenery, SCENERY_PLAN);
       this.minis = new Minis.Minis(this);
+      this.premios = new Premios.Premios(this);
+      this.mundo = new Mundo.Mundo(this);
+      this.looks = new Looks.Looks(this);
       this.events = [];
       this.welcome = null;
       this.state = saved ? this.load(saved) : this.fresh();
@@ -114,6 +122,9 @@
         cozinha: { pot: null, buff: null },
         humor: { amor: this.cfg.moodStart, barriga: this.cfg.moodStart, at: now, holdUntil: 0 },
         minis: this.minis.fresh(),
+        premios: this.premios.fresh(),
+        mundo: this.mundo.fresh(),
+        looks: this.looks.fresh(),
         album: [],
         bornAt: now,
         hints: {},
@@ -122,6 +133,7 @@
         daily: { day: null, streak: 0 },
         kissAt: 0,
         rafael: false,
+        rafaelHidden: false,
         yearStart: 0,
         records: { maior: null, size: 1 },
         weather: { rain: null, rainbow: null, nextAt: 0, thunderAt: 0 },
@@ -220,6 +232,7 @@
       s.bingo = { round: this.cleanBingo(raw.bingo?.round) };
       s.kissAt = Math.max(0, finite(raw.kissAt));
       s.rafael = raw.rafael === true;
+      s.rafaelHidden = s.rafael && raw.rafaelHidden === true;
       // A corrida de saco não volta no meio: a próxima continua agendada.
       s.saco = { active: null, nextAt: Math.max(0, finite(raw.saco?.nextAt)) };
       // Leilão no meio: o lance guardado volta para o bolso e o próximo leilão continua agendado.
@@ -296,6 +309,9 @@
       s.runtime = { ...this.freshRuntime(), dancing: true };
       this.state = s;
       s.minis = this.minis.load(raw.minis);
+      s.premios = this.premios.load(raw.premios);
+      s.mundo = this.mundo.load(raw.mundo);
+      s.looks = this.looks.load(raw.looks);
       s.runtime.stamina = this.maxStamina();
       this.staggerDue(s);
       this.catchUp(finite(s.lastSeen, this.now()), raw);
@@ -403,6 +419,7 @@
       if (this.events.length > 200) this.events.shift();
       this.albumCheck('event', type, detail);
       this.minis?.hear(type, detail);
+      this.premios?.hear(type, detail);
     }
 
     // Álbum da Festa: as figurinhas que um acontecimento (`event`) ou uma entrada do diário (`record`) dá.
@@ -575,6 +592,34 @@
         } else if (op === 'burro') {
           this.startBurro(now);
           note = 'Rabo no burro';
+        } else if (op === 'folclore') {
+          // Cada clique chama a próxima visita da lista (mesmo as que ainda não abriram), para ver as 20 uma por uma.
+          const events = this.data.minis.folclore.events;
+          this.debugFolclore = ((this.debugFolclore ?? -1) + 1) % events.length;
+          const visit = events[this.debugFolclore];
+          this.mini('folclore').start(visit.id);
+          note = `Visita do folclore: ${visit.name}`;
+        } else if (op === 'mundo') {
+          // Cada clique chama o próximo evento do mundo da lista (e encerra o que estiver passando).
+          const list = this.data.mundo.eventos;
+          this.debugMundo = ((this.debugMundo ?? -1) + 1) % list.length;
+          const next = list[this.debugMundo];
+          const s = this.state;
+          s.mundo.active = null;
+          s.weather.rain = s.weather.rainbow = null;
+          this.mundo.start(next.id);
+          note = `Evento do mundo: ${next.name}`;
+        } else if (op === 'desfile') {
+          note = this.premios.startParade() ? 'Desfile dos Prêmios' : 'Nenhum personagem na festa ainda';
+        } else if (op === 'premio') {
+          // Cada clique libera o próximo prêmio que falta: a conta do minigame dele vai até o que o prêmio pede.
+          const next = this.data.premios.itens.find(entry => !this.premios.has(entry.id));
+          if (next) {
+            const s = this.state.premios;
+            s.count[next.jogo] = Math.max(s.count[next.jogo] || 0, next.feitos);
+            this.premios.unlock(next.jogo);
+            note = `Prêmio: ${next.name}`;
+          } else note = 'Todos os prêmios já estão liberados';
         } else if (op === 'fotografo') {
           this.startFotografo(now);
           note = 'Fotógrafo lambe-lambe';
@@ -647,6 +692,8 @@
       s.humor.at = back(s.humor.at);
       s.humor.holdUntil = back(s.humor.holdUntil);
       this.minis.shift(ms);
+      this.premios.shift(ms);
+      this.mundo.shift(ms);
       if (s.cozinha.pot) for (const key of ['startAt', 'readyAt']) s.cozinha.pot[key] -= ms;
       if (s.cozinha.buff) s.cozinha.buff.until = back(s.cozinha.buff.until);
       // Os eventos da festa com relógio de verdade também andam: balão, chuva e arco-íris, quadrilha, quebra-pote e corrida de saco.
@@ -985,7 +1032,7 @@
       return (1 + this.cfg.sizeBonus * this.state.size) * (1 + this.collection()) * (1 + this.effect('cheer')) *
         (1 + this.cfg.heatPerLevel * b.calor) * (1 + this.cfg.growthBonus * this.growthStage()) *
         (1 + this.danceBonus()) * (1 + this.setBonus()) * (1 + this.albumBonus()) * (1 + this.visitorBonus()) * (1 + this.tradition()) * (1 + this.trioBonus()) * (1 + (this.specialDay(at)?.bonus || 0)) * (this.legendary() ? 2 : 1) *
-        (1 + this.cookBonus(at, bonuses?.cookBuff)) * (1 + this.hortaBonus()) * (1 + this.hortaBuff('cheer', at, bonuses?.hortaBuffs));
+        (1 + this.cookBonus(at, bonuses?.cookBuff)) * (1 + this.hortaBonus()) * (1 + this.premioBonus()) * (1 + this.mundoBonus()) * (1 + this.hortaBuff('cheer', at, bonuses?.hortaBuffs));
     }
     // O Rebolado de cada passo, com a felicidade da Mandioca (×0,5 a ×1,25) e todos os bônus.
     stepValue(at = this.now(), bonuses) { return this.statValue('rebolado') * this.moodFactor(this.mood(at)) * this.multiplier(at, bonuses); }
@@ -1077,6 +1124,8 @@
       this.lastTick = this.now();
       this.updateTimers(this.now());
       this.minis.tick(dt);
+      this.premios.tick();
+      this.mundo.tick();
       this.updateGoals();
       const day = this.specialDay();
       if (day) {
@@ -1239,8 +1288,17 @@
       this.state.inventory.push(id);
       this.record('item', { id });
       if (this.state.inventory.length >= 15) this.unlock('estiloso');
+      for (const theme of this.data.themes) {
+        const [have, total] = this.themeCount(theme.id);
+        if (have >= total) this.unlock(theme.achievement);
+      }
       this.emit('item', { id });
       return true;
+    }
+    // Quantos itens de um tema da loja a pessoa tem: [tem, total].
+    themeCount(theme) {
+      const all = this.data.items.filter(item => item.tema === theme);
+      return [all.filter(item => this.state.inventory.includes(item.id)).length, all.length];
     }
     isPlaced(id) { return this.state.equipped.esquerda === id || this.state.equipped.direita === id; }
     equip(id, side) {
@@ -1491,7 +1549,7 @@
       } else if (s.size >= this.cfg.rainMin) {
         // Dia de São Pedro (o santo da chuva): a chuva de São João vem com o dobro da frequência.
         if (!w.nextAt) w.nextAt = now + this.between(this.cfg.rainEvery) * (this.specialDay()?.id === 'pedro' ? 0.5 : 1);
-        if (now >= w.nextAt) {
+        if (now >= w.nextAt && !s.mundo?.active) {
           w.rain = { born: now, until: now + this.cfg.rainSeconds * 1000 };
           w.nextAt = 0;
           this.emit('rain');
@@ -1694,6 +1752,7 @@
       s.tickets += tickets;
       s.stats.letters++;
       this.record('letter', { tickets });
+      this.emit('letter', { tickets });
       if (s.stats.letters >= 10) this.unlock('correio');
       const letters = this.data.letters;
       const text = letters[(s.stats.letters * 7 + Math.floor(this.rng() * letters.length)) % letters.length];
@@ -1715,6 +1774,7 @@
       this.earn(reward);
       this.state.stats.requests++;
       this.record('request', { kind });
+      this.emit('request-done', { kind });
       if (this.state.stats.requests >= 25) this.unlock('atenciosa');
       return { reward, kind };
     }
@@ -1779,7 +1839,14 @@
         album: [(s.album || []).length, (this.data.album || []).reduce((n, page) => n + page.stickers.length, 0)], estilista: [s.setsWorn.length, 5],
         'turma-completa': [this.data.chars.filter(c => s.crew[c.id]).length, this.data.chars.length],
         lendaria: [bonfire, this.cfg.legendary], estiloso: [s.inventory.length, 15], correio: [st.letters, 10],
-        atenciosa: [st.requests, 25], seguranca: [st.crashers, 10]
+        atenciosa: [st.requests, 25], seguranca: [st.crashers, 10],
+        colecionador: [this.premios.total(), 10], 'elenco-completo': [this.premios.tally().people, this.premios.tally().peopleOf],
+        'festa-de-ouro': [this.premios.tally().golds, this.premios.tally().goldsOf],
+        'ceu-aberto': [this.mundo.info().seenKinds, this.mundo.info().kinds], 'cacador-de-alvos': [this.mundo.caughtTotal(), 100],
+        'guarda-roupa': [this.state.looks.list.length, this.data.looks.achievementAt],
+        'ceu-completo': [this.mundo.doneKinds(), this.mundo.cfg.completeKinds],
+        'era-dos-dinossauros': this.themeCount('dino'), 'noite-de-halloween': this.themeCount('halloween'), 'apocalipse-zumbi': this.themeCount('zumbi'), 'mestre-da-pinhata': [this.state.mundo.caught.pinhata || 0, 9],
+        astronomo: [this.state.mundo.done.constelacao || 0, 3], 'fregues-da-feira': [this.state.mundo.caught.feira || 0, 10]
       };
       const entry = tier ? [s.size, tier.size] : table[id];
       return entry ? [Math.min(entry[0], entry[1]), entry[1]] : null;
@@ -1802,13 +1869,21 @@
       return { ready: true, tickets: this.cfg.kissTickets };
     }
 
+    // Prêmios dos minigames (src/premios.js): a Animação a mais que todos os prêmios liberados somam.
+    premioBonus() { return this.premios ? this.premios.bonus() : 0; }
+    // Eventos do mundo (src/mundo.js): a Animação a mais enquanto o evento do céu e do tempo dura.
+    mundoBonus() { return this.mundo ? this.mundo.bonus() : 0; }
+
     // Segredo da festa: digitar "yeye" com o jogo em foco chama o Rafael, que passa a andar pela festa com um quentão na mão (fica
-    // de um ano para o outro). `first` diz se foi a primeira vez; digitar de novo só faz ele gritar.
-    unlockRafael() {
-      const first = !this.state.rafael;
-      this.state.rafael = true;
-      this.emit('rafael', { first });
-      return { first };
+    // de um ano para o outro). Com ele já liberado, digitar de novo o esconde (ele sai de cena, mas continua liberado) e outra vez o traz
+    // de volta gritando. `first` diz se foi a primeira vez; `hidden`, se ele ficou escondido.
+    toggleRafael() {
+      const s = this.state;
+      const first = !s.rafael;
+      s.rafael = true;
+      s.rafaelHidden = first ? false : !s.rafaelHidden;
+      this.emit(s.rafaelHidden ? 'rafael-hide' : 'rafael', { first });
+      return { first, hidden: s.rafaelHidden };
     }
 
     // Concurso de quadrilha: cada jurado parte de 7 e soma a marcadora (Pamonha), o conjunto que a Mandioca veste, a pista
@@ -1860,7 +1935,7 @@
       const old = this.state;
       this.updateReserve(old.mail, this.cfg.letterCap, () => this.letterInterval(), 'letter-ready');
       const next = this.fresh();
-      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt', 'humor', 'rafael']) {
+      for (const key of ['seed', 'name', 'tickets', 'inventory', 'crew', 'achievements', 'stats', 'log', 'hints', 'setsWorn', 'mail', 'daily', 'records', 'album', 'bornAt', 'humor', 'rafael', 'rafaelHidden', 'premios', 'mundo', 'looks']) {
         next[key] = old[key];
       }
       next.year = (old.year || 1) + 1;
@@ -1868,6 +1943,9 @@
       if (old.minis?.cordel) next.minis.cordel = old.minis.cordel;
       // O bônus fixo da horta também: as plantas já colhidas continuam valendo (a horta em si recomeça).
       if (old.minis?.horta?.harvested) next.minis.horta.harvested = old.minis.horta.harvested;
+      // As visitas do folclore que já abriram (criaturas derrotadas) e quantas vezes vieram também ficam: a Mata recomeça, a coleção não.
+      const folclore = old.minis?.folclore;
+      if (folclore) Object.assign(next.minis.folclore, { met: folclore.met, seen: folclore.seen, caught: folclore.caught, last: folclore.last });
       next.yearStart = old.stats.playtime;
       // Rodadas no meio: a entrada volta (elas acabam com a festa). O lance guardado do leilão também.
       if (old.bingo?.round && !old.bingo.round.result) next.tickets += old.bingo.round.cost;
@@ -2505,6 +2583,7 @@
         result = { kind: 'wood', amount };
       }
       this.record('balloon', result);
+      this.emit('balloon-claimed', result);
       if (s.stats.balloons >= 10) this.unlock('balao-de-sorte');
       return result;
     }
@@ -2607,6 +2686,7 @@
       s.tickets += tickets;
       s.stats.rainbows++;
       this.record('rainbow', { amount, tickets });
+      this.emit('rainbow-claimed', { amount, tickets });
       if (s.stats.rainbows >= 5) this.unlock('arco-iris');
       return { amount, tickets };
     }
@@ -2631,8 +2711,8 @@
     }
 
     // Argolas da Sorte: cada rodada dobra o preço da próxima, e cada espera sem jogar corta o preço pela metade.
-    // Garrafas de Animação multiplicam a Animação que a festa já tem (×2 ou ×3); garrafas ×2 e ×3 multiplicam o que
-    // a rodada render.
+    // A garrafa de Animação (a estrela, no máximo uma por rodada) multiplica a Animação que a festa já tem (×2 ou ×3); garrafas
+    // ×2 e ×3 multiplicam o que a rodada render.
     ringThrows() { return this.cfg.ringThrows + (this.isPlaced('barraca-argolas') ? 1 : 0); }
     ringCost() { return this.state.rings.cost; }
     ringCooldown() { return this.cfg.ringCooldownMinutes * MINUTE * (1 - Math.min(0.6, this.effect('rings'))); }
@@ -2667,11 +2747,18 @@
       this.state.tickets -= cost;
       this.state.rings = { cost: cost * 2, nextAt: this.now() + this.ringCooldown() };
       const exclusives = this.data.items.filter(item => item.source === 'argolas' && !this.owned(item.id));
+      // A garrafa de Animação (a estrela) multiplica toda a Animação da festa: só uma por rodada (depois dela, as outras garrafas
+      // sorteiam entre os demais prêmios, na mesma proporção).
+      let star = false;
       const prizes = Array.from({ length: this.cfg.ringBottles }, () => {
-        let roll = this.rng();
-        for (const [kind, chance] of this.cfg.ringTable) {
+        const table = star ? this.cfg.ringTable.filter(([kind]) => kind !== 'animacao') : this.cfg.ringTable;
+        let roll = this.rng() * table.reduce((sum, [, chance]) => sum + chance, 0);
+        for (const [kind, chance] of table) {
           roll -= chance;
-          if (roll < 0) return this.ringPrize(kind, exclusives);
+          if (roll < 0) {
+            star = star || kind === 'animacao';
+            return this.ringPrize(kind, exclusives);
+          }
         }
         return this.ringPrize('fichas', exclusives);
       });
@@ -2700,7 +2787,7 @@
       const sum = kind => got.filter(prize => prize.kind === kind).reduce((total, prize) => total + (prize.amount || 0), 0);
       const mult = got.filter(prize => prize.mult).reduce((total, prize) => total * prize.mult, 1);
       const tickets = sum('fichas') * mult;
-      // Duas garrafas de Animação se multiplicam (×2 e ×3 = ×6); o ×2/×3 da rodada multiplica o que elas renderam.
+      // A garrafa de Animação (só vem uma por rodada) multiplica a Animação da festa; o ×2/×3 da rodada multiplica o que ela rendeu.
       const factor = got.filter(prize => prize.kind === 'animacao').reduce((total, prize) => total * prize.factor, 1);
       const cheer = factor > 1 ? this.state.cheer * (factor - 1) * mult : 0;
       const wood = sum('lenha') * mult;

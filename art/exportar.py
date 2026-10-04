@@ -28,6 +28,12 @@ import crescer
 import danca
 import itens_novos
 import itens_mata
+import tema_dino
+import tema_halloween
+import tema_zumbi
+import mundo_icones
+import placa_icones
+import premios
 import rafael
 import tamanhos
 from scene import (BACK_TINT, HEART, Layer, awning, bonfire, booth_back, booth_counter, crate, flag_mast, mastro_sao_joao,
@@ -1034,6 +1040,10 @@ def export_sides():
                                       sign={'x0': x0, 'x1': x1, 'y': 3, 'heart': kind == 'barraca-beijo',
                                             'color': PALETTE['r'], 'heartColor': PALETTE['H']})
         images[f'lado-{kind}-frente'] = strip([front for _, front in parts])[0]
+    # Os cenários dos temas novos (dinossauros, Halloween e terra de zumbis).
+    for tema in (tema_dino, tema_halloween, tema_zumbi):
+        for side_id, cenario_ in tema.LADOS.items():
+            manifest['sides'][side_id] = add(f'lado-{side_id}', cenario_['quadros'], fps=cenario_['fps'])
     for side_id, meta in manifest['sides'].items():
         image = images[meta['image']].crop((0, 0, meta['w'], meta['h']))
         if meta.get('front'):
@@ -1505,6 +1515,9 @@ def main():
     manifest['scenery'] = cenario.export(add)
     manifest['casa'] = casa_salas.exportar(add, icons)
     manifest['janelas'] = janelas.exportar(add, icons)
+    manifest['premios'] = premios.exportar(add, icons)
+    mundo_icones.exportar(icons)
+    placa_icones.exportar(icons)
     export_icons()
     export_terrains()
     export_app_icon()

@@ -128,7 +128,13 @@
       byId(data.minis.mata.creatures, override.mataCreatures, ['name', 'lore']);
       byId(data.minis.mata.bosses, override.mataBosses, ['name', 'lore']);
       byId(data.minis.mata.stages, override.mataStages, ['name']);
+      byId(data.minis.folclore.events, override.folcloreEvents, ['name', 'say', 'text']);
       byId(data.minis.cordel.pages, override.cordelPages, ['title', 'text', 'hint', 'say', 'done']);
+    }
+    if (data.mundo) byId(data.mundo.eventos, override.mundoEventos, ['name', 'text', 'shop0', 'shop1', 'shop2', 'chat0', 'chat1']);
+    if (data.premios) {
+      byId(data.premios.jogos, override.premiosJogos, ['name']);
+      byId(data.premios.itens, override.premiosItens, ['name', 'text', 'say0', 'say1', 'say2']);
     }
     byId(data.scenery.landmarks, override.landmarks, ['name']);
     byId(data.scenery.cycle, override.cycle, ['name']);

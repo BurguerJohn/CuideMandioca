@@ -1091,8 +1091,6 @@ test('argolas: a garrafa de Animação multiplica a Animação que a festa tem, 
   assert.equal(engine.state.cheer, 2000);
   ({ result, engine } = play(bottles, [1], 1000));
   assert.equal(engine.state.cheer, 3000, '×3: fica com o triplo');
-  ({ result } = play(bottles, [0, 1], 1000));
-  assert.equal(result.cheer, 5000, '×2 e ×3 juntas: ×6');
   ({ result } = play(bottles, [0, 2], 1000));
   assert.equal(result.cheer, 2000, 'com o ×2 da rodada, o ganho dobra');
   assert.equal(result.cheerTimes, 3);
@@ -1282,8 +1280,9 @@ test('São João do ano que vem: volta ao quintal com a turma, as roupas e as fi
   engine.buyBingo();
   s.wood = 50;
   s.bonfire.calor = 5;
-  s.stats.steps = 1200000;
-  engine.unlockRafael();
+  s.stats.steps = data.dances.at(-1).at;
+  engine.toggleRafael();
+  engine.toggleRafael();
   s.minis.horta.harvested = { milho: 3, abobora: 1 };
   s.minis.horta.buffs = { milho: engine.now() + 60000 };
   assert.equal(engine.canNewYear(), true);
@@ -1291,6 +1290,7 @@ test('São João do ano que vem: volta ao quintal com a turma, as roupas e as fi
   s = engine.state;
   assert.equal(s.year, 2);
   assert.equal(s.rafael, true, 'o Rafael fica de um ano para o outro');
+  assert.equal(s.rafaelHidden, true, 'e escondido continua escondido');
   assert.deepEqual(s.minis.horta.harvested, { milho: 3, abobora: 1 }, 'as plantas já colhidas continuam dando o bônus fixo da horta');
   assert.ok(Math.abs(engine.hortaBonus() - 0.2) < 1e-9);
   assert.equal(engine.hortaBuff('cheer'), 0, 'mas o bônus de 10 min não passa de um ano para o outro');
@@ -2170,14 +2170,15 @@ test('Álbum da Festa: figurinhas pelos acontecimentos e pelo diário, página c
   engine.emit('rain');
   assert.equal(engine.drainEvents().filter(event => event.type === 'sticker').length, 0, 'figurinha repetida não conta');
   // Fecha a página das brincadeiras.
-  const before = engine.multiplier();
+  const before = engine.multiplier() / (1 + engine.premioBonus());
   const tickets = s.tickets;
   for (const type of ['rings', 'fished', 'saco', 'leilao']) engine.record(type, {});
   const events = engine.drainEvents();
   assert.ok(events.some(event => event.type === 'album-page' && event.id === 'brincadeiras'));
   assert.equal(s.tickets - tickets, data.config.albumTickets);
   assert.equal(engine.albumPages(), 1);
-  assert.ok(Math.abs(engine.multiplier() / before - (1 + data.config.albumBonus)) < 1e-9, '+2% em tudo');
+  // (As figurinhas coladas também contam para os prêmios do Álbum: o bônus deles fica de fora da conta.)
+  assert.ok(Math.abs(engine.multiplier() / (1 + engine.premioBonus()) / before - (1 + data.config.albumBonus)) < 1e-9, '+2% em tudo');
   // O ano que vem guarda o álbum.
   s.size = 120;
   if (engine.canNewYear()) {
@@ -2905,7 +2906,7 @@ test('avanço determinístico equivale a rodar a festa segundo a segundo, inclus
   }
   const timestamps = new Set(['nextAt', 'until', 'born', 'endsAt', 'judgeAt', 'readyAt', 'startAt', 'saleAt',
     'leaveAt', 'bidAt', 'rivalAt', 'thunderAt', 'kissAt', 'start', 'at', 'fallUntil', 'pokeAt', 'riceAt',
-    'cartAt', 'flagAt', 'compadreAt', 'announceAt', 'grainAt', 'giftAt', 'petAt', 'foodAt', 'bubbleAt', 'waterAt', 'crowAt', 'plantedAt', 'jumpAt', 'cooldownAt', 'startAt', 'rocketAt', 'finaleAt', 'starAt', 'simpatiaAt']);
+    'cartAt', 'flagAt', 'compadreAt', 'announceAt', 'grainAt', 'giftAt', 'petAt', 'foodAt', 'bubbleAt', 'waterAt', 'crowAt', 'butterflyAt', 'orderAt', 'plantedAt', 'jumpAt', 'cooldownAt', 'startAt', 'rocketAt', 'finaleAt', 'starAt', 'simpatiaAt']);
   const relative = ({ engine, clock }) => JSON.parse(JSON.stringify(engine.state, (key, value) =>
     timestamps.has(key) && value ? value - clock.now : value));
   assert.deepEqual(relative(fast), relative(live), 'mesmos saldos, estatísticas, diário e tempos restantes');
@@ -3165,22 +3166,38 @@ test('Barriga parada: o avanço do tempo, o save e a carga com lixo guardam a pa
   assert.equal(engine.mood().barriga, 0);
 });
 
-test('segredo "yeye": o Rafael é chamado uma vez, o save lembra dele e lixo no save não chama ninguém', () => {
+test('segredo "yeye": o Rafael é chamado, digitar de novo o esconde e outra vez o traz de volta; o save lembra e lixo no save não chama ninguém', () => {
   const { engine, clock } = game();
+  const loadWith = raw => new GameEngine(data, raw, { rng: () => 0.5, now: () => clock.now }).state;
+  const rafaelEvents = () => engine.events.filter(event => event.type.startsWith('rafael')).map(event => event.type);
   assert.equal(engine.state.rafael, false, 'de fábrica ele não está na festa');
+  assert.equal(engine.state.rafaelHidden, false);
   engine.events.length = 0;
-  assert.deepEqual(engine.unlockRafael(), { first: true });
+  assert.deepEqual(engine.toggleRafael(), { first: true, hidden: false });
   assert.equal(engine.state.rafael, true);
-  assert.deepEqual(engine.events.filter(event => event.type === 'rafael').map(event => event.first), [true]);
-  assert.deepEqual(engine.unlockRafael(), { first: false }, 'digitar de novo só o faz gritar');
-  assert.deepEqual(engine.events.filter(event => event.type === 'rafael').map(event => event.first), [true, false]);
+  assert.deepEqual(rafaelEvents(), ['rafael']);
+  assert.deepEqual(engine.toggleRafael(), { first: false, hidden: true }, 'digitar de novo, com ele liberado, o esconde');
+  assert.equal(engine.state.rafael, true, 'escondido não é bloqueado de novo');
+  assert.deepEqual(rafaelEvents(), ['rafael', 'rafael-hide']);
+  const hiddenSave = engine.exportState();
+  assert.equal(loadWith(hiddenSave).rafaelHidden, true, 'o save lembra que ele está escondido');
+  assert.deepEqual(engine.toggleRafael(), { first: false, hidden: false }, 'e a terceira vez o traz de volta');
+  assert.deepEqual(rafaelEvents(), ['rafael', 'rafael-hide', 'rafael']);
   const saved = engine.exportState();
-  assert.equal(new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.now }).state.rafael, true, 'o save lembra');
+  const back = loadWith(saved);
+  assert.deepEqual([back.rafael, back.rafaelHidden], [true, false], 'o save lembra');
   for (const lixo of ['sim', 1, {}, null, 'true']) {
     const messy = JSON.parse(JSON.stringify(saved));
     messy.rafael = lixo;
-    assert.equal(new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.now }).state.rafael, false, `rafael: ${JSON.stringify(lixo)}`);
+    messy.rafaelHidden = lixo;
+    assert.deepEqual([loadWith(messy).rafael, loadWith(messy).rafaelHidden], [false, false], `rafael: ${JSON.stringify(lixo)}`);
+    const half = JSON.parse(JSON.stringify(hiddenSave));
+    half.rafaelHidden = lixo;
+    assert.equal(loadWith(half).rafaelHidden, false, `escondido: ${JSON.stringify(lixo)}`);
   }
+  const unlockedNever = JSON.parse(JSON.stringify(hiddenSave));
+  unlockedNever.rafael = false;
+  assert.equal(loadWith(unlockedNever).rafaelHidden, false, 'quem nunca o chamou não tem Rafael escondido');
 });
 
 test('tempo fora paga o bônus da horta só até a colheita expirar, tanto ao acordar quanto ao carregar', () => {
@@ -3813,4 +3830,32 @@ for (const [kind, seconds, activate] of [
   assert.ok(Math.abs(engine.state.runtime.lastStep - plain) < 1e-9);
   engine.updateTimers(clock.now);
   assert.equal(engine.state.runtime[`${kind}Left`], 0);
+});
+
+test('argolas: a garrafa de Animação (a estrela) vem no máximo uma vez por rodada, e o resto do sorteio continua variado', () => {
+  const kinds = new Set();
+  let withStar = 0;
+  const rounds = 4000;
+  for (let i = 0; i < rounds; i++) {
+    let seed = i * 7919 + 3;
+    const rng = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const { engine } = game({ rng });
+    engine.state.tickets = 5;
+    engine.state.size = 60;
+    const prizes = engine.startRings().prizes;
+    assert.equal(prizes.length, data.config.ringBottles);
+    const stars = prizes.filter(prize => prize.kind === 'animacao').length;
+    assert.ok(stars <= 1, `rodada ${i}: ${stars} garrafas de Animação`);
+    withStar += stars;
+    for (const prize of prizes) kinds.add(prize.kind);
+  }
+  assert.deepEqual([...kinds].sort(), ['animacao', 'fichas', 'item', 'lenha', 'x2', 'x3'], 'todos os prêmios ainda saem');
+  // A estrela segue comum (5 garrafas a 30% dão uma em cerca de 83% das rodadas).
+  assert.ok(withStar / rounds > 0.75 && withStar / rounds < 0.9, `rodadas com estrela: ${withStar / rounds}`);
+  // Mesmo se o sorteio só caísse em Animação, só a primeira garrafa seria uma.
+  const { engine } = game({ rng: () => 0.5 });
+  engine.state.tickets = 5;
+  const fixed = engine.startRings().prizes.map(prize => prize.kind);
+  assert.equal(fixed[0], 'animacao');
+  assert.ok(fixed.slice(1).every(kind => kind !== 'animacao'), fixed.join(','));
 });

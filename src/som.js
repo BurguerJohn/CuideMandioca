@@ -63,6 +63,26 @@
       }
     },
     aviso: { gap: 500, play: v => { v.tom(0, 0.18, nota(21), { gain: 0.09 }); v.tom(0.12, 0.32, nota(28), { gain: 0.09 }); } },
+    // O aviso de um evento do mundo: três notas subindo com um acorde brilhante e uma chuva de estrelinhas (nenhum outro som da festa é assim).
+    evento: {
+      gap: 900,
+      play: v => {
+        [24, 28, 31].forEach((n, i) => v.tom(i * 0.09, 0.22, nota(n), { type: 'square', gain: 0.05, filter: 3200 }));
+        for (const n of [31, 36]) v.tom(0.3, 0.55, nota(n), { type: 'sine', gain: 0.07 });
+        [43, 47, 50].forEach((n, i) => v.tom(0.42 + i * 0.07, 0.3, nota(n), { type: 'sine', gain: 0.035 }));
+      }
+    },
+    // O dos eventos raros: tambor grave, corneta subindo a escala, acorde aberto de sanfona e uma cascata de brilhos.
+    'evento-raro': {
+      gap: 1500,
+      play: v => {
+        v.tom(0, 0.22, 95, { to: 52, type: 'sine', gain: 0.2 });
+        v.ruido(0, 0.08, { type: 'lowpass', freq: 700, gain: 0.12 });
+        [19, 24, 28, 31, 36].forEach((n, i) => sanfona(v, 0.12 + i * 0.1, 0.22, [n], 0.03));
+        sanfona(v, 0.72, 0.9, [24, 28, 31, 36], 0.028);
+        for (let i = 0; i < 6; i++) v.tom(0.78 + i * 0.08, 0.35, nota(43 + (i * 5) % 12), { type: 'sine', gain: 0.035 });
+      }
+    },
     pesca: {
       play: v => {
         v.ruido(0, 0.3, { freq: 1800, to: 400, q: 0.8, gain: 0.2 });
@@ -257,6 +277,16 @@
     carinho: { gap: 250, play: v => { v.tom(0, 0.14, 320, { to: 900, type: 'sine', gain: 0.1 }); v.tom(0.13, 0.14, nota(31), { type: 'sine', gain: 0.06 }); } },
     // "Olha a cobra!": apito de escorregar, baixinho e raro.
     cobra: { gap: 4000, play: v => v.tom(0, 0.2, 700, { to: 1500, type: 'sine', gain: 0.05 }) },
+    // Visitas do folclore: o brilho do fogo-fátuo (três notinhas agudas descendo), o assobio (sobe e desce), o uivo do lobisomem, o galope
+    // (cascos), o canto da Iara (três notas suaves), as bolhas do caldeirão da Cuca, o sopro do Boitatá e o ronco do gigante fedorento.
+    brilho: { gap: 500, play: v => [0, 0.09, 0.18].forEach((at, i) => v.tom(at, 0.22, 2600 - i * 380, { type: 'sine', gain: 0.035 })) },
+    assobio: { gap: 600, play: v => { v.tom(0, 0.28, 900, { to: 1700, type: 'sine', gain: 0.05 }); v.tom(0.3, 0.3, 1700, { to: 1000, type: 'sine', gain: 0.045 }); } },
+    uivo: { gap: 2500, play: v => { v.tom(0, 0.35, 260, { to: 520, type: 'sawtooth', gain: 0.04, filter: 1400, attack: 0.08 }); v.tom(0.35, 0.9, 520, { to: 300, type: 'sawtooth', gain: 0.04, filter: 1100 }); } },
+    galope: { gap: 1500, play: v => { for (let i = 0; i < 6; i++) { const at = (i % 3) * 0.1 + Math.floor(i / 3) * 0.42; v.tom(at, 0.06, 150, { to: 80, type: 'sine', gain: 0.1 }); v.ruido(at, 0.03, { type: 'lowpass', freq: 900, gain: 0.07 }); } } },
+    canto: { gap: 1500, play: v => [0, 7, 3].forEach((step, i) => v.tom(i * 0.28, 0.7, nota(31 + step), { type: 'sine', gain: 0.04, attack: 0.06 })) },
+    bolha: { gap: 800, play: v => [0, 0.12, 0.25, 0.4].forEach((at, i) => v.tom(at, 0.1, 280 + i * 70, { to: 520 + i * 90, type: 'sine', gain: 0.05 })) },
+    chama: { gap: 1500, play: v => { v.ruido(0, 0.7, { type: 'bandpass', freq: 900, to: 2400, gain: 0.07 }); v.tom(0, 0.5, 110, { to: 160, type: 'sawtooth', gain: 0.03, filter: 500 }); } },
+    fedor: { gap: 1500, play: v => { v.tom(0, 0.5, 80, { to: 55, type: 'sawtooth', gain: 0.07, filter: 300 }); v.tom(0.12, 0.4, 120, { to: 70, type: 'square', gain: 0.03, filter: 250 }); } },
     // Papagaio: um "crrá" rouco, duas vezes.
     papagaio: { gap: 300, play: v => { v.tom(0, 0.1, 1100, { to: 700, type: 'sawtooth', gain: 0.045, filter: 2400 }); v.tom(0.13, 0.12, 1000, { to: 650, type: 'sawtooth', gain: 0.045, filter: 2400 }); } },
     // Show de drones: um arpejo subindo, suave e brilhante (dó, mi, sol, dó).

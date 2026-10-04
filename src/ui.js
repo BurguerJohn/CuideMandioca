@@ -38,7 +38,8 @@
     { id: 'terreiro', icon: 'item:terra-batida' },
     { id: 'lado', icon: 'item:barraca-pescaria' },
     { id: 'varal', icon: 'item:varal-colorido' },
-    { id: 'conjuntos', icon: 'item:coroa-flores' }
+    { id: 'conjuntos', icon: 'item:coroa-flores' },
+    { id: 'looks', icon: 'ui:looks' }
   ];
   // Tamanhos prontos em Ajustes (e no menu da bandeja): do menor ao maior que a alça de arrastar alcança (25% a 300%).
   const ZOOMS = [25, 50, 75, 100, 150, 200, 300];
@@ -168,7 +169,13 @@
       minisList.map(mini => `<button class="ferramenta ${mini.visible ? 'aberta' : ''} ${mini.pending ? 'chama' : ''}" data-action="mini" data-mini="${mini.id}" ` +
         `title="${esc(t('hud.mini', { name: mini.name }))}${mini.pending ? ` ${esc(t('hud.miniPending', { n: mini.pending }))}` : ''}">${ctx.icon(`ui:${mini.id}`)}` +
         `${mini.pending ? `<i class="selo-botao">${mini.pending}</i>` : ''}</button>`).join('');
-    const janelasRow = janelaButtons ? `<div class="barra-janelas">${janelaButtons}</div>` : '';
+    // As gavetas da placa: as janelas e as coleções (álbum, prêmios, eventos do mundo) ficam guardadas atrás de um botão cada, e só uma abre de cada vez
+    // (a preferência `gaveta` lembra qual). O botão das janelas leva o total das pendências, para nada passar batido com a gaveta fechada.
+    const gaveta = ctx.settings?.gaveta === 'janelas' || ctx.settings?.gaveta === 'colecoes' ? ctx.settings.gaveta : null;
+    const pendingTotal = minisList.reduce((sum, mini) => sum + (mini.pending || 0), 0);
+    const drawerButton = (id, icon, title, badge) => `<button class="ferramenta gaveta ${gaveta === id ? 'aberta' : ''} ${badge ? 'chama' : ''}" data-action="gaveta" data-gaveta="${id}" ` +
+      `aria-expanded="${gaveta === id}" title="${esc(title)}">${ctx.icon(icon)}${badge ? `<i class="selo-botao">${badge}</i>` : ''}</button>`;
+    const janelasRow = janelaButtons ? `<div class="barra-gaveta barra-janelas" data-gaveta="janelas"${gaveta === 'janelas' ? '' : ' hidden'}>${janelaButtons}</div>` : '';
     // O que está valendo agora: frenesi (do balão de sorte) e quadrilha marcada, cada um com os segundos que faltam.
     const r = s.runtime;
     const buffs = [
@@ -197,6 +204,12 @@
       ...engine.hortaBuffs().map(buff => `<span class="selo verde" title="${esc(t('hud.hortaTitle', { m: engine.data.minis.horta.buffMinutes }))}">` +
         `${esc(t('hud.horta', { crop: engine.data.minis.horta.crops.find(entry => entry.id === buff.crop)?.name || buff.crop,
           effect: t(`horta.buff.${buff.kind}`, { v: Math.round(buff.value * 100) }) }))} ${until(buff.until, ctx.now)}</span>`),
+      // Bônus comprados na feira: o nome, quanto soma e quanto falta.
+      ...(engine.mundo ? engine.mundo.buffs().map(buff => `<span class="selo verde" title="${esc(t('hud.mundoBuffTitle'))}">${esc(t('hud.mundoBuff', { name: buff.name, v: Math.round(buff.bonus * 100) }))} ${until(buff.until, ctx.now)}</span>`) : []),
+      // O aviso de que o próximo evento do mundo vem aí (faltam poucos segundos): o nome e a contagem.
+      engine.mundo?.soon() ? (() => { const plan = engine.mundo.soon(); return `<span class="selo" title="${esc(plan.entry.text)}">${esc(t('hud.mundoSoon', { name: plan.entry.name }))} ${until(plan.at, ctx.now)}</span>`; })() : '',
+      // Evento do mundo (céu e tempo da festa): o nome, os alvos já pegos e o tempo que falta.
+      engine.mundo?.active() ? (() => { const a = engine.mundo.active(); return `<span class="selo ouro" title="${esc(a.entry.text)}">${esc(a.n ? t('hud.mundo', { name: a.entry.name, got: a.got.length, n: a.n }) : t('hud.mundoSemAlvo', { name: a.entry.name, v: Math.round(a.entry.bonus * 100) }))} ${until(a.until, ctx.now)}</span>`; })() : '',
       s.cold?.active ? `<span class="selo azul" title="${esc(t(engine.quentaoOn() ? 'hud.coldQuentao' : 'hud.coldTitle'))}">${esc(t('hud.cold'))}</span>` : ''
     ].join('');
     return `<div class="placa-linha">` +
@@ -214,25 +227,35 @@
       `<button class="ferramenta" data-action="vitrine" title="${esc(t('hud.shop'))}">${ctx.icon('ui:loja')}</button>` +
       `<button class="ferramenta argolas" data-action="argolas" title="${esc(t('rings.title'))}">${ctx.icon('ui:argolas')}` +
       `<i class="preco-argolas" data-live="ringCost"${engine.ringCost() > engine.cfg.ringCost ? '' : ' hidden'}>` +
-      `${engine.ringCost()}</i></button>` + telas + `</div>` + janelasRow + `<div class="barra-sistema">` +
+      `${engine.ringCost()}</i></button>` + telas + `</div>` + `<div class="barra-sistema">` +
       `<button class="ferramenta" data-action="abrir" title="${esc(t('hud.panel'))}">` +
       `${ctx.icon('ui:painel')}</button>` +
       // Conquistas: abre o painel nessa aba; o selo conta as metas cumpridas esperando o resgate.
       `<button class="ferramenta ${goalsReady ? 'chama' : ''} ${ctx.tab === 'conquistas' && ctx.panelOpen ? 'aberta' : ''}" ` +
       `data-action="tab" data-tab="conquistas" data-alternar="1" title="${esc(goalsReady ? t('hud.goalsReady', { n: goalsReady }) : tabName('conquistas'))}">` +
       `${ctx.icon('ui:conquista')}${goalsReady ? `<i class="selo-botao">${goalsReady}</i>` : ''}</button>` +
-      // Álbum de figurinhas, na janela dele.
-      `<button class="ferramenta ${ctx.tela === 'album' ? 'aberta' : ''}" data-action="tela" data-tela="album" ` +
-      `title="${esc(tabName('album'))}">${ctx.icon('ui:album')}</button>` +
+      // As gavetas: coleções (álbum, prêmios e eventos do mundo) e janelas (a casa e os minijogos extras).
+      drawerButton('colecoes', 'ui:gaveta-colecoes', t('hud.gavetaColecoes')) +
+      (janelaButtons ? drawerButton('janelas', 'ui:gaveta-janelas', t('hud.gavetaJanelas'), pendingTotal) : '') +
       (engine.cfg.debugMenu || ctx.debug ? `<button class="ferramenta teste ${ctx.tela === 'teste' ? 'aberta' : ''}" data-action="tela" ` +
         `data-tela="teste" title="${esc(t('hud.test'))}">${ctx.icon('ui:teste')}</button>` : '') +
       `<span class="espaco"></span>` +
+      // Tamanho e fechar vão juntos no fim da barra (e descem para a linha de baixo quando os botões de cima ocupam a largura toda).
+      `<span class="barra-fim">` +
       // Tamanho num botão só: arrastar aumenta ou diminui; um clique (sem arrastar) volta a 100%.
       `<button class="ferramenta zoom alca" data-action="zoom-alca" title="${esc(t('hud.resize'))}">` +
       `${ctx.icon('ui:redimensionar')}<b data-live="zoom">${esc(ctx.zoomLabel || '100%')}</b></button>` +
       (ctx.desktop ? `<button class="ferramenta fechar-jogo ${ctx.closeArmed ? 'armado' : ''}" data-action="fechar-jogo" ` +
         `title="${esc(ctx.closeArmed ? t('hud.closeAgain') : t('hud.close'))}">${ctx.icon('ui:fechar')}</button>` : '') +
-      `</div></div>`;
+      `</span>` +
+      `</div>` +
+      // A gaveta das coleções: álbum de figurinhas, prêmios dos minigames (as coisas e os personagens que cada jogo libera) e os eventos do mundo
+      // (o céu e o tempo da festa, os que já passaram e o que está no ar).
+      `<div class="barra-gaveta barra-colecoes" data-gaveta="colecoes"${gaveta === 'colecoes' ? '' : ' hidden'}>` +
+      ['album', 'premios', 'mundo'].map(id => `<button class="ferramenta ${ctx.tela === id ? 'aberta' : ''}" data-action="tela" data-tela="${id}" ` +
+        `title="${esc(tabName(id))}">${ctx.icon(id === 'album' ? 'ui:album' : id === 'premios' ? 'ui:premios' : 'ui:mundo')}</button>`).join('') + `</div>` +
+      janelasRow +
+      `</div>`;
   }
 
   // Vitrine: loja e melhorias encaixadas em cima da festa. Passar o mouse num item mostra a prévia na festa.
@@ -277,55 +300,160 @@
           `data-id="${food.id}" title="${esc(food.desc)}"><div class="vcard-img">${ctx.icon(`ui:comida-${food.id}`, 'icone-mini')}</div>` +
           `<b class="nome">${esc(food.name)} <small>${esc(t('shop.foodFill', { n: food.fill }))}</small></b><span class="estado">${state}</span></div>`;
       }).join('') + `</div>`;
+    } else if (cat === 'looks') {
+      // O guarda-roupa: o cartão de salvar o visual de agora, o do look surpresa e um cartão por look salvo (as sete peças em ícones, as que faltam
+      // apagadas); clicar num look veste, o × apaga. Passar o mouse mostra o look na festa.
+      const info = engine.looks.info();
+      const now = engine.looks.current();
+      const tiles = (pieces, state) => `<span class="conjunto-pecas look-pecas">${engine.looks.slots.map(slot => (pieces[slot]
+        ? `<span class="peca ${engine.owned(pieces[slot]) ? 'tem' : 'falta'}" title="${esc(engine.items[pieces[slot]]?.name || pieces[slot])}">${ctx.icon(`item:${pieces[slot]}`, 'icone-mini')}</span>` : '')).join('')}` +
+        `<span class="estado">${state}</span></span>`;
+      const save = `<div class="vcard item look novo ${info.full ? 'especial' : ''}" role="button" tabindex="0" data-action="look-salvar" title="${esc(t('looks.save'))}">` +
+        `<span class="conjunto-linha"><b class="nome">${esc(t('looks.save'))}</b></span>${tiles(now, esc(info.full ? t('looks.full') : t('looks.saveCount', { n: info.count, max: info.max })))}</div>`;
+      const dice = `<div class="vcard item look sorte" role="button" tabindex="0" data-action="look-sortear" title="${esc(t('looks.randomHint'))}">` +
+        `<span class="conjunto-linha"><b class="nome">${esc(t('looks.random'))}</b><span class="dado">${ctx.icon('ui:dado', 'icone-mini')}</span></span>` +
+        `<span class="look-dica">${esc(t('looks.randomHint'))}</span></div>`;
+      const cards = info.list.map(look => {
+        const worn = engine.looks.isWorn(look);
+        const lacking = engine.looks.missing(look).length;
+        const [state, cls] = worn ? [esc(t('looks.worn')), 'uso'] : lacking ? [esc(t('looks.wear')), 'especial'] : [esc(t('looks.wear')), 'tem'];
+        return `<div class="vcard item look ${cls}" role="button" tabindex="0" data-action="look-vestir" data-id="${look.id}" data-preview="look:${look.id}" title="${esc(look.name)}">` +
+          `<span class="conjunto-linha"><b class="nome">${esc(look.name)}</b><button class="look-apagar" data-action="look-apagar" data-id="${look.id}" title="${esc(t('looks.delete'))}">×</button></span>` +
+          `${tiles(look.pieces, state)}</div>`;
+      });
+      body = `<div class="vgrade looks" style="--colunas:${Math.max(1, Math.ceil((2 + cards.length) / 2))}">${save}${dice}${cards.join('')}</div>`;
     } else if (cat === 'conjuntos') {
-      // Os conjuntos: um cartão cada, com o chapéu dele de rosto; clicar veste as três peças (se a pessoa tem todas).
-      const sets = engine.data.sets;
-      const active = engine.activeSet();
-      const rows = sets.length > 12 ? 4 : 3;
-      body = `<div class="vgrade ${rows === 4 ? 'quatro' : ''}" style="--colunas:${Math.max(1, Math.ceil(sets.length / rows))}">` +
-        sets.map(set => {
+      // Os conjuntos: um cartão cada, separados por tema nas pílulas de cima e, dentro do tema, do menor para o maior bônus. O cartão mostra as três
+      // peças (apagadas as que faltam) e o bônus em destaque, que muda de cor a cada faixa (`config.setTiers`); clicar veste as três (se tem todas).
+      const entries = [...engine.data.sets].sort((a, b) => a.bonus - b.bonus).map(set => ({ set, group: setGroup(engine, set) }));
+      const group = pickGroup(ctx, 'conjuntos', entries.map(entry => entry.group));
+      const shown = group === 'todos' ? entries : entries.filter(entry => entry.group === group);
+      const rows = entries.map(entry => ({ group: entry.group, mine: [entry.set.hat, entry.set.hand, entry.set.fabric].every(piece => engine.owned(piece)) }));
+      body = `<div class="vitrine-itens">${filterBar(ctx, rows, group)}` +
+        `<div class="vgrade conjuntos" style="--colunas:${Math.max(1, Math.ceil(shown.length / 2))}">` + shown.map(({ set, group: g }) => {
           const pieces = [set.hat, set.hand, set.fabric];
           const missing = pieces.filter(piece => !engine.owned(piece)).length;
+          const active = engine.activeSet();
           const [state, cls] = active?.id === set.id ? [esc(t('shop.inUse')), 'uso']
             : missing ? [esc(t(missing === 1 ? 'shop.setMissingOne' : 'shop.setMissing', { n: missing })), 'especial'] : [esc(t('shop.use')), 'tem'];
-          return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-conjunto" data-id="${set.id}" ` +
-            `data-preview="set:${set.id}" title="${esc(pieces.map(piece => engine.items[piece]?.name || piece).join(' + '))}">` +
-            `<div class="vcard-img">${ctx.icon(`item:${set.hat}`, 'icone-mini')}</div>` +
-            `<b class="nome">${esc(set.name)} +${Math.round(set.bonus * 100)}%</b><span class="estado">${state}</span></div>`;
-        }).join('') + `</div>`;
+          const bonus = Math.round(set.bonus * 100);
+          const tier = engine.cfg.setTiers.filter(min => set.bonus >= min).length;
+          return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-conjunto" data-id="${set.id}" data-faixa="${tier}" data-grupo="${g}" ` +
+            `data-preview="set:${set.id}" title="${esc(`${set.name} +${bonus}%: ${pieces.map(piece => engine.items[piece]?.name || piece).join(' + ')}`)}">` +
+            `<span class="conjunto-linha"><b class="nome">${esc(set.name)}</b><b class="bonus">+${bonus}%</b></span>` +
+            `<span class="conjunto-pecas">${pieces.map(piece => `<span class="peca ${engine.owned(piece) ? 'tem' : 'falta'}" title="${esc(engine.items[piece]?.name || piece)}">` +
+              `${ctx.icon(`item:${piece}`, 'icone-mini')}</span>`).join('')}<span class="estado">${state}</span></span></div>`;
+        }).join('') + `</div></div>`;
     } else {
-      const items = engine.data.items.filter(item => item.cat === cat);
+      // Os itens da categoria, em grupos (clássicos de São João, criativos caros, os três temas e os prêmios que não se compram): as pílulas de cima
+      // filtram, e dentro de cada grupo vai do mais barato para o mais caro. A grade tem duas fileiras e rola de lado.
+      const all = engine.data.items.map((item, index) => ({ item, index, group: itemGroup(item) })).filter(entry => entry.item.cat === cat)
+        .sort((a, b) => GROUP_ORDER[a.group] - GROUP_ORDER[b.group] || a.item.price - b.item.price || a.index - b.index);
+      const group = pickGroup(ctx, cat, all.map(entry => entry.group));
+      const shown = group === 'todos' ? all : all.filter(entry => entry.group === group);
       const side = ctx.dockSide || 'esquerda';
-      const sides = cat === 'lado' ? `<div class="vlados">${['esquerda', 'direita'].map(name =>
+      const sides = cat === 'lado' ? `<span class="vlados">${['esquerda', 'direita'].map(name =>
         `<button class="chip ${side === name ? 'ativa' : ''}" data-action="vitrine-lado" data-side="${name}">` +
-        `${esc(t(name === 'esquerda' ? 'shop.sideLeft' : 'shop.sideRight'))}</button>`).join('')}</div>` : '';
-      // Itens numa grade de 3 fileiras (4 se a categoria crescer), com colunas que dividem a largura: tudo cabe sem rolar.
-      const rows = items.length > 12 ? 4 : 3;
-      const columns = Math.max(1, Math.ceil(items.length / rows));
-      body = sides + `<div class="vgrade ${rows === 4 ? 'quatro' : ''}" style="--colunas:${columns}">` + items.map(item => {
-        const owned = engine.owned(item.id);
-        const inUse = cat === 'lado' ? s.equipped[side] === item.id : s.equipped[cat] === item.id;
-        let state;
-        let cls = '';
-        if (inUse) { state = esc(t('shop.inUse')); cls = 'uso'; }
-        else if (owned) { state = esc(t(cat === 'lado' ? `shop.place.${side}` : 'shop.use')); cls = 'tem'; }
-        else if (item.source === 'role') { state = esc(t('shop.onlyOutings')); cls = 'especial'; }
-        else if (item.source === 'argolas') { state = esc(t('shop.onlyRings')); cls = 'especial'; }
-        else if (item.source === 'casamento') { state = esc(t('shop.onlyWedding')); cls = 'especial'; }
-        else if (item.source === 'leilao') { state = esc(t('shop.onlyAuction')); cls = 'especial'; }
-        else if (item.source === 'cobra') { state = esc(t('shop.onlySnake')); cls = 'especial'; }
-        else if (item.source === 'luta') { state = esc(t('shop.onlyBattle')); cls = 'especial'; }
-        else if (engine.itemLocked(item.id)) { state = `🔒 ${esc(engine.data.tiers[item.tier].name)}`; cls = 'especial'; }
-        else state = `<span class="preco" data-cost="${item.price}" data-currency="tickets">${ctx.icon('ui:fichas')}${item.price}</span>`;
-        return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-item" data-id="${item.id}" ` +
-          `data-preview="${item.id}" title="${esc(item.name)}"><div class="vcard-img">${ctx.icon(`item:${item.id}`, 'icone-mini')}</div>` +
-          `<b class="nome">${esc(item.name)}</b><span class="estado">${state}</span></div>`;
-      }).join('') + `</div>`;
+        `${esc(t(name === 'esquerda' ? 'shop.sideLeft' : 'shop.sideRight'))}</button>`).join('')}</span>` : '';
+      body = `<div class="vitrine-itens">${filterBar(ctx, all.map(entry => ({ group: entry.group, mine: engine.owned(entry.item.id) })), group, sides)}` +
+        `<div class="vgrade" style="--colunas:${Math.max(1, Math.ceil(shown.length / 2))}">` + shown.map(({ item, group: g }) => {
+          const owned = engine.owned(item.id);
+          const inUse = cat === 'lado' ? s.equipped[side] === item.id : s.equipped[cat] === item.id;
+          let state;
+          let cls = '';
+          if (inUse) { state = esc(t('shop.inUse')); cls = 'uso'; }
+          else if (owned) { state = esc(t(cat === 'lado' ? `shop.place.${side}` : 'shop.use')); cls = 'tem'; }
+          else if (item.source === 'role') { state = esc(t('shop.onlyOutings')); cls = 'especial'; }
+          else if (item.source === 'argolas') { state = esc(t('shop.onlyRings')); cls = 'especial'; }
+          else if (item.source === 'casamento') { state = esc(t('shop.onlyWedding')); cls = 'especial'; }
+          else if (item.source === 'leilao') { state = esc(t('shop.onlyAuction')); cls = 'especial'; }
+          else if (item.source === 'cobra') { state = esc(t('shop.onlySnake')); cls = 'especial'; }
+          else if (item.source === 'luta') { state = esc(t('shop.onlyBattle')); cls = 'especial'; }
+          else if (engine.itemLocked(item.id)) { state = `🔒 ${esc(engine.data.tiers[item.tier].name)}`; cls = 'especial'; }
+          else state = `<span class="preco" data-cost="${item.price}" data-currency="tickets">${ctx.icon('ui:fichas')}${item.price}</span>`;
+          return `<div class="vcard item ${cls}" role="button" tabindex="0" data-action="vitrine-item" data-id="${item.id}" data-grupo="${g}" ` +
+            `data-preview="${item.id}" title="${esc(item.name)}"><div class="vcard-img">${ctx.icon(`item:${item.id}`, 'icone-vitrine')}</div>` +
+            `<b class="nome">${esc(item.name)}</b><span class="estado">${state}</span></div>`;
+        }).join('') + `</div></div>`;
     }
     const hint = cat === 'comidas'
       ? t('shop.hintFoods', { stat: engine.stats.rebolado.name, high: number(engine.cfg.moodHigh, 2), low: number(engine.cfg.moodLow, 2) })
-      : t(cat === 'melhorias' ? 'shop.hintUpgrades' : cat === 'conjuntos' ? 'shop.hintSets' : 'shop.hintItems');
-    return top + `<div class="vitrine-corpo">${body}</div><div class="vitrine-detalhe" id="vitrine-detalhe">${esc(hint)}</div>`;
+      : t(cat === 'melhorias' ? 'shop.hintUpgrades' : cat === 'conjuntos' ? 'shop.hintSets' : cat === 'looks' ? 'shop.hintLooks' : 'shop.hintItems');
+    return top + `<div class="vitrine-corpo">${body}</div><div class="vitrine-detalhe" id="vitrine-detalhe"><p class="vdet-dica">${esc(hint)}</p></div>`;
+  }
+
+  // Os grupos da vitrine: de onde vem cada item. Os clássicos de São João, os criativos caros (porte 2 em diante), os três temas novos (`tema` no item)
+  // e os prêmios que não se compram (rolê, Argolas, casamento, leilão, cobra e as lutas da Mata).
+  const GROUPS = [
+    { id: 'classicos', icon: 'item:chapeu-palha' }, { id: 'criativos', icon: 'item:cartola-magica' }, { id: 'dino', icon: 'item:capuz-dino' },
+    { id: 'halloween', icon: 'item:chapeu-bruxa' }, { id: 'zumbi', icon: 'item:cerebro-exposto' }, { id: 'premios', icon: 'item:coroa-iara' }
+  ];
+  const GROUP_ORDER = Object.fromEntries(GROUPS.map((group, index) => [group.id, index]));
+  function itemGroup(item) {
+    if (item.tema) return item.tema;
+    if (item.source && item.source !== 'inicial') return 'premios';
+    return item.tier >= 2 ? 'criativos' : 'classicos';
+  }
+  // O grupo de um conjunto: o do tema de qualquer peça; senão prêmio (se tem peça de luta), criativo (peça de porte) ou clássico.
+  function setGroup(engine, set) {
+    const pieces = [set.hat, set.hand, set.fabric].map(id => engine.items[id]).filter(Boolean);
+    const themed = pieces.find(piece => piece.tema);
+    if (themed) return themed.tema;
+    if (pieces.some(piece => piece.source === 'luta')) return 'premios';
+    return pieces.some(piece => piece.tier >= 2) ? 'criativos' : 'classicos';
+  }
+  // O filtro escolhido nesta categoria, se ainda houver algo dele (senão volta para Todos).
+  function pickGroup(ctx, cat, present) {
+    const chosen = ctx.dockGroups?.[cat] || 'todos';
+    return chosen === 'todos' || present.includes(chosen) ? chosen : 'todos';
+  }
+  // A fileira de pílulas: Todos e um por grupo que existe na categoria, cada uma com quantos o jogador já tem (`extra` vai no fim, à direita).
+  function filterBar(ctx, rows, active, extra = '') {
+    const count = list => `${list.filter(row => row.mine).length}/${list.length}`;
+    const pills = [{ id: 'todos', list: rows }, ...GROUPS.map(group => ({ ...group, list: rows.filter(row => row.group === group.id) }))]
+      .filter(pill => pill.id === 'todos' || pill.list.length);
+    return `<div class="vfiltros" role="group">` + pills.map(pill => `<button class="vfiltro ${pill.id === active ? 'ativa' : ''}" data-action="vitrine-grupo" ` +
+      `data-grupo="${pill.id}"${pill.id === 'todos' ? '' : ` data-cor="${pill.id}"`}>${pill.icon ? ctx.icon(pill.icon, 'icone-aba') : ''}` +
+      `<span>${esc(t(`grupo.${pill.id}`))}</span><small>${count(pill.list)}</small></button>`).join('') + extra + `</div>`;
+  }
+
+  // O detalhe de um item (ou de um conjunto, com `set:<id>`) na faixa de baixo da vitrine: ícone, nome, etiquetas (grupo, preço ou porte), o texto e
+  // os conjuntos de que ele faz parte.
+  function vitrineDetalhe(engine, ctx, key) {
+    if (typeof key === 'string' && key.startsWith('set:')) {
+      const set = engine.data.sets.find(entry => `set:${entry.id}` === key);
+      if (!set) return '';
+      const pieces = [set.hat, set.hand, set.fabric];
+      const lacking = pieces.filter(piece => !engine.owned(piece)).map(piece => engine.items[piece]?.name || piece);
+      return `<span class="vdet-icone">${ctx.icon(`item:${set.hat}`, 'icone-mini')}</span><div class="vdet-texto"><div class="vdet-linha"><b>${esc(set.name)}</b>` +
+        `<span class="vtag bonus">+${Math.round(set.bonus * 100)}%</span><span class="vtag" data-grupo="${setGroup(engine, set)}">${esc(t(`grupo.${setGroup(engine, set)}`))}</span></div>` +
+        `<p>${esc(pieces.map(piece => engine.items[piece]?.name || piece).join(' + '))}. ${esc(lacking.length ? t('shop.setLacks', { list: lacking.join(', ') }) : t('shop.setComplete'))}</p></div>`;
+    }
+    if (typeof key === 'string' && key.startsWith('look:')) {
+      const look = engine.looks.get(key.slice(5));
+      if (!look) return '';
+      const names = engine.looks.slots.map(slot => look.pieces[slot]).filter(Boolean).map(id => engine.items[id]?.name || id);
+      const lacking = engine.looks.missing(look).map(id => engine.items[id]?.name || id);
+      const set = engine.data.sets.find(entry => entry.hat === look.pieces.chapeu && entry.hand === look.pieces.mao && entry.fabric === look.pieces.tecido);
+      return `<span class="vdet-icone">${ctx.icon(`item:${look.pieces.chapeu || look.pieces.mao || look.pieces.tecido || look.pieces.varal}`, 'icone-mini')}</span><div class="vdet-texto">` +
+        `<div class="vdet-linha"><b>${esc(look.name)}</b>${set ? `<span class="vtag bonus">${esc(set.name)} +${Math.round(set.bonus * 100)}%</span>` : `<span class="vtag">${esc(t('looks.noSet'))}</span>`}</div>` +
+        `<p>${esc(t('looks.pieces', { list: names.join(', ') }))}${lacking.length ? ` ${esc(t('looks.lacks', { list: lacking.join(', ') }))}` : ''}</p></div>`;
+    }
+    const item = engine.items[key];
+    if (!item) return '';
+    const group = itemGroup(item);
+    const sets = engine.data.sets.filter(set => [set.hat, set.hand, set.fabric].includes(item.id));
+    const setText = sets.length === 1
+      ? ` ${t('shop.set', { name: sets[0].name, v: Math.round(sets[0].bonus * 100), pieces: [sets[0].hat, sets[0].hand, sets[0].fabric].map(id => engine.items[id]?.name || id).join(' + ') })}`
+      : sets.length ? ` ${t('shop.sets', { list: sets.map(set => `${set.name} +${Math.round(set.bonus * 100)}%`).join(', ') })}` : '';
+    let tag = '';
+    if (engine.owned(item.id)) tag = `<span class="vtag tem">${esc(t('shop.detailOwned'))}</span>`;
+    else if (item.source) tag = '';
+    else if (engine.itemLocked(item.id)) tag = `<span class="vtag trava">🔒 ${esc(engine.data.tiers[item.tier].name)}</span>`;
+    else tag = `<span class="vtag preco">${ctx.icon('ui:fichas')}${item.price}</span>`;
+    return `<span class="vdet-icone">${ctx.icon(`item:${item.id}`, 'icone-mini')}</span><div class="vdet-texto"><div class="vdet-linha"><b>${esc(item.name)}</b>` +
+      `<span class="vtag" data-grupo="${group}">${esc(t(`grupo.${group}`))}</span>${tag}</div>` +
+      `<p>${esc(`${item.desc}${item.effect ? ` ${item.effect}` : ''}${setText}`)}</p></div>`;
   }
 
   // Área de texto da janela das Argolas da Sorte.
@@ -406,9 +534,12 @@
       [t('party.tradition'), engine.tradition() ? `+${percent(engine.tradition())}` : '—'],
       [t('party.trio'), engine.trioBonus() ? `+${percent(engine.trioBonus())}` : '—'],
       [t('party.horta'), engine.hortaBonus() ? `+${percent(engine.hortaBonus())}` : '—'],
+      [t('party.premios'), engine.premioBonus() ? `+${percent(engine.premioBonus())}` : '—'],
       [t('party.legendary'), engine.legendary() ? '×2' : '—']
     ];
     const production = productionValues(engine);
+    // As visitas do folclore (criaturas da Mata que passam pela festa): quantas já abriram e quantas vezes foram pegas.
+    const visits = engine.miniOpen('mata') ? engine.mini('folclore').info() : null;
     return header(s.name, esc(t('party.subtitle', { tier: engine.tier().name, n: s.size }))) +
       `<div class="grade2"><div class="cartao"><div class="rotulo">${esc(t('party.tier'))}</div>` +
       `<h3>${esc(engine.tier().name)}</h3>${bar(s.fame, engine.fameNeed(), 'fama')}` +
@@ -420,6 +551,8 @@
       (s.year > 1 ? `<p class="miudo">${esc(t('year.current', { n: s.year, v: Math.round(engine.tradition() * 100) }))}</p>` : '') +
       (s.records?.maior !== null && s.records?.maior !== undefined ? `<p class="miudo">${esc(t('records.maior', { time: duration(s.records.maior * 1000),
         size: s.records.size }))}</p>` : '') +
+      (engine.mundo ? `<p class="miudo">${esc(t('party.mundo', { seen: engine.mundo.info().seenTotal, kinds: engine.mundo.info().seenKinds, total: engine.mundo.info().kinds }))}</p>` : '') +
+      (visits ? `<p class="miudo">${esc(t('party.folclore', { open: visits.open, total: visits.total, caught: visits.caught }))}</p>` : '') +
       `</div><div class="cartao"><div class="rotulo">${esc(t('party.host'))}</div>` +
       `<label class="campo">${esc(t('party.name'))}<input id="nome" maxlength="24" value="${esc(s.name)}"></label>` +
       `<p class="miudo">${esc(t('party.panelHint'))}</p>` + growthBlock(engine, growth) +
@@ -648,6 +781,105 @@
       }).join('')}</div>`;
   }
 
+  // Prêmios dos minigames (tela própria, botão na placa): um cartão por minigame com a coisa e o personagem que ele libera na festa. O que
+  // falta aparece com "?", o nome e quantas vezes ainda é preciso jogar; o personagem liberado mostra se o presente dele já está pronto.
+  function premios(engine, ctx) {
+    const pr = engine.premios;
+    const cfg = engine.data.premios;
+    const now = engine.now();
+    const cards = pr.progress().map(game => {
+      const rows = game.prizes.map(prize => {
+        const entry = pr.item(prize.id);
+        const person = entry.tipo === 'personagem';
+        if (!prize.got) {
+          return `<div class="premio"><b class="vazio">?</b><div><h4>${esc(entry.name)}</h4>` +
+            `<p class="miudo">${esc(t(person ? 'premios.lockedPerson' : entry.tipo === 'ouro' ? 'premios.lockedGold' : 'premios.lockedThing', { n: prize.feitos - game.count }))}</p>` +
+            `${bar(game.count, prize.feitos)}<small>${game.count}/${prize.feitos}</small></div></div>`;
+        }
+        const next = pr.state.gifts[entry.id] || 0;
+        const gift = !person ? '' : pr.giftReady(entry.id, now) ? `<small class="pronto">${esc(t('premios.giftReady'))}</small>`
+          : `<small>${t('premios.giftIn', { time: until(next, now) })}</small>`;
+        return `<div class="premio feito">${ctx.icon(`premio:${entry.id}`, 'grande')}<div><h4>${esc(entry.name)}</h4>` +
+          `<p class="miudo">${esc(entry.text)}</p>${gift}</div></div>`;
+      }).join('');
+      const done = game.prizes.every(prize => prize.got);
+      return `<div class="cartao jogo-premio ${done ? 'feita' : ''}"><div class="linha">${ctx.icon(game.icon)}<h3>${esc(game.name)}</h3>` +
+        `<span class="selo ${done ? 'verde' : ''}">${esc(t('premios.times', { n: game.count }))}</span></div>${rows}</div>`;
+    }).join('');
+    return header(tabName('premios'), esc(t('premios.hint', { v: number(cfg.bonus * 100, 1), min: cfg.giftMinutes })),
+      `<span class="selo">${esc(t('count.of', { n: pr.total(), total: cfg.itens.length }))}</span>`) +
+      `<p class="miudo">${esc(t('premios.paradeInfo', { min: cfg.desfile.minPeople, have: pr.people().length }))}</p><div class="premios">${cards}</div>`;
+  }
+
+  // Eventos do mundo (tela própria, botão na placa): um cartão por evento do céu e do tempo; o que ainda não passou aparece com "?" e a partir de
+  // quantos convidados pode aparecer; o que está no ar fica em destaque com os alvos pegos e o tempo que falta.
+  // Os ganhos de um prêmio ("5 fichas 120 de animação ..."), para os avisos e para o almanaque.
+  function gains(given) {
+    const lines = [];
+    if (given.tickets) lines.push(t('gain.tickets', { n: given.tickets }));
+    if (given.cheer) lines.push(t('gain.cheer', { n: compact(given.cheer) }));
+    if (given.wood) lines.push(t('gain.wood', { n: given.wood }));
+    if (given.love) lines.push(t('mini.gain.love', { n: Math.round(given.love) }));
+    if (given.belly) lines.push(t('mini.gain.belly', { n: Math.round(given.belly) }));
+    if (given.frenzy) lines.push(t('folclore.frenzy', { s: given.frenzy }));
+    return lines.join(' ');
+  }
+
+  const MUNDO_FILTROS = ['todos', 'faltam', 'raros', 'vistos'];
+
+  // Eventos do mundo, o almanaque (tela própria, botão na placa): no alto o progresso (vistos, completos, raros) e o que vem a seguir; depois filtros e um
+  // cartão por evento do céu e do tempo. O que ainda não passou aparece com "?", a raridade, se já cabe na festa (ou quantos convidados faltam) e dicas de onde
+  // vem; o que já passou mostra o prêmio de pegar tudo; o que está no ar fica em destaque com os alvos pegos e o tempo que falta.
+  function mundo(engine, ctx) {
+    const cfg = engine.data.mundo;
+    const state = engine.state.mundo;
+    const info = engine.mundo.info();
+    const now = engine.now();
+    const active = info.active;
+    const rows = engine.mundo.almanac();
+    const filter = MUNDO_FILTROS.includes(ctx.mundoFilter) ? ctx.mundoFilter : 'todos';
+    const counts = { todos: rows.length, faltam: rows.filter(row => !row.seen).length, raros: rows.filter(row => row.rarity === 'rare').length, vistos: rows.filter(row => row.seen).length };
+    const shown = rows.filter(row => filter === 'todos' || (filter === 'faltam' && !row.seen) || (filter === 'raros' && row.rarity === 'rare') || (filter === 'vistos' && row.seen));
+    if (filter === 'faltam') shown.sort((a, b) => a.entry.minSize - b.entry.minSize);
+    const badge = row => `<span class="selo raridade ${row.rarity}">${esc(t(`mundo.rarity.${row.rarity}`))}</span>`;
+    const cards = shown.map(row => {
+      const { entry, seen } = row;
+      if (!seen) {
+        const viaName = row.via.length ? engine.mundo.event(row.via[0]).name : '';
+        return `<div class="cartao evento-mundo desconhecido" data-raridade="${row.rarity}">${badge(row)}<div class="linha"><b class="vazio">?</b><div><h3>${esc(t('mundo.unknown'))}</h3>` +
+          `<p class="miudo">${esc(t('mundo.needs', { n: entry.minSize }))}</p>` +
+          `<small class="${row.unlocked ? 'pronto' : ''}">${esc(row.unlocked ? t('mundo.canNow') : t('mundo.missing', { m: row.needs }))}</small>` +
+          (viaName ? `<small>${esc(t('mundo.hintVia', { name: viaName }))}</small>` : '') +
+          (row.days.length ? `<small>${esc(t('mundo.hintDay', { day: t(`mundo.day.${row.days[0]}`) }))}</small>` : '') + `</div></div></div>`;
+      }
+      const on = active && active.id === entry.id;
+      // Quem puxa outro evento (`chains`): o nome do seguinte se já passou, senão só a dica de que existe um.
+      const link = cfg.chains && cfg.chains[entry.id];
+      const follow = link ? `<small>${esc(state.seen[link.id] ? t('mundo.chain', { name: engine.mundo.event(link.id).name }) : t('mundo.chainUnknown'))}</small>` : '';
+      const boosted = engine.mundo.boost(entry) > 1 ? ` <span class="selo ouro">${esc(t('mundo.boosted'))}</span>` : '';
+      const prize = gains(Object.keys(entry.finale || {}).length ? entry.finale : entry.reward || {});
+      return `<div class="cartao evento-mundo ${on ? 'agora' : ''}" data-raridade="${row.rarity}">${badge(row)}<div class="linha">${ctx.icon(`mundo:${entry.id}`, 'grande')}<div><h3>${esc(entry.name)}${boosted}</h3>` +
+        `<p class="miudo">${esc(entry.text)}</p>` +
+        `<small>${esc(t(entry.targets ? 'mundo.stats' : 'mundo.statsSemAlvo', { seen, caught: row.caught, n: entry.targets, v: Math.round(entry.bonus * 100) }))}` +
+        `${row.done ? ` · ${esc(t('mundo.doneTimes', { n: row.done }))}` : ''}</small>` +
+        (prize ? `<small class="premio-mundo">${esc(t('mundo.prize', { gains: prize }))}</small>` : '') + follow +
+        (on ? `<small class="pronto">${t(active.n ? 'mundo.now' : 'mundo.nowSemAlvo', { got: active.got.length, n: active.n, time: until(active.until, now) })}</small>` : '') + `</div></div></div>`;
+    }).join('');
+    const plan = engine.mundo.forecast();
+    const next = !active && state.nextAt ? `<p class="miudo">${plan ? t('mundo.forecast', { name: plan.entry.name, time: until(plan.at, now) }) : t('mundo.next', { time: until(state.nextAt, now) })}</p>` : '';
+    const percent = (n, total) => Math.min(100, Math.round(n / Math.max(1, total) * 100));
+    const meter = (label, n, total, cls = '') => `<div class="alma-linha ${cls}"><span>${esc(label)} <b>${n}/${total}</b></span><div class="alma-barra"><i style="width:${percent(n, total)}%"></i></div></div>`;
+    const locked = rows.filter(row => !row.unlocked).map(row => row.entry.minSize);
+    const unlockNote = locked.length ? `<p class="miudo">${esc(t('mundo.nextUnlock', { n: Math.min(...locked) }))}</p>` : '';
+    const summary = `<div class="cartao alma-resumo">${meter(t('mundo.progress.seen'), info.seenKinds, info.kinds)}${meter(t('mundo.progress.done'), Math.min(info.doneKinds, cfg.completeKinds), cfg.completeKinds)}` +
+      `${meter(t('mundo.progress.rare'), info.rareSeen, info.rareKinds, 'raro')}${unlockNote}${next}</div>`;
+    const chips = `<div class="chips alma-filtros">` + MUNDO_FILTROS.map(id => `<button class="chip ${filter === id ? 'ativa' : ''}" data-action="mundo-filtro" data-value="${id}">` +
+      `${esc(t(`mundo.filter.${id}`, { n: counts[id] }))}</button>`).join('') + `</div>`;
+    return header(tabName('mundo'), esc(t('mundo.hint', { min: Math.round(cfg.every[0] / 60), max: Math.round(cfg.every[1] / 60), size: cfg.minSize })),
+      `<span class="selo">${esc(t('count.of', { n: info.seenKinds, total: info.kinds }))}</span>`) + summary + chips +
+      (cards ? `<div class="eventos-mundo">${cards}</div>` : `<p class="miudo">${esc(t('mundo.nothing'))}</p>`);
+  }
+
   function conquistas(engine, ctx) {
     const done = engine.state.achievements;
     return header(tabName('conquistas'), esc(t('count.of', { n: done.length, total: engine.data.achievements.length }))) +
@@ -671,7 +903,9 @@
     return `<div class="rotulo">🌐 ${esc(t('settings.language'))}</div><div class="chips">${chips}</div>` +
       `<p class="miudo">${esc(t(steam?.on ? 'settings.languageSteam' : 'settings.languageSystem'))}</p>` +
       (ctx.desktop ? `<div class="rotulo">Steam</div><p class="miudo">${steam?.on
-        ? t('settings.steamOn', { name: esc(steam.name || '') }) : esc(t('settings.steamOff'))}</p>` : '');
+        ? t('settings.steamOn', { name: esc(steam.name || '') }) : esc(t('settings.steamOff'))}</p>` +
+        // A nuvem da Steam: ligada na conta e no jogo, ou como ligar (o save acompanha a pessoa em outros computadores).
+        (steam?.on && steam.cloud !== undefined ? `<p class="miudo">${esc(t(steam.cloud ? 'settings.cloudOn' : 'settings.cloudOff'))}</p>` : '') : '');
   }
 
   // Som: liga e desliga os efeitos e escolhe o volume (a barra fica apagada com o som desligado).
@@ -774,6 +1008,8 @@
     if (entry.type === 'fished') return entry.isNew ? 'turma' : null;
     if (entry.type === 'item') return 'item';
     if (entry.type === 'achievement') return 'conquista';
+    // Um prêmio de minigame (coisa ou personagem na festa) conta como cenário novo.
+    if (entry.type === 'premio') return 'cenario';
     return null;
   }
 
@@ -842,6 +1078,10 @@
       case 'wedding': return t('log.wedding', { rice: entry.rice, n: Math.round(entry.amount || 0), tickets: entry.tickets });
       case 'balloon': return t(`log.balloon.${entry.kind}`, { n: Math.round(entry.amount || 0), mult: entry.mult, s: entry.seconds });
       case 'grow': return t('log.grow', { stage: t(`growth.stage.${entry.stage}`) });
+      case 'desfile': return t('log.desfile', { n: entry.n });
+      case 'mundo': return t('log.mundo', { name: engine.mundo.event(entry.id)?.name || entry.id });
+      case 'mundo-completo': return t('log.mundoCompleto', { name: engine.mundo.event(entry.id)?.name || entry.id });
+      case 'premio': return t('log.premio', { game: engine.premios.game(entry.jogo)?.name || entry.jogo, name: engine.premios.item(entry.id)?.name || entry.id });
       case 'learn': return t('log.learn', { name: named(d.dances, entry.id) });
       case 'fishing-open': return t('log.fishingOpen');
       case 'debug': return t('log.debug', { note: debugText(engine, entry) });
@@ -954,7 +1194,7 @@
       group(t('debug.crewBooths'), [button('prendas', 0, t('debug.prendas')), button('cartas', 0, t('debug.cartas')),
         button('roles', 0, t('debug.roles')), button('turma', 0, t('debug.turma')), button('itens', 0, t('debug.itens'))]) +
       group(t('debug.atParty'), [button('pedido', 0, t('debug.callRequest')), button('penetra', 0, t('debug.callCrasher')),
-        button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('aviso', 0, t('debug.callAnnounce')), button('frio', 0, t('debug.callCold')), button('sanfoneiro', 0, t('debug.callVisitor')), button('cobra', 0, t('debug.callSnake')), button('fotografo', 0, t('debug.callPhotographer')), button('burro', 0, t('debug.callBurro')), button('fantasia', 0, t('debug.callFantasia')), button('cozinha', 0, t('debug.callCook')), button('feliz', 0, t('debug.feliz')), button('triste', 0, t('debug.triste')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
+        button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('aviso', 0, t('debug.callAnnounce')), button('frio', 0, t('debug.callCold')), button('sanfoneiro', 0, t('debug.callVisitor')), button('cobra', 0, t('debug.callSnake')), button('fotografo', 0, t('debug.callPhotographer')), button('burro', 0, t('debug.callBurro')), button('folclore', 0, t('debug.callFolclore')), button('premio', 0, t('debug.callPremio')), button('mundo', 0, t('debug.callMundo')), button('desfile', 0, t('debug.callDesfile')), button('fantasia', 0, t('debug.callFantasia')), button('cozinha', 0, t('debug.callCook')), button('feliz', 0, t('debug.feliz')), button('triste', 0, t('debug.triste')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
         button('argolas', 0, t('debug.cheapRings'))]);
   }
 
@@ -989,8 +1229,8 @@
       `<p class="miudo">${esc(t('bingo.stats', { cards: s.stats.bingoCards, wins: s.stats.bingos }))}</p>`;
   }
 
-  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, bingo, cozinha, album, teste };
-  const telaName = id => (id === 'teste' || id === 'album' || TELAS.some(entry => entry.id === id) ? tabName(id) : '');
+  const RENDER_TELA = { turma, pescaria, roles, fogueira, correio, bingo, cozinha, album, premios, mundo, teste };
+  const telaName = id => (id === 'teste' || id === 'album' || id === 'premios' || id === 'mundo' || TELAS.some(entry => entry.id === id) ? tabName(id) : '');
 
   function panel(engine, ctx) {
     const tab = RENDER[ctx.tab] ? ctx.tab : 'festa';
@@ -1003,6 +1243,6 @@
     return RENDER_TELA[id](engine, ctx);
   }
 
-  return { TABS, TELAS, DOCK, hud, moodTitle, tabs, panel, tela, telaName, vitrine, argolas, compact, duration, percent, number, esc,
+  return { TABS, TELAS, DOCK, GROUPS, itemGroup, vitrineDetalhe, hud, moodTitle, tabs, panel, tela, telaName, vitrine, argolas, compact, duration, percent, number, esc, gains,
     logText, debugText, productionValues, timeProgress, t };
 });

@@ -452,7 +452,7 @@ test('a aba de conjuntos da loja avisa o que falta para vestir o conjunto', asyn
   const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
   click({ action: 'vitrine' });
   click({ action: 'vitrine-cat', cat: 'conjuntos' });
-  assert.match(node('#vitrine').innerHTML, /Caipira de Raiz \+3%/);
+  assert.match(node('#vitrine').innerHTML, /Caipira de Raiz<\/b>[^]*?\+3%/, 'o nome e o bônus do conjunto aparecem no cartão');
   assert.match(node('#vitrine').innerHTML, /Faltam 2/);
   click({ action: 'vitrine-conjunto', id: 'noiva' });
   assert.match(node('#avisos').children.map(item => item.textContent).join('|'), /faltam Véu de Noiva, Buquê da Noiva/, 'sem as peças, o aviso diz quais faltam');
@@ -3535,10 +3535,12 @@ test('digitar "yeye" com o jogo em foco chama o Rafael; sem foco, em campo de te
   // Maiúsculas valem; com o jogo em foco o Rafael chega e o aviso diz.
   digitar('YeYe');
   assert.match(toasts(), /Rafael chegou à festa/);
-  // Digitar de novo não repete o aviso (ele só grita na festa).
-  const before = toasts();
+  // Digitar de novo esconde o Rafael (o aviso diz como chamar de volta) e outra vez o traz de volta.
+  assert.doesNotMatch(toasts(), /dar uma volta/);
   digitar('yeye');
-  assert.equal(toasts(), before);
+  assert.match(toasts(), /Rafael foi dar uma volta. Digite yeye de novo/);
+  digitar('yeye');
+  assert.match(toasts(), /Rafael voltou! Digite yeye para escondê-lo/);
 });
 
 test('minijogos lembrados reaparecem quando as preferências iniciais chegam depois de carregar a partida', async () => {
@@ -3911,4 +3913,493 @@ test('recusar o último clique mantém a escolha anterior da mesma chave que ain
   pending[0].resolve({ ...Settings.publicSettings(current), pinned: false, revision: 1 });
   await Promise.resolve();
   assert.equal(game.ui.settings.pinned, false, 'a primeira confirmação termina normalmente');
+});
+
+test('as teclas 1, 2 e 3 vão para a janela do Palco com o jogo em foco; com Ctrl, repetindo, sem foco ou em campo de texto, não', async () => {
+  require('../src/festa-sprites.js');
+  const views = { ArraiaI18n: require('../src/i18n.js'), Image: class {
+    set src(value) { this.complete = true; this.width = 12; }
+  } };
+  for (const file of ['janela-base.js', 'janelas.js']) {
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'src', file), 'utf8'), views, { filename: file });
+  }
+  const keys = [];
+  views.ArraiaJanelas.registerView('palco', () => ({
+    size: () => ({ width: 176, height: 120 }), draw() {}, hit: () => null, probe: () => ({}),
+    key(name, now) { keys.push([name, typeof now]); return name !== '3'; }
+  }));
+  const source = new core.GameEngine(data, null, { rng: () => 0.5 });
+  while (source.state.size < 40) source.addFame(source.fameNeed() - source.state.fame);
+  let game;
+  const { document, run } = boot({ ArraiaJanelas: views.ArraiaJanelas, FESTA_SPRITES: globalThis.FESTA_SPRITES,
+    __gravador: api => { game = api; } }, {
+    loadGame: () => source.exportState(),
+    getSettings: () => Promise.resolve({ minis: { palco: { hidden: false } }, revision: 0 })
+  });
+  await Promise.resolve();
+  assert.equal(game.ui.janelas.visible('palco'), true);
+  let prevented = 0;
+  const press = (key, extra = {}) => document.listeners.keydown({ key, target: { closest: () => null }, preventDefault() { prevented++; }, ...extra });
+  press('1');
+  press('2');
+  assert.deepEqual(keys, [['1', 'number'], ['2', 'number']], 'as teclas chegam à janela com a hora');
+  assert.equal(prevented, 2, 'e a tecla usada não faz mais nada');
+  press('3');
+  assert.equal(prevented, 2, 'tecla que a janela não usou segue o caminho normal');
+  keys.length = 0;
+  press('1', { ctrlKey: true });
+  press('1', { altKey: true });
+  press('1', { repeat: true });
+  document.listeners.keydown({ key: '1', target: { closest: () => ({}) }, preventDefault() {} });
+  run({ foco: false });
+  press('1');
+  assert.deepEqual(keys, [], 'com Ctrl/Alt, segurando a tecla, num campo de texto ou sem foco ela não vale');
+  run({ foco: true });
+  press('1');
+  assert.deepEqual(keys, [['1', 'number']], 'voltou o foco, voltou a valer');
+  game.ui.janelas.close('palco');
+  press('1');
+  assert.equal(keys.length, 1, 'janela escondida não recebe teclas');
+});
+
+test('clicar numa visita do folclore na festa paga o prêmio uma vez só e o aviso diz o que veio', async () => {
+  let game;
+  const festa = fakeFesta({ hit: () => 'folclore' });
+  const { document } = boot({ ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  click();
+  assert.doesNotMatch(toasts(), /fichas/, 'sem visita na festa o clique não faz nada');
+  engine.mini('folclore').start('saco');
+  const tickets = engine.state.tickets;
+  const wood = engine.state.wood;
+  click();
+  assert.equal(engine.state.tickets, tickets + 2);
+  assert.equal(engine.state.wood, wood + 3);
+  assert.match(toasts(), /O Homem do Saco largou o saco e saiu correndo\. \+2 fichas \+3 lenha/);
+  click();
+  assert.equal(engine.state.tickets, tickets + 2, 'o segundo clique não paga');
+});
+
+test('clicar numa coisa ou num personagem dos prêmios na festa: a coisa reage; o personagem dá o presente uma vez e depois avisa a espera', async () => {
+  let game;
+  let target = 'premio:zeca-argolas';
+  const pokes = [];
+  const festa = fakeFesta({ hit: () => target, poke: id => pokes.push(id) });
+  const { document } = boot({ ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  // Personagem que ainda não chegou: nada acontece (e a festa nem desenha uma região para ele).
+  const tickets = engine.state.tickets;
+  click();
+  assert.equal(engine.state.tickets, tickets);
+  // Chegou: o clique paga o presente e o aviso diz o que veio.
+  engine.state.premios.count.argolas = 20;
+  engine.premios.unlock('argolas');
+  click();
+  assert.equal(engine.state.tickets, tickets + 2);
+  assert.match(toasts(), /Zeca das Argolas deu um presente: \+2 fichas/);
+  assert.ok(pokes.includes('premio:zeca-argolas'), 'a festa também reage ao clique');
+  // Segundo clique: não paga, e o aviso diz quanto falta.
+  click();
+  assert.equal(engine.state.tickets, tickets + 2);
+  assert.match(toasts(), /Zeca das Argolas ainda está preparando o próximo presente \(\d+min/);
+  // Uma coisa não dá presente, só reage.
+  target = 'premio:ursinhos';
+  click();
+  assert.equal(engine.state.tickets, tickets + 2);
+  assert.ok(pokes.includes('premio:ursinhos'));
+  // Id que não existe não quebra.
+  target = 'premio:nao-existe';
+  assert.doesNotThrow(click);
+});
+
+test('um prêmio de minigame novo avisa de qual minigame veio, com o som, e a tela dos prêmios aberta acompanha', async () => {
+  const frames = [];
+  let game;
+  const { document } = boot({ requestAnimationFrame: fn => frames.push(fn), ArraiaFesta: { create: () => fakeFesta() }, FESTA_SPRITES: {},
+    __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const open = id => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset: { action: 'tela', tela: id } }) } });
+  open('premios');
+  const body = document.nodes.get('#tela-corpo');
+  assert.match(body.innerHTML, /0 de 105/);
+  for (let i = 0; i < 4; i++) engine.emit('fished', { id: 'x', isNew: true });
+  frames.shift()(2000);
+  assert.match(toasts(), /Pescaria liberou uma coisa nova na festa: Balde de Peixes!/);
+  assert.match(body.innerHTML, /1 de 105/, 'a tela aberta já mostra o prêmio novo');
+  for (let i = 4; i < 15; i++) engine.emit('fished', { id: 'x', isNew: true });
+  frames.shift()(3000);
+  assert.match(toasts(), /Pescaria trouxe um convidado novo para a festa: Seu Tainha!/);
+  assert.match(body.innerHTML, /2 de 105/);
+});
+
+test('o Desfile dos Prêmios avisa quando começa e um clique em quem passa paga o prêmio uma vez só', async () => {
+  const frames = [];
+  let game;
+  let target = 'premio:desfile';
+  const festa = fakeFesta({ hit: () => target });
+  const { document } = boot({ requestAnimationFrame: fn => frames.push(fn), ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  click();
+  assert.doesNotMatch(toasts(), /Desfile/, 'sem desfile o clique não faz nada');
+  for (const item of data.premios.jogos.slice(0, 6)) { engine.state.premios.count[item.id] = 99; engine.premios.unlock(item.id); }
+  engine.premios.startParade();
+  frames.shift()(2000);
+  assert.match(toasts(), /O Desfile dos Prêmios começou!/);
+  const tickets = engine.state.tickets;
+  click();
+  assert.equal(engine.state.tickets, tickets + 2 + 2, 'fichas do desfile de 6 personagens');
+  assert.match(toasts(), /Desfile dos Prêmios: 6 personagens passaram! \+4 fichas/);
+  click();
+  assert.equal(engine.state.tickets, tickets + 4, 'o segundo clique não paga');
+});
+
+test('um evento do mundo avisa quando começa e quando acaba, e um clique num alvo paga o prêmio uma vez só', async () => {
+  const frames = [];
+  let game;
+  let target = 'mundo:0';
+  const festa = fakeFesta({ hit: () => target });
+  const { document } = boot({ requestAnimationFrame: fn => frames.push(fn), ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  click();
+  assert.doesNotMatch(toasts(), /Ventania/, 'sem evento o clique não faz nada');
+  engine.mundo.start('ventania');
+  frames.shift()(2000);
+  assert.match(toasts(), /Ventania: Um vento forte leva pipas soltas pelo céu/);
+  assert.match(document.nodes.get('#placa').innerHTML, /Ventania 0\/6/);
+  const wood = engine.state.wood;
+  click();
+  assert.equal(engine.state.wood, wood + 1);
+  assert.match(toasts(), /Ventania: alvo pego! \+\d+ de Animação \+1 lenha \(faltam 5\)/);
+  click();
+  assert.equal(engine.state.wood, wood + 1, 'o mesmo alvo não paga de novo');
+  target = 'mundo:99';
+  assert.doesNotThrow(click);
+  // Pegando os cinco que faltam vem o prêmio final.
+  const tickets = engine.state.tickets;
+  for (target of ['mundo:1', 'mundo:2', 'mundo:3', 'mundo:4', 'mundo:5']) click();
+  assert.match(toasts(), /Ventania completo!/);
+  assert.equal(engine.state.tickets, tickets + 3);
+  // O fim do evento avisa quantos alvos faltaram, se faltaram.
+  engine.state.mundo.active = null;
+  engine.mundo.start('lua');
+  engine.mundo.catchTarget(0);
+  engine.state.mundo.active.until = engine.now() - 1;
+  engine.tick(0.1);
+  frames.shift()(3000);
+  assert.match(toasts(), /Lua cheia passou: 1 de 3 alvos pegos\./);
+});
+
+test('feira do mundo: clicar numa barraca compra o bônus (e avisa quanto custou), sem fichas só avisa o preço e nada é cobrado duas vezes', async () => {
+  const frames = [];
+  let game;
+  let target = 'mundo:0';
+  const festa = fakeFesta({ hit: () => target });
+  const { document } = boot({ requestAnimationFrame: fn => frames.push(fn), ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  engine.mundo.start('feira');
+  frames.shift()(2000);
+  assert.match(toasts(), /Feira de São João: Três barracas abrem na festa/);
+  engine.state.tickets = 2;
+  click();
+  assert.match(toasts(), /Faltam fichas para Pamonha quentinha: custa 4\./);
+  assert.equal(engine.state.tickets, 2, 'sem ficha nada é cobrado');
+  assert.equal(engine.mundoBonus(), 0);
+  engine.state.tickets = 20;
+  click();
+  assert.match(toasts(), /Pamonha quentinha: \+15% de Animação por 3 min \(4 fichas\)/);
+  assert.equal(engine.state.tickets, 16);
+  assert.equal(engine.mundoBonus(), 0.15);
+  click();
+  assert.equal(engine.state.tickets, 16, 'a mesma barraca não cobra de novo');
+  target = 'mundo:1';
+  click();
+  target = 'mundo:2';
+  click();
+  assert.match(toasts(), /Feira de São João completo!/);
+  assert.equal(engine.state.tickets, 16 - 7 - 3 + 4, 'as três compradas e o prêmio final');
+  assert.match(document.nodes.get('#placa').innerHTML, /Pamonha quentinha \+15%/);
+});
+
+test('Cruzeiro do Sul: clicar numa estrela fora da ordem só avisa (nada é pego) e na ordem certa vale', async () => {
+  const frames = [];
+  let game;
+  let target = 'mundo:3';
+  const festa = fakeFesta({ hit: () => target });
+  const { document } = boot({ requestAnimationFrame: fn => frames.push(fn), ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  engine.mundo.start('constelacao');
+  frames.shift()(2000);
+  click();
+  assert.match(toasts(), /Na ordem! Clique na estrela que está piscando\./);
+  assert.deepEqual(engine.state.mundo.active.got, [], 'nada foi pego');
+  target = 'mundo:0';
+  click();
+  assert.deepEqual(engine.state.mundo.active.got, [0]);
+});
+
+test('pinhata do mundo: os golpes só balançam (sem aviso nem prêmio) e o último estoura e paga', async () => {
+  const frames = [];
+  let game;
+  const festa = fakeFesta({ hit: () => 'mundo:1' });
+  const { document } = boot({ requestAnimationFrame: fn => frames.push(fn), ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  engine.mundo.start('pinhata');
+  frames.shift()(2000);
+  const before = toasts();
+  const hits = engine.mundo.event('pinhata').hits;
+  for (let n = 1; n < hits; n++) click();
+  assert.equal(toasts(), before, 'os golpes não geram aviso');
+  assert.deepEqual(engine.state.mundo.active.got, []);
+  assert.equal(engine.state.mundo.active.hits[1], hits - 1);
+  click();
+  assert.deepEqual(engine.state.mundo.active.got, [1]);
+  assert.match(toasts(), /Pinhata gigante/);
+});
+
+test('vitrine: clicar numa pílula filtra a categoria (cada categoria lembra o seu filtro), a grade volta ao começo e o detalhe aparece ao passar o mouse', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'vitrine' });
+  click({ action: 'vitrine-cat', cat: 'chapeu' });
+  const ids = () => [...node('#vitrine').innerHTML.matchAll(/data-action="vitrine-item" data-id="([^"]+)"/g)].map(match => match[1]);
+  const todos = ids().length;
+  assert.ok(todos > 25, `todos os chapéus (${todos})`);
+  click({ action: 'vitrine-grupo', grupo: 'dino' });
+  assert.deepEqual(ids(), ['capuz-dino', 'crista-estegossauro']);
+  assert.match(node('#vitrine').innerHTML, /vfiltro ativa" data-action="vitrine-grupo" data-grupo="dino"/);
+  // Outra categoria tem o próprio filtro (o de chapéus não vale lá) e, ao voltar, o de chapéus continua.
+  click({ action: 'vitrine-cat', cat: 'mao' });
+  assert.ok(ids().length > 15, 'as mãos não herdam o filtro dos chapéus');
+  click({ action: 'vitrine-grupo', grupo: 'zumbi' });
+  assert.deepEqual(ids(), ['mao-zumbi', 'taco-pregos', 'antidoto']);
+  click({ action: 'vitrine-cat', cat: 'chapeu' });
+  assert.deepEqual(ids(), ['capuz-dino', 'crista-estegossauro'], 'os chapéus lembram o filtro');
+  click({ action: 'vitrine-grupo', grupo: 'todos' });
+  assert.equal(ids().length, todos);
+  // O detalhe: sem passar o mouse vem a dica da aba; ao passar, o item com grupo, preço ou porte e o texto.
+  assert.match(node('#vitrine').innerHTML, /<div class="vitrine-detalhe" id="vitrine-detalhe"><p class="vdet-dica">Passe o mouse num item/);
+  const detail = { innerHTML: '', textContent: '' };
+  document.querySelector = selector => (selector === '#vitrine-detalhe' ? detail : node(selector));
+  document.listeners.mouseover({ target: { closest: () => ({ dataset: { preview: 'chapeu-bruxa' } }) } });
+  assert.match(detail.innerHTML, /<b>Chapéu de Bruxa<\/b>/);
+  assert.match(detail.innerHTML, /data-grupo="halloween">Halloween</);
+  assert.match(detail.innerHTML, /vtag trava">🔒 |vtag preco/);
+  document.listeners.mouseover({ target: { closest: () => ({ dataset: { preview: 'set:bruxa' } }) } });
+  assert.match(detail.innerHTML, /<b>Bruxa da Festa<\/b><span class="vtag bonus">\+10%<\/span>/);
+});
+
+test('vitrine: a roda do mouse sobre a grade rola de lado (só quando tem o que rolar e o movimento é vertical)', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  const grid = { scrollLeft: 100, scrollWidth: 1800, clientWidth: 900 };
+  const roda = (deltaY, deltaX = 0, alvo = grid) => {
+    let impediu = false;
+    document.listeners.wheel({ deltaY, deltaX, target: { closest: selector => (selector === '.vgrade, .vfiltros' ? alvo : null) }, preventDefault() { impediu = true; } });
+    return impediu;
+  };
+  assert.equal(roda(120), false, 'com a vitrine fechada a roda não é da grade');
+  assert.equal(grid.scrollLeft, 100);
+  click({ action: 'vitrine' });
+  click({ action: 'vitrine-cat', cat: 'chapeu' });
+  assert.equal(roda(120), true);
+  assert.equal(grid.scrollLeft, 220, 'a roda para baixo anda para a direita');
+  assert.equal(roda(-60), true);
+  assert.equal(grid.scrollLeft, 160);
+  assert.equal(roda(10, 80), false, 'movimento mais de lado do que vertical fica como está');
+  assert.equal(grid.scrollLeft, 160);
+  assert.equal(roda(120, 0, { scrollLeft: 5, scrollWidth: 700, clientWidth: 700 }), false, 'grade que cabe inteira não rola');
+  assert.equal(roda(120, 0, null), false, 'fora da grade nada acontece');
+  // A fileira de pílulas também rola com a roda (ela esconde a barra de rolagem).
+  const pilulas = { scrollLeft: 0, scrollWidth: 1300, clientWidth: 800 };
+  assert.equal(roda(100, 0, pilulas), true);
+  assert.equal(pilulas.scrollLeft, 100);
+});
+
+test('gavetas da placa: clicar abre, clicar de novo fecha, clicar na outra troca, e a escolha vai para as preferências', async () => {
+  const { document, calls } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  const settled = async () => { for (let i = 0; i < 4; i++) await Promise.resolve(); };
+  const aberta = id => {
+    const html = node('#placa').innerHTML.match(new RegExp(`data-gaveta="${id}"( hidden)?>`));
+    assert.ok(html, `a gaveta ${id} está na placa`);
+    return !html[1];
+  };
+  assert.equal(aberta('colecoes'), false, 'começa fechada');
+  click({ action: 'gaveta', gaveta: 'colecoes' });
+  await settled();
+  assert.deepEqual(JSON.parse(JSON.stringify(calls.filter(call => call[0] === 'settings').at(-1))), ['settings', { gaveta: 'colecoes' }]);
+  assert.equal(aberta('colecoes'), true);
+  assert.match(node('#placa').innerHTML, /data-gaveta="colecoes" aria-expanded="true"/);
+  click({ action: 'gaveta', gaveta: 'colecoes' });
+  await settled();
+  assert.deepEqual(JSON.parse(JSON.stringify(calls.filter(call => call[0] === 'settings').at(-1))), ['settings', { gaveta: null }], 'o mesmo botão fecha');
+  assert.equal(aberta('colecoes'), false);
+  click({ action: 'gaveta', gaveta: 'colecoes' });
+  await settled();
+  click({ action: 'tela', tela: 'album' });
+  await settled();
+  assert.equal(aberta('colecoes'), true, 'abrir uma tela de dentro da gaveta não fecha a gaveta');
+});
+
+test('guarda-roupa: salvar o visual, vestir, apagar (com confirmação) e o look surpresa, com avisos e a prévia na festa', async () => {
+  let game;
+  const { document } = boot({ __gravador: api => { game = api; } });
+  await Promise.resolve();
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 120;
+  for (const id of ['vaqueiro', 'chapeu-bruxa', 'vassoura-bruxa', 'espiga']) engine.addItem(id);
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  const toasts = () => node('#avisos').children.map(item => item.textContent).join('|');
+  click({ action: 'vitrine' });
+  click({ action: 'vitrine-cat', cat: 'looks' });
+  assert.match(node('#vitrine').innerHTML, /data-action="look-salvar"/);
+  assert.match(node('#vitrine').innerHTML, /0 de 12 salvos/);
+  click({ action: 'look-salvar' });
+  assert.match(toasts(), /Look "Look 1" salvo no guarda-roupa\./);
+  assert.equal(engine.state.looks.list.length, 1);
+  assert.match(node('#vitrine').innerHTML, /data-action="look-vestir" data-id="look-1" data-preview="look:look-1"/);
+  assert.match(node('#vitrine').innerHTML, /1 de 12 salvos/);
+  click({ action: 'look-salvar' });
+  assert.match(toasts(), /Esse visual já está salvo como "Look 1"\./, 'o mesmo visual não salva duas vezes');
+  assert.equal(engine.state.looks.list.length, 1);
+  // Veste outro visual, volta ao look salvo com um clique e a festa recebe a comemoração.
+  engine.equip('chapeu-bruxa');
+  engine.equip('vassoura-bruxa');
+  assert.equal(engine.looks.isWorn(engine.looks.get('look-1')), false);
+  click({ action: 'look-vestir', id: 'look-1' });
+  assert.match(toasts(), /Look "Look 1" vestido!/);
+  assert.equal(engine.looks.isWorn(engine.looks.get('look-1')), true);
+  assert.match(node('#vitrine').innerHTML, /vcard item look uso/);
+  // Um look com peça que a pessoa não tem avisa o que faltou.
+  engine.state.looks.list[0].pieces.chapeu = 'capuz-dino';
+  click({ action: 'look-vestir', id: 'look-1' });
+  assert.match(toasts(), /Look "Look 1" vestido, mas faltam: Dino de Estimação\./);
+  // O look surpresa só usa peças que a pessoa tem.
+  click({ action: 'look-sortear' });
+  assert.match(toasts(), /Look surpresa!/);
+  for (const slot of engine.looks.slots) assert.ok(engine.owned(engine.state.equipped[slot]), slot);
+  // A prévia do detalhe mostra o look e as peças.
+  const detail = { innerHTML: '', textContent: '' };
+  document.querySelector = selector => (selector === '#vitrine-detalhe' ? detail : node(selector));
+  document.listeners.mouseover({ target: { closest: () => ({ dataset: { preview: 'look:look-1' } }) } });
+  assert.match(detail.innerHTML, /<b>Look 1<\/b>/);
+  assert.match(detail.innerHTML, /Faltam: Dino de Estimação\./);
+  // Apagar pede confirmação (aqui ela é aceita) e tira o look.
+  click({ action: 'look-apagar', id: 'look-1' });
+  assert.match(toasts(), /Look "Look 1" apagado\./);
+  assert.equal(engine.state.looks.list.length, 0);
+});
+
+test('eventos do mundo: o começo toca uma fanfarra própria (a dos raros é maior e comemora na festa) e logo depois o som do evento; o almanaque filtra', async () => {
+  const frames = [];
+  const timers = [];
+  const plays = [];
+  const celebrations = [];
+  let game;
+  const som = { set() {}, setMusic() {}, unlock() {}, play: name => { plays.push(name); return true; } };
+  const clock = { t: 1000 };
+  const festa = fakeFesta({ celebrate: (_now, text) => celebrations.push(text) });
+  const { document } = boot({ performance: { now: () => clock.t }, requestAnimationFrame: fn => frames.push(fn), setTimeout: (fn, ms) => { timers.push([fn, ms]); return 1; },
+    ArraiaSom: { create: () => som }, ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  clock.t = 20000;
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 60;
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  // Um evento comum: a fanfarra comum, depois o som dele (agendado), sem comemoração.
+  plays.length = 0;
+  engine.mundo.start('estrelas');
+  frames.shift()(2000);
+  assert.equal(plays[0], 'evento');
+  assert.match(toasts(), /Chuva de estrelas/);
+  assert.doesNotMatch(toasts(), /EVENTO RARO/);
+  const own = timers.find(([, ms]) => ms === 700);
+  assert.ok(own, 'o som do evento é agendado para logo depois da fanfarra');
+  own[0]();
+  assert.equal(plays.at(-1), 'brilho');
+  assert.deepEqual(celebrations, []);
+  // Um evento raro: fanfarra maior, aviso destacado, comemoração na festa e o som do evento um pouco mais tarde.
+  engine.mundo.end();
+  plays.length = 0;
+  timers.length = 0;
+  engine.mundo.start('eclipse');
+  frames.shift()(4000);
+  assert.equal(plays[0], 'evento-raro');
+  assert.match(toasts(), /EVENTO RARO! Eclipse/);
+  assert.deepEqual(celebrations, ['EVENTO RARO!']);
+  assert.ok(timers.some(([, ms]) => ms === 1100), 'nos raros o som do evento vem depois da fanfarra maior');
+  // O filtro do almanaque guarda a escolha e redesenha a tela.
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'tela', tela: 'mundo' });
+  assert.equal(game.ui.mundoFilter, 'todos');
+  assert.match(document.nodes.get('#tela-corpo').innerHTML, /chip ativa" data-action="mundo-filtro" data-value="todos"/);
+  click({ action: 'mundo-filtro', value: 'raros' });
+  assert.equal(game.ui.mundoFilter, 'raros');
+  assert.match(document.nodes.get('#tela-corpo').innerHTML, /chip ativa" data-action="mundo-filtro" data-value="raros"/);
+  assert.equal((document.nodes.get('#tela-corpo').innerHTML.match(/data-raridade="rare"/g) || []).length, 8);
 });

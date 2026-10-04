@@ -773,7 +773,7 @@ test('horta: reabrir antes do próximo desenho não espanta um corvo novo pelo c
 });
 
 // --- Fogueira de Perto ----------------------------------------------------------------------------------------------------
-test('fogueira: lenha, escolher a comida, pôr no espeto, virar, tirar no ponto e pular a fogueira pelos cliques', () => {
+test('fogueira: lenha, escolher a comida, pôr no espeto, esperar ficar pronta (nunca queima), comer (a comida voa até o espectador) e pular a fogueira pelos cliques', () => {
   const { host, engine, sounds } = setup(40, { minis: { fogueira: { hidden: false } } });
   host.restore();
   const view = host.windows.get('fogueira').view;
@@ -794,22 +794,33 @@ test('fogueira: lenha, escolher a comida, pôr no espeto, virar, tirar no ponto 
   assert.equal(engine.state.wood, 5);
   assert.ok(sounds.includes('lenha') && sounds.includes('erro'));
 
-  // Escolhe o queijo e põe no espeto 0; o espeto cheio, o clique vira (entre 10% e 90%) e depois tira no ponto.
+  // Escolhe o queijo e põe no espeto 0; ainda assando, clicar só avisa (não tira nada); pronto, clicar come.
   clickArea(host, 'fogueira', 'comida:queijo', now);
   assert.equal(fogueira.info().selected, 'queijo');
   clickArea(host, 'fogueira', 'espeto:0', now);
   assert.equal(fogueira.info().sticks[0].food, 'queijo');
   const heat = () => { engine.state.minis.fogueira.heat = c.heatMax; engine.tick(1); host.draw((now += 40)); };
   while (fogueira.info().sticks[0].progress < 0.3) heat();
+  const falas = view.probe().says;
   clickArea(host, 'fogueira', 'espeto:0', now);
-  assert.equal(fogueira.info().sticks[0].turns, 1, 'o clique virou o espeto');
-  while (fogueira.info().sticks[0].state !== 'ponto') heat();
+  assert.equal(fogueira.info().sticks[0].food, 'queijo', 'ainda assando: o clique não tira');
+  assert.equal(view.probe().says, falas + 1, 'só avisa que ainda está assando')
+  while (!fogueira.info().sticks[0].ready) heat();
+  // Pronta, ela espera (e não queima), mesmo com o fogo no máximo por muito tempo.
+  for (let i = 0; i < 400; i++) heat();
+  assert.equal(fogueira.info().sticks[0].ready, true);
+  assert.equal(engine.state.minis.fogueira.burnt, undefined, 'não existe mais queimar');
   engine.state.humor.amor = 0;
   engine.state.humor.at = engine.now();
   clickArea(host, 'fogueira', 'espeto:0', now);
-  assert.equal(fogueira.info().sticks[0], null, 'tirou no ponto');
-  assert.ok(engine.mood().amor > 0, 'o queijo certinho rende Amor');
-  assert.equal(engine.state.minis.fogueira.perfect, 1);
+  assert.equal(fogueira.info().sticks[0], null, 'comeu');
+  assert.ok(engine.mood().amor > 0, 'o queijo rende Amor');
+  assert.equal(engine.state.minis.fogueira.roasted, 1);
+  assert.equal(view.probe().flights, 1, 'a comida voa até o espectador do banco');
+  assert.ok(sounds.includes('carinho'));
+  for (let i = 0; i < 20; i++) host.draw((now += 40));
+  assert.equal(view.probe().flights, 0, 'chegou: o espectador comeu e o prêmio aparece');
+  assert.ok(view.probe().says >= 2, 'NHAM e o prêmio na tela');
 
   // Pular a fogueira: precisa de calor; a animação dura um instante.
   const cheer = engine.state.cheer;
@@ -1795,4 +1806,146 @@ test('fogueira: a comida no espeto é desenhada por cima do fogo (não fica esco
   const food = bundle.images[bundle.janelas.fogueira.comidas.image];
   assert.ok(order.includes(fire) && order.includes(food), 'o fogo e a comida foram desenhados');
   assert.ok(order.indexOf(fire) < order.indexOf(food), 'a comida vem depois (por cima) do fogo');
+});
+
+test('palco: as teclas 1, 2 e 3 marcam as pistas como o clique, só com o show rolando e a janela à vista', () => {
+  const { host, engine, sounds, clock } = setup(40, { minis: { palco: { hidden: false } } });
+  host.restore();
+  const view = host.windows.get('palco').view;
+  const palco = engine.mini('palco');
+  let now = 1000;
+  host.draw((now += 40));
+  assert.equal(host.key('1', now), false, 'no menu a tecla não faz nada');
+  assert.equal(host.key('x', now), false, 'outras teclas nunca valem');
+  clickArea(host, 'palco', 'musica:xote', now);
+  assert.equal(host.key('1', now), false, 'o show só vale para a tecla depois de desenhado (como o clique)');
+  host.draw((now += 40));
+  const startAt = engine.state.minis.palco.show.startAt;
+  const notes = palco.chart('xote');
+  // Toca a música toda só nas teclas: cada tecla é a pista da esquerda para a direita.
+  for (const note of notes) {
+    clock.t = startAt + note.t;
+    host.draw((now += 40));
+    assert.equal(host.key(String(note.lane + 1), now), true);
+  }
+  assert.ok(sounds.includes('palco-triangulo') && sounds.includes('palco-zabumba') && sounds.includes('palco-sanfona'), 'cada tecla toca o som da pista');
+  assert.equal(engine.state.minis.palco.show.maxCombo, notes.length, 'todas as notas acertadas só com o teclado');
+  assert.equal(host.key('4', now), false);
+  assert.equal(host.key('0', now), false);
+  // Fora de hora a tecla é usada mas erra, como o clique.
+  const before = sounds.length;
+  assert.equal(host.key('1', now), true);
+  assert.equal(sounds[before], 'errou');
+  assert.equal(engine.state.minis.palco.show.combo, notes.length, 'o combo só zera quando a nota passa, não no erro de clique');
+  // Ajuda aberta ou janela escondida: a tecla fica para o resto do jogo.
+  host.setHelp('palco', true);
+  assert.equal(host.key('2', now), false, 'com a ajuda aberta a tecla não vale');
+  host.setHelp('palco', false);
+  host.close('palco');
+  assert.equal(host.key('2', now), false, 'janela escondida não recebe tecla');
+  host.setHidden('palco', false);
+  host.draw((now += 40));
+  // Acaba o show: o resultado aparece e as teclas não o fecham (quem segue tocando não perde o resultado).
+  clock.t = startAt + notes[notes.length - 1].t + 5000;
+  engine.tick(1);
+  host.onEvents(engine.drainEvents(), now);
+  host.draw((now += 40));
+  assert.ok(palco.info().last);
+  assert.equal(host.key('1', now), false);
+  assert.equal(host.key('2', now), false);
+  assert.ok(palco.info().last, 'o resultado continua na tela');
+  assert.ok(view.probe().areas.some(area => area.id === 'resultado'));
+});
+
+test('horta: a regadora, a cesta e a pá da prateleira regam, colhem e plantam tudo; o combo e a sorte aparecem; o quadro e os bichos reagem ao clique', () => {
+  const { host, engine, sounds, toasts, clock } = setup(90, { minis: { horta: { hidden: false } } });
+  host.restore();
+  const view = host.windows.get('horta').view;
+  const horta = engine.mini('horta');
+  engine.state.minis.horta.crowAt = clock.t + 1e9;
+  engine.state.minis.horta.butterflyAt = clock.t + 1e9;
+  let now = 1000;
+  engine.tick(1);
+  host.draw((now += 40));
+  const areas = view.probe().areas.map(area => area.id);
+  for (const id of ['regadora', 'cesta', 'pa', 'nota:0', 'nota:1', 'galinha', 'espantalho']) assert.ok(areas.includes(id), `${id} (tem ${areas.join(',')})`);
+  // A pá planta a semente escolhida em todos os canteiros livres.
+  clickArea(host, 'horta', 'semente:milho', now);
+  clickArea(host, 'horta', 'pa', now);
+  assert.equal(horta.info().empty, 0);
+  assert.ok(sounds.includes('pulo'));
+  sounds.length = 0;
+  clickArea(host, 'horta', 'pa', now);
+  assert.ok(sounds.includes('erro'), 'sem canteiro livre a pá avisa');
+  // A regadora rega tudo (5 cargas) e depois avisa que está vazia.
+  clickArea(host, 'horta', 'regadora', now);
+  assert.equal(horta.info().water, 0);
+  assert.equal(engine.state.minis.horta.plots.filter(plot => plot.waters > 0).length, 5);
+  sounds.length = 0;
+  clickArea(host, 'horta', 'regadora', now);
+  assert.ok(sounds.includes('erro'), 'regadora vazia avisa');
+  // A cesta colhe tudo o que está no ponto; as colheitas seguidas viram combo, e os pedidos entregues avisam.
+  sounds.length = 0;
+  clickArea(host, 'horta', 'cesta', now);
+  assert.ok(sounds.includes('erro'), 'sem nada pronto a cesta avisa');
+  for (const plot of engine.state.minis.horta.plots) plot.readyAt = clock.t;
+  engine.state.minis.horta.orders = [{ crop: 'milho', n: 3, have: 0 }];
+  engine.state.minis.horta.plots[2].luck = 'dourada';
+  host.draw((now += 40));
+  assert.equal(horta.info().ready, 10);
+  sounds.length = 0;
+  clickArea(host, 'horta', 'cesta', now);
+  assert.equal(horta.info().ready, 0, 'tudo colhido de uma vez');
+  assert.equal(engine.state.minis.horta.harvests, 10);
+  assert.ok(sounds.includes('conquista'), 'combo grande e encomenda entregue tocam a fanfarra');
+  assert.ok(toasts.some(text => /mini\.horta\.orderToast/.test(text)), 'a encomenda entregue avisa');
+  assert.equal(horta.info().combo.n, 5);
+  for (let i = 0; i < 40; i++) host.draw((now += 40));
+  // O quadro de encomendas, a galinha e o espantalho respondem ao clique sem estragar nada.
+  sounds.length = 0;
+  clickArea(host, 'horta', 'nota:0', now);
+  assert.ok(sounds.includes('clique'));
+  clickArea(host, 'horta', 'galinha', now);
+  assert.ok(sounds.includes('galinha'));
+  clickArea(host, 'horta', 'espantalho', now);
+  assert.ok(sounds.includes('crianca'));
+  // O moinho (nas pás, sem região) gira mais depressa.
+  const item = host.windows.get('horta');
+  const rect = item.canvas.getBoundingClientRect();
+  const probe = view.probe();
+  const mill = bundle.janelas.horta.moinho;
+  sounds.length = 0;
+  view.click(rect.left + mill.x * rect.width / probe.size.width, rect.top + (mill.y - 4) * rect.height / probe.size.height, now);
+  assert.ok(sounds.includes('clique'), 'clicar nas pás do moinho');
+});
+
+test('horta: a borboleta dourada, a chuva, a sorte e as amigas desenham sem erro e a borboleta pega no clique', () => {
+  const { host, engine, sounds, toasts, clock } = setup(80, { minis: { horta: { hidden: false } } });
+  host.restore();
+  const view = host.windows.get('horta').view;
+  const horta = engine.mini('horta');
+  engine.state.minis.horta.crowAt = clock.t + 1e9;
+  let now = 1000;
+  const ids = ['milho', 'abobora', 'mandioca', 'batata-doce', 'amendoim'];
+  ids.forEach((id, i) => horta.plant(i, id));
+  engine.state.minis.horta.plots[0].luck = 'dobro';
+  engine.state.minis.horta.plots[1].luck = 'dourada';
+  engine.state.weather.rain = { born: clock.t, until: clock.t + 120000 };
+  engine.state.minis.horta.butterfly = { born: clock.t, until: clock.t + 14000, seed: 14 };
+  for (let i = 0; i < 60; i++) host.draw((now += 40));
+  assert.ok(view.probe().areas.some(area => area.id === 'borboleta'), 'a borboleta dourada tem região para clicar');
+  // O clique na borboleta (a região segue o voo): pega, adianta a planta e solta os brilhos.
+  sounds.length = 0;
+  const slow = horta.info().plots[1].remaining;
+  clickArea(host, 'horta', 'borboleta', now);
+  assert.equal(horta.info().butterfly, null);
+  assert.equal(engine.state.minis.horta.caught, 1);
+  assert.ok(horta.info().plots.some(plot => plot.crop && plot.remaining < slow), 'a planta mais atrasada foi adiantada');
+  assert.ok(sounds.includes('brilho'));
+  // Tudo no ponto: o chamado da planta (pulinho), a sorte e a chuva continuam desenhando por muito tempo.
+  for (const plot of engine.state.minis.horta.plots.slice(0, 5)) plot.readyAt = clock.t;
+  for (let i = 0; i < 400; i++) host.draw((now += 33));
+  // O aviso da borboleta chega pelo evento do motor.
+  host.onEvents([{ type: 'mini', mini: 'horta', kind: 'butterfly' }], now);
+  assert.ok(toasts.some(text => /mini\.horta\.butterflyLanded/.test(text)));
 });

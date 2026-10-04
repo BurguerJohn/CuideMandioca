@@ -7,7 +7,7 @@ const { normalizeSettings, mergeSettings, publicSettings, pickDisplay } = requir
 
 test('preferências inválidas voltam ao padrão', () => {
   assert.deepEqual(normalizeSettings({ pinned: 'sim', zoom: 9, x: 9, lift: -3, hud: 'x', hidden: 1, display: 'a' }),
-    { pinned: true, zoom: 3, x: 1, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false, minis: {}, display: null, language: 'auto',
+    { pinned: true, zoom: 3, x: 1, lift: 0, hud: 'sempre', hidden: false, placa: null, gaveta: null, casa: null, casaHidden: false, minis: {}, display: null, language: 'auto',
       sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
   assert.equal(normalizeSettings({ sound: false }).sound, false, 'som desligado fica desligado');
   assert.equal(normalizeSettings({ sound: 'não' }).sound, true, 'valor estranho: som ligado');
@@ -26,7 +26,7 @@ test('mudanças parciais só alteram as chaves conhecidas', () => {
   assert.equal(next.x, 0.3);
   assert.equal(next.hud, 'passar');
   assert.equal('malicioso' in next, false);
-  assert.deepEqual(Object.keys(publicSettings(next)), ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'casa', 'casaHidden', 'minis', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm']);
+  assert.deepEqual(Object.keys(publicSettings(next)), ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'gaveta', 'casa', 'casaHidden', 'minis', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm']);
   assert.equal(normalizeSettings({ music: true }).music, true);
   assert.equal(normalizeSettings({ startup: true }).startup, true);
   assert.equal(normalizeSettings({ startup: 1 }).startup, false, 'abrir com o Windows só liga com true de verdade');
@@ -85,4 +85,17 @@ test('navegador normaliza preferências corrompidas com os mesmos limites do des
   assert.equal(next.zoom, 1);
   assert.equal(next.volume, 0.5);
   assert.deepEqual(JSON.parse(JSON.stringify(next.placa)), { dx: 20, dy: 30 });
+});
+
+test('gaveta da placa: só aceita janelas ou coleções (o resto fecha a gaveta) e dá para mudar pelas preferências', () => {
+  assert.equal(normalizeSettings({}).gaveta, null);
+  assert.equal(normalizeSettings({ gaveta: 'janelas' }).gaveta, 'janelas');
+  assert.equal(normalizeSettings({ gaveta: 'colecoes' }).gaveta, 'colecoes');
+  for (const estranho of ['album', '', 3, true, {}, [], 'JANELAS']) assert.equal(normalizeSettings({ gaveta: estranho }).gaveta, null, String(estranho));
+  const aberta = normalizeSettings({ gaveta: 'janelas' });
+  assert.equal(mergeSettings(aberta, { gaveta: 'colecoes' }).gaveta, 'colecoes', 'troca de gaveta');
+  assert.equal(mergeSettings(aberta, { gaveta: null }).gaveta, null, 'fecha a gaveta');
+  assert.equal(mergeSettings(aberta, { zoom: 2 }).gaveta, 'janelas', 'outras mudanças não mexem nela');
+  assert.equal(mergeSettings(aberta, { gaveta: 'lixo' }).gaveta, null);
+  assert.equal(publicSettings(aberta).gaveta, 'janelas');
 });

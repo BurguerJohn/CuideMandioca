@@ -161,3 +161,51 @@ test('uma falha transitória na presença permite reenviar o mesmo porte e lota�
   steam.setPresence({ tier: 'cidade', size: 30 });
   assert.equal(presence().length, count, 'a presença completa confirmada não se repete');
 });
+
+test('nuvem da Steam: só com o App ID de verdade e a nuvem ligada na conta e no jogo; ler, gravar e falhar viram no-op', () => {
+  const files = new Map([['save.json', '{"a":1}']]);
+  const flags = { account: true, app: true, boom: false };
+  const lib = {
+    init: () => ({
+      localplayer: { getName: () => 'Ana' },
+      apps: { currentGameLanguage: () => 'brazilian' },
+      cloud: {
+        isEnabledForAccount: () => flags.account,
+        isEnabledForApp: () => flags.app,
+        fileExists: name => files.has(name),
+        readFile: name => { if (flags.boom) throw new Error('falhou'); return files.get(name); },
+        writeFile: (name, content) => { if (flags.boom) throw new Error('falhou'); files.set(name, content); return true; }
+      }
+    })
+  };
+  const real = createSteam({ config: { appId: 5343830, required: true, overlay: false }, load: () => lib, log: quiet });
+  assert.equal(real.cloudEnabled(), false, 'sem iniciar a Steam não há nuvem');
+  assert.equal(real.cloudRead('save.json'), null);
+  assert.equal(real.cloudWrite('save.json', 'x'), false);
+  assert.equal(real.init(), true);
+  assert.equal(real.cloudEnabled(), true);
+  assert.equal(real.cloudRead('save.json'), '{"a":1}');
+  assert.equal(real.cloudRead('nao-existe.json'), null);
+  assert.equal(real.cloudWrite('save.json', '{"b":2}'), true);
+  assert.equal(files.get('save.json'), '{"b":2}');
+  flags.app = false;
+  assert.equal(real.cloudEnabled(), false, 'desligada nas Propriedades do jogo');
+  flags.app = true;
+  flags.account = false;
+  assert.equal(real.cloudEnabled(), false, 'desligada na conta');
+  flags.account = true;
+  flags.boom = true;
+  assert.equal(real.cloudRead('save.json'), null, 'erro da Steam vira null');
+  assert.equal(real.cloudWrite('save.json', 'y'), false, 'e gravação que falha vira false');
+  // O App ID de testes (480) nunca mexe na nuvem de ninguém.
+  flags.boom = false;
+  const spacewar = createSteam({ config: { appId: 480, required: false, overlay: false }, load: () => lib, log: quiet });
+  spacewar.init();
+  assert.equal(spacewar.cloudEnabled(), false);
+  // Uma Steam sem a parte da nuvem (biblioteca velha) também não derruba nada.
+  const old = createSteam({ config: { appId: 5343830, required: true, overlay: false }, load: () => ({ init: () => ({ localplayer: { getName: () => 'Ana' } }) }), log: quiet });
+  old.init();
+  assert.equal(old.cloudEnabled(), false);
+  assert.equal(old.cloudRead('save.json'), null);
+  assert.equal(old.cloudWrite('save.json', 'z'), false);
+});

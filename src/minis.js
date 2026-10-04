@@ -9,7 +9,8 @@
   // (`src/mini-<id>.js`) que guarda o estado dentro do save (`state.minis[id]`), anda com o tempo e dá os prêmios;
   // quem desenha é `src/janela-<id>.js`. Todas abrem num número de convidados (`data.minis.windows[].start`) e o botão
   // delas aparece na placa. Aqui ficam o registro dos modelos, a abertura por convidados e as ferramentas comuns.
-  const IDS = ['cordel', 'bichos', 'aquario', 'horta', 'fogueira', 'palco', 'mata', 'ceu', 'bairro'];
+  // Um modelo `background` (as visitas do folclore) não é janela: não tem botão na placa e anda sempre, pela festa.
+  const IDS = ['cordel', 'bichos', 'aquario', 'horta', 'fogueira', 'palco', 'mata', 'ceu', 'bairro', 'folclore'];
   const models = {};
   const define = (id, factory) => { models[id] = factory; };
 
@@ -75,6 +76,10 @@
       return !!entry && !!this.api[id] && this.engine.houseLevel() >= entry.start;
     }
     opened() { return this.list().filter(entry => this.open(entry.id)).map(entry => entry.id); }
+    // Quem anda com o tempo: as janelas abertas e os modelos que não são janela.
+    running() {
+      return [...this.opened(), ...Object.keys(this.api).filter(id => this.api[id].background)];
+    }
 
     fresh() {
       return Object.fromEntries(Object.entries(this.api).map(([id, model]) => [id, model.fresh()]));
@@ -92,18 +97,18 @@
     }
 
     tick(dt) {
-      for (const id of this.opened()) this.api[id].tick?.(dt);
+      for (const id of this.running()) this.api[id].tick?.(dt);
     }
 
     // `engine.advance`: o tempo passou de uma vez, então todo relógio guardado (em horas de verdade) anda para trás junto.
     shift(ms) {
-      for (const id of this.opened()) this.api[id].shift?.(ms);
+      for (const id of this.running()) this.api[id].shift?.(ms);
     }
 
     // Os acontecimentos da festa (`engine.emit`): as janelas abertas que querem saber (`hear(type, detail)`) ficam sabendo.
     hear(type, detail) {
       if (type === 'mini' || !this.engine.state?.minis) return;
-      for (const id of this.opened()) this.api[id].hear?.(type, detail);
+      for (const id of this.running()) this.api[id].hear?.(type, detail);
     }
 
     // Convidado novo (nunca visto antes): quem abre agora avisa, e as janelas abertas que se importam (uma página nova no cordel...) ficam sabendo.

@@ -1,5 +1,5 @@
-// Palco do Forró: escolha uma música e marque o ritmo clicando na pista (triângulo, zabumba ou sanfona) na hora em que a nota
-// chega no círculo. O trio toca junto. No fim, estrelas e o prêmio. O motor está em src/mini-palco.js.
+// Palco do Forró: escolha uma música e marque o ritmo clicando na pista (triângulo, zabumba ou sanfona), ou apertando a tecla 1, 2 ou 3,
+// na hora em que a nota chega no círculo. O trio toca junto. No fim, estrelas e o prêmio. O motor está em src/mini-palco.js.
 (function (root) {
   'use strict';
 
@@ -7,6 +7,7 @@
   const W = 176;
   const H = 120;
   const LANE_SOUND = ['palco-triangulo', 'palco-zabumba', 'palco-sanfona'];
+  const LANE_KEYS = ['1', '2', '3'];
   const compact = n => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
   const clock = seconds => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
 
@@ -69,6 +70,7 @@
         const lit = flash[lane] > now;
         ring(x, meta.alvo, 8, lit ? '#ffffff' : '#ffe27a');
         ring(x, meta.alvo, 7, lit ? '#ffe27a' : '#8a6a1c');
+        base.text(LANE_KEYS[lane], x, meta.alvo + 10, lit ? '#ffffff' : '#ffe27a');
         if (lit) { base.g.fillStyle = 'rgba(255, 240, 160, 0.35)'; base.g.fillRect(x - 6, meta.alvo - 6, 13, 13); }
       });
       drawnNotes = 0;
@@ -160,7 +162,12 @@
         if (model.start(found.musica).ok) hooks.sound?.('abrir');
         return true;
       }
-      const lane = found?.lane ?? laneAt(base.toArt(clientX, clientY).x);
+      playLane(model, found?.lane ?? laneAt(base.toArt(clientX, clientY).x), now);
+      return true;
+    }
+
+    // Marca a nota da pista (clique ou tecla): o músico reage, a nota acende e o aviso diz o quanto acertou.
+    function playLane(model, lane, now) {
       const got = model.hit(lane);
       const x = meta.x[lane];
       if (got.ok) {
@@ -175,6 +182,16 @@
         hooks.sound?.('errou');
         base.say(tr('mini.palco.off'), x, meta.alvo - 18, now, '#ff9a8a');
       }
+    }
+
+    // As teclas 1, 2 e 3 tocam as pistas da esquerda para a direita, só com o show rolando (no menu e no resultado não fazem nada,
+    // para a pessoa que continua marcando o ritmo não fechar o resultado sem querer). Devolve se a tecla foi usada.
+    function key(name, now = 0) {
+      const lane = LANE_KEYS.indexOf(name);
+      if (lane < 0 || !engineRef) return false;
+      const model = engineRef.mini('palco');
+      if (!model.info().show || shownMode !== 'show') return false;
+      playLane(model, lane, now);
       return true;
     }
 
@@ -198,7 +215,7 @@
       return { ...base.probeBase(), notes: drawnNotes };
     }
 
-    return { size: base.size, setScale: base.setScale, draw, hit: base.hit, click, status, onEvents, probe };
+    return { size: base.size, setScale: base.setScale, draw, hit: base.hit, click, key, status, onEvents, probe };
   }
 
   root.ArraiaJanelas.registerView('palco', create);

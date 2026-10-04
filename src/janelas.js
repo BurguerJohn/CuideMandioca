@@ -84,7 +84,8 @@
     // Os números do texto de ajuda vêm da configuração da janela (`data.minis.<id>`): o texto nunca fica desatualizado.
     function helpVars(id) {
       const cfg = engine.data.minis[id] || {};
-      return Object.fromEntries(Object.entries(cfg).filter(([, value]) => typeof value === 'number'));
+      // O modelo pode acrescentar números que ele calcula (em %, por exemplo): `helpVars()`.
+      return { ...Object.fromEntries(Object.entries(cfg).filter(([, value]) => typeof value === 'number')), ...(engine.mini(id)?.helpVars?.() || {}) };
     }
 
     // Abre ou fecha o painel "como funciona" desta janela (o texto é montado ao abrir, no idioma de agora).
@@ -320,11 +321,20 @@
       item.view.click?.(drag.x, drag.y, now);
     }
 
+    // Tecla apertada com o jogo em foco: a primeira janela visível (com a ajuda fechada) que usa a tecla fica com ela. Devolve se alguma usou.
+    function key(name, now) {
+      for (const item of windows.values()) {
+        if (!visible(item.id) || item.helpOpen || !item.view.key) continue;
+        if (item.view.key(name, now)) return true;
+      }
+      return false;
+    }
+
     function probe() {
       return Object.fromEntries([...windows.entries()].map(([id, item]) => [id, { visible: visible(id), ...(item.view.probe?.() || {}) }]));
     }
 
-    return { ensure, place, placeAll, toggle, close, setHidden, draw, onEvents, items, signature, restore, dragStart, dragMove, dragEnd,
+    return { ensure, place, placeAll, toggle, close, setHidden, draw, onEvents, items, signature, restore, dragStart, dragMove, dragEnd, key,
       visible, probe, windows, setHelp, toggleHelp, helpOpen, setEngine, reset };
   }
 

@@ -68,8 +68,8 @@
   const firstRun = !raw || !!loadError;
 
   const ui = {
-    tab: 'festa', yeye: '', lastLetter: null, open: false, modal: false, focused: true, focusRequest: 0, press: null, cancelledClick: false, spacePress: null, cancelledSpace: false, logFilter: 'desbloqueios', lastLogRender: 0,
-    dock: { open: false, cat: 'melhorias', side: 'esquerda', dx: 0 }, preview: null,
+    tab: 'festa', yeye: '', lastLetter: null, open: false, modal: false, focused: true, focusRequest: 0, press: null, cancelledClick: false, spacePress: null, cancelledSpace: false, logFilter: 'desbloqueios', mundoFilter: 'todos', lastLogRender: 0,
+    dock: { open: false, cat: 'melhorias', side: 'esquerda', dx: 0, groups: {} }, preview: null,
     rings: { open: false, playing: false, result: null },
     tela: { open: false, id: 'correio' }, telaPos: null,
     settings: publicSettings(normalizeSettings(desktop ? null : readJSON(SETTINGS_KEY))),
@@ -590,9 +590,9 @@
   function context() {
     return { tab: ui.tab, panelOpen: ui.open, debug: ui.debug, casaVisible: casaVisible(), minis: ui.janelas ? ui.janelas.items() : [],
       lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
-      settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side,
+      settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side, dockGroups: ui.dock.groups,
       ringPlaying: ui.rings.playing, ringResult: ui.rings.result, zoomLabel: zoomLabel(),
-      closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter };
+      closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter, mundoFilter: ui.mundoFilter };
   }
 
   // Painel (números, conquistas, ajustes) e a janela da tela de jogo aberta, redesenhados juntos.
@@ -686,9 +686,9 @@
     ui.dock.full = engine.bellyFull();
     const dock = $('#vitrine');
     const restoreFocus = keepFocus(dock);
-    const scroll = dock.querySelector?.('.vitrine-corpo')?.scrollLeft || 0;
+    const scroll = dock.querySelector?.('.vgrade')?.scrollLeft || dock.querySelector?.('.vitrine-corpo')?.scrollLeft || 0;
     dock.innerHTML = UI.vitrine(engine, context());
-    const body = dock.querySelector?.('.vitrine-corpo');
+    const body = dock.querySelector?.('.vgrade') || dock.querySelector?.('.vitrine-corpo');
     if (body) body.scrollLeft = scroll;
     refreshLive(true);
     placeDock();
@@ -715,7 +715,7 @@
       engine.specialDay()?.id, engine.daysToSaoJoao(), s.leilao?.active ? `${s.leilao.active.leader}:${s.leilao.active.price}` : '', !!s.saco?.active,
       !!s.cold?.active, !!s.visitor?.active, !!(s.fotografo?.active && !s.fotografo.active.shot), !!(s.burro?.active && !s.burro.active.pinned), !!s.fantasia?.judgeAt,
       `${s.cozinha.pot?.id || ''}:${!!s.cozinha.pot?.ready}:${s.cozinha.buff?.until || 0}:${engine.cookBonus() > 0}`, engine.isPlaced('fogao-lenha'),
-      engine.hortaBuffs().map(buff => `${buff.crop}${buff.until}`).join(','), engine.goalsReady(), ui.open && ui.tab, ui.debug, engine.houseInfo().open, casaVisible(), ui.janelas?.signature() || ''].join('|');
+      engine.hortaBuffs().map(buff => `${buff.crop}${buff.until}`).join(','), s.mundo?.active ? `${s.mundo.active.id}:${s.mundo.active.got.length}` : '', engine.mundo?.soon()?.entry.id || '', (s.mundo?.buffs || []).map(buff => buff.id).join(','), engine.goalsReady(), ui.open && ui.tab, ui.debug, engine.houseInfo().open, casaVisible(), ui.janelas?.signature() || ''].join('|');
     if (!force && key === ui.hudKey) return;
     ui.hudKey = key;
     const placa = $('#placa');
@@ -907,6 +907,10 @@
   }
 
   function previewFor(id) {
+    if (typeof id === 'string' && id.startsWith('look:')) {
+      const look = engine.looks.get(id.slice(5));
+      return look ? Object.fromEntries(engine.looks.slots.filter(slot => look.pieces[slot]).map(slot => [slot, look.pieces[slot]])) : null;
+    }
     if (typeof id === 'string' && id.startsWith('set:')) {
       const set = engine.data.sets.find(entry => entry.id === id.slice(4));
       return set ? { chapeu: set.hat, mao: set.hand, tecido: set.fabric } : null;
@@ -1101,6 +1105,7 @@
     if (a === 'tela') { openTela(d.tela); return; }
     if (a === 'tela-fechar') { closeTela(); return; }
     if (a === 'historico-filtro') { ui.logFilter = d.value; renderWindows(); return; }
+    if (a === 'mundo-filtro') { ui.mundoFilter = d.value; renderWindows(); return; }
     if (a === 'debug') {
       const note = engine.debug(d.op, d.value);
       const entry = engine.state.log.at(-1);
@@ -1120,7 +1125,58 @@
       renderDock();
       return;
     }
+    // As gavetas da placa (janelas e coleções): clicar abre, clicar de novo fecha; a escolha fica nas preferências.
+    if (a === 'gaveta') { changeSettings({ gaveta: ui.settings.gaveta === d.gaveta ? null : d.gaveta }); return; }
     if (a === 'vitrine-lado') { ui.dock.side = d.side; ui.preview = null; renderDock(); return; }
+    // O guarda-roupa: salvar o visual de agora, vestir um look salvo, apagar e o look surpresa.
+    if (a === 'look-salvar') {
+      const result = engine.looks.save();
+      if (result.ok) { tocar('carta'); toast(t('app.lookSaved', { name: result.look.name })); saveLater(); }
+      else toast(result.reason === 'full' ? t('app.lookFull', { max: result.max }) : t('app.lookSame', { name: result.name }), 'erro');
+      renderDock();
+      return;
+    }
+    if (a === 'look-vestir') {
+      const result = engine.looks.wear(d.id);
+      if (!result.ok) return;
+      tocar('equipar');
+      ui.festa?.celebrate?.(performance.now(), t('fx.lookNovo'));
+      toast(result.lacking.length ? t('app.lookWornMissing', { name: result.look.name, list: result.lacking.map(id => engine.items[id]?.name || id).join(', ') })
+        : t('app.lookWorn', { name: result.look.name }));
+      ui.preview = null;
+      saveLater();
+      renderDock();
+      return;
+    }
+    if (a === 'look-apagar') {
+      const look = engine.looks.get(d.id);
+      if (!look || !confirm(t('looks.confirmDelete', { name: look.name }))) return;
+      engine.looks.remove(d.id);
+      toast(t('app.lookDeleted', { name: look.name }));
+      ui.preview = null;
+      saveLater();
+      renderDock();
+      return;
+    }
+    if (a === 'look-sortear') {
+      engine.looks.random();
+      tocar('brilho');
+      ui.festa?.celebrate?.(performance.now(), t('fx.lookNovo'));
+      toast(t('app.lookRandom'));
+      ui.preview = null;
+      saveLater();
+      renderDock();
+      return;
+    }
+    // As pílulas da vitrine: mostra só os itens daquele grupo (cada categoria lembra o seu filtro), com a grade de volta ao começo.
+    if (a === 'vitrine-grupo') {
+      ui.dock.groups[ui.dock.cat] = d.grupo;
+      ui.preview = null;
+      renderDock();
+      const grid = $('#vitrine').querySelector?.('.vgrade');
+      if (grid) grid.scrollLeft = 0;
+      return;
+    }
     if (a === 'vitrine-item') { dockItem(d.id); return; }
     if (a === 'vitrine-conjunto') { dockSet(d.id); return; }
     if (a === 'vitrine-comida') { feedFood(d.id); return; }
@@ -1321,6 +1377,9 @@
     if (dish) done(true, t('app.cookServed', { dish: engine.recipe(dish.id)?.name || dish.id, v: Math.round(dish.bonus * 100), n: dish.minutes }), null, 'premio');
   }
 
+  // O que uma visita do folclore deu, em linhas ("+2 fichas +5 lenha...").
+  const folcloreGains = given => UI.gains(given);
+
   function festaClick(region, at = null) {
     if (region === 'request') {
       const result = engine.claimRequest();
@@ -1335,6 +1394,43 @@
     } else if (typeof region === 'string' && region.startsWith('lanterna:')) {
       ui.festa?.poke(region);
       tocar('arremesso');
+    } else if (typeof region === 'string' && region.startsWith('mundo:')) {
+      // Um alvo do evento do mundo (estrela, lampião, vaga-lume, olhos, pipa, balão d'água, cometa).
+      const result = engine.mundo.catchTarget(Number(region.slice(6)));
+      if (!result.ok && result.reason === 'order') {
+        tocar('errou');
+        toast(t('app.mundoOrdem'));
+      } else if (result.ok && result.partial) {
+        // Um golpe numa pinhata: só a festa reage (balança, solta doce e toca o martelo); o prêmio vem no último.
+      } else if (!result.ok && result.reason === 'poor') {
+        const entry = engine.mundo.event(result.id);
+        tocar('errou');
+        toast(t('app.mundoPobre', { name: entry[`shop${result.k}`] || entry.name, cost: result.cost }));
+      } else if (result.ok && result.buff) {
+        // Compra na barraca da feira: o aviso diz o bônus, o tempo e o preço.
+        const entry = engine.mundo.event(result.id);
+        done(true, t('app.mundoCompra', { name: entry[`shop${result.k}`] || entry.name, v: Math.round(result.buff.bonus * 100), min: Math.round(result.buff.seconds / 60), cost: result.buff.cost }) +
+          (result.all ? ` ${t('app.mundoTudo', { name: entry.name, gains: folcloreGains(result.finale || {}) })}` : ''), null, result.all ? 'premio' : 'moeda');
+      } else if (result.ok) {
+        const entry = engine.mundo.event(result.id);
+        const gains = folcloreGains(result.given);
+        done(true, result.all
+          ? t('app.mundoTudo', { name: entry.name, gains: `${gains} ${folcloreGains(result.finale || {})}`.trim() })
+          : t('app.mundoPego', { name: entry.name, gains, left: result.left }), null, result.all ? 'premio' : 'brilho');
+      }
+    } else if (region === 'premio:desfile') {
+      // O Desfile dos Prêmios: um clique em qualquer um da fila ganha o prêmio do desfile (uma vez só).
+      const result = engine.premios.catchParade();
+      if (result.ok) done(true, t('app.premioDesfile', { n: result.n, gains: folcloreGains(result.given) }), null, 'premio');
+    } else if (typeof region === 'string' && region.startsWith('premio:')) {
+      // Coisa ou personagem de um minigame: a coisa reage; o personagem, com o presente pronto, dá o presente (de tempos em tempos).
+      const entry = engine.premios.item(region.slice(7));
+      ui.festa?.poke(region);
+      if (entry && entry.tipo === 'personagem') {
+        const result = engine.premios.gift(entry.id);
+        if (result.ok) done(true, t('app.premioGift', { name: entry.name, gains: folcloreGains(result.given) }), null, 'premio');
+        else if (result.reason === 'wait') { tocar('clique'); toast(t('app.premioWait', { name: entry.name, time: UI.duration(result.wait) })); }
+      } else if (entry) tocar(PREMIO_SONS[entry.id] || 'clique');
     } else if (typeof region === 'string' && region.startsWith('bicho:')) {
       ui.festa?.poke(region);
       tocar(BICHO_SONS[region.split(':')[1]] || 'clique');
@@ -1365,6 +1461,12 @@
       if (result) {
         done(true, t(`app.burroPin.${result.grade}`, { n: UI.compact(result.amount), tickets: result.tickets }), null,
           { mosca: 'conquista', perto: 'premio', longe: 'acerto', fora: 'errou' }[result.grade]);
+      }
+    } else if (region === 'folclore') {
+      const result = engine.mini('folclore').act();
+      if (result) {
+        const entry = engine.data.minis.folclore.events.find(item => item.id === result.id);
+        done(true, t('app.folcloreCatch', { text: entry?.text || '', gains: folcloreGains(result.given) }), null, null);
       }
     } else if (region === 'compadres') {
       const result = engine.witnessCompadres();
@@ -1442,11 +1544,21 @@
   // O som de cada bicho da festa que reage ao clique.
   const BICHO_SONS = { sapo: 'sapo', trem: 'apito', kombi: 'buzina', 'carro-boi': 'boi', papagaio: 'papagaio', jegue: 'zurro', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca', rafael: 'yeah' };
 
+  // O som da chegada de cada evento do mundo (src/som.js).
+  const MUNDO_SONS = { estrelas: 'brilho', ventania: 'assobio', vagalumes: 'bolha', calorao: 'fogo', feira: 'quadrilha', poente: 'sinos', tesouro: 'moeda', neve: 'brilho', tremor: 'lenha', cheia: 'bolha', constelacao: 'brilho', sapos: 'sapo', trem: 'apito', pinhata: 'arremesso', amanhecer: 'canto', turbulencia: 'assobio', fichas: 'moeda', temporal: 'trovao', lua: 'uivo', petalas: 'carinho', baloes: 'arremesso', granizo: 'chuva', eclipse: 'sinos', redemoinho: 'assobio', pipoca: 'galinha', fogos: 'fogo', boitata: 'chama', revoada: 'pombo', procissao: 'sinos', ovni: 'bolha', cometa: 'crescer' };
+
+  // O som de cada coisa dos prêmios quando clicada (src/som.js).
+  const PREMIO_SONS = { ursinhos: 'carinho', 'balde-peixes': 'pesca', 'globo-bingo': 'bola', burrico: 'zurro', 'fita-chegada': 'apito', 'pote-enfeitado': 'pote',
+    'martelo-banco': 'martelo', 'cesto-cobra': 'cobra', 'varal-cordeis': 'carta', 'cocho-milho': 'pintinho', 'barril-aquario': 'bolha', 'carrinho-legumes': 'lenha',
+    'panela-fogo': 'fogo', 'cesta-pamonhas': 'lenha', 'cabide-fantasias': 'equipar', 'bolo-noiva': 'sinos', 'camera-tripe': 'foto', 'placa-penetra': 'expulsar',
+    'poleiro-pombos': 'pombo', 'album-gigante': 'revelar', 'corneta-alto': 'altofalante', 'almofada-coracao': 'carinho', 'cacho-baloes': 'arremesso', 'pote-ouro-arco': 'moeda', 'mastro-bandeirinhas': 'arremesso',
+    'banco-praca': 'clique', 'mesa-compadres': 'canto', 'roda-carro-boi': 'boi', 'caderno-pedidos': 'aviso', 'estacao-tempo': 'assobio', zabumba: 'palco-zabumba', 'totem-curupira': 'assobio', telescopio: 'brilho', 'caixa-correio': 'carta', 'lanterna-boitata': 'chama' };
+
   // --- Eventos do motor --------------------------------------------------------------------------------
   // Som de cada acontecimento da festa (os que o jogador não causou com um clique).
   const EVENT_SOUNDS = { contest: 'porte', daily: 'premio', 'new-year': 'porte', 'bingo-number': 'bola', 'bingo-line': 'acerto', 'bingo-win': 'conquista', 'bingo-lost': 'errou', 'quadrilha-call': 'grito', pote: 'aviso', saco: 'aviso', 'saco-go': 'juiz', leilao: 'aviso', 'leilao-call': 'martelo', announce: 'altofalante', cobra: 'cobra', fotografo: 'aviso', burro: 'aviso', 'fantasia-soon': 'aviso', cold: 'chuva', quentao: 'moeda', sticker: 'revelar', 'album-page': 'conquista', visitor: 'quadrilha', set: 'premio', wedding: 'sinos', 'wedding-end': 'premio', 'special-day': 'quadrilha', quadrilha: 'quadrilha', 'goal-done': 'aviso', rain: 'chuva', thunder: 'trovao', 'rain-end': 'arcoiris', balloon: 'aviso', 'frenzy-start': 'porte', learn: 'crescer', grow: 'crescer', 'tier-up': 'porte', legendary: 'porte', achievement: 'conquista', 'fishing-open': 'aviso', rafael: 'yeah',
     'prize-ready': 'aviso', 'letter-ready': 'pombo', 'outing-done': 'aviso', crasher: 'penetra', request: 'pedido',
-    'size-up': 'convidado', 'flare-start': 'fogo', 'cook-ready': 'aviso', 'house-room': 'crescer', 'house-resident': 'convidado' };
+    'size-up': 'convidado', premio: 'conquista', 'premio-parade': 'quadrilha', 'flare-start': 'fogo', 'cook-ready': 'aviso', 'house-room': 'crescer', 'house-resident': 'convidado' };
   // Acontecimentos que mudam o que as janelas mostram: prenda pronta, carta chegando, turma voltando do rolê...
   const REFRESH_EVENTS = new Set(['bingo-win', 'bingo-lost', 'goal-done', 'learn', 'grow', 'tier-up', 'fishing-open', 'prize-ready', 'letter-ready', 'outing-done', 'legendary', 'item', 'equip',
     'achievement', 'cook-ready', 'cook-end', 'cook-served', 'cook-start']);
@@ -1497,6 +1609,34 @@
         // O troféu do chefe avisa mesmo com a janela escondida.
         toast(t('mini.mata.cleared', { stage: event.stage }), 'ouro');
         for (const id of event.items || []) toast(t('mini.mata.unlocked', { item: engine.items[id]?.name || id }), 'ouro');
+      } else if (event.type === 'mundo') {
+        // Um evento do mundo começou: o aviso diz o que é e o que fazer; cada um tem o seu som.
+        const entry = engine.mundo.event(event.id);
+        const rare = !!entry && engine.mundo.rarity(entry) === 'rare';
+        if (entry) toast(t(rare ? 'app.mundoInicioRaro' : 'app.mundoInicio', { name: entry.name, text: entry.text }), 'ouro');
+        // Um aviso que se destaca: uma fanfarra só dos eventos (maior e com tambor nos raros, que também comemoram na festa) e, logo depois, o som do próprio evento.
+        if (!quiet) {
+          tocar(rare ? 'evento-raro' : 'evento');
+          setTimeout(() => tocar(MUNDO_SONS[event.id] || 'aviso'), rare ? 1100 : 700);
+        }
+        if (rare) ui.festa?.celebrate?.(performance.now(), t('fx.mundoRaro'));
+        refresh = true;
+      } else if (event.type === 'mundo-fim') {
+        const entry = engine.mundo.event(event.id);
+        if (entry && event.got < event.n) toast(t('app.mundoFim', { name: entry.name, got: event.got, n: event.n }));
+        refresh = true;
+      } else if (event.type === 'premio-parade') {
+        toast(t('app.premioDesfileStart'), 'ouro');
+      } else if (event.type === 'premio') {
+        // Um minigame liberou uma coisa ou um personagem na festa.
+        const entry = engine.premios.item(event.id);
+        if (entry) toast(t(entry.tipo === 'personagem' ? 'app.premioPerson' : entry.tipo === 'ouro' ? 'app.premioGold' : 'app.premioThing', { name: entry.name, game: engine.premios.game(entry.jogo)?.name || '' }), 'ouro');
+        if (ui.tela.open && ui.tela.id === 'premios') refresh = true;
+      } else if (event.type === 'mini' && event.mini === 'folclore' && event.kind === 'unlock') {
+        // Derrotar uma criatura pela primeira vez na Mata libera a visita dela na festa.
+        toast(t('app.folcloreUnlock', { name: engine.data.minis.folclore.events.find(item => item.id === event.id)?.name || event.id }), 'ouro');
+      } else if (event.type === 'mini' && event.mini === 'folclore' && event.kind === 'start' && event.first) {
+        toast(t('app.folcloreNew', { name: engine.data.minis.folclore.events.find(item => item.id === event.id)?.name || event.id }), 'ouro');
       } else if (event.type === 'mini' && event.mini === 'cordel' && (event.kind === 'page' || event.kind === 'page-done')) {
         const title = engine.data.minis.cordel.pages[event.page - 1]?.title || '';
         toast(t(event.kind === 'page' ? 'mini.cordel.newPage' : 'mini.cordel.pageDone', { title }), 'ouro');
@@ -1704,26 +1844,8 @@
     const card = event.target.closest?.('[data-preview]');
     if (!card || !ui.dock.open) return;
     ui.preview = previewFor(card.dataset.preview);
-    const item = engine.items[card.dataset.preview];
-    const set = engine.data.sets.find(entry => `set:${entry.id}` === card.dataset.preview);
-    if (set) {
-      const pieces = [set.hat, set.hand, set.fabric];
-      const lacking = pieces.filter(piece => !engine.owned(piece)).map(piece => engine.items[piece]?.name || piece);
-      const box = $('#vitrine-detalhe') || document.querySelector?.('#vitrine-detalhe');
-      if (box) {
-        box.textContent = `${set.name} (+${Math.round(set.bonus * 100)}%): ${pieces.map(piece => engine.items[piece]?.name || piece).join(' + ')}. ` +
-          (lacking.length ? t('shop.setLacks', { list: lacking.join(', ') }) : t('shop.setComplete'));
-      }
-      return;
-    }
     const detail = $('#vitrine-detalhe') || document.querySelector?.('#vitrine-detalhe');
-    // Os conjuntos de que a peça faz parte: um só mostra as três peças; mais de um, só os nomes e bônus (a linha é curta).
-    const sets = engine.data.sets.filter(set => [set.hat, set.hand, set.fabric].includes(item?.id));
-    const setText = sets.length === 1
-      ? ` ${t('shop.set', { name: sets[0].name, v: Math.round(sets[0].bonus * 100),
-        pieces: [sets[0].hat, sets[0].hand, sets[0].fabric].map(id => engine.items[id]?.name || id).join(' + ') })}`
-      : sets.length ? ` ${t('shop.sets', { list: sets.map(set => `${set.name} +${Math.round(set.bonus * 100)}%`).join(', ') })}` : '';
-    if (detail && item) detail.textContent = `${item.name}: ${item.desc}${item.effect ? ` ${item.effect}` : ''}${setText}`;
+    if (detail) detail.innerHTML = UI.vitrineDetalhe(engine, context(), card.dataset.preview);
   });
 
   document.addEventListener('mouseout', event => {
@@ -1973,6 +2095,15 @@
   });
 
   document.addEventListener('wheel', event => {
+    // A roda do mouse sobre a grade da vitrine rola de lado (as fileiras da grade são na horizontal).
+    const grid = event.target?.closest?.('.vgrade, .vfiltros');
+    if (grid && ui.dock.open) {
+      if (Math.abs(event.deltaY) >= Math.abs(event.deltaX) && grid.scrollWidth > grid.clientWidth) {
+        grid.scrollLeft += event.deltaY;
+        event.preventDefault();
+      }
+      return;
+    }
     if (!event.target.closest?.('[data-action="zoom-alca"]')) return;
     event.preventDefault();
     if (!event.deltaY) return;
@@ -2034,7 +2165,8 @@
     setTimeout(() => { renderWindows(); renderHud(true); }, 0);
   });
 
-  // Segredo: digitar "yeye" com o jogo em foco chama o Rafael para a festa (ou, se ele já está lá, faz ele gritar de novo).
+  // Segredo: digitar "yeye" com o jogo em foco chama o Rafael para a festa; com ele já liberado, digitar de novo o esconde (e outra vez
+  // o traz de volta).
   const YEYE = 'yeye';
   document.addEventListener('keydown', event => {
     if (event.key === ' ') {
@@ -2052,7 +2184,9 @@
       ui.yeye = (ui.yeye + event.key.toLowerCase()).slice(-YEYE.length);
       if (ui.yeye === YEYE) {
         ui.yeye = '';
-        if (engine.unlockRafael().first) { toast(t('app.rafael')); saveLater(); }
+        const rafael = engine.toggleRafael();
+        toast(t(rafael.first ? 'app.rafael' : rafael.hidden ? 'app.rafaelHide' : 'app.rafaelBack'));
+        saveLater();
       }
     } else if (event.key !== 'Shift') ui.yeye = '';
     // Itens da vitrine são cartões (div com role="button"): Enter e espaço funcionam como clique.
@@ -2060,6 +2194,11 @@
     if (card && (event.key === 'Enter' || event.key === ' ')) {
       event.preventDefault();
       comSom(() => act(card));
+      return;
+    }
+    // As janelas da festa com teclas (o Palco do Forró marca as pistas com 1, 2 e 3).
+    if (ui.focused && !event.ctrlKey && !event.altKey && !event.metaKey && !event.repeat && ui.janelas?.key(event.key, performance.now())) {
+      event.preventDefault();
       return;
     }
     if (event.key === ' ' && ui.rings.open && ui.rings.playing && !event.target?.closest?.('button, a')) {

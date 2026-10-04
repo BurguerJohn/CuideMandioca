@@ -84,6 +84,14 @@ function createSteam({ config = readConfig(), load = () => require('steamworks.j
       if (pendingStore && safe(c => c.stats.store(), false) === true) pendingStore = false;
       return changed;
     },
+    // Steam Cloud pela API (veja desktop/cloud-save.js): só com a Steam conectada, o App ID de verdade (o 480 é de testes e não deve mexer na nuvem de ninguém)
+    // e a nuvem ligada na conta e no jogo (Propriedades do jogo > Geral).
+    cloudEnabled() {
+      if (config.appId === DEFAULTS.appId) return false;
+      return safe(c => c.cloud.isEnabledForAccount() === true && c.cloud.isEnabledForApp() === true, false);
+    },
+    cloudRead(file) { return safe(c => (c.cloud.fileExists(file) ? c.cloud.readFile(file) : null), null); },
+    cloudWrite(file, content) { return safe(c => c.cloud.writeFile(file, content) === true, false); },
     // O que os amigos veem na lista da Steam. Os textos ficam no Steamworks (steam/rich_presence.vdf).
     setPresence({ tier, size }) {
       const key = `${tier}|${size}`;

@@ -275,9 +275,15 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .placa-barra { margin: 8px -4px -4px; padding-top: 6px; border-top: 3px solid var(--papel3); }
 .barra-jogo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
 .barra-jogo.cheia { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.barra-janelas { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin-top: 4px; padding-top: 4px; border-top: 2px dotted var(--papel3); }
-.barra-sistema { display: flex; align-items: center; gap: 4px; margin-top: 5px; }
+/* As gavetas da placa (janelas e coleções): uma grade de 5 colunas que só aparece quando a gaveta está aberta. */
+.barra-gaveta { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin-top: 5px; padding-top: 5px; border-top: 2px dotted var(--papel3); }
+.barra-gaveta[hidden] { display: none; }
+.ferramenta.gaveta { position: relative; }
+.barra-sistema { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 5px; }
 .placa-barra .espaco { flex: 1; }
+/* O tamanho (com a porcentagem) e o botão de fechar ficam juntos e nunca encolhem: sem espaço na linha de cima, descem para a de baixo. */
+.barra-fim { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.barra-fim .ferramenta { flex: none; }
 .ferramenta {
   display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 28px; padding: 0 4px;
   cursor: pointer; background: var(--papel2); border: 3px solid var(--tinta); box-shadow: inset -2px -2px 0 var(--papel3);
@@ -287,7 +293,7 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .ferramenta.zoom b { font-size: 13px; }
 .ferramenta.alca { cursor: nwse-resize; touch-action: none; }
 /* Botão de tamanho: ícone e porcentagem juntos; arrastar muda o tamanho, um clique volta a 100% */
-.ferramenta.zoom { gap: 3px; }
+.ferramenta.zoom { gap: 3px; padding: 0 5px; white-space: nowrap; }
 
 /* Volume: trilho de papel com pino vermelho, no estilo das outras peças */
 .volume { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; font-size: 14px; font-weight: 700; }
@@ -335,7 +341,7 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .vitrine-saldo .fechar { margin-left: auto; }
 /* Altura fixa: trocar de aba ou ganhar Animação não faz a vitrine subir e descer em cima da festa */
 .vitrine-corpo {
-  display: flex; gap: 8px; height: 166px; box-sizing: border-box; padding: 10px 10px 8px; overflow-x: auto; overflow-y: hidden;
+  display: flex; gap: 8px; height: 196px; box-sizing: border-box; padding: 10px 10px 8px; overflow-x: auto; overflow-y: hidden;
 }
 .vitrine-corpo::-webkit-scrollbar { height: 12px; }
 .vitrine-corpo::-webkit-scrollbar-thumb { background: var(--madeira-clara); border: 3px solid var(--papel); }
@@ -361,10 +367,6 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .vcard.especial { opacity: .75; }
 .vcard.especial .estado { color: var(--madeira); }
 .sem-saldo { opacity: .45; }
-.vitrine-detalhe {
-  height: 30px; box-sizing: border-box; padding: 5px 12px 7px; font-size: 14px; color: var(--madeira-escura);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
 
 /* Minijogo: Argolas da Sorte */
 .minijogo {
@@ -430,26 +432,133 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .placa { cursor: move; }
 .placa button { cursor: pointer; }
 
-/* Itens da vitrine em grade: 3 fileiras (4 em categoria grande), colunas dividindo a largura, sem rolagem */
+/* Vitrine: as pílulas de filtro (um grupo por pílula) em cima e a grade de cartões grandes embaixo, duas fileiras que rolam de lado.
+   Cada grupo tem a sua cor (`data-grupo` nos cartões e `data-cor` nas pílulas): clássicos vermelho, criativos roxo, dinossauros verde,
+   Halloween laranja, zumbis verde-água e prêmios dourado. */
+[data-grupo="classicos"], [data-cor="classicos"] { --tema: #c0302a; --tema-claro: #ffe6dc; }
+[data-grupo="criativos"], [data-cor="criativos"] { --tema: #8a4ad8; --tema-claro: #eadcff; }
+[data-grupo="dino"], [data-cor="dino"] { --tema: #3fae4a; --tema-claro: #d4f4c8; }
+[data-grupo="halloween"], [data-cor="halloween"] { --tema: #ff8a12; --tema-claro: #ffe3bc; }
+[data-grupo="zumbi"], [data-cor="zumbi"] { --tema: #4f9a8a; --tema-claro: #cfe9e2; }
+[data-grupo="premios"], [data-cor="premios"] { --tema: #d8a010; --tema-claro: #fff0b0; }
+.vitrine-itens { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.vfiltros { flex: none; display: flex; align-items: center; gap: 4px; height: 26px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.vfiltros::-webkit-scrollbar { display: none; }
+.vfiltro {
+  flex: none; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px 0 6px; font: inherit; font-size: 13px; font-weight: 700;
+  color: var(--tinta); white-space: nowrap; cursor: pointer; background: var(--tema-claro, var(--papel3)); border: 2px solid var(--tinta);
+  box-shadow: inset -2px -2px 0 rgba(46, 24, 18, .15);
+}
+.vfiltro img { max-height: 16px; width: auto; }
+.vfiltro small { font-size: 11px; opacity: .75; }
+.vfiltro:hover, .vfiltro:focus-visible { background: #fff3a0; outline: none; }
+.vfiltro.ativa { color: #fff; background: var(--tema, var(--tinta)); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .25); text-shadow: 1px 1px 0 rgba(0, 0, 0, .35); }
+.vfiltro.ativa small { opacity: 1; }
+.vfiltros .vlados { margin-left: auto; display: inline-flex; gap: 4px; }
+.vfiltros .vlados .chip { margin: 0; font-size: 12px; padding: 0 8px; height: 24px; }
 .vgrade {
-  flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(var(--colunas, 4), minmax(0, 300px));
-  grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 5px;
+  flex: 1; min-width: 0; display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, minmax(0, 1fr)); grid-auto-columns: 168px;
+  gap: 6px; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px;
 }
-.vgrade.quatro { grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.vgrade::-webkit-scrollbar { height: 10px; }
+.vgrade::-webkit-scrollbar-thumb { background: var(--madeira-clara); border: 2px solid var(--papel); }
 .vgrade .vcard.item {
-  width: auto; min-width: 0; display: grid; grid-template-columns: 34px minmax(0, 1fr); grid-template-rows: auto auto;
-  align-content: center; align-items: center; column-gap: 6px; row-gap: 1px; padding: 2px 6px; text-align: left;
+  width: auto; min-width: 0; display: grid; grid-template-columns: 50px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; align-items: center;
+  column-gap: 7px; row-gap: 2px; padding: 4px 6px 4px 5px; text-align: left; border-left: 6px solid var(--tema, var(--tinta));
+  box-shadow: inset -3px -3px 0 var(--papel3);
 }
-.vgrade .vcard.item:hover, .vgrade .vcard.item:focus-visible { transform: none; box-shadow: inset 0 0 0 2px var(--ouro-escuro); }
-.vgrade .vcard-img { grid-row: 1 / span 2; width: 34px; height: 100%; }
-.vgrade .vcard-img img { max-width: 34px; max-height: 32px; }
-.vgrade .vcard .nome { font-size: 11px; line-height: 1; -webkit-line-clamp: 2; }
+.vgrade .vcard.item:hover, .vgrade .vcard.item:focus-visible { transform: none; background: #fff3a0; box-shadow: inset 0 0 0 3px var(--ouro-escuro); }
+.vgrade .vcard-img {
+  grid-row: 1 / span 2; width: 50px; height: 100%; min-height: 46px; background: var(--tema-claro, var(--papel3)); border: 2px solid var(--tinta);
+  box-shadow: inset -2px -2px 0 rgba(46, 24, 18, .12);
+}
+.vgrade .vcard-img img { max-width: 44px; max-height: 42px; }
+.vgrade .vcard .nome { align-self: end; font-size: 13px; line-height: 1.05; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.vgrade .vcard .estado {
+  align-self: start; justify-self: start; display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 0 6px; font-size: 12px;
+  line-height: 17px; background: var(--papel3); border: 2px solid var(--tinta);
+}
 .vgrade .vcard .estado img { height: 12px; width: auto; }
-.vgrade .vcard .preco { gap: 2px; }
-.vgrade .vcard .estado { font-size: 11px; }
-.vgrade.quatro .vcard .nome { -webkit-line-clamp: 1; }
-.vgrade.quatro .vcard-img img { max-height: 24px; }
-.vitrine-corpo { overflow: hidden; }
+.vgrade .vcard .preco { gap: 3px; }
+.vgrade .vcard .estado:has(.preco) { background: var(--ouro); }
+.vgrade .vcard.tem .estado { color: var(--verde-escuro); background: var(--verde-claro); }
+.vgrade .vcard.uso { background: var(--verde-claro); }
+.vgrade .vcard.uso .estado { color: #fff; background: var(--verde); }
+.vgrade .vcard.especial { opacity: 1; }
+.vgrade .vcard.especial .vcard-img img { filter: grayscale(.85) opacity(.7); }
+.vgrade .vcard.especial .nome { color: var(--madeira); }
+.vgrade .vcard.especial .estado { color: var(--madeira); background: #e3d3b4; border-style: dashed; }
+.vgrade .vcard.sem-saldo { opacity: 1; }
+.vgrade .vcard.sem-saldo .estado { background: #e3d3b4; color: var(--madeira); }
+.vgrade.duas { grid-template-rows: repeat(2, minmax(0, 1fr)); grid-auto-columns: 176px; }
+.vgrade .vcard.comida .nome small { font-weight: 700; color: #b44a0a; }
+
+/* Conjuntos: o nome e o bônus em cima, as três peças no meio (apagadas as que faltam) e o estado embaixo; o bônus muda de cor a cada faixa
+   (data-faixa de 0 a 3, de config.setTiers) e a faixa de cima brilha. Conjunto incompleto não apaga o bônus. */
+.vgrade.conjuntos { grid-auto-columns: 214px; }
+.vgrade .vcard[data-faixa] { display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 3px; padding: 4px 7px 4px 6px; }
+.vgrade .vcard[data-faixa] .conjunto-linha { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.vgrade .vcard[data-faixa] .nome { flex: 1; min-width: 0; font-size: 13px; line-height: 15px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vgrade .vcard[data-faixa] .bonus {
+  flex: none; padding: 0 4px; font-size: 13px; line-height: 15px; color: var(--madeira-escura); background: var(--papel3); border: 2px solid var(--tinta);
+}
+.conjunto-pecas { display: flex; align-items: center; gap: 5px; }
+.conjunto-pecas .peca {
+  display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 28px; background: var(--tema-claro, var(--papel3)); border: 2px solid var(--tinta);
+}
+.conjunto-pecas .peca img { max-width: 30px; max-height: 24px; }
+.conjunto-pecas .peca.falta img { filter: grayscale(1) opacity(.35); }
+.conjunto-pecas .peca.tem { box-shadow: inset 0 -3px 0 var(--verde); }
+.vgrade .vcard[data-faixa] .estado { margin-left: auto; align-self: center; }
+.vgrade .vcard[data-faixa="1"] { border-left-color: var(--verde); }
+.vgrade .vcard[data-faixa="1"] .bonus { color: var(--verde-escuro); background: var(--verde-claro); }
+.vgrade .vcard[data-faixa="2"] { border-left-color: var(--azul); }
+.vgrade .vcard[data-faixa="2"] .bonus { color: #1c2f8a; background: var(--azul-claro); }
+.vgrade .vcard[data-faixa="3"] { border-left-color: var(--ouro-escuro); }
+.vgrade .vcard[data-faixa="3"] .bonus { color: var(--vermelho-escuro); background: var(--ouro); animation: bonus-brilha 1s steps(1) infinite; }
+@keyframes bonus-brilha { 50% { background: #fff3a0; } }
+
+/* Guarda-roupa: cartões largos com as sete peças do look (apagadas as que faltam) e o estado na ponta da linha de baixo. */
+.vgrade.looks { grid-auto-columns: 262px; }
+.vgrade .vcard.look { display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 3px; padding: 4px 7px 4px 6px; border-left-color: var(--azul); }
+.vgrade .vcard.look .conjunto-linha { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.vgrade .vcard.look .nome { flex: 1; min-width: 0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 15px; }
+.vgrade .vcard.look .look-pecas { gap: 2px; }
+.vgrade .vcard.look .look-pecas .peca { width: 24px; height: 24px; }
+.vgrade .vcard.look .look-pecas .peca img { max-width: 20px; max-height: 18px; }
+.vgrade .vcard.look .estado { margin-left: auto; }
+.vgrade .vcard.look.novo { border-left-color: var(--verde); background: #eaffd8; }
+.vgrade .vcard.look.sorte { border-left-color: var(--rosa); background: #ffe6f2; }
+.vgrade .vcard.look .look-dica { font-size: 12px; line-height: 14px; color: var(--madeira); }
+.vgrade .vcard.look .dado { display: inline-flex; }
+.vgrade .vcard.look.especial.novo { opacity: .8; }
+.look-apagar {
+  flex: none; width: 18px; height: 18px; padding: 0; font: inherit; font-size: 15px; line-height: 14px; color: var(--vermelho-escuro); cursor: pointer;
+  background: var(--papel); border: 2px solid var(--tinta);
+}
+.look-apagar:hover, .look-apagar:focus-visible { color: #fff; background: var(--vermelho); outline: none; }
+
+/* A faixa de baixo: o item que o mouse está olhando (ícone, nome, etiquetas e o texto) ou a dica da aba. */
+.vitrine-detalhe {
+  display: flex; align-items: center; gap: 10px; height: 50px; box-sizing: border-box; padding: 5px 12px; background: var(--papel2);
+  border-top: 3px solid var(--tinta); color: var(--madeira-escura); font-size: 14px; white-space: normal; overflow: hidden;
+}
+.vitrine-detalhe p { margin: 0; }
+.vdet-dica { opacity: .85; }
+.vdet-icone { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 38px; background: var(--papel); border: 2px solid var(--tinta); }
+.vdet-icone img { max-width: 36px; max-height: 32px; }
+.vdet-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1px; }
+.vdet-texto p { font-size: 13px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vdet-linha { display: flex; align-items: center; gap: 6px; font-size: 15px; }
+.vtag {
+  display: inline-flex; align-items: center; gap: 3px; padding: 0 6px; font-size: 12px; font-weight: 700; line-height: 16px; color: var(--tinta);
+  background: var(--tema-claro, var(--papel3)); border: 2px solid var(--tinta);
+}
+.vtag img { height: 12px; width: auto; }
+.vtag.preco { background: var(--ouro); }
+.vtag.tem { color: var(--verde-escuro); background: var(--verde-claro); }
+.vtag.trava { color: var(--madeira); background: #e3d3b4; }
+.vtag.bonus { color: var(--vermelho-escuro); background: var(--ouro); }
 
 /* Janela das telas de jogo (turma, pescaria, rolês, fogueira, correio) */
 .minijogo.tela { width: 660px; }
@@ -536,3 +645,47 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
   color: #b08a5a; font-size: 16px; }
 .figurinha.vazia span { opacity: 0.6; }
 
+/* Prêmios dos minigames: um cartão por jogo, com a coisa e o personagem que ele libera (o que falta é um quadradinho tracejado com "?"). */
+.premios { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.jogo-premio h3 { margin: 0; flex: 1; }
+.jogo-premio.feita { box-shadow: inset 0 0 0 2px #35a03a; }
+.jogo-premio .linha .icone, .jogo-premio .linha img { width: 22px; height: 20px; object-fit: contain; image-rendering: pixelated; }
+.premio { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+.premio > div { flex: 1; min-width: 0; }
+.premio h4 { margin: 0; font-size: 13px; }
+.premio p { margin: 2px 0 0; }
+.premio img, .premio .icone { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; flex: none; }
+.premio .vazio { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border: 2px dashed #b08a5a; border-radius: 6px; color: #b08a5a;
+  font-size: 18px; }
+.premio:not(.feito) h4 { opacity: 0.7; }
+.premio small { font-size: 11px; font-weight: 700; }
+.premio small.pronto { color: #2a8a36; }
+
+/* Eventos do mundo: um cartão por evento do céu e do tempo; o que está no ar fica com a borda dourada e o que não passou ainda é um "?". */
+.eventos-mundo { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.evento-mundo h3 { margin: 0; padding-right: 58px; }
+.evento-mundo p { margin: 2px 0 4px; }
+.evento-mundo small { display: block; font-size: 11px; font-weight: 700; }
+.evento-mundo small.pronto { color: #2a8a36; }
+.evento-mundo .linha { align-items: flex-start; gap: 10px; }
+.evento-mundo .icone, .evento-mundo img { width: 44px; height: 40px; object-fit: contain; image-rendering: pixelated; flex: none; }
+.evento-mundo.agora { box-shadow: inset 0 0 0 3px #e8a812; }
+.evento-mundo[data-raridade="rare"] { border-color: #c89a12; background: linear-gradient(135deg, #fff8dc, #fff); }
+.evento-mundo small.premio-mundo { color: #8a5a10; }
+.evento-mundo { position: relative; }
+.selo.raridade { position: absolute; top: 6px; right: 8px; font-size: 10px; padding: 0 5px; text-transform: uppercase; letter-spacing: .04em; }
+.selo.raridade.common { background: #e8e4d8; color: #6a604a; }
+.selo.raridade.uncommon { background: #d8ecff; color: #1f5a98; }
+.selo.raridade.rare { background: #ffd24a; color: #6a3a00; }
+.alma-resumo { display: grid; gap: 6px; margin-bottom: 8px; }
+.alma-linha { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 10px; font-size: 13px; }
+.alma-barra { height: 10px; background: #e8dcc0; border: 2px solid var(--tinta); border-radius: 3px; overflow: hidden; }
+.alma-barra i { display: block; height: 100%; background: var(--verde); }
+.alma-linha.raro .alma-barra i { background: #e8a812; }
+.alma-filtros { margin-bottom: 10px; }
+.evento-mundo.desconhecido { opacity: 0.75; }
+.evento-mundo .vazio { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border: 2px dashed #b08a5a; border-radius: 6px; color: #b08a5a; font-size: 18px; }
+.premio .barra { height: 6px; margin: 4px 0 2px; }
+
+
+.vitrine-corpo { overflow: hidden; }

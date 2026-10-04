@@ -12,7 +12,7 @@
     Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111',
     2: '111001111100111', 3: '111001111001111', 4: '101101111001001', 5: '111100111001111',
     6: '111100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001111',
-    '%': '101001010100101', '+': '000010111010000', '-': '000000111000000', '.': '000000000000010', ',': '000000000010100',
+    '%': '101001010100101', '/': '001001010100100', '+': '000010111010000', '-': '000000111000000', '.': '000000000000010', ',': '000000000010100',
     '!': '010010010000010', '?': '111001011000010', ':': '000010000010000', ' ': '000000000000000'
   };
   const INK = '#120906';
@@ -179,7 +179,7 @@
       particles: [], texts: [], arrivals: new Map(), shown: {}, celebrateUntil: 0, jumpUntil: 0,
       nextBlink: 0, blinkUntil: 0, nextSpark: 0, nextSweat: 0, nextFirework: 0, nextNote: 0, nextHeart: {}, frame: 0, previous: 0,
       lastDraw: 0, stepSum: 0, stepCrit: false, stepAt: 0, crasherSeen: null, leaving: null,
-      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, rafael: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
+      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, shakeX: 0, shakeY: 0, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, rafael: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
       nextZ: 0, nextSmoke: 0, pops: [],
       light: null, nextFireSmoke: 0, dustAt: 0, rockets: [], flashes: [], shooting: null, nextShoot: 0, glintAt: 0
     });
@@ -325,6 +325,17 @@
       g.restore();
     }
 
+    // Só o pedaço de cima do quadro (`cut` px de altura), com a base no chão: quem sobe da terra ou da água.
+    function spriteCut(meta, frame, x, y, flip, cut) {
+      cut = Math.max(0, Math.min(meta.h, Math.round(cut)));
+      if (!cut) return;
+      const image = images[meta.image];
+      const sx = (frame % meta.frames) * meta.w;
+      const source = flip ? mirror(meta.image) : image;
+      if (!source) return;
+      g.drawImage(source, flip ? source.width - sx - meta.w : sx, 0, meta.w, cut, Math.round(x), Math.round(y), meta.w, cut);
+    }
+
     // Sombra de contato: miolo escuro, meia-sombra nas pontas e uma segunda linha mais curta (elipse achatada).
     // Cada sombra (largura e força) é pintada uma vez numa imagenzinha e reusada: eram quatro retângulos por sombra.
     const shadows = new Map();
@@ -381,8 +392,9 @@
       // A ilha fica mais funda conforme alarga (26 linhas com 440 px, 33 com 600).
       const depth = 12 + Math.round((width - 112) / 328 * 14);
       const w = width + 2;
-      const h = depth + 22;
-      const top = 3;
+      // Os terreiros com `deco` (lápides, abóboras, ovos...) ganham espaço em cima para a decoração mais alta.
+      const top = Math.max(3, ...(palette.deco || []).map(piece => piece.rows.length));
+      const h = depth + 19 + top;
       const grid = new Array(w * h).fill(null);
       const put = (x, y, color) => { if (x >= 0 && y >= 0 && x < w && y < h) grid[y * w + x] = color; };
       const half = (width - 1) / 2;
@@ -399,6 +411,7 @@
           let color;
           if (y === edge) {
             if (palette.pattern === 'planks') color = x % 6 === 0 ? palette.sub[0] : palette.top[0];
+            else if (palette.pattern === 'road') color = x % 12 < 6 ? palette.top[1] : palette.top[0];
             else if (palette.pattern === 'checker') color = (Math.floor(x / 2) + y) % 2 ? palette.top[0] : palette.mid[0];
             else if (palette.pattern === 'disco') color = palette.top[Math.floor(x / 3) % palette.top.length];
             else color = pick(palette.top, r);
@@ -407,6 +420,7 @@
             else if (palette.pattern === 'disco') color = palette.mid[(Math.floor(x / 3) + 1) % palette.mid.length];
             else color = pick(palette.mid, r);
           } else if (y === edge + 2) color = pick(palette.sub, r);
+          else if (palette.pattern === 'strata' && y < bottom - 1) color = palette.strata[((Math.floor((y + 1.8 * Math.sin(x * 0.13)) / 2) % palette.strata.length) + palette.strata.length) % palette.strata.length];
           else if (y < 7) color = pick(palette.soil, r);
           else if (y < bottom * 0.62) color = pick(palette.deep, r);
           else if (y < bottom - 1) color = palette.low[0];
@@ -419,6 +433,30 @@
         const y = 8 + Math.floor(r() * Math.max(1, bottoms[x] - 10));
         put(x + 1, top + y, palette.speck[0]);
         put(x + 2, top + y, palette.speck[1] || palette.speck[0]);
+      }
+      // Peças enterradas no corte da terra (ossos, caixões, mãos...): uma a cada `buriedGap` pixels, inteiras dentro da terra, e só no fundo da camada de cima.
+      if (palette.buried?.length) {
+        const count = Math.floor(width / (palette.buriedGap || 22));
+        const used = [];
+        for (let n = 0; n < count; n++) {
+          // Sorteia a peça e o lugar; onde a terra é rasa demais para ela ou já tem outra peça, tenta de novo (até 8 vezes).
+          for (let tries = 0; tries < 8; tries++) {
+            const piece = pick(palette.buried, r);
+            const pieceW = piece.rows[0].length;
+            const pieceH = piece.rows.length;
+            const x = 3 + Math.floor(r() * Math.max(1, width - 6 - pieceW));
+            const lowest = Math.min(...bottoms.slice(x, x + pieceW)) - pieceH - 2;
+            if (lowest < 5) continue;
+            const y = 5 + Math.floor(r() * (lowest - 4));
+            if (used.some(([ux, uy, uw, uh]) => x < ux + uw + 1 && x + pieceW + 1 > ux && y < uy + uh + 1 && y + pieceH + 1 > uy)) continue;
+            used.push([x, y, pieceW, pieceH]);
+            piece.rows.forEach((row, dy) => [...row].forEach((ch, dx) => {
+              const color = piece.colors[ch];
+              if (color) put(x + dx + 1, top + y + dy, color);
+            }));
+            break;
+          }
+        }
       }
       if (palette.puddle) {
         for (let i = 0; i < width / 30; i++) {
@@ -482,6 +520,26 @@
           } else if (roll < 0.25 && palette.flowers?.length) {
             t.fillStyle = pick(palette.flowers, r);
             t.fillRect(x, top - 1, 1, 1);
+          }
+        }
+      }
+      // Decorações em pé na beirada de cima (cada peça é `{ rows, colors }`, uma letra por cor): uma a cada `decoGap` pixels, sorteadas.
+      if (palette.deco?.length) {
+        const count = Math.floor(width / (palette.decoGap || 26));
+        const used = [];
+        for (let n = 0; n < count; n++) {
+          // Uma peça e um lugar sorteados; se já tiver outra peça ali, tenta outro lugar (até 8 vezes).
+          for (let tries = 0; tries < 8; tries++) {
+            const piece = pick(palette.deco, r);
+            const pieceW = piece.rows[0].length;
+            const x = 4 + Math.floor(r() * Math.max(1, width - 8 - pieceW));
+            if (used.some(([ux, uw]) => x < ux + uw + 1 && x + pieceW + 1 > ux)) continue;
+            used.push([x, pieceW]);
+            piece.rows.forEach((row, dy) => [...row].forEach((ch, dx) => {
+              const color = piece.colors[ch];
+              if (color) { t.fillStyle = color; t.fillRect(x + dx, top - piece.rows.length + dy, 1, 1); }
+            }));
+            break;
           }
         }
       }
@@ -1013,7 +1071,8 @@
     // Friozinho de São João: a noite fica azulada (entra e sai devagar) e quem está na festa solta fumacinha pela boca; de
     // vez em quando alguém reclama do frio.
     function drawCold(engine, now) {
-      const on = !!(engine.state.cold && engine.state.cold.active);
+      // (A neve em São Joaquim, evento do mundo, também esfria a festa.)
+      const on = !!(engine.state.cold && engine.state.cold.active) || !!(mundo && mundo.cold());
       const dt = Math.min(200, now - (fx.coldAt || now));
       fx.coldAt = now;
       fx.cold = Math.max(0, Math.min(1, fx.cold + (on ? 1 : -1) * dt / 2500));
@@ -1878,6 +1937,11 @@
       const out = { rain: 0, rainbow: 0 };
       if (w && w.rain) out.rain = Math.max(0, Math.min(1, (t - w.rain.born) / 3000, (w.rain.until - t) / 4000));
       if (w && w.rainbow) out.rainbow = Math.max(0, Math.min(1, (t - w.rainbow.born) / 2500, (w.rainbow.until - t) / 3000));
+      // O temporal (evento do mundo) traz chuva forte enquanto dura.
+      const m = engine.state.mundo && engine.state.mundo.active;
+      if (m && (m.id === 'temporal' || m.id === 'granizo')) {
+        out.rain = Math.max(out.rain, (m.id === 'temporal' ? 1 : 0.4) * Math.max(0, Math.min(1, (t - m.born) / 2500, (m.until - t) / 3000)));
+      }
       return out;
     }
 
@@ -3298,6 +3362,10 @@
         }
         return;
       }
+      if (typeof id === 'string' && id.startsWith('premio:')) {
+        if (premios) premios.poke(id.slice(7), root.performance?.now?.() || 0);
+        return;
+      }
       if (typeof id !== 'string' || !id.startsWith('bicho:')) return;
       const now = root.performance?.now?.() || 0;
       if (id === 'bicho:rafael') { fx.rafael.shout = now; return; }
@@ -3362,11 +3430,12 @@
     }
 
     // O Rafael (segredo: digitar "yeye" com o jogo em foco): passeia pela frente da festa com um quentão na mão, para, dá uma bicada
-    // no quentão, pisca e, quando alguém clica nele (ou digita "yeye" de novo), pula gritando "YEAH YEAH!" com confete.
+    // no quentão, pisca e, quando alguém clica nele (ou quando digitam "yeye" para trazê-lo de volta), pula gritando "YEAH YEAH!" com
+    // confete. Digitar "yeye" com ele na festa o esconde (`state.rafaelHidden`): não é desenhado nem clicável.
     const YEAH_MS = 1500;
     const YEAH_STEP = 240;
     function drawRafael(engine, now) {
-      if (!engine.state.rafael) return;
+      if (!engine.state.rafael || engine.state.rafaelHidden) return;
       const meta = bundle.chars.rafael;
       if (!meta) return;
       const pose = meta.poses;
@@ -3402,6 +3471,26 @@
       rim(meta, frame, state.x, y + hop, state.dir < 0, cx);
       spots.set('rafael', { x: cx, y: GROUND - meta.h });
     }
+
+    // As visitas do folclore (src/festa-folclore.js): as criaturas da Mata passam pela festa e quem clica nelas pega o prêmio.
+    const folclore = root.ArraiaFestaFolclore ? root.ArraiaFestaFolclore.create({
+      bundle, g, sprite, spriteCut, shadow, halo, say, float, confetti, dust, sound, rng, fx: () => fx, layout: () => layout, ground: () => GROUND,
+      poleTop: () => GROUND - POLE_H[layout.tier], region: (id, x, y, w, h) => regions.push({ id, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) })
+    }) : null;
+
+    // Os prêmios dos minigames (src/festa-premios.js): as coisas e os personagens que cada minigame libera.
+    const premios = root.ArraiaFestaPremios ? root.ArraiaFestaPremios.create({
+      bundle, g, sprite, shadow, halo, say, float, confetti, sound, rng, fx: () => fx, layout: () => layout, ground: () => GROUND, roam,
+      poleTop: () => GROUND - POLE_H[layout.tier], lift: () => (ridge ? 9 : 0), tr,
+      region: (id, x, y, w, h) => regions.push({ id, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) })
+    }) : null;
+
+    // Os eventos do mundo (src/festa-mundo.js): o céu e o tempo mudam o mapa inteiro por alguns segundos, com alvos para clicar.
+    const mundo = root.ArraiaFestaMundo ? root.ArraiaFestaMundo.create({
+      g, halo, light, say, float, confetti, sound, rng, fx: () => fx, layout: () => layout, ground: () => GROUND, tr, write,
+      poleTop: () => GROUND - POLE_H[layout.tier], size: () => ({ width: view.width, height: H }),
+      region: (id, x, y, w, h) => regions.push({ id, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) })
+    }) : null;
 
     // Ciranda: com duas ou mais crianças, de tempos em tempos elas dão a volta na fogueira por uns segundos. Passam por
     // trás (as chamas escondem) e pela frente, e depois voltam a correr por aí. O desenho de cada uma é separado da conta:
@@ -4200,12 +4289,18 @@
         draw(engine, now);
         events = events.slice(newYear);
       }
-      // O Rafael chamado (ou digitando "yeye" de novo): grita assim que for desenhado.
+      // O Rafael chamado (a primeira vez, ou de volta depois de escondido): grita assim que for desenhado.
       if (Array.isArray(events) && events.some(event => event.type === 'rafael')) fx.rafael.shout = now;
       if (!layout) return;
       const hostX = layout.host.x + 12;
       const up = n => GROUND - Math.round(n * fx.scale);
       for (const event of events) {
+        if (premios && event.type === 'premio') premios.onUnlock(event, now);
+        if (premios) premios.onPlay(event, now);
+        if (mundo && event.type === 'mundo-pego') mundo.onCatch(event, now);
+        if (mundo && event.type === 'mundo-golpe') mundo.onHit(event, now);
+        if (premios && event.type === 'premio-parade-caught') premios.onParadeCaught(event, now);
+        if (premios && event.type === 'premio-gift') premios.onGift(event, now);
         // A Mandioca reage com o olhar: coração no amor, estrela nas vitórias, felizinha no carinho e na roupa nova.
         const kind = LOOKS[event.type];
         if (kind && (event.type !== 'leilao-sold' || event.winner === 'voce') && (event.type !== 'saco-end' || event.place === 1) &&
@@ -4706,13 +4801,17 @@
       const poleTop = GROUND - POLE_H[tier];
       fx.wx = weatherOf(engine);
       updateWind(now);
+      if (mundo) mundo.update(engine, now);
       drawSky(engine, now, poleTop);
+      if (mundo) mundo.draw('sky', engine, now);
       drawRainbow(engine);
       drawClouds(now, poleTop);
       drawIslands(engine, now, poleTop);
       drawBack(now);
       drawBackdrop(now);
       drawCarroBoi(now);
+      if (folclore) { folclore.update(engine, now); folclore.draw('back', engine, now); }
+      if (premios) { premios.update(engine, now); premios.draw('back', engine, now); }
       drawStage(engine, now);
       drawCrowd(engine, now, layout.audience3, bundle.crowd.audience3, GROUND - 19, false);
       drawCrowd(engine, now, layout.audience2, bundle.crowd.audience2, GROUND - 14, false);
@@ -4729,6 +4828,7 @@
         drawBunting(layout.L - 1, layout.R + 1, poleTop + 2 + i * 9, 8 + tier * 3 - i * 2, i * 3, lamps, now);
       }
       drawHanging(now, poleTop, tier);
+      if (premios) premios.draw('hang', engine, now);
       g.drawImage(terrain.image, layout.L - 1, GROUND - terrain.top);
       drawRoots(now);
       drawPuddles(now);
@@ -4772,6 +4872,7 @@
       updateCompadres(engine, now);
       drawKids(now, true);
       drawCompadres(now, true);
+      if (folclore) folclore.draw('mid', engine, now);
       drawFire(engine, now);
       drawSide(engine, layout.rightSide, now, 'lado-direita');
       drawKids(now, false);
@@ -4787,13 +4888,16 @@
       moodLines(engine, now);
       if (engine.state.size < 25 && bundle.scenery.sapo) drawFrog(now);
       drawPeddler(engine, now);
+      if (premios) premios.draw('front', engine, now);
       drawRafael(engine, now);
+      if (folclore) folclore.draw('front', engine, now);
       drawCrasher(engine, now);
       drawRequest(engine, now);
       ambientEstalo(now);
       // A cobra passa por cima dos bichos e das flores da beira, para não sumir no meio da festa cheia.
       drawCobra(engine, now, floor);
       drawLights(engine, now);
+      if (mundo) mundo.draw('over', engine, now);
       drawEffects(engine, now);
       popScenery(now);
     }
@@ -4818,6 +4922,9 @@
 
     // Outra partida substitui os efeitos e os alvos, mantendo escala, ritmo e opções visuais.
     function reset() {
+      if (folclore) folclore.reset();
+      if (premios) premios.reset();
+      if (mundo) mundo.reset();
       fx = freshEffects();
       fx.lastDraw = -Infinity;
       layout = null;
@@ -4871,8 +4978,11 @@
       fx.light = { x: fire.x + fire.meta.w / 2, y: GROUND - fire.meta.h * 0.4,
         power: flicker * (engine.flareActive ? 1.3 : 1) * (1 - 0.3 * (fx.wx ? fx.wx.rain : 0)), reach: 60 + fire.meta.w * 1.8 };
       g.clearRect(0, 0, buffer.width, buffer.height);
+      // O tremor de forró (evento do mundo) balança o quadro inteiro um pixel para cada lado; o clique acompanha o deslocamento.
+      view.shakeX = fx.shakeX || 0;
+      view.shakeY = fx.shakeY || 0;
       g.save();
-      g.translate(0, view.float);
+      g.translate(view.shakeX, view.float + view.shakeY);
       // Um erro no meio do quadro não deixa o pincel torto (deslocamento, transparência, modo de mistura) para os
       // próximos: o quadro seguinte começa limpo e desenha tudo de novo.
       try {
@@ -4897,11 +5007,12 @@
     function hit(clientX, clientY) {
       const point = locate(clientX, clientY);
       if (!point) return null;
-      const y = point.y - view.float;
+      const y = point.y - view.float - (view.shakeY || 0);
+      const px = point.x - (view.shakeX || 0);
       for (let i = regions.length - 1; i >= 0; i--) {
         const area = regions[i];
         if (area.id === 'terreiro') continue;
-        if (point.x >= area.x && point.x < area.x + area.w && y >= area.y && y < area.y + area.h) {
+        if (px >= area.x && px < area.x + area.w && y >= area.y && y < area.y + area.h) {
           const data = g.getImageData(Math.max(0, point.x - 1), Math.max(0, point.y - 1), 3, 3).data;
           for (let k = 3; k < data.length; k += 4) if (data[k] > 0) return area.id;
           if (['request', 'crasher'].includes(area.id)) return area.id;
@@ -5030,7 +5141,7 @@
     function setSleepy(on) { sleepy = on === true; }
 
     // Estado dos enfeites que vêm e vão sozinhos (para os testes e as fotos): vento (-1 a 1) e ciranda das crianças.
-    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rafael: fx.rafael.x === undefined ? null : { x: fx.rafael.x, mode: fx.rafael.mode, yeahAt: fx.rafael.yeahAt ?? null, shout: fx.rafael.shout ?? null }, rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
+    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rafael: fx.rafael.x === undefined ? null : { x: fx.rafael.x, mode: fx.rafael.mode, yeahAt: fx.rafael.yeahAt ?? null, shout: fx.rafael.shout ?? null }, folclore: folclore ? folclore.probe() : null, premios: premios ? premios.probe() : null, mundo: mundo ? mundo.probe() : null, mundoTrace: mundo ? mundo.traceId() : null, shake: [fx.shakeX || 0, fx.shakeY || 0], rain: fx.wx ? Math.round(fx.wx.rain * 100) / 100 : 0, rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
 
     // A pessoa voltou para a festa depois de um tempo fora: a Mandioca dá um pulinho, faz o olhar felizinho e cumprimenta.
     const GREETINGS = 4;

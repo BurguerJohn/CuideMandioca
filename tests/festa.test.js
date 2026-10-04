@@ -792,7 +792,8 @@ test('os itens caros e criativos: custam mais que os antigos, liberam por porte,
     'varal-pizza', 'varal-coracao', 'varal-peixe', 'varal-lanterna', 'varal-estrelas'];
   const byId = Object.fromEntries(data.items.map(item => [item.id, item]));
   for (const cat of ['chapeu', 'mao', 'tecido', 'terreiro', 'varal']) {
-    const antigos = data.items.filter(item => item.cat === cat && !NOVOS.includes(item.id));
+    // (Os itens dos temas novos também são caros e travados por porte; aqui só se compara com os antigos, que não têm porte.)
+    const antigos = data.items.filter(item => item.cat === cat && !NOVOS.includes(item.id) && !item.tier);
     const novos = NOVOS.map(id => byId[id]).filter(item => item.cat === cat);
     assert.ok(novos.length >= 5, `${cat}: pelo menos 5 itens novos`);
     for (const item of novos) {
@@ -1334,7 +1335,7 @@ test('o Rafael (segredo "yeye") só aparece depois de chamado, anda e bebe o que
   assert.equal(used().size, 0, 'sem o segredo ele não está na festa');
   assert.ok(!festa.areas().some(area => area.id === 'bicho:rafael'));
   // Chamado: aparece clicável, grita ao chegar (quadros de pulo) e depois volta a passear.
-  engine.unlockRafael();
+  engine.toggleRafael();
   festa.onEvents(engine, [{ type: 'rafael', first: true }], now);
   now = run(30, now);
   assert.ok(festa.areas().some(area => area.id === 'bicho:rafael'), 'o Rafael é clicável');
@@ -1351,6 +1352,20 @@ test('o Rafael (segredo "yeye") só aparece depois de chamado, anda e bebe o que
   festa.poke('bicho:rafael');
   run(30, now);
   assert.ok([...used()].some(frame => yeah.has(frame)), 'o clique faz gritar "YEAH YEAH"');
+  // Digitar "yeye" de novo o esconde: some da festa e não é mais clicável (nem o clique antigo o faz gritar).
+  engine.toggleRafael();
+  festa.onEvents(engine, [{ type: 'rafael-hide', first: false }], now);
+  draws.length = 0;
+  now = run(60, now);
+  assert.equal(used().size, 0, 'escondido ele não é desenhado');
+  assert.ok(!festa.areas().some(area => area.id === 'bicho:rafael'), 'e não é clicável');
+  // Outra vez: volta gritando e passeia de novo.
+  engine.toggleRafael();
+  festa.onEvents(engine, [{ type: 'rafael', first: false }], now);
+  draws.length = 0;
+  now = run(30, now);
+  assert.ok(festa.areas().some(area => area.id === 'bicho:rafael'), 'de volta, clicável');
+  assert.ok([...used()].some(frame => yeah.has(frame)), 'volta gritando');
 });
 
 test('uma folha de arte que falha não prende o carregamento da festa inteira', () => {
@@ -1398,4 +1413,746 @@ test('carregar um chapéu no lugar do enfeite lateral não interrompe o desenho 
     assert.ok(festa.areas().some(area => area.id === `lado-${side}`), 'o enfeite restaurado continua clicável');
     assert.ok(festa.areas().some(area => area.id === 'host'), 'a Mandioca continua clicável');
   }
+});
+
+test('visitas do folclore: as 20 aparecem na festa com a arte da Mata, só são clicáveis até o clique e somem depois', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-folclore.js');
+  const { SOUNDS } = globalThis.ArraiaFestaFolclore;
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = [];
+  canvas.getContext = () => ({ ...fakeContext(), drawImage(image, sx) { draws.push([image.value, sx]); } });
+  const sounds = [];
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, { sound: name => sounds.push(name) });
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 85;
+  const sheets = new Set([bundle.images[bundle.janelas.mata.comuns.image], bundle.images[bundle.janelas.mata.chefes.image]]);
+  let now = 5000;
+  const run = (ms) => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  run(300);
+  assert.equal(festa.probe().folclore, null, 'sem visita não tem nada');
+  assert.ok(!festa.areas().some(area => area.id === 'folclore'));
+  const folclore = engine.mini('folclore');
+  for (const entry of data.minis.folclore.events) {
+    engine.state.minis.folclore.active = null;
+    sounds.length = 0;
+    folclore.start(entry.id);
+    draws.length = 0;
+    // Ela chega (som da chegada) e, na hora do meio da visita, está na tela e dá para clicar.
+    run(entry.seconds * 400);
+    assert.equal(sounds[0], SOUNDS[entry.id], `${entry.id}: som da chegada`);
+    assert.ok(draws.some(([image]) => sheets.has(image)), `${entry.id}: usa a arte da Mata`);
+    assert.ok(festa.areas().some(area => area.id === 'folclore'), `${entry.id}: dá para clicar`);
+    assert.equal(festa.probe().folclore.caught, false);
+    // O clique: confete, o som do prêmio, e a região some (a criatura vai embora sem poder ser clicada de novo).
+    assert.ok(folclore.act(), `${entry.id}: prêmio`);
+    run(100);
+    assert.ok(sounds.includes('premio'), `${entry.id}: som do prêmio`);
+    assert.equal(festa.probe().folclore.caught, true);
+    assert.ok(!festa.areas().some(area => area.id === 'folclore'), `${entry.id}: depois do clique não é mais clicável`);
+    // Passada a saída, a visita acaba e a festa volta ao normal.
+    run(data.minis.folclore.exit + 400);
+    engine.tick(0.1);
+    run(100);
+    assert.equal(festa.probe().folclore, null, `${entry.id}: foi embora`);
+  }
+  // Uma visita que ninguém clicou também acaba sozinha, sem erro.
+  folclore.start('boitata');
+  run(40000);
+  engine.tick(0.1);
+  run(100);
+  assert.equal(festa.probe().folclore, null);
+  assert.equal(engine.state.minis.folclore.active, null);
+});
+
+test('prêmios dos minigames: coisas e personagens aparecem na festa, cabem pela largura, se revezam, reagem ao clique e recomeçam no ano novo', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-premios.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = new Set();
+  canvas.getContext = () => ({ ...fakeContext(), drawImage(image) { draws.add(image.value); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  const sheetOf = id => bundle.images[bundle.premios[id].image];
+  const goldSheetOf = id => bundle.images[bundle.premios[`${id}-ouro`].image];
+  const unlockAll = () => {
+    for (const game of data.premios.jogos) { engine.state.premios.count[game.id] = 9999; engine.premios.unlock(game.id); }
+    festa.onEvents(engine, engine.drainEvents(), now);
+  };
+  engine.state.size = engine.state.records.size = 110;
+  run(300);
+  assert.deepEqual(festa.probe().premios, { chao: [], varal: [], fundo: [], pessoa: [], spot: null, acting: [], glints: 0, chats: 0, lastChat: [], said: [], gold: [], parade: [] }, 'sem prêmio não tem nada');
+  assert.ok(!festa.areas().some(area => area.id.startsWith('premio:')));
+  // Com tudo liberado, cada lugar tem o seu e o prêmio recém-chegado fica de destaque.
+  unlockAll();
+  run(1500);
+  const shown = festa.probe().premios;
+  assert.ok(shown.chao.length >= 2 && shown.chao.length <= 9, `coisas no chão: ${shown.chao}`);
+  assert.deepEqual(shown.varal.length, 3, 'as três coisas do varal');
+  assert.deepEqual([...shown.fundo].sort(), ['corneta-alto', 'totem-curupira'], 'as duas coisas altas do fundo, cada uma no seu lugar');
+  const [one, two] = shown.fundo.map(id => festa.areas().find(entry => entry.id === `premio:${id}`).box);
+  assert.ok(one[2] <= two[0] || two[2] <= one[0], 'as duas coisas do fundo não ficam uma em cima da outra');
+  assert.ok(shown.pessoa.length >= 2 && shown.pessoa.length <= 6, `personagens: ${shown.pessoa}`);
+  assert.ok(shown.spot, 'o último prêmio chegou');
+  const area = id => festa.areas().find(entry => entry.id === `premio:${id}`);
+  for (const id of [...shown.chao, ...shown.varal, ...shown.fundo, ...shown.pessoa]) assert.ok(area(id), `${id}: dá para clicar`);
+  // Com os troféus de ouro, as coisas aparecem em ouro e os personagens (coroados) com a arte própria.
+  for (const id of [...shown.chao, ...shown.varal, ...shown.fundo]) assert.ok(draws.has(goldSheetOf(id)), `${id}: em ouro`);
+  for (const id of shown.pessoa) assert.ok(draws.has(sheetOf(id)), `${id}: desenhado com a arte própria`);
+  assert.deepEqual([...shown.gold].sort(), [...shown.chao, ...shown.varal, ...shown.fundo, ...shown.pessoa].sort(), 'tudo o que aparece é de ouro (coisa e personagem coroado)');
+  // Nada da frente da festa (coisas do chão e personagens, andando) fica por cima da Mandioca.
+  const host = festa.areas().find(entry => entry.id === 'host');
+  for (let k = 0; k < 40; k++) {
+    run(500);
+    for (const id of [...festa.probe().premios.chao, ...festa.probe().premios.pessoa]) {
+      const box = area(id).box;
+      assert.ok(box[2] <= host.box[0] + 1 || box[0] >= host.box[2] - 1, `${id}: fora da Mandioca`);
+    }
+  }
+  // O revezamento mostra, ao longo do tempo, todos os personagens e todas as coisas do chão.
+  const seen = new Set();
+  for (let k = 0; k < 40; k++) {
+    now += 150000;
+    clock.t += 150000;
+    run(100);
+    const p = festa.probe().premios;
+    [...p.chao, ...p.varal, ...p.fundo, ...p.pessoa].forEach(id => seen.add(id));
+  }
+  assert.deepEqual(data.premios.itens.filter(item => item.tipo !== 'ouro' && !seen.has(item.id)).map(item => item.id), [], 'todos aparecem em algum momento');
+  // Clicar não quebra nada: coisa e personagem reagem; o presente vira confete.
+  run(1000);
+  const p = festa.probe().premios;
+  const person = p.pessoa[0];
+  assert.doesNotThrow(() => { festa.poke(`premio:${p.chao[0]}`); festa.poke(`premio:${person}`); festa.poke('premio:nao-existe'); });
+  // O personagem que acabou de dar o presente comemora na hora (pose de ação), mesmo se estava parado ou andando.
+  for (let k = 0; k < 400 && festa.probe().premios.acting.includes(person); k++) run(100);
+  assert.ok(!festa.probe().premios.acting.includes(person));
+  const gift = engine.premios.gift(person);
+  assert.equal(gift.ok, true);
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(33);
+  assert.ok(festa.probe().premios.acting.includes(person), 'comemorou o presente');
+  run(500);
+  // Festa pequena: sem lugar no chão, só o que cabe no varal.
+  festa.onEvents(engine, [{ type: 'new-year' }], now);
+  engine.state.size = engine.state.records.size = 3;
+  run(600);
+  const small = festa.probe().premios;
+  assert.deepEqual([small.chao.length, small.pessoa.length], [0, 0], 'o terreiro pequeno não tem vaga');
+  assert.ok(small.varal.length <= 1);
+  // O ano novo limpa os efeitos mas os prêmios continuam, e um motor sem prêmios desenha do mesmo jeito.
+  assert.equal(engine.premios.total(), 105);
+  const bare = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  delete bare.premios;
+  assert.doesNotThrow(() => festa.draw(bare, now + 100));
+  const { glints, chats, lastChat, said, ...rest } = festa.probe().premios;
+  assert.deepEqual(rest, { chao: [], varal: [], fundo: [], pessoa: [], spot: null, acting: [], gold: [], parade: [] });
+});
+
+test('prêmios dos minigames: as coisas soltam vapor, bolhas e brilhos sozinhas, e a festa reage ao jogo do minigame de cada prêmio', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-premios.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = new Set();
+  let crownPixels = 0;
+  canvas.getContext = () => ({ ...fakeContext(), drawImage(image) { draws.add(image.value); }, fillRect() { if (this.fillStyle === '#c8841a') crownPixels++; } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  // Só a Fogueira de Perto liberou: a panela é a única coisa do chão, e solta vapor.
+  engine.state.premios.count.fogueira = 20;
+  engine.premios.unlock('fogueira');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(4000);
+  let p = festa.probe().premios;
+  assert.deepEqual(p.chao, ['panela-fogo']);
+  assert.deepEqual(p.pessoa, ['chico-assador']);
+  assert.ok(p.glints >= 3, `vapor da panela: ${p.glints}`);
+  assert.deepEqual(p.gold, [], 'sem troféu, sem ouro');
+  assert.equal(crownPixels, 0, 'sem troféu, sem coroa');
+  assert.ok(draws.has(bundle.images[bundle.premios['panela-fogo'].image]) && !draws.has(bundle.images[bundle.premios['panela-fogo-ouro'].image]), 'arte comum');
+  // Jogar o minigame faz o personagem comemorar na hora (uma vez por vez, não a cada espetinho).
+  for (let k = 0; k < 400 && festa.probe().premios.acting.length; k++) run(100);
+  assert.deepEqual(festa.probe().premios.acting, []);
+  engine.emit('mini', { mini: 'fogueira', kind: 'roasted', perfect: false });
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(33);
+  assert.deepEqual(festa.probe().premios.acting, ['chico-assador'], 'comemorou o espetinho');
+  // Um jogo que não é o dele não mexe com ele.
+  for (let k = 0; k < 400 && festa.probe().premios.acting.length; k++) run(100);
+  engine.emit('rings', { hits: 1, mult: 1 });
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(33);
+  assert.deepEqual(festa.probe().premios.acting, []);
+  // O troféu de ouro: a panela vira ouro, o personagem ganha a coroa e o nome do troféu sobe na festa.
+  engine.state.premios.count.fogueira = 80;
+  engine.premios.unlock('fogueira');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(1500);
+  p = festa.probe().premios;
+  assert.deepEqual(p.gold.sort(), ['chico-assador', 'panela-fogo']);
+  assert.equal(p.spot, 'panela-fogo-ouro');
+  assert.ok(draws.has(bundle.images[bundle.premios['panela-fogo-ouro'].image]), 'arte de ouro');
+  assert.ok(crownPixels > 0, 'o Chico ganhou a coroa');
+});
+
+test('prêmios dos minigames: o Desfile dos Prêmios leva os personagens para a fila, dá para clicar até pegar o prêmio, e eles voltam a passear depois', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-premios.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = new Set();
+  canvas.getContext = () => ({ ...fakeContext(), drawImage(image) { draws.add(image.value); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  for (const game of data.premios.jogos.slice(0, 8)) { engine.state.premios.count[game.id] = 12; engine.premios.unlock(game.id); }
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(2000);
+  assert.deepEqual(festa.probe().premios.parade, []);
+  assert.ok(festa.probe().premios.pessoa.length >= 2, 'passeando');
+  assert.ok(!festa.areas().some(area => area.id === 'premio:desfile'));
+  assert.equal(engine.premios.startParade(), true);
+  const sounds = [];
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(15000);
+  const march = festa.probe().premios;
+  assert.ok(march.parade.length >= 3, `a fila está na festa: ${march.parade}`);
+  assert.deepEqual(march.pessoa, [], 'quem passeava foi para a fila');
+  assert.ok(march.parade.every(id => engine.state.premios.parade.active.ids.includes(id)));
+  const marchers = festa.areas().filter(area => area.id === 'premio:desfile');
+  assert.equal(marchers.length, march.parade.length, 'dá para clicar em cada um da fila');
+  for (const id of march.parade) assert.ok(draws.has(bundle.images[bundle.premios[id].image]), `${id}: na fila com a arte dele`);
+  // Pegou: o prêmio vem, o confete sai e a fila continua sem poder ser clicada de novo.
+  assert.equal(engine.premios.catchParade().ok, true);
+  const before = festa.probe().premios.glints;
+  assert.doesNotThrow(() => { festa.onEvents(engine, engine.drainEvents(), now); });
+  assert.ok(festa.probe().premios.glints - before >= march.parade.length, 'confete e brilho na fila toda');
+  run(200);
+  assert.ok(!festa.areas().some(area => area.id === 'premio:desfile'), 'depois do prêmio, nada para clicar');
+  assert.ok(festa.probe().premios.parade.length >= 1, 'a fila segue passando');
+  // Acabou: os personagens voltam a passear.
+  run(data.premios.desfile.seconds * 1000);
+  engine.tick(0.1);
+  run(1500);
+  const done = festa.probe().premios;
+  assert.deepEqual(done.parade, []);
+  assert.ok(done.pessoa.length >= 2, 'voltaram a passear');
+});
+
+test('prêmios dos minigames: quem esbarra no passeio conversa (o segundo responde logo depois) e a Dona Bola canta números do bingo', () => {
+  // O sorteio da festa muda com tudo o que rodou antes (a semente é uma só para o arquivo inteiro): este teste usa a própria semente, para não oscilar.
+  const outerRandom = Math.random;
+  let ownSeed = 7;
+  Math.random = () => { ownSeed = (ownSeed * 1103515245 + 12345) % 2147483648; return ownSeed / 2147483648; };
+  try {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-premios.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {} });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  // Numa festa larga cabem vários personagens do mesmo lado da Mandioca (na estreita, cada lado tem um só e eles nunca se encontram).
+  engine.state.size = engine.state.records.size = 250;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  for (const game of data.premios.jogos.slice(0, 8)) { engine.state.premios.count[game.id] = 12; engine.premios.unlock(game.id); }
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(1000);
+  assert.ok(festa.probe().premios.pessoa.length >= 4, `vários passeando: ${festa.probe().premios.pessoa}`);
+  // Esperando, dois acabam esbarrando; na hora a conversa começa e o outro responde cerca de um segundo depois.
+  let found = false;
+  for (let tenth = 0; tenth < 6000 && !found; tenth++) {
+    const before = festa.probe().premios.chats;
+    run(100);
+    if (festa.probe().premios.chats > before) found = true;
+  }
+  assert.ok(found, 'dois personagens conversaram');
+  const [first, second] = festa.probe().premios.lastChat;
+  assert.ok(first && second && first !== second, 'um puxou conversa com outro');
+  assert.ok(festa.probe().premios.acting.includes(first), 'quem puxou conversa fala na hora');
+  assert.ok(!festa.probe().premios.acting.includes(second), 'o outro ainda está ouvindo');
+  run(1250);
+  assert.ok(festa.probe().premios.acting.includes(second), 'o outro respondeu pouco depois');
+  // A Dona Bola, com o presente já pego (senão o clique só dá o presente), canta número de bingo de vez em quando.
+  engine.premios.gift('dona-bola');
+  let numbers = 0;
+  for (let k = 0; k < 60 && !numbers; k++) {
+    festa.poke('premio:dona-bola');
+    run(1700);
+    numbers = festa.probe().premios.said.filter(text => /^[BINGO] \d{1,2}!$/.test(text)).length;
+  }
+  assert.ok(numbers > 0, 'cantou um número do bingo');
+  assert.ok(festa.probe().premios.said.every(text => /^[A-Z0-9 .,:!?+%-]+$/.test(text)), 'só letras da fonte de pixel');
+  } finally {
+    Math.random = outerRandom;
+  }
+});
+
+test('eventos do mundo: cada um desenha na festa, os alvos são clicáveis até serem pegos, o temporal traz chuva e o vento sopra', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = [];
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, fillRect(x, y, w, h) { draws.push(this.fillStyle); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  run(300);
+  assert.equal(festa.probe().mundo, null, 'sem evento não tem nada');
+  assert.ok(!festa.areas().some(area => area.id.startsWith('mundo:')));
+  const ids = () => festa.areas().filter(area => area.id.startsWith('mundo:')).map(area => area.id).sort();
+  for (const entry of data.mundo.eventos) {
+    engine.state.mundo.active = null;
+    engine.state.tickets = 1000;   // (a feira cobra fichas)
+    assert.equal(engine.mundo.start(entry.id), true, entry.id);
+    festa.onEvents(engine, engine.drainEvents(), now);
+    // Espera o primeiro alvo aparecer (as estrelas, as pipas e os balões chegam um de cada vez).
+    let probe = null;
+    for (let second = 0; second < 60 && (second < 4 || !(probe && probe.items.length)); second++) { run(1000); probe = festa.probe().mundo; }
+    assert.equal(probe.id, entry.id);
+    if (!entry.targets) {
+      // Evento sem alvos (só o bônus e a luz): nada para clicar; passa o tempo e acaba.
+      assert.deepEqual(probe.items, [], `${entry.id}: sem alvos`);
+      assert.deepEqual(ids(), []);
+      assert.ok(probe.effects >= 0);
+      now += entry.seconds * 1000;
+      clock.t += entry.seconds * 1000;
+      engine.tick(0.1);
+      run(2500);
+      assert.equal(festa.probe().mundo, null, `${entry.id}: acabou`);
+      continue;
+    }
+    assert.ok(probe.items.length >= 1, `${entry.id}: tem alvo na tela`);
+    assert.deepEqual(ids(), probe.items.map(k => `mundo:${k}`).sort(), `${entry.id}: cada alvo da tela é clicável`);
+    const rain = festa.probe().rain;
+    assert.equal(rain > 0.5, entry.id === 'temporal', `${entry.id}: chuva ${rain}`);
+    const wind = Math.abs(festa.probe().wind ?? 0);
+    // (As rajadas de vento de enfeite acontecem sozinhas de vez em quando; só a ventania sopra sempre forte.)
+    if (entry.id === 'ventania') assert.ok(wind > 0.5, `ventania: vento ${wind}`);
+    if (entry.id === 'redemoinho') assert.ok(wind > 0.4, `redemoinho: vento ${wind}`);
+    if (entry.id === 'granizo') assert.ok(rain > 0.2 && rain <= 0.5, `granizo: chuva fraca de guarda-chuva ${rain}`);
+    // Pegou um: some da tela e vira "pego".
+    const k = probe.items[0];
+    let grabbed;
+    do { grabbed = engine.mundo.catchTarget(k); } while (grabbed.partial);   // (a pinhata aguenta vários golpes)
+    assert.equal(grabbed.ok, true);
+    const before = probe.effects;
+    festa.onEvents(engine, engine.drainEvents(), now);
+    run(100);
+    probe = festa.probe().mundo;
+    assert.ok(probe.taken.includes(k), `${entry.id}: pego`);
+    assert.ok(!ids().includes(`mundo:${k}`), `${entry.id}: o alvo pego não é mais clicável`);
+    assert.ok(probe.effects > before, `${entry.id}: faíscas no lugar dele`);
+    if (entry.id === 'feira') {
+      // A barraca comprada fica apagada (balcão cinza-marrom); as outras seguem coloridas.
+      draws.length = 0;
+      run(100);
+      assert.ok(draws.includes('#6a5a4a'), 'feira: a barraca comprada fica apagada');
+      assert.ok(draws.includes('#8a5a2a'), 'feira: as outras barracas seguem à venda');
+    }
+    // Passou o tempo: o evento some e o mapa volta ao normal.
+    now += entry.seconds * 1000;
+    clock.t += entry.seconds * 1000;
+    engine.tick(0.1);
+    run(2500);
+    assert.equal(festa.probe().mundo, null, `${entry.id}: acabou`);
+    assert.deepEqual(ids(), []);
+    assert.ok(festa.probe().rain < 0.05, `${entry.id}: sem chuva depois`);
+    // Alguns eventos deixam vestígios no chão por uns minutos; depois apagam.
+    const traced = ['petalas', 'granizo', 'pipoca', 'redemoinho', 'fogos', 'vagalumes', 'neve', 'cheia'].includes(entry.id);
+    assert.equal(festa.probe().mundoTrace, traced ? entry.id : null, `${entry.id}: vestígios`);
+    if (traced) {
+      run(2000);
+      now += 200000;
+      clock.t += 200000;
+      run(500);
+      assert.equal(festa.probe().mundoTrace, null, `${entry.id}: os vestígios apagaram`);
+    }
+  }
+  // Pegar todos os alvos de um evento: o aviso do fim sai sem erro e nada mais é clicável.
+  engine.state.mundo.active = null;
+  engine.mundo.start('temporal');
+  run(2000);
+  for (let k = 0; k < 3; k++) engine.mundo.catchTarget(k);
+  assert.doesNotThrow(() => { festa.onEvents(engine, engine.drainEvents(), now); run(500); });
+  assert.deepEqual(ids(), []);
+  // Festa pequena e um motor sem eventos do mundo desenham do mesmo jeito.
+  engine.state.size = engine.state.records.size = 3;
+  engine.state.mundo.active = null;
+  engine.mundo.start('vagalumes');
+  assert.doesNotThrow(() => run(3000));
+  const bare = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  delete bare.mundo;
+  assert.doesNotThrow(() => festa.draw(bare, now + 100));
+  assert.equal(festa.probe().mundo, null);
+});
+
+test('eventos do mundo (onda 7): o tremor balança o quadro nas pisadas e some no fim, a neve esfria a festa e a cheia pinta a água barrenta', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = new Set();
+  const moves = [];
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, translate(x, y) { moves.push([x, y]); }, fillRect() { draws.add(this.fillStyle); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  run(300);
+  assert.deepEqual(festa.probe().shake, [0, 0]);
+  assert.ok(festa.probe().cold === 0, 'sem friozinho');
+  // Tremor: o quadro treme só nas pisadas (de lado a lado, nunca mais de 1 px) e o clique acompanha o deslocamento.
+  engine.mundo.start('tremor');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(3500);   // (a entrada do evento leva uns segundos; as pisadas só valem depois)
+  const seen = new Set();
+  let before = festa.probe().shake;
+  for (let i = 0; i < 90; i++) {
+    moves.length = 0;
+    run(33);
+    const shake = festa.probe().shake;
+    seen.add(shake.join(','));
+    // O primeiro deslocamento do quadro é o do tremor calculado no quadro anterior (sempre número, nunca vazio).
+    const [dx, dy] = moves[0];
+    assert.ok(Number.isFinite(dx) && Number.isFinite(dy), 'o deslocamento é número');
+    assert.equal(dx, before[0], 'o quadro foi deslocado pelo tremor');
+    before = shake;
+  }
+  assert.ok([...seen].some(value => value !== '0,0'), `treme em alguma pisada: ${[...seen]}`);
+  assert.ok(seen.has('0,0'), 'e para entre as pisadas');
+  for (const value of seen) for (const part of value.split(',')) assert.ok(Math.abs(Number(part)) <= 1, `no máximo 1 px: ${value}`);
+  assert.ok(moves.some(([x]) => x !== 0), 'o pincel foi deslocado de verdade');
+  assert.ok(festa.probe().mundo.effects >= 2, 'uma nuvem de poeira por pisada');
+  // Acabou no meio de uma pisada: o quadro volta a ficar parado no mesmo instante.
+  for (let i = 0; i < 200 && festa.probe().shake.join(',') === '0,0'; i++) run(33);
+  assert.notDeepEqual(festa.probe().shake, [0, 0], 'está no meio de uma pisada');
+  engine.state.mundo.active = null;
+  run(33);
+  assert.deepEqual(festa.probe().shake, [0, 0]);
+  // Neve: esfria a festa (a mesma neblina azul e fumacinha do friozinho) e some quando acaba.
+  engine.mundo.start('neve');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(4000);
+  assert.ok(festa.probe().cold > 0.5, `esfriou: ${festa.probe().cold}`);
+  assert.ok(draws.has('#f4faff'), 'o chão ficou branquinho');
+  engine.state.mundo.active = null;
+  run(4000);
+  assert.ok(festa.probe().cold === 0, 'esquentou de novo');
+  // Cheia: a água barrenta e as coisas boiando.
+  draws.clear();
+  engine.mundo.start('cheia');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(8000);
+  assert.ok(draws.has('#8a6a40'), 'a água barrenta');
+  assert.ok(draws.has('#e8d0a0'), 'as marolas');
+  assert.ok(festa.probe().mundo.items.length >= 1, 'tem coisa boiando');
+  // Resgatar uma coisa levanta respingos de água (gotas azuis); sem resgate não aparecem.
+  draws.clear();
+  run(300);
+  assert.ok(!draws.has('#9fc8ff'), 'sem respingo antes de pegar');
+  const k = festa.probe().mundo.items[0];
+  assert.equal(engine.mundo.catchTarget(k).ok, true);
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(100);
+  assert.ok(draws.has('#9fc8ff'), 'respingos de água ao resgatar');
+});
+
+test('eventos do mundo (onda 8): o Cruzeiro do Sul liga as estrelas na ordem, os sapos pulam e coaxam e o trem leva os passageiros pela festa', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = new Set();
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, fillRect() { draws.add(this.fillStyle); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  const ids = () => festa.areas().filter(area => area.id.startsWith('mundo:')).map(area => area.id).sort();
+  run(300);
+  // Cruzeiro do Sul: as cinco estrelas estão no céu; as linhas só aparecem entre as já pegas.
+  engine.mundo.start('constelacao');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(4000);
+  assert.deepEqual(ids(), ['mundo:0', 'mundo:1', 'mundo:2', 'mundo:3', 'mundo:4']);
+  assert.ok(!draws.has('#ffcf4a'), 'sem linhas antes de pegar');
+  assert.ok(draws.has('#fff8cc'), 'a próxima estrela pulsa com um anel');
+  assert.ok(draws.has('#a8c0f0'), 'as que faltam ficam azuladas');
+  engine.mundo.catchTarget(0);
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(200);
+  assert.ok(!draws.has('#ffcf4a'), 'com uma só estrela ainda não há linha');
+  engine.mundo.catchTarget(1);
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(200);
+  assert.ok(draws.has('#ffcf4a'), 'a primeira linha liga as duas estrelas pegas');
+  assert.deepEqual(ids(), ['mundo:2', 'mundo:3', 'mundo:4'], 'as pegas deixam de ser alvos');
+  engine.state.mundo.active = null;
+  run(3000);
+  // Sapos: caem, pulam (verde) e coaxam de vez em quando (o texto do coaxar conta como efeito).
+  draws.clear();
+  engine.mundo.start('sapos');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(100);
+  const croaksBefore = festa.probe().mundo.effects;
+  run(9000);
+  assert.ok(draws.has('#56c860'), 'sapos verdes na festa');
+  assert.ok(draws.has('#1f2a18'), 'o sapo no ar joga sombra no chão');
+  assert.ok(festa.probe().mundo.items.length >= 1);
+  assert.ok(festa.probe().mundo.effects >= croaksBefore + 2, 'coaxou duas vezes ou mais');
+  engine.state.mundo.active = null;
+  run(3000);
+  // Maria-fumaça: a locomotiva e os vagões entram pela lateral; só há alvo enquanto o passageiro está dentro da festa.
+  draws.clear();
+  engine.mundo.start('trem');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(6000);
+  assert.ok(draws.has('#c0302a'), 'a locomotiva vermelha');
+  const early = ids().length;
+  assert.ok(early >= 1 && early <= 5);
+  // Os vagões vão em fila, a 15 px um do outro (para trás da locomotiva), na mesma altura.
+  const train = festa.probe().mundo;
+  for (let i = 1; i < train.items.length; i++) {
+    if (train.items[i] === train.items[i - 1] + 1) assert.equal(Math.abs(train.xs[i] - train.xs[i - 1]), 15, `vagão ${train.items[i]}`);
+  }
+  run(30000);
+  const middle = festa.probe().mundo.items.length;
+  assert.ok(middle >= early, 'no meio da travessia há mais passageiros dentro');
+  // O trem sai pelo outro lado: perto do fim da travessia já não há passageiros dentro da festa.
+  run(14000);
+  assert.deepEqual(ids(), [], 'o trem já saiu da festa');
+  now += 20000;
+  clock.t += 20000;
+  engine.tick(0.1);
+  run(3000);
+  assert.equal(festa.probe().mundo, null, 'o evento acabou');
+});
+
+test('eventos do mundo (onda 9): a pinhata balança mais depois do golpe, o galo canta uma vez cada e a turbulência balança a ilha com as coisas escorregando', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = new Set();
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, fillRect() { draws.add(this.fillStyle); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  const ids = () => festa.areas().filter(area => area.id.startsWith('mundo:')).map(area => area.id).sort();
+  const range = (frames, pick) => {
+    const values = [];
+    for (let i = 0; i < frames; i++) { run(33); values.push(pick(festa.probe().mundo)); }
+    return Math.max(...values) - Math.min(...values);
+  };
+  run(300);
+  // Pinhata: as três penduradas desde o começo; um golpe faz a atingida balançar muito mais por um instante e levanta doce.
+  draws.clear();
+  engine.mundo.start('pinhata');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(1500);
+  assert.deepEqual(ids(), ['mundo:0', 'mundo:1', 'mundo:2']);
+  assert.ok(draws.has('#ee2f3c') && draws.has('#35a03a'), 'papel crepom colorido');
+  const calm = range(18, probe => probe.xs[probe.items.indexOf(0)]);
+  const effectsBefore = festa.probe().mundo.effects;
+  const grains = festa.probe().particles;
+  assert.equal(engine.mundo.catchTarget(0).partial, true);
+  festa.onEvents(engine, engine.drainEvents(), now);
+  assert.equal(festa.probe().mundo.effects, effectsBefore + 1, 'o golpe levantou doce');
+  assert.ok(festa.probe().particles > grains, 'e o confete saiu da pinhata');
+  // Onde fica a festa (as pinhatas ficam em 22%, 50% e 78% da largura), para conferir a beirada na turbulência.
+  const hung = festa.probe().mundo.xs;
+  const width = (hung[2] - hung[0]) / 0.56;
+  const edges = [hung[0] - 0.22 * width, hung[0] - 0.22 * width + width];
+  const shaken = range(18, probe => probe.xs[probe.items.indexOf(0)]);
+  assert.ok(shaken > calm + 3, `balançou mais depois do golpe: ${shaken} contra ${calm}`);
+  assert.deepEqual(ids(), ['mundo:0', 'mundo:1', 'mundo:2'], 'ainda não estourou');
+  // Estourar de verdade tira o alvo e solta o confete grande.
+  for (let n = 1; n < data.mundo.eventos.find(item => item.id === 'pinhata').hits; n++) engine.mundo.catchTarget(0);
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(100);
+  assert.deepEqual(ids(), ['mundo:1', 'mundo:2']);
+  engine.state.mundo.active = null;
+  run(3000);
+  // Amanhecer: os galos aparecem um de cada vez e cada um canta uma só vez (o grito conta como efeito).
+  draws.clear();
+  engine.mundo.start('amanhecer');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(100);
+  const base = festa.probe().mundo.effects;
+  run(5500);
+  assert.ok(draws.has('#e07a2a'), 'o galo laranja');
+  assert.equal(festa.probe().mundo.effects, base + 1, 'o primeiro galo cantou uma vez');
+  run(2000);
+  assert.equal(festa.probe().mundo.effects, base + 1, 'e não repete o grito enquanto está lá');
+  run(15500);   // (o segundo galo aparece uns 22 s depois do começo)
+  assert.ok(festa.probe().mundo.effects >= base + 2, 'o galo seguinte cantou');
+  engine.state.mundo.active = null;
+  run(3000);
+  // Turbulência: a ilha sobe e desce (até 3 px) e as coisas escorregam, sempre no mesmo sentido, até sumirem na beirada.
+  engine.mundo.start('turbulencia');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  run(3500);
+  const shakes = new Set();
+  const ups = new Set();
+  const xs = [];
+  for (let i = 0; i < 120; i++) {
+    run(33);
+    const probe = festa.probe();
+    shakes.add(probe.shake.join(','));
+    ups.add(probe.shake[1]);
+    for (const value of probe.shake) assert.ok(Math.abs(value) <= 3, `balanço pequeno: ${probe.shake}`);
+    if (probe.mundo.items.includes(0)) xs.push(probe.mundo.xs[probe.mundo.items.indexOf(0)]);
+  }
+  assert.ok([...shakes].some(value => value !== '0,0'), 'a ilha balança');
+  assert.ok([...ups].some(value => value !== 0), 'e sobe e desce');
+  assert.ok(shakes.size >= 3, `vários balanços diferentes: ${[...shakes]}`);
+  assert.ok(xs.length >= 10);
+  const steps = xs.slice(1).map((value, i) => value - xs[i]);
+  assert.ok(steps.every(step => step >= 0) || steps.every(step => step <= 0), 'escorrega sempre para o mesmo lado');
+  assert.ok(Math.abs(xs.at(-1) - xs[0]) > 2, 'e se mexe de verdade');
+  // Nenhuma coisa aparece além da beirada da ilha (quem chega lá cai e some).
+  for (let i = 0; i < 1100; i++) {
+    run(33);
+    const probe = festa.probe().mundo;
+    if (!probe) break;
+    for (const x of probe.xs) assert.ok(x >= edges[0] + 3 && x <= edges[1] - 3, `dentro da ilha: ${x} em ${edges}`);
+  }
+  engine.state.mundo.active = null;
+  run(100);
+  assert.deepEqual(festa.probe().shake, [0, 0], 'a ilha para quando acaba');
+});
+
+test('eventos do mundo: a turma solta uma fala do evento de tempos em tempos (uma das duas, só durante o evento)', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {} });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  run(300);
+  for (const id of ['estrelas', 'neve', 'sapos']) {
+    const entry = data.mundo.eventos.find(item => item.id === id);
+    engine.state.mundo.active = null;
+    engine.mundo.start(id);
+    festa.onEvents(engine, engine.drainEvents(), now);
+    run(1500);
+    assert.equal(festa.probe().mundo.chats, 0, `${id}: ainda não comentaram (o evento acabou de chegar)`);
+    run(6000);
+    const first = festa.probe().mundo;
+    assert.equal(first.chats, 1, `${id}: a primeira fala sai uns segundos depois da chegada`);
+    assert.ok([entry.chat0, entry.chat1].includes(first.chat), `${id}: é uma das duas falas (${first.chat})`);
+    run(11000);
+    assert.ok(festa.probe().mundo.chats >= 2, `${id}: e continua comentando (a cada 5,5 a 10 s)`);
+    assert.ok(festa.probe().mundo.chats <= 4, `${id}: sem tagarelar demais`);
+  }
+  // Sem evento a turma não comenta nada.
+  engine.state.mundo.active = null;
+  run(3000);
+  assert.equal(festa.probe().mundo, null);
+});
+
+test('eventos do mundo: na chuva de fichas várias fichas douradas ficam no ar ao mesmo tempo e cada uma é clicável', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  const draws = new Set();
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, fillRect() { draws.add(this.fillStyle); } });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  run(300);
+  engine.mundo.start('fichas');
+  festa.onEvents(engine, engine.drainEvents(), now);
+  let most = 0;
+  const seen = new Set();
+  for (let i = 0; i < 780; i++) {
+    run(33);
+    const probe = festa.probe().mundo;
+    if (!probe) break;
+    most = Math.max(most, probe.items.length);
+    for (const k of probe.items) seen.add(k);
+  }
+  assert.ok(most >= 2 && most <= 5, `umas três de cada vez no ar (${most})`);
+  assert.equal(seen.size, 15, 'todas as quinze passaram');
+  assert.ok(draws.has('#a8740a') && draws.has('#fff07a'), 'as fichas douradas');
 });

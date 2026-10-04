@@ -461,7 +461,7 @@ mao('agua-viva', agua_viva(), (7, 17), fps=4)
 # Um tecido é um ladrilho que se repete pelo corpo; cada letra é uma cor da paleta geral. Os tecidos novos precisam de cores que
 # a paleta não tem, então elas entram nela (com letras que ninguém usava) quando este módulo é carregado.
 
-_LIVRES = list("tZ@%$&*=:;!?<>^|_~()[]{}/,`\\\"'")
+_LIVRES = list("tZ@%$&*=:;!?<>^|_~()[]{}/,`\\\"'") + list("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞß")  # (os temas novos precisam de muitas cores de tecido)
 _REGISTRADAS = {}
 
 

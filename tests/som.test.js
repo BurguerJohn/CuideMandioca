@@ -12,6 +12,8 @@ test('som: cada efeito agenda notas, respeita liga/desliga, volume e o intervalo
   assert.ok(log.oscillators > 20 && log.noises > 5, 'tons e ruídos agendados');
   assert.equal(som.play('nada'), false, 'som desconhecido não toca');
   assert.equal(som.play('cobra'), false, 'o mesmo som logo em seguida espera o intervalo');
+  assert.equal(som.play('evento'), false, 'a fanfarra dos eventos também espera o intervalo');
+  assert.equal(som.play('evento-raro'), false, 'e a dos raros também');
 
   som.set({ enabled: false });
   assert.equal(som.play('moeda'), false, 'desligado não toca');

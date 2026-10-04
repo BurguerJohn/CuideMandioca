@@ -4,27 +4,23 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (Minis) {
   'use strict';
 
-  // Fogueira de Perto: lenha acende o fogo, os espetos assam (vire na hora certa, tire no ponto) e dá para pular a fogueira. Toda comida
-  // tirada do fogo deixa a Barriga da Mandioca cheia e parada por `bellyHold` horas.
+  // Fogueira de Perto: lenha acende o fogo, os espetos assam sozinhos e, quando a comida fica pronta, é só comer. Nada queima nem passa do ponto: pronta,
+  // a comida espera no espeto o tempo que for. Dá para pular a fogueira. Toda comida comida deixa a Barriga da Mandioca cheia e parada por `bellyHold` horas.
   // Configuração em `data.minis.fogueira`. O calor e o ponto da comida andam com o jogo aberto (fechado, a fogueira espera).
   Minis.define('fogueira', (engine, tools) => {
-    const { clamp, finite, int } = tools;
+    const { clamp, finite } = tools;
     const food = id => tools.cfg().foods.find(entry => entry.id === id) || null;
     const rate = heat => { const c = tools.cfg(); return heat >= c.minHeat ? 0.4 + 0.6 * heat / c.heatMax : 0; };
 
+    // A comida vai de crua a dourando e fica pronta ao chegar em 1 (e fica assim).
     function stateOf(stick) {
-      const c = tools.cfg();
-      if (stick.burnt) return 'queimado';
-      if (stick.progress < 0.5) return 'cru';
-      if (stick.progress < c.perfect[0]) return 'dourando';
-      if (stick.progress <= c.perfect[1]) return 'ponto';
-      return 'passou';
+      if (stick.progress >= 1) return 'pronto';
+      return stick.progress < 0.5 ? 'cru' : 'dourando';
     }
 
     return {
       fresh() {
-        return { heat: 0, sticks: Array.from({ length: tools.cfg().slots }, () => null), selected: tools.cfg().foods[0].id, jumpAt: 0,
-          roasted: 0, perfect: 0, burnt: 0, jumped: 0 };
+        return { heat: 0, sticks: Array.from({ length: tools.cfg().slots }, () => null), selected: tools.cfg().foods[0].id, jumpAt: 0, roasted: 0, jumped: 0 };
       },
 
       load(raw) {
@@ -34,12 +30,10 @@
         const sticks = Array.from({ length: c.slots }, (_, i) => {
           const entry = Array.isArray(raw.sticks) ? raw.sticks[i] : null;
           if (!tools.object(entry) || !food(entry.food)) return null;
-          const progress = clamp(finite(entry.progress), 0, c.burnAt);
-          return { food: entry.food, progress, turns: int(entry.turns, 0, c.turnMax, 0), burnt: progress >= c.burnAt };
+          return { food: entry.food, progress: clamp(finite(entry.progress), 0, 1) };
         });
         return { heat: clamp(finite(raw.heat), 0, c.heatMax), sticks, selected: food(raw.selected) ? raw.selected : base.selected,
-          jumpAt: clamp(finite(raw.jumpAt), 0, tools.now() + c.jumpWait * 1000), roasted: int(raw.roasted, 0, 1e9, 0), perfect: int(raw.perfect, 0, 1e9, 0),
-          burnt: int(raw.burnt, 0, 1e9, 0), jumped: int(raw.jumped, 0, 1e9, 0) };
+          jumpAt: clamp(finite(raw.jumpAt), 0, tools.now() + c.jumpWait * 1000), roasted: tools.int(raw.roasted, 0, 1e9, 0), jumped: tools.int(raw.jumped, 0, 1e9, 0) };
       },
 
       shift(ms) {
@@ -47,7 +41,7 @@
         if (s.jumpAt) s.jumpAt -= ms;
       },
 
-      // O fogo esfria; os espetos assam no ritmo do calor e, passando do ponto, queimam.
+      // O fogo esfria; os espetos assam no ritmo do calor e, ao chegar no ponto, avisam (e esperam).
       tick(dt) {
         const s = tools.state();
         const c = tools.cfg();
@@ -55,25 +49,27 @@
         s.heat = Math.max(0, s.heat - dt * c.heatLoss);
         if (!speed) return;
         for (const [slot, stick] of s.sticks.entries()) {
-          if (!stick || stick.burnt) continue;
-          stick.progress += dt / food(stick.food).seconds * speed;
-          if (stick.progress >= c.burnAt) {
-            stick.progress = c.burnAt;
-            stick.burnt = true;
-            s.burnt++;
-            tools.emit('burnt', { slot, food: stick.food });
-          }
+          if (!stick || stick.progress >= 1) continue;
+          stick.progress = Math.min(1, stick.progress + dt / food(stick.food).seconds * speed);
+          if (stick.progress >= 1) tools.emit('ready', { slot, food: stick.food });
         }
+      },
+
+      // Quantas comidas já estão prontas esperando (o número vermelho do botão da janela na placa).
+      pending() {
+        return tools.state().sticks.filter(stick => stick && stick.progress >= 1).length;
       },
 
       info() {
         const s = tools.state();
         const c = tools.cfg();
         const now = tools.now();
+        const speed = rate(s.heat);
         return { heat: s.heat, heatMax: c.heatMax, wood: engine.state.wood, foods: c.foods, selected: s.selected, burning: s.heat >= c.minHeat,
           canJump: s.heat >= c.jumpMinHeat && now >= s.jumpAt, jumpWait: Math.max(0, (s.jumpAt - now) / 1000),
-          sticks: s.sticks.map((stick, slot) => (stick ? { slot, food: stick.food, progress: stick.progress, turns: stick.turns, state: stateOf(stick), burnt: stick.burnt }
-            : null)) };
+          sticks: s.sticks.map((stick, slot) => (stick ? { slot, food: stick.food, progress: stick.progress, state: stateOf(stick), ready: stick.progress >= 1,
+            // Quanto falta (em segundos) no calor de agora; sem calor não anda.
+            left: stick.progress >= 1 ? 0 : speed ? Math.ceil((1 - stick.progress) * food(stick.food).seconds / speed) : null } : null)) };
       },
 
       select(id) {
@@ -100,48 +96,24 @@
         if (!food(id)) return { ok: false, reason: 'food' };
         if (!Number.isInteger(slot) || !(slot >= 0 && slot < s.sticks.length)) return { ok: false, reason: 'slot' };
         if (s.sticks[slot]) return { ok: false, reason: 'busy' };
-        s.sticks[slot] = { food: id, progress: 0, turns: 0, burnt: false };
+        s.sticks[slot] = { food: id, progress: 0 };
         tools.emit('put', { slot, food: id });
         return { ok: true, food: food(id) };
       },
 
-      // Virar o espeto (a comida entre 10% e 90%): assa por igual e vale mais.
-      turn(slot) {
+      // Comer a comida pronta: o espeto fica livre e vem o prêmio (o extra da comida e a Barriga cheia e parada). Crua ou dourando ainda não dá.
+      eat(slot) {
         const s = tools.state();
         const c = tools.cfg();
-        const stick = s.sticks[slot];
+        const stick = Number.isInteger(slot) ? s.sticks[slot] : null;
         if (!stick) return { ok: false, reason: 'empty' };
-        if (stick.burnt || stick.progress > 0.9) return { ok: false, reason: 'late' };
-        if (stick.progress < 0.1) return { ok: false, reason: 'early' };
-        if (stick.turns >= c.turnMax) return { ok: false, reason: 'turned' };
-        stick.turns++;
-        tools.emit('turn', { slot, turns: stick.turns });
-        return { ok: true, turns: stick.turns };
-      },
-
-      // Tirar do fogo: crua não sai; no ponto (e virada) vale mais; passada vale menos; queimada só vai para o lixo.
-      take(slot) {
-        const s = tools.state();
-        const c = tools.cfg();
-        const stick = s.sticks[slot];
-        if (!stick) return { ok: false, reason: 'empty' };
-        if (stick.burnt) {
-          s.sticks[slot] = null;
-          tools.emit('trash', { slot, food: stick.food });
-          return { ok: true, burnt: true, reward: {} };
-        }
-        if (stick.progress < c.perfect[0]) return { ok: false, reason: 'raw' };
+        if (stick.progress < 1) return { ok: false, reason: 'raw' };
         const item = food(stick.food);
-        const perfect = stick.progress <= c.perfect[1] && stick.turns >= 1;
-        const mult = perfect ? c.perfectMult : stick.progress <= c.perfect[1] ? 1 : 0.7;
-        const spec = Object.fromEntries(Object.entries(item.reward).map(([key, value]) => [key, Math.max(1, Math.round(value * mult))]));
-        spec.bellyFull = c.bellyHold;                  // o prêmio da comida: Barriga cheia e parada por `bellyHold` horas
-        const reward = tools.reward(spec);
+        const reward = tools.reward({ ...item.reward, bellyFull: c.bellyHold });
         s.sticks[slot] = null;
         s.roasted++;
-        if (perfect) s.perfect++;
-        tools.emit('roasted', { slot, food: stick.food, perfect, reward });
-        return { ok: true, food: item, perfect, mult, reward };
+        tools.emit('roasted', { slot, food: stick.food, reward });
+        return { ok: true, food: item, reward };
       },
 
       // Pular a fogueira (precisa de calor) rende Animação e Amor, e espera um tempo.

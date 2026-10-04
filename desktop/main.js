@@ -6,6 +6,7 @@ const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, dialog, po
 const { normalizeSettings, mergeSettings, publicSettings, pickDisplay } = require('./window-state');
 const { loadSave, writeSave } = require('./save-store');
 const { createSteam } = require('./steam');
+const { createCloudSave } = require('./cloud-save');
 const I18N = require('../src/i18n.js');
 const GAME_DATA = require('../src/data.js');
 const { GameEngine } = require('../src/core.js');
@@ -116,6 +117,30 @@ if (steamOnly && steam.restartIfNeeded()) {
     new GameEngine(GAME_DATA, state, { now: () => stamp, rng: () => 0.5 });
     return true;
   }
+
+  // Save na nuvem da Steam: o da nuvem e o daqui são comparados ao abrir (vale o mais recente; se o mais recente tem menos progresso, a pessoa escolhe),
+  // e cada gravação segue para a nuvem. Quem perde fica guardado como cópia.
+  const progressOf = state => (state.year || 1) * 1e9 + (state.records?.size || state.size || 1);
+  function askCloudSave({ local, cloud }) {
+    const describe = state => ({ year: state.year || 1, guests: state.records?.size || state.size || 1,
+      when: new Date(Number.isFinite(state.lastSeen) ? state.lastSeen : 0).toLocaleString(languageInfo().id) });
+    const c = describe(cloud);
+    const l = describe(local);
+    const keepCloud = progressOf(cloud) >= progressOf(local);
+    const answer = dialog.showMessageBoxSync({ type: 'question', title: t('cloud.conflictTitle'), noLink: true,
+      message: t('cloud.conflict', { cloudYear: c.year, cloudGuests: c.guests, cloudWhen: c.when, localYear: l.year, localGuests: l.guests, localWhen: l.when }),
+      buttons: [t('cloud.useCloud'), t('cloud.useLocal')], defaultId: keepCloud ? 0 : 1, cancelId: keepCloud ? 0 : 1 });
+    return answer === 0 ? 'cloud' : 'local';
+  }
+  const cloud = createCloudSave({ steam, validate: validSave, ask: askCloudSave,
+    adoptLocal(state, displaced) {
+      // O save daqui que a nuvem substituiu fica guardado ao lado.
+      if (displaced) {
+        try { fs.writeFileSync(`${savePath}.conflito`, JSON.stringify(displaced), 'utf8'); }
+        catch (error) { console.warn('Cópia do save deste computador não gravada:', error.message); }
+      }
+      writeSave(savePath, state, validSave);
+    } });
 
   function syncSteam(state) {
     if (!steam.available || !state || typeof state !== 'object') return;
@@ -501,7 +526,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     ipcMain.on('game:load', event => {
       if (!isOwnWindow(event)) { event.returnValue = null; return; }
       if (!sessionSave) {
-        sessionSave = loadSave(savePath, validSave);
+        sessionSave = cloud.reconcile(loadSave(savePath, validSave));
         sessionSaved = !!sessionSave;
       }
       event.returnValue = sessionSave;
@@ -519,7 +544,8 @@ if (steamOnly && steam.restartIfNeeded()) {
         catch (error) { console.error('Save não pôde ser gravado:', error); }
       }
       if (saved) sessionSaved = true;
-      // A página espera a resposta: a Steam só é avisada depois.
+      // A página espera a resposta: a Steam só é avisada depois (o save segue para a nuvem; ao sair, o último vai na hora).
+      if (saved) { cloud.push(sessionSave); if (quitting) cloud.flush(); }
       event.returnValue = saved;
       if (saved) syncSteam(sessionSave);
     });
@@ -527,7 +553,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     ipcMain.on('desktop:info', event => {
       if (!isOwnWindow(event)) { event.returnValue = null; return; }
       const reopen = reopenConsumedBy === win ? null : reopenPanel;
-      event.returnValue = { language: languageInfo(), steam: steam.info(), reopen };
+      event.returnValue = { language: languageInfo(), steam: { ...steam.info(), cloud: cloud.enabled() }, reopen };
       // O preload recebe o pedido antes dos scripts da festa. Se a carga cair, a substituta ainda precisa reabrir.
       if (reopen) {
         if (windowLoaded) { reopenPanel = null; reopenConsumedBy = null; }
@@ -586,6 +612,9 @@ if (steamOnly && steam.restartIfNeeded()) {
     quitting = true;
     clearTimeout(wakeTimer);
     if (settings) writeSettings();
+    cloud.flush();
   });
+  // Depois que a página fechou (e salvou pela última vez), o que ainda não foi para a nuvem vai agora.
+  app.on('will-quit', () => { cloud.flush(); });
   app.on('window-all-closed', () => { if (!replacing) app.quit(); });
 }

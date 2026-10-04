@@ -12,11 +12,12 @@ function fakeSteam(order, language = 'spanish') {
     restartIfNeeded: () => false, enableOverlay() {}, init: () => true, available: true,
     language: () => language, info: () => ({ on: true, name: 'Jogador', appId: 480 }),
     syncAchievements: ids => order.push(['steam-achievements', ids]),
-    setPresence: presence => order.push(['steam-presence', presence])
+    setPresence: presence => order.push(['steam-presence', presence]),
+    cloudEnabled: () => false, cloudRead: () => null, cloudWrite: () => false
   };
 }
 
-function loadMain({ language, packaged = false, timeout = setTimeout, clear = clearTimeout, deferClose = false, deferDestroy = false, deferLoad = false, saveStore, filesystem, paths, logger = console } = {}) {
+function loadMain({ language, packaged = false, timeout = setTimeout, clear = clearTimeout, deferClose = false, deferDestroy = false, deferLoad = false, saveStore, filesystem, paths, logger = console, steamOverrides = {}, dialogAnswer = 0 } = {}) {
   const listeners = new Map();
   const power = {};
   const intervals = [];
@@ -95,7 +96,7 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
       setAppUserModelId() {}, on: (name, fn) => { appEvents[name] = fn; }, quit: () => order.push('quit'),
       getLocale: () => 'pt-BR', isPackaged: packaged, setLoginItemSettings: value => order.push(['login', value])
     },
-    dialog: { showErrorBox: () => order.push('dialog') },
+    dialog: { showErrorBox: () => order.push('dialog'), showMessageBoxSync: options => { order.push(['ask', options]); return dialogAnswer; } },
     BrowserWindow: FakeWindow,
     ipcMain: { on: (channel, fn) => listeners.set(channel, fn), handle: (channel, fn) => handlers.set(channel, fn) },
     screen: { getPrimaryDisplay: () => displays[0], getAllDisplays: () => displays, on: (name, fn) => { displayEvents[name] = fn; }, getCursorScreenPoint: () => cursor },
@@ -116,7 +117,8 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
       order.push('write');
       return true;
     } },
-    './steam': { createSteam: () => fakeSteam(order, language) },
+    './steam': { createSteam: () => ({ ...fakeSteam(order, language), ...steamOverrides }) },
+    './cloud-save': require('../desktop/cloud-save'),
     '../src/i18n.js': I18N,
     '../src/data.js': require('../src/data.js'),
     '../src/core.js': require('../src/core.js')
@@ -418,7 +420,7 @@ test('janela cobre a área útil, vaza cliques e só aceita IPC da própria fest
   assert.equal(win.ignore, false, 'outra origem não mexe na janela');
 
   const settings = await handlers.get('desktop:update-settings')(own, { zoom: 1.5, pinned: false, lixo: 1 });
-  assert.deepEqual(JSON.parse(JSON.stringify(settings)), { pinned: false, zoom: 1.5, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false, minis: {},
+  assert.deepEqual(JSON.parse(JSON.stringify(settings)), { pinned: false, zoom: 1.5, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, gaveta: null, casa: null, casaHidden: false, minis: {},
     sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false, revision: 1 });
   assert.equal(win.onTop, false);
   assert.equal(await handlers.get('desktop:update-settings')({ sender: {} }, { zoom: 2 }), null);
@@ -1337,5 +1339,94 @@ test('mudar a resolução atualiza a área da festa e os tamanhos dos monitores 
   main.displayEvents['display-added']({}, second);
   assert.deepEqual(main.window().bounds, second.workArea, 'ao reconectar, volta ao monitor escolhido');
   assert.equal(monitors()[1].checked, true);
+  I18N.setLanguage('pt-BR');
+});
+
+test('nuvem da Steam no desktop: a abertura compara o save daqui com o da nuvem, cada gravação segue para a nuvem e sair manda o último', async () => {
+  const { GameEngine } = require('../src/core.js');
+  const data = require('../src/data.js');
+  const realSave = (year, size, lastSeen) => {
+    const state = new GameEngine(data, null, { rng: () => 0.5, now: () => lastSeen }).exportState();
+    return Object.assign(state, { year, size, lastSeen, records: { ...state.records, size } });
+  };
+  const savePath = path.join('C:\\dados', 'save.json');
+  const montar = ({ local, cloudFiles, cloudOn = true, answer = 0 }) => {
+    const files = new Map();
+    const written = [];
+    const cloudWrites = [];
+    const saveStore = { loadSave: () => local, writeSave: (file, state, _validate, onSnapshot) => {
+      onSnapshot?.(JSON.parse(JSON.stringify(state)));
+      written.push([file, JSON.parse(JSON.stringify(state))]);
+      return true;
+    } };
+    const missing = () => { const error = new Error('missing'); error.code = 'ENOENT'; throw error; };
+    const filesystem = { readFileSync: file => files.has(file) ? files.get(file) : missing(), existsSync: file => files.has(file), mkdirSync() {}, copyFileSync() {},
+      appendFileSync() {}, statSync: missing, writeFileSync: (file, content) => files.set(file, content), renameSync() {} };
+    const steamOverrides = { cloudEnabled: () => cloudOn, cloudRead: name => (name in cloudFiles ? cloudFiles[name] : null),
+      cloudWrite: (name, content) => { cloudWrites.push(name); cloudFiles[name] = content; return true; } };
+    const main = loadMain({ language: 'brazilian', saveStore, filesystem, steamOverrides, dialogAnswer: answer, timeout: () => 1, clear() {} });
+    return { ...main, files, written, cloudWrites, cloudFiles };
+  };
+  const ask = (main, channel, ...args) => {
+    let value;
+    const event = { sender: main.window().webContents };
+    Object.defineProperty(event, 'returnValue', { set(v) { value = v; } });
+    main.listeners.get(channel)(event, ...args);
+    return JSON.parse(JSON.stringify(value === undefined ? null : value));
+  };
+
+  // 1. Outro computador jogou mais recentemente: a festa abre com o da nuvem, grava ele aqui e guarda o save daqui como cópia.
+  const old = realSave(1, 30, 1_700_000_000_000);
+  const newer = realSave(1, 60, 1_700_000_900_000);
+  let t = montar({ local: old, cloudFiles: { 'save.json': JSON.stringify(newer) } });
+  await Promise.resolve();
+  assert.deepEqual(ask(t, 'game:load'), newer);
+  assert.deepEqual(t.written, [[savePath, newer]], 'o save da nuvem vai para o disco');
+  assert.deepEqual(JSON.parse(t.files.get(`${savePath}.conflito`)), old, 'o daqui fica guardado como cópia');
+  assert.deepEqual(t.cloudWrites, [], 'a nuvem não é mexida');
+  assert.ok(!t.order.some(entry => entry[0] === 'ask'), 'sem conflito ninguém é perguntado');
+  // O desktop avisa a página se a nuvem está ligada (Ajustes).
+  assert.equal(ask(t, 'desktop:info').steam.cloud, true);
+  // Cada gravação segue para a nuvem sem martelar a Steam (a primeira espera o minuto desde a abertura), e sair manda o último.
+  const next = realSave(1, 61, 1_700_000_950_000);
+  assert.equal(ask(t, 'game:save', next), true);
+  assert.deepEqual(t.cloudWrites, [], 'logo depois da abertura espera');
+  t.appEvents['before-quit']();
+  assert.deepEqual(JSON.parse(t.cloudFiles['save.json']).size, 61, 'ao sair o último save vai');
+  const last = realSave(1, 62, 1_700_001_000_000);
+  assert.equal(ask(t, 'game:save', last), true);
+  assert.deepEqual(JSON.parse(t.cloudFiles['save.json']).size, 62, 'o save que a página faz ao fechar vai na hora');
+  t.appEvents['will-quit']();
+  assert.equal(JSON.parse(t.cloudFiles['save.json']).size, 62);
+
+  // 2. Conflito de verdade (o mais recente tem menos progresso): pergunta; "manter o daqui" leva o daqui para a nuvem e guarda o da nuvem.
+  const big = realSave(2, 120, 1_700_000_000_000);
+  const fresh = realSave(1, 3, 1_700_000_900_000);
+  t = montar({ local: big, cloudFiles: { 'save.json': JSON.stringify(fresh) }, answer: 1 });
+  await Promise.resolve();
+  assert.deepEqual(ask(t, 'game:load'), big);
+  const asked = t.order.find(entry => entry[0] === 'ask')[1];
+  assert.equal(asked.title, 'Qual save manter?');
+  assert.match(asked.message, /Nuvem: ano 1, 3 convidados/);
+  assert.match(asked.message, /Este computador: ano 2, 120 convidados/);
+  assert.deepEqual(JSON.parse(JSON.stringify(asked.buttons)), ['Usar o da nuvem', 'Manter o deste computador']);
+  assert.equal(asked.defaultId, 1, 'o padrão é o de mais progresso');
+  assert.deepEqual(JSON.parse(t.cloudFiles['save.json']), big);
+  assert.deepEqual(JSON.parse(t.cloudFiles['save.anterior.json']), fresh);
+  assert.deepEqual(t.written, [], 'o disco não muda');
+  // "Usar o da nuvem" grava ela aqui.
+  t = montar({ local: big, cloudFiles: { 'save.json': JSON.stringify(fresh) }, answer: 0 });
+  await Promise.resolve();
+  assert.deepEqual(ask(t, 'game:load'), fresh);
+  assert.deepEqual(JSON.parse(t.files.get(`${savePath}.conflito`)), big);
+
+  // 3. Nuvem desligada (ou sem a Steam): nada muda, nada é enviado e a página fica sabendo.
+  t = montar({ local: old, cloudFiles: { 'save.json': JSON.stringify(newer) }, cloudOn: false });
+  await Promise.resolve();
+  assert.deepEqual(ask(t, 'game:load'), old);
+  assert.equal(ask(t, 'game:save', next), true);
+  t.appEvents['before-quit']();
+  assert.deepEqual(t.cloudWrites, []);
+  assert.equal(ask(t, 'desktop:info').steam.cloud, false);
   I18N.setLanguage('pt-BR');
 });

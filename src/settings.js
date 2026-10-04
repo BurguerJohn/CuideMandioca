@@ -7,11 +7,13 @@
   const { LANGUAGES } = i18n;
 
   // Preferências da festa, sempre normalizadas antes de usar ou salvar.
-  const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, casa: null, casaHidden: false, minis: {},
+  const DEFAULTS = Object.freeze({ pinned: true, zoom: 1, x: 0.72, lift: 0, hud: 'sempre', hidden: false, placa: null, gaveta: null, casa: null, casaHidden: false, minis: {},
     display: null, language: 'auto', sound: true, volume: 0.5, perf: 'suave', flash: true, music: false, startup: false, calm: false });
-  const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'casa', 'casaHidden', 'minis', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm'];
+  const PUBLIC = ['pinned', 'zoom', 'x', 'lift', 'hud', 'hidden', 'placa', 'gaveta', 'casa', 'casaHidden', 'minis', 'sound', 'volume', 'perf', 'flash', 'music', 'startup', 'calm'];
   // Quadros por segundo com foco / de fundo: suave 60/30, normal 30/20, economia 20/12.
   const PERFS = ['suave', 'normal', 'economia'];
+  // As gavetas da placa: os botões das janelas e os das coleções ficam guardados e só um deles abre de cada vez.
+  const GAVETAS = ['janelas', 'colecoes'];
   const language = value => (LANGUAGES.some(entry => entry.id === value) ? value : 'auto');
 
   function bounded(value, low, high, fallback) {
@@ -48,6 +50,7 @@
       hud: r.hud === 'passar' ? 'passar' : 'sempre',
       hidden: r.hidden === true,
       placa: placaOffset(r.placa),
+      gaveta: GAVETAS.includes(r.gaveta) ? r.gaveta : null,
       casa: placaOffset(r.casa),
       casaHidden: r.casaHidden === true,
       minis: minisSettings(r.minis),

@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 const data = require('../src/data.js');
 const { GameEngine } = require('../src/core.js');
 
+// A planta em alta do dia depende da data; os testes de prêmio da Horta a deixam sem bônus (o teste dela liga o bônus e desliga de novo).
+data.minis.horta.daily.bonus = 0;
+
 // Motor das janelas extras (src/minis.js e src/mini-*.js). Um relógio manual deixa o tempo andar sem esperar.
 function newEngine(level = 1, save = null) {
   const clock = { t: 1_000_000_000 };
@@ -49,7 +52,7 @@ test('convidado novo que abre uma janela dá um evento só, e nunca de novo', ()
 test('o estado das janelas vai no save e volta saneado', () => {
   const { engine } = newEngine(30);
   const saved = engine.exportState();
-  assert.deepEqual(Object.keys(saved.minis), ['cordel', 'bichos', 'aquario', 'horta', 'fogueira', 'palco', 'mata', 'ceu', 'bairro']);
+  assert.deepEqual(Object.keys(saved.minis), ['cordel', 'bichos', 'aquario', 'horta', 'fogueira', 'palco', 'mata', 'ceu', 'bairro', 'folclore']);
   // Lixo no save não derruba o jogo: volta ao começo daquela janela.
   const messy = JSON.parse(JSON.stringify(saved));
   messy.minis.bichos = { grain: 'muito', pets: { galinha: { bond: 999, ready: true } }, petted: -4 };
@@ -512,67 +515,76 @@ test('fogueira: lenha esquenta o fogo, que esfria sozinho', () => {
   assert.ok(fogueira.info().heat < c.heatMax && fogueira.info().heat > c.heatMax - 10 * c.heatLoss - 0.01);
 });
 
-test('fogueira: o espeto assa no ritmo do calor, vira, sai no ponto (vale mais se virou), passa do ponto e queima', () => {
+test('fogueira: o espeto assa sozinho no ritmo do calor, fica pronto e espera (nunca queima), e comer rende o extra e a Barriga cheia', () => {
   const { engine, pass } = newEngine(30);
   const fogueira = engine.mini('fogueira');
   const c = data.minis.fogueira;
   engine.state.wood = 99;
   const heat = () => { engine.state.minis.fogueira.heat = c.heatMax; };
-  // Frio: não assa.
+  // Frio: não assa (e o espeto diz que está sem calor).
   assert.equal(fogueira.put(0, 'milho').ok, true);
   assert.equal(fogueira.put(0, 'milho').reason, 'busy');
   assert.equal(fogueira.put(9, 'milho').reason, 'slot');
   pass(30);
   assert.equal(fogueira.info().sticks[0].progress, 0, 'sem calor a comida não assa');
-  // Quente: assa. Crua não sai; virar só entre 10% e 90%.
+  assert.equal(fogueira.info().sticks[0].left, null, 'sem calor não há previsão');
+  // Quente: assa sozinha (crua, dourando, pronta); crua ou dourando ainda não se come.
   heat();
-  assert.equal(fogueira.turn(0).reason, 'early');
+  assert.equal(fogueira.info().sticks[0].left, Math.ceil(c.foods[0].seconds), 'no calor cheio: os segundos da comida');
   const steps = () => { heat(); pass(1); };
+  assert.equal(fogueira.info().sticks[0].state, 'cru');
+  engine.state.minis.fogueira.sticks[0].progress = 0.49;
+  assert.equal(fogueira.info().sticks[0].state, 'cru', 'até 49% ainda está crua');
+  engine.state.minis.fogueira.sticks[0].progress = 0.5;
+  assert.equal(fogueira.info().sticks[0].state, 'dourando', 'a partir de 50% está dourando');
+  engine.state.minis.fogueira.sticks[0].progress = 0;
+  assert.equal(fogueira.eat(0).reason, 'raw');
   while (fogueira.info().sticks[0].progress < 0.5) steps();
-  assert.deepEqual([fogueira.take(0).reason, fogueira.turn(0).ok, fogueira.turn(0).ok, fogueira.turn(0).reason], ['raw', true, true, 'turned']);
-  while (fogueira.info().sticks[0].state !== 'ponto') steps();
+  assert.equal(fogueira.info().sticks[0].state, 'dourando');
+  assert.equal(fogueira.eat(0).reason, 'raw');
+  assert.equal(fogueira.pending(), 0, 'nada pronto ainda');
+  while (!fogueira.info().sticks[0].ready) steps();
+  assert.deepEqual([fogueira.info().sticks[0].state, fogueira.info().sticks[0].left, fogueira.pending()], ['pronto', 0, 1]);
+  assert.ok(events(engine).some(event => event.kind === 'ready' && event.slot === 0 && event.food === 'milho'), 'avisa quando fica pronta');
+  // Pronta, ela espera: o tempo passa (muito) com o fogo no máximo e ela não queima nem passa do ponto.
+  for (let i = 0; i < 600; i++) steps();
+  assert.deepEqual([fogueira.info().sticks[0].progress, fogueira.info().sticks[0].state, fogueira.info().sticks[0].ready], [1, 'pronto', true]);
+  const depois = events(engine);
+  assert.equal(depois.some(event => event.kind === 'burnt'), false, 'nunca queima');
+  assert.equal(depois.some(event => event.kind === 'ready'), false, 'o aviso de pronta vem uma vez só');
+  // Comer: o espeto fica livre, vem o extra do milho (Animação) e a Barriga fica 100% cheia e parada por 2 h.
   engine.state.humor.barriga = 0;
   engine.state.humor.at = engine.now();
   const cheer0 = engine.state.cheer;
-  const got = fogueira.take(0);
-  assert.deepEqual([got.ok, got.perfect, got.mult], [true, true, c.perfectMult]);
-  // O prêmio da comida: Barriga 100% cheia e parada por 2 h; o extra do milho (Animação) vale 1,5 vezes quando é certinho.
+  const got = fogueira.eat(0);
+  assert.deepEqual([got.ok, got.food.id], [true, 'milho']);
   assert.equal(engine.mood().barriga, engine.cfg.moodMax, 'Barriga cheia');
   assert.equal(got.reward.bellyFull, c.bellyHold);
   assert.ok(Math.abs(engine.bellyHoldLeft() - c.bellyHold * 3600000) < 1000, 'parada por 2 h');
   assert.ok(engine.state.cheer - cheer0 >= 20, 'extra do milho (Animação)');
   assert.equal(fogueira.info().sticks[0], null);
-  // Sem virar, no ponto vale 100% do extra (a batata dá lenha); a Barriga fica cheia do mesmo jeito.
+  assert.equal(fogueira.eat(0).reason, 'empty');
+  assert.ok(events(engine).some(event => event.kind === 'roasted' && event.food === 'milho'));
+  assert.equal(engine.state.minis.fogueira.roasted, 1);
+  // Cada comida dá o extra dela (a batata devolve lenha, o queijo dá Amor) e todas deixam a Barriga cheia.
   fogueira.put(1, 'batata');
-  while (fogueira.info().sticks[1].state !== 'ponto') steps();
-  engine.state.humor.barriga = 0;
-  engine.state.humor.at = engine.now();
-  const wood0 = engine.state.wood;
-  const potato = fogueira.take(1);
-  assert.equal(potato.perfect, false);
-  assert.equal(Math.round(engine.mood().barriga), engine.cfg.moodMax);
-  assert.equal(engine.state.wood - wood0, 3, 'a batata devolve lenha');
-  // Passado do ponto vale 70% do extra e a Barriga ainda enche.
   fogueira.put(2, 'queijo');
-  while (fogueira.info().sticks[2].state !== 'passou') steps();
-  engine.state.humor.amor = 0;
-  engine.state.humor.barriga = 0;
-  engine.state.humor.at = engine.now();
-  const cheese = fogueira.take(2);
-  assert.equal(cheese.mult, 0.7);
-  assert.equal(Math.round(engine.mood().amor), Math.round(6 * 0.7));
-  assert.equal(Math.round(engine.mood().barriga), engine.cfg.moodMax, 'passou do ponto, mas comeu: Barriga cheia');
   fogueira.put(3, 'linguica');
-  while (!fogueira.info().sticks[3].burnt) steps();
-  assert.equal(fogueira.info().sticks[3].state, 'queimado');
+  while (fogueira.pending() < 3) steps();
+  engine.state.humor.amor = 0;
   engine.state.humor.barriga = 0;
   engine.state.humor.holdUntil = 0;
   engine.state.humor.at = engine.now();
-  const trash = fogueira.take(3);
-  assert.deepEqual([trash.ok, trash.burnt], [true, true]);
-  assert.equal(Math.round(engine.mood().barriga), 0, 'queimada não enche a Barriga');
-  assert.ok(events(engine).some(event => event.kind === 'burnt'));
-  assert.equal(engine.state.minis.fogueira.burnt, 1);
+  const wood0 = engine.state.wood;
+  assert.equal(fogueira.eat(1).ok, true);
+  assert.equal(engine.state.wood - wood0, 4, 'a batata devolve lenha');
+  assert.equal(fogueira.eat(2).ok, true);
+  assert.equal(Math.round(engine.mood().amor), 8, 'o queijo coalho dá Amor');
+  assert.equal(fogueira.eat(3).ok, true);
+  assert.equal(Math.round(engine.mood().barriga), engine.cfg.moodMax);
+  assert.equal(engine.state.minis.fogueira.roasted, 4);
+  // Vazio de novo: dá para pôr outra comida.
+  assert.equal(fogueira.put(0, 'queijo').ok, true);
 });
 
 test('fogueira: pular a fogueira precisa de calor, rende Animação e Amor e espera', () => {
@@ -607,7 +619,7 @@ test('fogueira: o save guarda o fogo e os espetos e volta saneado', () => {
   messy.minis.fogueira.heat = 'quente';
   const clean = new GameEngine(data, messy, { rng: () => 0.5 });
   assert.equal(clean.mini('fogueira').info().sticks[1], null);
-  assert.equal(clean.mini('fogueira').info().sticks[0].burnt, true);
+  assert.deepEqual([clean.mini('fogueira').info().sticks[0].progress, clean.mini('fogueira').info().sticks[0].ready], [1, true], 'progresso de mais vira só "pronta"');
   assert.equal(clean.mini('fogueira').info().heat, 0);
 });
 
@@ -1679,7 +1691,8 @@ test('horta: cada planta colhida pela primeira vez deixa +10% de Animação para
   const base = engine.multiplier();
   assert.equal(engine.hortaBonus(), 0);
   // O bônus de 10 min da colheita passa antes de medir só o fixo.
-  const fixed = () => { clock.t += c.buffMinutes * 60000 + 1000; return engine.multiplier() / base; };
+  // (Colher seis vezes também libera o carrinho de legumes dos prêmios dos minigames: o bônus dele fica de fora da conta.)
+  const fixed = () => { clock.t += c.buffMinutes * 60000 + 1000; return engine.multiplier() / base / (1 + engine.premioBonus()); };
   const first = harvestCrop(engine, clock, 'milho');
   assert.deepEqual([first.first, first.permanent, first.total], [true, 10, 10]);
   assert.ok(Math.abs(fixed() - 1.1) < 1e-9, 'milho: ×1,1');
@@ -1885,4 +1898,688 @@ test('mata: o ano novo descarta eventos da batalha anterior e preserva a sequên
   assert.deepEqual(mata.events(0), [], 'a janela não repete os golpes do ano anterior ao reaparecer');
   engine.tick(0.1);
   assert.ok(mata.events(seen).some(event => event.kind === 'begin'), 'quem já viu a sequência antiga recebe a batalha nova');
+});
+
+// --- Visitas do folclore (src/mini-folclore.js): 20 eventos aleatórios, liberados pelas criaturas derrotadas na Mata ---------------------
+const mataIds = () => [...data.minis.mata.creatures, ...data.minis.mata.bosses].map(entry => entry.id);
+const defeat = (engine, ids) => { for (const id of ids) engine.state.minis.mata.kills[id] = (engine.state.minis.mata.kills[id] || 0) + 1; };
+// Motor com sorteio de verdade (semente fixa) e relógio manual; `pass(s)` anda s segundos de uma vez só.
+function newFolclore(seed = 7, level = 60) {
+  let state = seed;
+  const rng = () => { state = (state * 16807) % 2147483647; return state / 2147483647; };
+  const clock = { t: 1_000_000_000 };
+  const engine = new GameEngine(data, null, { rng, now: () => clock.t });
+  engine.state.size = level;
+  engine.state.records.size = level;
+  // (Os eventos do mundo, como a lua cheia, chamam visitas do folclore: aqui ficam de fora para medir só o relógio das visitas.)
+  engine.state.mundo.nextAt = 1e18;
+  return { engine, clock, pass: seconds => { clock.t += seconds * 1000; engine.tick(Math.min(1, seconds)); } };
+}
+const visits = engine => engine.drainEvents().filter(event => event.type === 'mini' && event.mini === 'folclore');
+
+test('folclore: são 20 visitas, uma por criatura da Mata mais o Desfile, com prêmio, tempo e movimento válidos', () => {
+  const c = data.minis.folclore;
+  assert.equal(c.events.length, 20);
+  assert.equal(new Set(c.events.map(entry => entry.id)).size, 20, 'ids únicos');
+  const creatures = c.events.map(entry => entry.creature).filter(Boolean);
+  assert.deepEqual([...creatures].sort(), mataIds().sort(), 'cada uma das 19 criaturas da Mata tem a sua visita');
+  assert.equal(c.events.filter(entry => !entry.creature).length, 1, 'e uma só, o Desfile, é de todas');
+  assert.equal(c.events.find(entry => !entry.creature).motion, 'desfile');
+  const motions = new Set(['voa', 'rasteja', 'rola', 'surge', 'salta', 'cruza', 'mastro', 'galopa', 'orbita', 'sobe', 'dança', 'desfile']);
+  const prizeKeys = new Set(['tickets', 'wood', 'cheer', 'love', 'belly', 'bellyFull', 'frenzy']);
+  require('../src/festa-folclore.js');
+  const { SOUNDS } = globalThis.ArraiaFestaFolclore;
+  const { SONS } = require('../src/som.js');
+  for (const entry of c.events) {
+    assert.ok(motions.has(entry.motion), `${entry.id}: movimento ${entry.motion}`);
+    assert.ok(entry.seconds >= 8 && entry.seconds <= 60, `${entry.id}: ${entry.seconds} s`);
+    const specs = entry.pick || [entry.reward];
+    assert.ok(specs.length >= 1 && specs.every(spec => Object.keys(spec).length && Object.entries(spec).every(([key, value]) => prizeKeys.has(key) && value > 0)), `${entry.id}: prêmio`);
+    assert.ok(entry.name && entry.text && /^[A-Z0-9 .,:!?+%-]+$/.test(entry.say), `${entry.id}: textos (o grito só usa as letras da fonte de pixel)`);
+    assert.ok(SONS.includes(SOUNDS[entry.id]), `${entry.id}: som de chegada ${SOUNDS[entry.id]}`);
+  }
+  assert.ok(c.every[0] >= 120 && c.every[1] > c.every[0], 'as visitas não chegam em cima uma da outra');
+});
+
+test('folclore: cada visita abre quando a criatura é derrotada pela primeira vez na Mata, e o Desfile só com todas', () => {
+  const { engine, pass } = newFolclore();
+  const folclore = engine.mini('folclore');
+  assert.equal(folclore.info().open, 0, 'sem criatura derrotada, nenhuma visita');
+  for (let i = 0; i < 1500; i++) pass(1);
+  assert.equal(folclore.info().active, null, 'e nada passa pela festa');
+  const order = data.minis.folclore.events.filter(entry => entry.creature);
+  order.forEach((entry, index) => {
+    defeat(engine, [entry.creature]);
+    pass(1);
+    const open = folclore.info().events.filter(item => item.open).map(item => item.id);
+    assert.equal(open.length, index + 1 + (index === order.length - 1 ? 1 : 0), `${entry.creature} abre ${entry.id}`);
+    assert.ok(open.includes(entry.id));
+  });
+  assert.equal(folclore.info().events.find(item => item.id === 'desfile').open, true, 'com as 19, o Desfile abre');
+  assert.equal(folclore.info().open, 20);
+  assert.equal(engine.state.minis.folclore.met['curupira'], true, 'e a lista fica guardada');
+});
+
+test('folclore: sorteia só entre as visitas abertas, espera entre uma e outra, não repete a anterior e some sozinha', () => {
+  const { engine, clock, pass } = newFolclore(11);
+  const folclore = engine.mini('folclore');
+  pass(1);
+  engine.drainEvents();
+  defeat(engine, ['fogo-fatuo', 'mao-de-cabelo', 'curupira']);
+  pass(1);
+  const unlocks = visits(engine).filter(event => event.kind === 'unlock').map(event => event.id).sort();
+  assert.deepEqual(unlocks, ['curupira', 'luzinha', 'mao'], 'avisa cada visita que abriu');
+  const started = [];
+  let ends = 0;
+  let lastEnd = clock.t;
+  const gaps = [];
+  for (let i = 0; i < 30000; i++) {
+    pass(1);
+    for (const event of visits(engine)) {
+      if (event.kind === 'start') { started.push(event.id); gaps.push(clock.t - lastEnd); }
+      if (event.kind === 'end') { ends++; lastEnd = clock.t; }
+    }
+    if (folclore.info().active) assert.ok(folclore.info().active.until - clock.t <= 30000, 'a visita dura segundos');
+  }
+  assert.ok(started.length >= 25, `visitas: ${started.length}`);
+  assert.deepEqual([...new Set(started)].sort(), ['curupira', 'luzinha', 'mao'], 'só as abertas aparecem, e todas aparecem');
+  for (let i = 1; i < started.length; i++) assert.notEqual(started[i], started[i - 1], 'não repete a anterior');
+  assert.ok(ends >= started.length - 1);
+  // Entre uma visita e a próxima passam de 5 a 10 minutos (o sorteio de `every`).
+  for (const gap of gaps.slice(1)) assert.ok(gap >= data.minis.folclore.every[0] * 1000 - 2000 && gap <= data.minis.folclore.every[1] * 1000 + 2000, `espera de ${gap} ms`);
+  assert.equal(engine.state.minis.folclore.seen[started[0]] >= 1, true);
+});
+
+test('folclore: o clique paga o prêmio uma vez só (a Cuca sorteia a poção, o Boi-Bumbá dá frenesi) e clique atrasado não vale', () => {
+  const { engine, clock } = newEngine(60);
+  const folclore = engine.mini('folclore');
+  assert.equal(folclore.act(), null, 'sem visita não tem prêmio');
+  assert.equal(folclore.start('mao').id, 'mao');
+  const tickets = engine.state.tickets;
+  const got = folclore.act();
+  assert.deepEqual(got, { id: 'mao', given: { tickets: 2 } });
+  assert.equal(engine.state.tickets, tickets + 2);
+  assert.equal(folclore.act(), null, 'a mesma visita não paga de novo');
+  assert.equal(engine.state.minis.folclore.caught.mao, 1);
+  assert.ok(engine.state.minis.folclore.active.done, 'ela fica indo embora');
+  assert.ok(engine.state.minis.folclore.active.until - clock.t <= data.minis.folclore.exit);
+  assert.ok(visits(engine).some(event => event.kind === 'catch' && event.id === 'mao'));
+  // A Cuca sorteia entre as poções (com o sorteio no meio: lenha).
+  clock.t += 5000;
+  engine.tick(0.1);
+  folclore.start('cuca');
+  const wood = engine.state.wood;
+  assert.deepEqual(folclore.act().given, { wood: 8 });
+  assert.equal(engine.state.wood, wood + 8);
+  // O Boi-Bumbá liga o frenesi (a festa rende mais por uns segundos) e dá Animação.
+  clock.t += 5000;
+  engine.tick(0.1);
+  folclore.start('bumba');
+  const cheer = engine.state.cheer;
+  const result = folclore.act();
+  assert.equal(result.given.frenzy, 12);
+  assert.ok(result.given.cheer > 0 && engine.state.cheer > cheer);
+  assert.ok(engine.runtimeActive('frenzy'), 'o frenesi ligou');
+  // Tarde demais: a visita já foi embora.
+  clock.t += 5000;
+  engine.tick(0.1);
+  folclore.start('luzinha');
+  clock.t += (data.minis.folclore.events[0].seconds + 1) * 1000;
+  assert.equal(folclore.act(), null);
+  engine.tick(0.1);
+  assert.equal(engine.state.minis.folclore.active, null);
+  // A visita da Animação paga em segundos da festa (cps × segundos).
+  clock.t += 5000;
+  folclore.start('luzinha');
+  const before = engine.state.cheer;
+  const gain = folclore.act().given.cheer;
+  assert.ok(Math.abs(engine.state.cheer - before - gain) < 1e-6 && gain >= 20);
+});
+
+test('folclore: o Desfile chama as criaturas que já foram derrotadas (de 2 a 8) e paga o prêmio maior', () => {
+  const { engine } = newEngine(60);
+  const folclore = engine.mini('folclore');
+  defeat(engine, mataIds());
+  const active = folclore.start('desfile');
+  assert.equal(active.cast.length, 8, 'no máximo 8 no desfile');
+  assert.ok(active.cast.every(id => mataIds().includes(id)) && new Set(active.cast).size === 8);
+  const prize = data.minis.folclore.events.find(entry => entry.id === 'desfile').reward;
+  assert.ok(prize.tickets >= 4 && prize.frenzy > 0 && prize.cheer > 0, 'o prêmio do desfile é o maior');
+  assert.equal(folclore.act().given.tickets, prize.tickets);
+  const few = newEngine(60);
+  defeat(few.engine, ['fogo-fatuo', 'curupira', 'cuca']);
+  assert.deepEqual(few.engine.mini('folclore').start('desfile').cast.slice().sort(), ['cuca', 'curupira', 'fogo-fatuo']);
+});
+
+test('folclore: o save guarda a coleção, limpa lixo, não guarda a visita do momento e o ano novo não perde as abertas', () => {
+  const { engine, clock, pass } = newFolclore(5, 120);
+  const folclore = engine.mini('folclore');
+  defeat(engine, ['cuca', 'boto', 'iara']);
+  pass(1);
+  folclore.start('cuca');
+  folclore.act();
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+  assert.deepEqual(back.state.minis.folclore.met, { cuca: true, boto: true, iara: true });
+  assert.equal(back.state.minis.folclore.active, null, 'a visita do momento não volta');
+  assert.equal(back.state.minis.folclore.caught.cuca, 1);
+  assert.equal(back.mini('folclore').info().open, 3);
+  // Lixo no save: criatura que não existe, números absurdos, texto onde devia ter número, visita desconhecida.
+  const messy = JSON.parse(JSON.stringify(saved));
+  messy.minis.folclore = { met: { curupira: true, fantasma: true, cuca: 'sim' }, seen: { cuia: 5, mao: -3, boi: 'x', fantasma: 9 },
+    caught: { cuia: 99, mao: 4 }, last: 'fantasma', active: { id: 'mao', until: 9e15 }, nextAt: 'logo' };
+  const clean = new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.t }).state.minis.folclore;
+  assert.deepEqual(clean.met, { curupira: true });
+  assert.deepEqual(clean.seen, { cuia: 5 });
+  assert.deepEqual(clean.caught, { cuia: 5 }, 'não se pega mais do que veio');
+  assert.deepEqual([clean.last, clean.active, clean.nextAt], ['', null, 0]);
+  assert.equal(new GameEngine(data, { ...saved, minis: { ...saved.minis, folclore: 'nada' } }, { rng: () => 0.5, now: () => clock.t }).state.minis.folclore.met.cuca, undefined);
+  // O São João seguinte: a Mata recomeça, mas as visitas que já abriram (e as contas) ficam.
+  engine.state.size = engine.state.records.size = 200;
+  while (!engine.canNewYear()) engine.addFame(engine.fameNeed() - engine.state.fame);
+  assert.equal(engine.newYear(), true);
+  assert.deepEqual(engine.state.minis.mata.kills, {}, 'a Mata começou do zero');
+  assert.equal(engine.mini('folclore').info().open, 3, 'as três visitas continuam abertas');
+  assert.equal(engine.state.minis.folclore.caught.cuca, 1);
+  assert.equal(engine.state.minis.folclore.active, null);
+});
+
+test('folclore: carregar um jogo com criaturas já derrotadas não repete os avisos; o relógio que pulou adia a próxima visita; avançar o tempo anda junto', () => {
+  const first = newFolclore(3);
+  defeat(first.engine, ['fogo-fatuo', 'mao-de-cabelo']);
+  const saved = first.engine.exportState();
+  const clock = first.clock;
+  const engine = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+  engine.tick(0.5);
+  assert.deepEqual(visits(engine).filter(event => event.kind === 'unlock'), [], 'o que já estava aberto não avisa de novo');
+  defeat(engine, ['curupira']);
+  engine.tick(0.5);
+  assert.deepEqual(visits(engine).filter(event => event.kind === 'unlock').map(event => event.id), ['curupira']);
+  // Computador dormiu: a visita que venceu espera um pouco em vez de chegar na hora.
+  const m = engine.state.minis.folclore;
+  assert.ok(m.nextAt > clock.t);
+  const due = m.nextAt;
+  clock.t = due + 3_600_000;
+  engine.tick(0.5);
+  assert.equal(m.active, null, 'depois do cochilo a visita não aparece de cara');
+  assert.ok(m.nextAt - clock.t >= data.minis.folclore.wake[0] * 1000 - 1 && m.nextAt - clock.t <= data.minis.folclore.wake[1] * 1000 + 1);
+  // Modo de teste (advance): tudo que o relógio guarda anda para trás junto.
+  engine.mini('folclore').start('luzinha');
+  const born = m.active.born;
+  engine.advance(10);
+  assert.equal(m.active.born, born - 10000, 'a visita do momento envelhece junto');
+  m.nextAt = clock.t + 100000;
+  engine.mini('folclore').shift(1000);
+  assert.equal(m.nextAt, clock.t + 99000, 'o relógio da próxima visita também anda');
+});
+
+test('modo de teste: o botão chama as 20 visitas, uma de cada vez, na ordem', () => {
+  const { engine, clock } = newEngine(60);
+  const names = [];
+  for (let i = 0; i < 21; i++) {
+    clock.t += 1000;
+    const result = engine.debug('folclore');
+    names.push(result.note || result);
+    assert.ok(engine.state.minis.folclore.active, 'a visita começou');
+  }
+  const events = data.minis.folclore.events;
+  assert.equal(engine.state.minis.folclore.active.id, events[0].id, 'depois da vigésima volta para a primeira');
+  assert.ok(String(names[0]).includes(events[0].name) && String(names[19]).includes(events[19].name));
+  assert.equal(Object.keys(engine.state.minis.folclore.seen).length, 20);
+});
+
+// --- Horta 2.0: vizinhas amigas, sorte, combo, ações em lote, chuva, borboleta e encomendas -------------------------------------------------------
+// Planta `id` no canteiro `slot` e deixa no ponto agora (sem passar o tempo da colheita seguinte).
+function ripe(engine, clock, slot, id, luck = null) {
+  const horta = engine.mini('horta');
+  assert.equal(horta.plant(slot, id).ok, true, `planta ${id}`);
+  const plot = engine.state.minis.horta.plots[slot];
+  if (luck) plot.luck = luck;
+  plot.readyAt = clock.t;
+  return plot;
+}
+const orderless = engine => { engine.state.minis.horta.orders = []; engine.state.minis.horta.orderAt = engine.now() + 1e9; };
+
+test('horta: vizinhas amigas lado a lado rendem prêmio a mais (+25% cada, até +50%), só as de cima, de baixo, da esquerda e da direita', () => {
+  const { engine, clock } = newEngine(90);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  const likes = (a, b) => a !== b && c.friends.some(pair => pair.includes(a) && pair.includes(b));
+  assert.ok(likes('milho', 'abobora') && likes('mandioca', 'batata-doce') && !likes('milho', 'mandioca'));
+  // Cada planta tem exatamente duas amigas.
+  for (const item of c.crops) assert.equal(c.crops.filter(other => likes(item.id, other.id)).length, 2, item.id);
+  // Sozinha: sem bônus. Ao lado de uma amiga: +25% (a Animação da mandioca é contínua, então dá para medir).
+  const cheerOf = got => got.reward.cheer / (c.crops.find(item => item.id === got.crop.id).reward.cheer);
+  ripe(engine, clock, 6, 'mandioca');
+  const cps = engine.cheerPerSecond();
+  const alone = horta.harvest(6);
+  assert.deepEqual([alone.friends, alone.mult], [0, 1]);
+  assert.ok(Math.abs(cheerOf(alone) - cps) < 1e-6);
+  clock.t += 5000;
+  ripe(engine, clock, 6, 'mandioca');
+  ripe(engine, clock, 7, 'batata-doce');
+  const cps2 = engine.cheerPerSecond();
+  const withFriend = horta.harvest(6);
+  assert.equal(withFriend.friends, 1);
+  assert.ok(Math.abs(withFriend.mult - 1.25) < 1e-9);
+  assert.ok(Math.abs(cheerOf(withFriend) - cps2 * 1.25) < 1e-6, 'a Animação vem 25% maior');
+  horta.harvest(7);
+  // Planta que não é amiga e a diagonal não contam.
+  clock.t += 5000;
+  ripe(engine, clock, 6, 'mandioca');
+  ripe(engine, clock, 5, 'milho');
+  ripe(engine, clock, 0, 'batata-doce');
+  ripe(engine, clock, 2, 'abobora');
+  assert.equal(horta.info().plots[6].friends, 0, 'milho ao lado e as amigas só na diagonal');
+  horta.harvestAll();
+  // Com as três vizinhas possíveis amigas (esquerda, direita e embaixo) passa do teto de +50%.
+  clock.t += 5000;
+  ripe(engine, clock, 1, 'mandioca');
+  ripe(engine, clock, 0, 'batata-doce');
+  ripe(engine, clock, 2, 'abobora');
+  ripe(engine, clock, 6, 'batata-doce');
+  const full = horta.harvest(1);
+  assert.equal(full.friends, 3);
+  assert.ok(Math.abs(full.mult - 1.5) < 1e-9, 'o teto de +50%');
+  horta.harvestAll();
+  // O fim de uma fileira não é vizinho do começo da próxima (4 e 5).
+  clock.t += 5000;
+  ripe(engine, clock, 4, 'milho');
+  ripe(engine, clock, 5, 'abobora');
+  assert.deepEqual([horta.info().plots[4].friends, horta.info().plots[5].friends], [0, 0]);
+  horta.harvestAll();
+  // O número de amigas aparece na informação do canteiro.
+  clock.t += 5000;
+  ripe(engine, clock, 8, 'milho');
+  ripe(engine, clock, 9, 'abobora');
+  ripe(engine, clock, 3, 'amendoim');
+  assert.equal(horta.info().plots[8].friends, 2, 'o milho do 8 tem o amendoim (em cima) e a abóbora (do lado)');
+  assert.equal(horta.info().plots[3].friends, 1, 'e o amendoim do 3 tem o milho embaixo');
+});
+
+test('horta: a sorte sai ao plantar (em dobro ×2 ou dourada ×3 com fichas), o save guarda e não aceita lixo', () => {
+  const { engine, clock } = newEngine(90);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  const luckyAt = (roll, slot) => { engine.rng = () => roll; return horta.plant(slot, 'mandioca'); };
+  assert.equal(luckyAt(0.5, 0).luck, null);
+  assert.equal(luckyAt(c.luck.golden / 2, 1).luck, 'dourada');
+  assert.equal(luckyAt(c.luck.golden + c.luck.double / 2, 2).luck, 'dobro');
+  assert.equal(luckyAt(c.luck.golden + c.luck.double + 0.01, 3).luck, null);
+  assert.deepEqual(horta.info().plots.slice(0, 4).map(plot => plot.luck), [null, 'dourada', 'dobro', null]);
+  engine.rng = () => 0.5;
+  // O prêmio: dobro ×2; dourada ×3 e mais fichas.
+  for (const plot of engine.state.minis.horta.plots.slice(0, 4)) plot.readyAt = clock.t;
+  const normal = horta.harvest(0);
+  const double = horta.harvest(2);
+  const golden = horta.harvest(1);
+  assert.ok(normal.reward.cheer > 0 && double.reward.cheer > normal.reward.cheer);
+  assert.equal(double.luck, 'dobro');
+  assert.equal(golden.luck, 'dourada');
+  assert.ok(Math.abs(double.mult - c.doubleMult * (1 + c.combo.step)) < 1e-9, 'em dobro: ×2 (e o combo da segunda colheita seguida)');
+  assert.ok(Math.abs(golden.mult - c.goldenMult * (1 + 2 * c.combo.step)) < 1e-9);
+  assert.ok(golden.reward.tickets >= c.goldenTickets, 'a dourada dá fichas');
+  // O save guarda a sorte; lixo vira nada.
+  clock.t += 5000;
+  horta.plant(0, 'milho');
+  engine.state.minis.horta.plots[0].luck = 'dobro';
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+  assert.equal(back.state.minis.horta.plots[0].luck, 'dobro');
+  for (const lixo of ['ouro', 3, {}, null, 'DOBRO']) {
+    const messy = JSON.parse(JSON.stringify(saved));
+    messy.minis.horta.plots[0].luck = lixo;
+    assert.equal(new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.t }).state.minis.horta.plots[0].luck, null, `luck ${JSON.stringify(lixo)}`);
+  }
+});
+
+test('horta: colheitas seguidas viram combo (+10% cada, até 5 seguidas) e o combo acaba depois de 3 s sem colher', () => {
+  const { engine, clock } = newEngine(90);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  assert.equal(horta.info().combo.n, 0);
+  const cheerOf = slot => { ripe(engine, clock, slot, 'mandioca'); return horta.harvest(slot); };
+  const first = cheerOf(0);
+  assert.deepEqual([first.combo, first.mult], [1, 1]);
+  clock.t += 2000;
+  const second = cheerOf(1);
+  assert.equal(second.combo, 2, 'a colheita de 2 s depois soma ao combo');
+  assert.ok(Math.abs(second.mult - 1.1) < 1e-9);
+  assert.equal(horta.info().combo.n, 2);
+  assert.ok(horta.info().combo.left > 0 && horta.info().combo.left <= c.combo.window);
+  clock.t += (c.combo.window + 0.5) * 1000;
+  assert.equal(horta.info().combo.n, 0, 'passou da janela: o combo acabou');
+  assert.equal(cheerOf(2).combo, 1, 'recomeça do 1');
+  // O teto: seis seguidas param em 5 (+40%).
+  const results = [];
+  for (let i = 0; i < 6; i++) { clock.t += 400; results.push(cheerOf(3 + i).combo); }
+  assert.deepEqual(results, [2, 3, 4, 5, 5, 5], 'o combo sobe até o teto e fica');
+});
+
+test('horta: colher tudo, plantar tudo e regar tudo (a regadora esvazia e a mais atrasada vem primeiro)', () => {
+  const { engine, clock } = newEngine(90);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  assert.equal(horta.harvestAll().ok, false, 'sem nada pronto não colhe');
+  assert.equal(horta.waterAll().ok, false, 'sem nada para regar');
+  // Plantar tudo: a semente escolhida em todos os canteiros abertos e livres.
+  horta.select('milho');
+  horta.plant(2, 'abobora');
+  const planted = horta.plantAll();
+  assert.equal(planted.ok, true);
+  assert.deepEqual(planted.planted, [0, 1, 3, 4, 5, 6, 7, 8, 9]);
+  assert.equal(horta.plantAll().ok, false, 'sem canteiro livre');
+  assert.equal(horta.info().plots[2].crop, 'abobora', 'não mexe no que já estava plantado');
+  assert.equal(horta.info().empty, 0);
+  assert.equal(horta.info().thirsty, 10);
+  // Regar tudo: gasta a regadora (5) e cada planta aceita 2 regas, então 5 regas na mais atrasada e nas seguintes.
+  const slowest = engine.state.minis.horta.plots[2].readyAt;
+  const wet = horta.waterAll();
+  assert.equal(wet.ok, true);
+  assert.equal(wet.wet.length, 5);
+  assert.equal(wet.empty, true);
+  assert.equal(wet.wet[0], 2, 'a abóbora (a mais demorada) é a primeira');
+  assert.ok(engine.state.minis.horta.plots[2].readyAt < slowest);
+  assert.equal(horta.info().water, 0);
+  assert.equal(horta.waterAll().ok, false);
+  // Colher tudo: tudo o que está no ponto de uma vez, na ordem, com o combo subindo.
+  for (const plot of engine.state.minis.horta.plots.slice(0, 10)) plot.readyAt = clock.t;
+  const harvested = horta.harvestAll();
+  assert.equal(harvested.ok, true);
+  assert.equal(harvested.results.length, 10);
+  assert.deepEqual(harvested.results.map(got => got.index), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  assert.deepEqual(harvested.results.slice(0, 6).map(got => got.combo), [1, 2, 3, 4, 5, 5]);
+  assert.equal(horta.info().ready, 0);
+  assert.equal(engine.state.minis.horta.harvests, 10);
+  assert.ok(c.combo.max === 5);
+});
+
+test('horta: chuva na festa faz a horta crescer mais depressa e enche a regadora (e a chuva que passa volta ao normal)', () => {
+  const { engine, clock, pass } = newEngine(30);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  engine.state.minis.horta.crowAt = clock.t + 1e9;
+  engine.state.minis.horta.butterflyAt = clock.t + 1e9;
+  horta.plant(0, 'amendoim');
+  const remaining = () => horta.info().plots[0].remaining;
+  assert.equal(horta.info().raining, false);
+  const before = remaining();
+  pass(20);
+  assert.ok(Math.abs(before - remaining() - 20) < 1.5, 'sem chuva, passa 1 s por segundo');
+  engine.state.weather.rain = { born: clock.t, until: clock.t + 60_000 };
+  assert.equal(horta.info().raining, true);
+  engine.state.minis.horta.water = 0;
+  engine.state.minis.horta.waterAt = clock.t + 1e9;      // só a chuva enche a regadora neste teste
+  const mid = remaining();
+  for (let i = 0; i < 20; i++) pass(1);
+  assert.ok(Math.abs(mid - remaining() - 20 * (1 + c.rainBoost)) < 2.5, 'na chuva, 2 s por segundo');
+  assert.equal(horta.info().water, Math.floor(20 / c.rainWater), 'a regadora enche a cada 5 s de chuva');
+  // A chuva acaba: volta ao ritmo normal.
+  clock.t = engine.state.weather.rain.until + 1000;
+  engine.tick(1);
+  assert.equal(horta.info().raining, false);
+  const after = remaining();
+  pass(10);
+  assert.ok(Math.abs(after - remaining() - 10) < 1.5);
+  // A chuva também termina a espera: a planta no ponto não passa de pronta.
+  engine.state.weather.rain = { born: clock.t, until: clock.t + 1e9 };
+  for (let i = 0; i < 400; i++) pass(1);
+  assert.equal(horta.info().plots[0].ready, true);
+});
+
+test('horta: a borboleta da sorte só vem com planta crescendo, adianta a mais atrasada, some sozinha e o save não a guarda', () => {
+  const { engine, clock, pass } = newEngine(30);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  engine.state.minis.horta.crowAt = clock.t + 1e9;
+  pass(1);
+  assert.ok(engine.state.minis.horta.butterflyAt > clock.t, 'a próxima borboleta está sorteada');
+  clock.t = engine.state.minis.horta.butterflyAt + 1;
+  pass(1);
+  assert.equal(horta.info().butterfly, null, 'sem planta crescendo ela não vem');
+  assert.ok(engine.state.minis.horta.butterflyAt > clock.t, 'e fica para depois');
+  horta.plant(0, 'milho');
+  horta.plant(1, 'abobora');
+  events(engine);
+  clock.t = engine.state.minis.horta.butterflyAt + 1;
+  pass(1);
+  const butterfly = horta.info().butterfly;
+  assert.ok(butterfly && butterfly.left > c.butterfly.seconds - 2 && butterfly.left <= c.butterfly.seconds);
+  assert.ok(events(engine).some(event => event.kind === 'butterfly'));
+  // O save não guarda a visita (e a borboleta é uma de cada vez).
+  assert.equal(new GameEngine(data, engine.exportState(), { rng: () => 0.5, now: () => clock.t }).mini('horta').info().butterfly, null);
+  // Pegar: adianta a planta mais atrasada (a abóbora), dá Amor e a próxima vem depois.
+  const slow = horta.info().plots[1].remaining;
+  const fast = horta.info().plots[0].remaining;
+  const love = engine.mood().amor;
+  engine.state.humor.amor = 0;
+  engine.state.humor.at = clock.t;
+  const got = horta.catchButterfly();
+  assert.equal(got.ok, true);
+  assert.equal(got.index, 1);
+  assert.ok(Math.abs(horta.info().plots[1].remaining - slow * (1 - c.butterfly.skip)) < 1);
+  assert.ok(Math.abs(horta.info().plots[0].remaining - fast) < 1, 'só a mais atrasada');
+  assert.ok(engine.mood().amor > 0 && love >= 0, 'rende Amor');
+  assert.equal(horta.info().butterfly, null);
+  assert.equal(horta.catchButterfly().reason, 'none');
+  assert.equal(engine.state.minis.horta.caught, 1);
+  // Sem ser pega, ela vai embora no prazo.
+  clock.t = engine.state.minis.horta.butterflyAt + 1;
+  pass(1);
+  assert.ok(horta.info().butterfly);
+  clock.t += (c.butterfly.seconds + 1) * 1000;
+  pass(1);
+  assert.equal(horta.info().butterfly, null);
+  assert.ok(events(engine).some(event => event.kind === 'butterfly-gone'));
+  assert.equal(engine.state.minis.horta.caught, 1);
+});
+
+test('horta: a feira faz duas encomendas por vez, cada colheita conta, o prêmio vem ao completar e a próxima chega depois', () => {
+  const { engine, clock, pass } = newEngine(90);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  engine.state.minis.horta.crowAt = clock.t + 1e9;
+  engine.state.minis.horta.butterflyAt = clock.t + 1e9;
+  pass(1);
+  const orders = horta.info().orders;
+  assert.equal(orders.length, 2, 'duas encomendas logo de saída');
+  assert.notEqual(orders[0].crop, orders[1].crop, 'de plantas diferentes');
+  for (const order of orders) {
+    const item = c.crops.find(entry => entry.id === order.crop);
+    assert.ok(order.n >= item.order.n[0] && order.n <= item.order.n[1] && order.have === 0, JSON.stringify(order));
+    assert.deepEqual([order.tickets, order.cheer], [c.orders.tickets + (order.n >= c.orders.bigAt ? c.orders.bigTickets : 0), item.order.cheer * order.n]);
+  }
+  // Colher a planta pedida conta; uma planta que ninguém pediu não conta.
+  const wanted = orders[0].crop;
+  const other = c.crops.find(item => !orders.some(order => order.crop === item.id)).id;
+  ripe(engine, clock, 0, other);
+  assert.deepEqual(horta.harvest(0).orders, []);
+  assert.equal(horta.info().orders[0].have, 0);
+  const tickets = engine.state.tickets;
+  let done = [];
+  for (let i = 0; i < orders[0].n && !done.length; i++) {
+    clock.t += 4000;
+    ripe(engine, clock, 1, wanted);
+    done = horta.harvest(1).orders;
+    if (!done.length) assert.equal(horta.info().orders.find(order => order.crop === wanted).have, i + 1);
+  }
+  assert.equal(done.length, 1, 'a última colheita completa o pedido');
+  assert.equal(done[0].crop, wanted);
+  assert.ok(engine.state.tickets >= tickets + orders[0].tickets, 'as fichas da encomenda');
+  assert.equal(engine.state.minis.horta.delivered, 1);
+  assert.equal(horta.info().orders.length, 1, 'o pedido entregue sai do quadro');
+  assert.ok(events(engine).some(event => event.kind === 'order-done' && event.crop === wanted));
+  // O próximo pedido chega de 30 a 70 s depois.
+  pass(c.orders.wait[0] - 5);
+  assert.equal(horta.info().orders.length, 1);
+  for (let i = 0; i < 80; i++) pass(1);
+  assert.equal(horta.info().orders.length, 2);
+  // Planta em dobro ou dourada conta duas unidades.
+  const last = horta.info().orders[0];
+  engine.state.minis.horta.orders = [{ crop: last.crop, n: Math.max(2, last.n), have: 0 }];
+  clock.t += 4000;
+  ripe(engine, clock, 2, last.crop, 'dobro');
+  horta.harvest(2);
+  assert.equal(horta.info().orders.find(order => order.crop === last.crop).have, 2, 'em dobro vale duas unidades');
+});
+
+test('horta: o save guarda as encomendas, as contas e a borboleta futura, e limpa lixo', () => {
+  const { engine, clock, pass } = newEngine(90);
+  const horta = engine.mini('horta');
+  pass(1);
+  const orders = horta.info().orders.map(order => ({ crop: order.crop, n: order.n, have: order.have }));
+  engine.state.minis.horta.delivered = 7;
+  engine.state.minis.horta.caught = 3;
+  engine.state.minis.horta.harvests = 40;
+  const saved = engine.exportState();
+  const back = new GameEngine(data, saved, { rng: () => 0.5, now: () => clock.t });
+  assert.deepEqual(back.mini('horta').info().orders.map(order => ({ crop: order.crop, n: order.n, have: order.have })), orders);
+  assert.deepEqual([back.state.minis.horta.delivered, back.state.minis.horta.caught, back.state.minis.horta.harvests], [7, 3, 40]);
+  const messy = JSON.parse(JSON.stringify(saved));
+  messy.minis.horta.orders = [{ crop: 'fantasma', n: 3, have: 0 }, { crop: 'milho', n: 99, have: 50 }, { crop: 'milho', n: 3, have: 0 }, 'x', null,
+    { crop: 'abobora', n: 'dois', have: -4 }, { crop: 'mandioca', n: 2, have: 0 }];
+  messy.minis.horta.delivered = 'muitas';
+  messy.minis.horta.orderAt = 1e18;
+  const clean = new GameEngine(data, messy, { rng: () => 0.5, now: () => clock.t });
+  const list = clean.mini('horta').info().orders;
+  assert.ok(list.length <= data.minis.horta.orders.slots);
+  assert.deepEqual([...new Set(list.map(order => order.crop))].length, list.length, 'sem planta repetida');
+  for (const order of list) {
+    const item = data.minis.horta.crops.find(entry => entry.id === order.crop);
+    assert.ok(item && order.n >= item.order.n[0] && order.n <= item.order.n[1] && order.have >= 0 && order.have < order.n, JSON.stringify(order));
+  }
+  assert.equal(clean.state.minis.horta.delivered, 0);
+  assert.ok(clean.state.minis.horta.orderAt <= clock.t + data.minis.horta.orders.wait[1] * 1000, 'o prazo não vira eternidade');
+});
+
+test('horta: todos os números do texto de ajuda existem (os de data.minis.horta e os que o modelo calcula)', () => {
+  const { engine } = newEngine(30);
+  const numbers = Object.fromEntries(Object.entries(data.minis.horta).filter(([, value]) => typeof value === 'number'));
+  const vars = { ...numbers, ...engine.mini('horta').helpVars() };
+  const I18N = require('../src/i18n.js');
+  for (const lang of Object.keys(I18N.dictionaries())) {
+    const text = I18N.dictionaries()[lang].ui['mini.help.horta'];
+    for (const name of new Set(text.match(/\{\w+\}/g))) assert.ok(name.slice(1, -1) in vars, `${lang}: ${name} não existe`);
+  }
+  assert.equal(vars.friendPct, 25);
+  assert.equal(vars.comboMax, 5);
+});
+
+test('horta: uma planta por dia fica em alta (muda com a data) e rende +50% na colheita; o arco-íris da festa chama a borboleta dourada', () => {
+  const { engine, clock, pass } = newEngine(90);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  engine.state.minis.horta.crowAt = clock.t + 1e9;
+  engine.state.minis.horta.butterflyAt = clock.t + 1e9;
+  const todayOn = date => { clock.t = new Date(date).getTime(); return horta.info().today; };
+  // Cada dia uma planta (as cinco passam por todos os dias de uma semana, sem repetir em dias seguidos), e a mesma o dia inteiro.
+  const week = [10, 11, 12, 13, 14, 15, 16].map(day => todayOn(`2026-03-${day}T12:00:00`));
+  const seen = new Set(week);
+  assert.ok(week.every(id => c.crops.some(item => item.id === id)));
+  for (let i = 1; i < week.length; i++) assert.notEqual(week[i], week[i - 1], 'dias seguidos, plantas diferentes');
+  assert.equal(seen.size, 5, 'em cinco dias passam as cinco plantas');
+  assert.equal(todayOn('2026-03-12T00:05:00'), todayOn('2026-03-12T23:55:00'), 'a mesma o dia inteiro');
+  // O prêmio da planta em alta vale `daily.bonus` a mais.
+  const previous = c.daily.bonus;
+  c.daily.bonus = 0.5;
+  try {
+    clock.t = new Date('2026-03-12T12:00:00').getTime();
+    const hot = horta.info().today;
+    const cold = c.crops.find(item => item.id !== hot && item.reward.cheer).id;
+    ripe(engine, clock, 0, hot === 'milho' ? 'mandioca' : hot);
+    const cps = engine.cheerPerSecond();
+    const got = horta.harvest(0);
+    assert.equal(got.today, hot === 'milho' ? false : true);
+    clock.t += 5000;
+    ripe(engine, clock, 1, cold);
+    const other = horta.harvest(1);
+    assert.equal(other.today, false);
+    assert.ok(Math.abs(other.mult - 1) < 1e-9, 'sem ser a planta em alta: sem bônus');
+    if (got.today) assert.ok(Math.abs(got.mult - 1.5) < 1e-9, 'em alta: +50%');
+    assert.ok(horta.helpVars().dailyPct === 50);
+  } finally {
+    c.daily.bonus = previous;
+  }
+  // O arco-íris chama a borboleta (uma vez por arco-íris); sem planta crescendo ela não vem.
+  clock.t = new Date('2026-03-12T12:00:00').getTime();
+  horta.plant(2, 'abobora');
+  engine.state.minis.horta.butterflyAt = clock.t + 1e9;
+  pass(1);
+  assert.equal(horta.info().rainbow, false);
+  engine.state.weather.rainbow = { born: clock.t, until: clock.t + 45000 };
+  assert.equal(horta.info().rainbow, true);
+  pass(1);
+  assert.ok(engine.state.minis.horta.butterflyAt - clock.t <= 1600, 'o arco-íris adianta a borboleta');
+  pass(2);
+  assert.ok(horta.info().butterfly, 'e ela vem');
+  horta.catchButterfly();
+  engine.state.minis.horta.butterflyAt = clock.t + 1e9;
+  pass(2);
+  assert.ok(engine.state.minis.horta.butterflyAt > clock.t + 1e6, 'o mesmo arco-íris não chama outra');
+});
+
+test('horta: as fichas do prêmio não crescem com as amigas, o combo nem a planta em alta; só a sorte as multiplica', () => {
+  const { engine, clock } = newEngine(90);
+  const horta = engine.mini('horta');
+  const c = data.minis.horta;
+  orderless(engine);
+  engine.state.minis.horta.harvested.milho = 5;           // sem o bônus da primeira colheita
+  const previous = c.daily.bonus;
+  c.daily.bonus = 0.5;
+  try {
+    clock.t = new Date('2026-03-12T12:00:00').getTime();   // a planta em alta é uma só: o teste usa as amigas e o combo
+    ripe(engine, clock, 6, 'milho');
+    ripe(engine, clock, 5, 'amendoim');
+    ripe(engine, clock, 7, 'abobora');
+    const tickets = engine.state.tickets;
+    const got = horta.harvest(6);
+    assert.equal(got.friends, 2);
+    assert.ok(got.mult >= 1.5 - 1e-9, `o prêmio todo vale ${got.mult}`);
+    assert.equal(got.reward.tickets, 1, 'mas a ficha do milho continua uma');
+    assert.equal(engine.state.tickets, tickets + 1);
+    assert.ok(got.reward.belly > c.crops[0].reward.belly, 'a Barriga cresce com a vizinhança');
+    // A sorte multiplica as fichas.
+    clock.t += 5000;
+    ripe(engine, clock, 6, 'milho', 'dobro');
+    assert.equal(horta.harvest(6).reward.tickets, 2, 'em dobro: 2 fichas');
+  } finally {
+    c.daily.bonus = previous;
+  }
+});
+
+test('horta: o temporal e o granizo (eventos do mundo) molham a horta como a chuva, e os outros eventos não', () => {
+  for (const [id, wet] of [['temporal', true], ['granizo', true], ['estrelas', false], ['ventania', false], ['calorao', false]]) {
+    const { engine, clock, pass } = newEngine(60);
+    const horta = engine.mini('horta');
+    const c = data.minis.horta;
+    orderless(engine);
+    engine.state.minis.horta.crowAt = clock.t + 1e9;
+    engine.state.minis.horta.butterflyAt = clock.t + 1e9;
+    engine.state.mundo.nextAt = 1e18;
+    horta.plant(0, 'amendoim');
+    engine.state.minis.horta.water = 0;
+    engine.state.minis.horta.waterAt = clock.t + 1e9;
+    engine.mundo.start(id);
+    assert.equal(horta.info().raining, wet, `${id}: chovendo na horta`);
+    const before = horta.info().plots[0].remaining;
+    for (let i = 0; i < 20; i++) pass(1);
+    const grown = before - horta.info().plots[0].remaining;
+    if (wet) {
+      assert.ok(Math.abs(grown - 20 * (1 + c.rainBoost)) < 2.5, `${id}: cresce mais depressa (${grown})`);
+      assert.equal(horta.info().water, Math.floor(20 / c.rainWater), `${id}: enche a regadora`);
+    } else {
+      assert.ok(Math.abs(grown - 20) < 1.5, `${id}: ritmo normal (${grown})`);
+    }
+    // O evento acaba: volta ao normal.
+    clock.t = engine.state.mundo.active.until + 1000;
+    engine.tick(1);
+    assert.equal(horta.info().raining, false, `${id}: acabou`);
+  }
 });

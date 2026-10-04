@@ -1,24 +1,33 @@
-// Fogueira de Perto: clique na lenha para pôr no fogo, num pacote da faixa de baixo para escolher a comida, num espeto livre para
-// pôr a comida, no espeto com comida para virar (cedo) ou tirar (no ponto), e no fogo para pular a fogueira. O motor está em
-// src/mini-fogueira.js; o fogo é o mesmo sprite da festa.
+// Fogueira de Perto: clique na lenha para pôr no fogo, num pacote da faixa de baixo para escolher a comida, num espeto livre para pôr a comida, na comida
+// pronta (ela espera, nunca queima) para comer, e no fogo para pular a fogueira. O motor está em src/mini-fogueira.js; o fogo é o mesmo sprite da festa.
 (function (root) {
   'use strict';
 
   const Base = root.ArraiaJanelaBase;
-  const W = 176;
-  const H = 112;
   const compact = n => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
-  const STATE_INDEX = { cru: 0, dourando: 1, ponto: 2, passou: 2, queimado: 3 };
+  const STATE_INDEX = { cru: 0, dourando: 1, pronto: 2 };
+  const HOP_MS = 700;
+  const FLIGHT_MS = 520;
+  // Os vaga-lumes: cada um anda numa curva própria e pisca.
+  const FIREFLIES = [[34, 52, 0], [58, 66, 1.7], [88, 44, 3.1], [136, 50, 4.4], [170, 62, 2.3], [196, 48, 5.2], [120, 70, 0.9]];
 
   function create(canvas, bundle, hooks = {}) {
     const meta = bundle.janelas.fogueira;
-    const base = Base.create(canvas, bundle, { width: W, height: H, sound: hooks.sound, images: [meta.fundo.image, meta.comidas.image,
+    const W = meta.w;
+    const H = meta.h;
+    const base = Base.create(canvas, bundle, { width: W, height: H, sound: hooks.sound, images: [meta.fundo.image, meta.frente.image, meta.comidas.image,
       ...Object.values(bundle.fires).map(entry => entry.image), bundle.scenery.mandioquinha.image] });
     const tr = hooks.t || Base.tr;
     let engineRef = null;
     let jump = null;
     let smokeAt = 0;
+    const flights = [];                              // comidas voando do espeto até quem vai comer
+    const hops = meta.bancos.map(() => 0);           // quando cada espectador pulou (comeu) pela última vez
+    const steamAt = new Map();
     const nameOf = id => engineRef?.data.minis.fogueira.foods.find(entry => entry.id === id)?.name || id;
+    const benchOf = slot => (slot < 2 ? 0 : 1);
+    // Onde cada espectador fica (sentado no banco) e a boca dele, para onde a comida voa.
+    const seat = i => ({ x: meta.bancos[i][0] + 12, y: meta.bancos[i][1] + 2 });
 
     function fireLevel(heat, min) {
       if (heat < min) return -1;
@@ -35,6 +44,31 @@
       return lines;
     }
 
+    // Uma elipse de pixels (o brilho em volta da comida pronta).
+    function glow(cx, cy, rx, ry, color, alpha) {
+      base.g.globalAlpha = alpha;
+      base.g.fillStyle = color;
+      for (let dy = -ry; dy <= ry; dy++) {
+        const half = Math.round(rx * Math.sqrt(Math.max(0, 1 - (dy / ry) ** 2)));
+        base.g.fillRect(Math.round(cx) - half, Math.round(cy) + dy, half * 2 + 1, 1);
+      }
+      base.g.globalAlpha = 1;
+    }
+
+    function drawFireflies(now) {
+      for (const [x, y, phase] of FIREFLIES) {
+        const t = now / 1000;
+        const fx = x + Math.sin(t * 0.7 + phase) * 9 + Math.sin(t * 1.9 + phase * 2) * 3;
+        const fy = y + Math.cos(t * 0.5 + phase) * 6;
+        const on = 0.35 + 0.65 * Math.max(0, Math.sin(t * 2.2 + phase * 3));
+        glow(fx, fy, 3, 2, '#ffe27a', 0.14 * on);
+        base.g.globalAlpha = on;
+        base.g.fillStyle = '#fff6b0';
+        base.g.fillRect(Math.round(fx), Math.round(fy), 1, 1);
+        base.g.globalAlpha = 1;
+      }
+    }
+
     // O fogo no tamanho do calor (os mesmos sprites da festa); apagado, só brasa.
     function drawFire(info, now) {
       const [fx, fy] = meta.fogo;
@@ -44,113 +78,193 @@
         for (const [dx, dy] of [[-12, -4], [-4, -6], [5, -5], [12, -3], [0, -3]]) base.g.fillRect(fx + dx, fy + dy, 3, 2);
         if (info.heat > 0 && Math.floor(now / 400) % 2 === 0) { base.g.fillStyle = '#ff7a1e'; base.g.fillRect(fx - 4, fy - 6, 2, 1); base.g.fillRect(fx + 6, fy - 5, 2, 1); }
         if (info.heat > 0 && now - smokeAt > 900) { smokeAt = now; base.spawn('fumaca', fx - 2, fy - 8, now); }
-        return;
+        return undefined;
       }
       const sheet = bundle.fires[String(level)];
       const frame = Math.floor(now / 1000 * sheet.fps) % sheet.frames;
       const top = fy - sheet.h + 4;
+      // A luz do fogo no chão em volta.
+      glow(fx, fy + 4, 34 + level * 6, 12 + level * 2, '#ff9a3a', 0.07 + level * 0.015);
       base.sprite(sheet, frame, fx - sheet.w / 2, top);
       if (info.heat > 30 && Math.floor(now / 90) % 3 === 0) base.spawn('faisca', fx + ((now % 17) - 8), fy - sheet.h * 0.7, now);
       return top;
     }
 
+    // O espeto: uma vara fincada no chão (com montinho de terra) apontando para o fogo, e a comida na ponta.
     function drawStick(slot, stick, info, now) {
       const [hx, hy] = meta.cabos[slot];
       const [tx, ty] = meta.pontas[slot];
-      // O espeto: da mão até a ponta.
-      base.line(hx, hy, tx, ty, '#8a5a34');
-      base.line(hx, hy - 1, tx, ty - 1, '#b07a48');
+      const dx = Math.sign(meta.fogo[0] - hx);
+      base.line(hx, hy, tx + dx * 9, ty + 4, '#3e2410');
+      base.line(hx, hy - 1, tx + dx * 9, ty + 3, '#8a5a34');
+      base.line(hx, hy - 2, tx + dx * 9, ty + 2, '#c8985c');
+      base.g.fillStyle = '#5a4028';
+      base.g.fillRect(hx - 2, hy, 5, 2);
+      base.g.fillStyle = '#7a5a38';
+      base.g.fillRect(hx - 1, hy - 1, 3, 1);
+      const cw = meta.comidas.w;
+      const ch = meta.comidas.h;
       let tip;
       if (!stick) {
-        base.g.globalAlpha = 0.45 + 0.25 * Math.sin(now / 400 + slot);
-        base.sprite(meta.comidas, meta.comidas.ids.indexOf(info.selected) * 4 + 2, tx - 8, ty - 5);
+        base.g.globalAlpha = 0.4 + 0.2 * Math.sin(now / 400 + slot);
+        base.sprite(meta.comidas, meta.comidas.ids.indexOf(info.selected) * 3 + 0, tx - cw / 2, ty - ch / 2);
         base.g.globalAlpha = 1;
         tip = tr('mini.fogueira.tipEmpty', { food: nameOf(info.selected) });
       } else {
-        const index = meta.comidas.ids.indexOf(stick.food) * 4 + STATE_INDEX[stick.state];
-        // Vira: a comida balança um pouco; no ponto, brilha.
-        const wobble = stick.state === 'ponto' && Math.floor(now / 300) % 2 === 0 ? -1 : 0;
-        base.sprite(meta.comidas, index, tx - 8, ty - 5 + wobble);
-        if (stick.state === 'ponto' && Math.floor(now / 500) % 3 === 0) base.spawn('brilho', tx - 2, ty - 12, now);
-        if (stick.state === 'queimado' && Math.floor(now / 350) % 3 === 0) base.spawn('fumaca', tx - 2, ty - 10, now);
-        // Quanto já assou: barrinha em cima da comida.
-        if (!stick.burnt) {
-          const cfg = engineRef.data.minis.fogueira;
+        const index = meta.comidas.ids.indexOf(stick.food) * 3 + STATE_INDEX[stick.state];
+        if (stick.ready) {
+          // Pronta: brilha, balança de leve e uma bolha com coração chama para comer.
+          const bob = Math.round(Math.sin(now / 260 + slot) * 1);
+          glow(tx, ty, 17, 10, '#fff0a0', 0.16 + 0.1 * Math.sin(now / 300 + slot));
+          base.sprite(meta.comidas, index, tx - cw / 2, ty - ch / 2 + bob);
+          // A bolha fica em cima dos espetos de trás e ao lado dos da frente (para não cobrir a comida do espeto de trás).
+          const front = slot === 1 || slot === 2;
+          drawBubble(front ? tx + (slot === 1 ? -24 : 24) : tx, (front ? ty - 3 : ty - ch / 2 - 9) + bob + Math.round(Math.sin(now / 200 + slot) * 1.5));
+          if (Math.floor(now / 480 + slot) % 3 === 0) base.spawn('brilho', tx - 8 + ((now / 7) % 16), ty - 8, now);
+          if (now - (steamAt.get(slot) || 0) > 700) { steamAt.set(slot, now); base.spawn('vapor', tx - 2 + ((now % 5) - 2), ty - 10, now); }
+          tip = tr('mini.fogueira.tipStick', { food: nameOf(stick.food), state: tr('mini.fogueira.state.pronto') }) + tr('mini.fogueira.tipEat');
+        } else {
+          base.sprite(meta.comidas, index, tx - cw / 2, ty - ch / 2);
+          if (stick.state === 'dourando' && info.burning && now - (steamAt.get(slot) || 0) > 1600) { steamAt.set(slot, now); base.spawn('vapor', tx - 2, ty - 10, now); }
+          // O quanto já assou: barrinha em cima da comida.
           base.g.fillStyle = '#26242e';
-          base.g.fillRect(tx - 8, ty - 10, 16, 3);
-          base.g.fillStyle = stick.progress < cfg.perfect[0] ? '#ffb84a' : stick.progress <= cfg.perfect[1] ? '#9ef05a' : '#ff5a5a';
-          base.g.fillRect(tx - 7, ty - 9, Math.round(14 * Math.min(1, stick.progress / cfg.burnAt)), 1);
-          // O pedacinho "no ponto" da barra.
-          base.g.fillStyle = '#ffffff';
-          base.g.fillRect(tx - 7 + Math.round(14 * cfg.perfect[0] / cfg.burnAt), ty - 9, 1, 1);
+          base.g.fillRect(tx - 11, ty - ch / 2 - 5, 22, 4);
+          base.g.fillStyle = stick.progress < 0.5 ? '#ffb84a' : '#ff8a3a';
+          base.g.fillRect(tx - 10, ty - ch / 2 - 4, Math.max(1, Math.round(20 * stick.progress)), 2);
+          tip = tr('mini.fogueira.tipStick', { food: nameOf(stick.food), state: tr(`mini.fogueira.state.${stick.state}`) }) +
+            (stick.left === null ? tr('mini.fogueira.tipNoHeat') : tr('mini.fogueira.tipLeft', { n: stick.left }));
         }
-        const state = tr(`mini.fogueira.state.${stick.state}`);
-        const action = stick.burnt ? 'mini.fogueira.tipTrash' : stick.progress >= engineRef.data.minis.fogueira.perfect[0] ? 'mini.fogueira.tipTake'
-          : stick.progress >= 0.1 && stick.progress <= 0.9 && stick.turns < engineRef.data.minis.fogueira.turnMax ? 'mini.fogueira.tipTurn' : 'mini.fogueira.tipWait';
-        tip = tr('mini.fogueira.tipStick', { food: nameOf(stick.food), state }) + tr(action);
       }
-      base.region(`espeto:${slot}`, tx - 10, ty - 12, 20, 18, { espeto: slot, tip });
+      base.region(`espeto:${slot}`, tx - 14, ty - 14, 28, 24, { espeto: slot, tip });
     }
 
-    function drawThermometer(info) {
-      const x = 6;
-      const y0 = 44;
-      const h = 54;
-      base.g.fillStyle = '#26242e';
-      base.g.fillRect(x - 1, y0 - 1, 8, h + 2);
-      base.g.fillStyle = '#4a4858';
-      base.g.fillRect(x, y0, 6, h);
-      const fill = Math.round(h * info.heat / info.heatMax);
-      base.g.fillStyle = info.heat < engineRef.data.minis.fogueira.minHeat ? '#4a78d8' : info.heat < 60 ? '#ffb84a' : '#ff5a2a';
-      base.g.fillRect(x, y0 + h - fill, 6, fill);
-      // Marca de "dá para assar".
-      const mark = y0 + h - Math.round(h * engineRef.data.minis.fogueira.minHeat / info.heatMax);
-      base.g.fillStyle = '#ffffff';
-      base.g.fillRect(x - 1, mark, 8, 1);
-      base.region('termometro', x - 2, y0 - 2, 12, h + 4, { tip: tr('mini.fogueira.tipHeat', { n: Math.round(info.heat), min: engineRef.data.minis.fogueira.minHeat }) });
+    // A bolha branca com um coração vermelho (a comida está pronta: é só comer).
+    function drawBubble(cx, cy) {
+      const g = base.g;
+      g.fillStyle = '#26242e';
+      g.fillRect(cx - 7, cy - 6, 15, 12);
+      g.fillRect(cx - 1, cy + 6, 3, 2);
+      g.fillStyle = '#ffffff';
+      g.fillRect(cx - 6, cy - 5, 13, 10);
+      g.fillRect(cx - 1, cy + 5, 3, 2);
+      g.fillStyle = '#e8302c';
+      for (const [x, y, w] of [[-4, -3, 3], [1, -3, 3], [-5, -2, 11], [-5, -1, 11], [-4, 0, 9], [-3, 1, 7], [-2, 2, 5], [-1, 3, 3]]) g.fillRect(cx + x, cy + y, w, 1);
+      g.fillStyle = '#ff9a8a';
+      g.fillRect(cx - 4, cy - 2, 2, 1);
+    }
+
+    // O termômetro do fogo (tubo com bulbo): azul sem fogo, laranja e vermelho com fogo; a marca branca é onde a comida começa a assar.
+    function drawGauge(info) {
+      const [x0, y0, x1, y1] = meta.medidor;
+      const g = base.g;
+      const cfg = engineRef.data.minis.fogueira;
+      const tx = x0 + 3;
+      const top = y0 + 4;
+      const bottom = y1 - 8;
+      const height = bottom - top;
+      g.fillStyle = '#26242e';
+      g.fillRect(tx - 1, top - 1, 8, height + 3);
+      g.fillRect(tx - 2, bottom - 1, 10, 10);
+      g.fillStyle = '#4a4858';
+      g.fillRect(tx, top, 6, height + 1);
+      const color = info.heat < cfg.minHeat ? '#4a78d8' : info.heat < 60 ? '#ffb84a' : '#ff5a2a';
+      g.fillStyle = color;
+      g.fillRect(tx - 1, bottom, 8, 7);
+      g.fillRect(tx, bottom - 1, 6, 1);
+      const fill = Math.round(height * info.heat / info.heatMax);
+      g.fillRect(tx + 1, bottom - fill, 4, fill + 1);
+      g.fillStyle = '#ffffff';
+      g.fillRect(tx + 1, bottom + 1, 2, 2);
+      const mark = bottom - Math.round(height * cfg.minHeat / info.heatMax);
+      g.fillRect(tx - 2, mark, 10, 1);
+      // A chama em cima do termômetro.
+      g.fillStyle = info.heat < cfg.minHeat ? '#7a8aa8' : '#ffb84a';
+      for (const [dx, dy, w] of [[2, 0, 2], [1, 1, 4], [1, 2, 4], [0, 3, 6], [1, 4, 4]]) g.fillRect(tx + dx, y0 - 5 + dy, w, 1);
+      base.region('termometro', x0 - 2, y0 - 8, x1 - x0 + 8, y1 - y0 + 10, { tip: tr('mini.fogueira.tipHeat', { n: Math.round(info.heat), min: cfg.minHeat }) });
+    }
+
+    function drawSpectators(now) {
+      const small = bundle.scenery.mandioquinha;
+      meta.bancos.forEach((_, i) => {
+        const { x, y } = seat(i);
+        const hopping = now - hops[i] < HOP_MS ? Math.abs(Math.sin((now - hops[i]) / 110)) * 5 : 0;
+        const jumping = jump && now - jump.t0 < 900 ? Math.abs(Math.sin(now / 90)) * 5 : 0;
+        base.sprite(small, Math.floor(now / 600 + i) % 2, x - small.w / 2, y - small.h - Math.max(hopping, jumping), { flip: i === 1 });
+      });
+    }
+
+    function drawFlights(now) {
+      const small = bundle.scenery.mandioquinha;
+      for (let i = flights.length - 1; i >= 0; i--) {
+        const f = flights[i];
+        const t = (now - f.t0) / FLIGHT_MS;
+        if (t >= 1) {
+          // Chegou: o espectador comeu, pula de alegria e o prêmio aparece.
+          const to = seat(f.bench);
+          hops[f.bench] = now;
+          base.spawn('coracao', to.x - 4, to.y - small.h - 4, now);
+          base.spawn('estrela', to.x + 2, to.y - small.h - 10, now);
+          base.say(tr('mini.fogueira.eat'), to.x, to.y - small.h - 18, now, '#9ef05a');
+          f.lines.forEach((line, k) => base.say(line, to.x, to.y - small.h - 26 - k * 7, now, '#ffe27a'));
+          flights.splice(i, 1);
+          continue;
+        }
+        const to = seat(f.bench);
+        const x = f.from[0] + (to.x - f.from[0]) * t;
+        const y = f.from[1] + (to.y - small.h * 0.6 - f.from[1]) * t - Math.sin(Math.PI * t) * 26;
+        base.sprite(meta.comidas, f.index, x - meta.comidas.w / 2, y - meta.comidas.h / 2);
+      }
     }
 
     function draw(engine, now) {
       engineRef = engine;
       const info = engine.mini('fogueira').info();
+      const cfg = engine.data.minis.fogueira;
       base.clear();
       base.clearRegions();
       base.picture(meta.fundo.image);
-      // Os dois espectadores nos bancos (pulam de alegria quando alguém pula a fogueira).
-      const small = bundle.scenery.mandioquinha;
-      [[14, 68], [158, 70]].forEach(([x, y], i) => base.sprite(small, Math.floor(now / 600 + i) % 2, x, y - small.h - (jump && now - jump.t0 < 900 ? Math.abs(Math.sin(now / 90)) * 5 : 0), { flip: i === 1 }));
-      // O fogo primeiro e os espetos por cima: a comida assando fica na frente das chamas, não escondida atrás delas.
+      drawFireflies(now);
+      drawSpectators(now);
+      // O fogo, as pedras da frente, e os espetos por cima: a comida assando fica na frente das chamas, não escondida atrás delas.
       const fireTop = drawFire(info, now);
+      base.picture(meta.frente.image);
       const hitTop = Math.min(meta.fogo[1] - 40, fireTop ?? meta.fogo[1] - 40);
-      base.region('fogo', meta.fogo[0] - 26, hitTop, 52, meta.fogo[1] + 6 - hitTop, { tip: info.canJump ? tr('mini.fogueira.tipFire')
-        : info.heat < engine.data.minis.fogueira.jumpMinHeat ? tr('mini.fogueira.tipFireCold') : tr('mini.fogueira.tipFireWait', { n: Math.ceil(info.jumpWait) }) });
+      base.region('fogo', meta.fogo[0] - 22, hitTop, 44, meta.fogo[1] + 6 - hitTop, { tip: info.canJump ? tr('mini.fogueira.tipFire')
+        : info.heat < cfg.jumpMinHeat ? tr('mini.fogueira.tipFireCold') : tr('mini.fogueira.tipFireWait', { n: Math.ceil(info.jumpWait) }) });
       info.sticks.forEach((stick, slot) => drawStick(slot, stick, info, now));
       // Quem pula passa por cima do fogo.
       if (jump) {
+        const small = bundle.scenery.mandioquinha;
         const t = (now - jump.t0) / 900;
         if (t >= 1) {
           base.spawn('estrela', jump.to - 4, meta.fogo[1] - 12, now);
           base.spawn('coracao', jump.to, meta.fogo[1] - 16, now);
           jump = null;
         } else {
-          const x = 36 + 104 * t;
+          const from = seat(0).x;
+          const x = from + (jump.to - from) * t;
           const y = meta.fogo[1] - 8 - Math.sin(Math.PI * t) * 46;
           base.sprite(small, Math.floor(now / 120) % 2, x - 7, y - 20, { w: 14, h: 20, flip: false });
         }
       }
-      drawThermometer(info);
-      // Lenha e o menu de comidas.
-      base.text(String(info.wood), meta.lenha[0] + 14, meta.lenha[1] - 9, info.wood > 0 ? '#ffe27a' : '#9a9ca8');
-      base.region('lenha', meta.lenha[0], meta.lenha[1], meta.lenha[2] - meta.lenha[0], meta.lenha[3] - meta.lenha[1], { tip: tr('mini.fogueira.tipWood', { n: info.wood }) });
+      drawGauge(info);
+      // Lenha (a pilha clicável, com o que sobrou) e o menu de comidas.
+      const [lx0, ly0, lx1, ly1] = meta.lenha;
+      base.text(String(info.wood), (lx0 + lx1) / 2, ly0 - 8, info.wood > 0 ? '#ffe27a' : '#9a9ca8');
+      base.region('lenha', lx0, ly0, lx1 - lx0, ly1 - ly0, { tip: tr('mini.fogueira.tipWood', { n: info.wood }) });
       info.foods.forEach((item, i) => {
-        const x = 38 + i * 24;
+        const x = meta.menuX[i];
         const chosen = info.selected === item.id;
-        if (chosen) { base.g.fillStyle = '#ffe27a'; base.g.fillRect(x - 1, meta.menu + 1, 19, 14); }
-        base.g.fillStyle = chosen ? '#7a4a1c' : '#52301a';
-        base.g.fillRect(x, meta.menu + 2, 17, 12);
-        base.sprite(meta.comidas, i * 4 + 2, x, meta.menu + 3);
-        base.region(`comida:${item.id}`, x, meta.menu + 1, 17, 14, { comida: item.id, tip: tr('mini.fogueira.tipFood', { food: nameOf(item.id) }) });
+        if (chosen) {
+          base.g.fillStyle = '#ffe27a';
+          base.g.fillRect(x - 1, meta.menu + 1, 29, H - meta.menu - 3);
+          base.g.fillStyle = '#8a5a2c';
+          base.g.fillRect(x, meta.menu + 2, 27, H - meta.menu - 5);
+        }
+        base.sprite(meta.comidas, i * 3 + 2, x + 1, meta.menu + 2);
+        base.region(`comida:${item.id}`, x - 1, meta.menu + 1, 29, H - meta.menu - 3, { comida: item.id, tip: tr('mini.fogueira.tipFood', { food: nameOf(item.id) }) });
       });
+      drawFlights(now);
       base.drawParticles(now);
       base.drawSays(now);
       return true;
@@ -161,13 +275,13 @@
       const model = engineRef.mini('fogueira');
       const found = base.hit(clientX, clientY);
       if (!found) return false;
-      const cfg = engineRef.data.minis.fogueira;
       if (found.id === 'lenha') {
         const got = model.addWood();
+        const [lx0, ly0] = meta.lenha;
         if (got.ok) {
           hooks.sound?.('lenha');
           for (let k = 0; k < 3; k++) base.spawn('faisca', meta.fogo[0] - 6 + k * 6, meta.fogo[1] - 14, now);
-        } else { hooks.sound?.('erro'); base.say(tr(got.reason === 'wood' ? 'mini.fogueira.noWood' : 'mini.fogueira.full'), meta.lenha[0] + 14, meta.lenha[1] - 14, now, '#ff9a8a'); }
+        } else { hooks.sound?.('erro'); base.say(tr(got.reason === 'wood' ? 'mini.fogueira.noWood' : 'mini.fogueira.full'), lx0 + 18, ly0 - 14, now, '#ff9a8a'); }
         return true;
       }
       if (found.comida) { if (model.select(found.comida)) hooks.sound?.('clique'); return true; }
@@ -175,7 +289,7 @@
         const got = model.jump();
         if (got.ok) {
           hooks.sound?.('pulo');
-          jump = { t0: now, to: meta.fogo[0] + 30 };
+          jump = { t0: now, to: seat(1).x };
           base.say(tr('mini.fogueira.jumped'), meta.fogo[0], meta.fogo[1] - 52, now, '#fff8e8');
           rewardLines(got.reward).forEach((line, i) => base.say(line, meta.fogo[0], meta.fogo[1] - 60 - i * 7, now, '#ffe27a'));
         } else { hooks.sound?.('erro'); base.say(tr(got.reason === 'cold' ? 'mini.fogueira.cold' : 'mini.fogueira.waitJump'), meta.fogo[0], meta.fogo[1] - 40, now, '#ff9a8a'); }
@@ -189,20 +303,15 @@
         if (model.put(slot).ok) { hooks.sound?.('clique'); base.spawn('poeira', tx, ty, now, { dx: 1 }); }
         return true;
       }
-      if (stick.burnt || stick.progress >= cfg.perfect[0]) {
-        const got = model.take(slot);
-        if (got.ok && got.burnt) { hooks.sound?.('errou'); base.say(tr('mini.fogueira.burnt'), tx, ty - 12, now, '#ff9a8a'); }
-        else if (got.ok) {
-          hooks.sound?.(got.perfect ? 'moeda' : 'carinho');
-          base.spawn(got.perfect ? 'estrela' : 'coracao', tx - 4, ty - 8, now);
-          if (got.perfect) base.say(tr('mini.fogueira.perfect'), tx, ty - 14, now, '#9ef05a');
-          rewardLines(got.reward).forEach((line, i) => base.say(line, tx, ty - 22 - i * 7, now, '#ffe27a'));
-        }
-        return true;
+      if (!stick.ready) { hooks.sound?.('erro'); base.say(tr('mini.fogueira.notYet'), tx, ty - 18, now, '#8ed6ff'); return true; }
+      const got = model.eat(slot);
+      if (got.ok) {
+        hooks.sound?.('carinho');
+        const index = meta.comidas.ids.indexOf(stick.food) * 3 + 2;
+        // A comida voa até o espectador do banco mais perto; o prêmio aparece quando ela chega.
+        flights.push({ index, from: [tx, ty], bench: benchOf(slot), t0: now, lines: rewardLines(got.reward) });
+        base.spawn('brilho', tx - 2, ty - 8, now);
       }
-      const got = model.turn(slot);
-      if (got.ok) { hooks.sound?.('pulo'); base.spawn('brilho', tx - 2, ty - 8, now); }
-      else base.say(tr(got.reason === 'early' ? 'mini.fogueira.early' : got.reason === 'turned' ? 'mini.fogueira.turned' : 'mini.fogueira.late'), tx, ty - 14, now, '#8ed6ff');
       return true;
     }
 
@@ -215,12 +324,17 @@
       engineRef = engine;
       for (const event of events) {
         if (event.type !== 'mini' || event.mini !== 'fogueira') continue;
-        if (event.kind === 'burnt') { hooks.sound?.('errou'); hooks.toast?.(tr('mini.fogueira.burntToast', { food: nameOf(event.food) }), 'erro'); }
+        if (event.kind === 'ready') {
+          hooks.sound?.('brilho');
+          hooks.toast?.(tr('mini.fogueira.readyToast', { food: nameOf(event.food) }));
+          const [tx, ty] = meta.pontas[event.slot] || meta.fogo;
+          base.spawn('estrela', tx - 3, ty - 10, now);
+        }
       }
     }
 
     function probe() {
-      return { ...base.probeBase(), jumping: !!jump };
+      return { ...base.probeBase(), jumping: !!jump, flights: flights.length };
     }
 
     return { size: base.size, setScale: base.setScale, draw, hit: base.hit, click, status, onEvents, probe };

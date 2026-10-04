@@ -148,3 +148,135 @@ test('as palavras das placas das barracas cabem na madeira, em letras da fonte d
     }
   }
 });
+
+test('as 20 visitas do folclore têm nome, grito e texto em todos os idiomas, e o grito só usa letras da fonte de pixel', () => {
+  for (const id of ids) {
+    const copy = localized(id);
+    const source = data.minis.folclore.events;
+    copy.minis.folclore.events.forEach((entry, index) => {
+      assert.ok(entry.name && entry.say && entry.text, `${id}: ${entry.id}`);
+      const shout = entry.say.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+      assert.match(shout, /^[A-Z0-9 .,:!?+%-]+$/, `${id}: grito de ${entry.id}: ${entry.say}`);
+      assert.ok(shout.length * 4 <= 110, `${id}: o grito de ${entry.id} cabe na festa`);
+      if (id !== I18N.SOURCE) assert.notEqual(entry.text, source[index].text, `${id}: ${entry.id} traduzida`);
+    });
+  }
+});
+
+test('os prêmios dos minigames têm nome, texto e falas em todos os idiomas, e as falas só usam letras da fonte de pixel', () => {
+  for (const id of ids) {
+    const copy = localized(id);
+    const source = data.premios;
+    copy.premios.jogos.forEach((game, index) => {
+      assert.ok(game.name, `${id}: jogo ${game.id}`);
+      if (id !== I18N.SOURCE) assert.ok(langs[id].data.premiosJogos[game.id]?.name, `${id}: premiosJogos.${game.id}`);
+      assert.equal(game.id, source.jogos[index].id);
+    });
+    copy.premios.itens.forEach((entry, index) => {
+      assert.ok(entry.name && entry.text, `${id}: ${entry.id}`);
+      if (id !== I18N.SOURCE) {
+        const text = langs[id].data.premiosItens[entry.id];
+        assert.ok(text?.name && text.text, `${id}: premiosItens.${entry.id}`);
+        assert.notEqual(entry.text, source.itens[index].text, `${id}: ${entry.id} traduzido`);
+      }
+      for (const key of ['say0', 'say1', 'say2']) {
+        if (!source.itens[index][key]) { assert.equal(entry[key], undefined, `${id}: ${entry.id}.${key} não existe no original`); continue; }
+        const shout = entry[key].normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+        assert.match(shout, /^[A-Z0-9 .,:!?+%-]+$/, `${id}: fala ${entry.id}.${key}: ${entry[key]}`);
+        assert.ok(shout.length * 4 <= 130, `${id}: a fala de ${entry.id}.${key} cabe na festa`);
+      }
+    });
+  }
+  // Nenhum idioma deixa sobrar prêmio que o jogo não tem.
+  for (const id of ids.filter(lang => lang !== I18N.SOURCE)) {
+    assert.deepEqual(Object.keys(langs[id].data.premiosJogos).sort(), data.premios.jogos.map(game => game.id).sort());
+    assert.deepEqual(Object.keys(langs[id].data.premiosItens).sort(), data.premios.itens.map(item => item.id).sort());
+  }
+});
+
+test('a tela dos prêmios desenha em inglês e espanhol, sem sobrar português', () => {
+  for (const id of ids.filter(lang => lang !== I18N.SOURCE)) {
+    I18N.setLanguage(id);
+    try {
+      const translated = localized(id);
+      const engine = new GameEngine(translated, null, { now: () => 1_700_000_000_000 });
+      for (let i = 0; i < 12; i++) engine.emit('rings', { hits: 1, mult: 1 });
+      const html = UI.tela(engine, { tela: 'premios', icon: () => '', now: 1_700_000_000_000, settings: {} });
+      assert.doesNotMatch(html, /Prêmios|Faltam|Presente|vezes|Animação/, `${id}: sobrou português`);
+      assert.match(html, id === 'en' ? /Minigame prizes/ : /Premios de los minijuegos/);
+      assert.match(html, id === 'en' ? /Zeca of the Rings/ : /Zeca de los Aros/);
+      assert.match(html, id === 'en' ? /Gift ready!/ : /¡Regalo listo!/);
+    } finally {
+      I18N.setLanguage(I18N.SOURCE);
+    }
+  }
+});
+
+test('os eventos do mundo têm nome e texto em todos os idiomas, e a tela deles não deixa sobrar português', () => {
+  for (const id of ids.filter(lang => lang !== I18N.SOURCE)) {
+    assert.deepEqual(Object.keys(langs[id].data.mundoEventos).sort(), data.mundo.eventos.map(entry => entry.id).sort(), `${id}: mundoEventos`);
+    const copy = localized(id);
+    copy.mundo.eventos.forEach((entry, index) => {
+      assert.ok(entry.name && entry.text, `${id}: ${entry.id}`);
+      assert.notEqual(entry.text, data.mundo.eventos[index].text, `${id}: ${entry.id} traduzido`);
+      // (O nome pode ser igual ao português quando a palavra é a mesma, como Eclipse.)
+      assert.ok(langs[id].data.mundoEventos[entry.id].name, `${id}: o nome de ${entry.id}`);
+    });
+    I18N.setLanguage(id);
+    try {
+      const engine = new GameEngine(localized(id), null, { now: () => 1_700_000_000_000 });
+      engine.state.size = engine.state.records.size = 60;
+      engine.mundo.start('lua');
+      const html = UI.hud(engine, { icon: () => '', now: 1_700_000_000_000, settings: {}, desktop: true });
+      assert.doesNotMatch(html, /Lua cheia|Eventos? do mundo/, `${id}: sobrou português na placa`);
+      assert.match(html, id === 'en' ? /Full moon 0\/3/ : /Luna llena 0\/3/);
+      const panel = UI.panel(engine, { tab: 'festa', icon: () => '', now: 1_700_000_000_000, settings: {}, desktop: true });
+      assert.match(panel, id === 'en' ? /World events: 1 seen, 1 of 31 kinds\./ : /Eventos del mundo: 1 vistos, 1 de 31 tipos\./);
+      const page = UI.tela(engine, { tela: 'mundo', icon: () => '', now: 1_700_000_000_000, settings: {}, desktop: true });
+      assert.doesNotMatch(page, /Evento ainda|Aparece com|alvos pegos|bônus de|Próximo evento|Previsão do tempo|Mais comum hoje|Em breve|Às vezes puxa|Passou \d|minutos depois/, `${id}: sobrou português na tela dos eventos`);
+      assert.match(page, id === 'en' ? /<h3>Full moon<\/h3>/ : /<h3>Luna llena<\/h3>/);
+      assert.match(page, id === 'en' ? /Event not seen yet/ : /Evento aún no visto/);
+    } finally {
+      I18N.setLanguage(I18N.SOURCE);
+    }
+  }
+});
+
+test('eventos do mundo: a turma comenta cada evento com duas falas que cabem na fonte de pixel, em todos os idiomas', () => {
+  for (const id of ['pt-BR', 'en', 'es']) {
+    const book = id === 'pt-BR' ? data : localized(id);
+    for (const entry of book.mundo.eventos) {
+      for (const key of ['chat0', 'chat1']) {
+        const line = entry[key];
+        assert.ok(line, `${id}/${entry.id}: ${key}`);
+        assert.match(line, /^[A-Z0-9 .,:!?+%-]+$/, `${id}/${entry.id}: só letras da fonte de pixel (${line})`);
+        assert.ok(line.length <= 24, `${id}/${entry.id}: cabe no balão (${line.length})`);
+      }
+      assert.notEqual(entry.chat0, entry.chat1, `${id}/${entry.id}: duas falas diferentes`);
+    }
+  }
+  // Em inglês e espanhol as falas são traduzidas (ao menos a maioria difere do português).
+  for (const id of ['en', 'es']) {
+    const other = localized(id).mundo.eventos;
+    const same = data.mundo.eventos.filter((entry, i) => entry.chat0 === other[i].chat0 && entry.chat1 === other[i].chat1);
+    assert.ok(same.length <= 2, `${id}: falas ainda em português em ${same.map(entry => entry.id)}`);
+  }
+});
+
+test('Ajustes: a linha da nuvem da Steam aparece só com a Steam ligada, diz se está ligada ou como ligar, e existe em todos os idiomas', () => {
+  const ctx = extra => ({ tab: 'ajustes', settings: { pinned: true, hud: 'sempre', zoom: 1 }, desktop: true, icon: () => '',
+    now: Date.now(), language: { choice: 'auto', id: 'en', auto: 'en' }, steam: { on: true, name: 'Ana', cloud: true }, ...extra });
+  try {
+    for (const [id, ligada, desligada] of [['pt-BR', /Nuvem da Steam: ligada/, /Nuvem da Steam: desligada\. Ligue em Propriedades do jogo/],
+      ['en', /Steam Cloud: on/, /Steam Cloud: off\. Turn it on/], ['es', /Nube de Steam: activada/, /Nube de Steam: desactivada\. Actívala/]]) {
+      I18N.setLanguage(id);
+      const engine = new GameEngine(localized(id), null, { rng: () => 0.4 });
+      assert.match(UI.panel(engine, ctx()), ligada, `${id}: ligada`);
+      assert.match(UI.panel(engine, ctx({ steam: { on: true, name: 'Ana', cloud: false } })), desligada, `${id}: desligada`);
+      assert.doesNotMatch(UI.panel(engine, ctx({ steam: { on: true, name: 'Ana' } })), /Steam Cloud|Nuvem da Steam|Nube de Steam/, `${id}: sem informação da nuvem não mostra a linha`);
+      assert.doesNotMatch(UI.panel(engine, ctx({ steam: { on: false, name: null, cloud: true } })), /Steam Cloud|Nuvem da Steam|Nube de Steam/, `${id}: sem a Steam não mostra a linha`);
+    }
+  } finally {
+    I18N.setLanguage('pt-BR');
+  }
+});
