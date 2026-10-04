@@ -3,7 +3,8 @@
 from casa import Tela, rgb
 
 LEG = {'y': '#ffd21e', 'Y': '#e8a812', 'w': '#f8f4ea', 'b': '#3a78d8', 'B': '#1a3a8a', 'c': '#8fd4ee', 'k': '#26242e', 'g': '#56c860', 'G': '#2e8a44',
-       'r': '#e0343e', 'R': '#9a1a2e', 'o': '#ff8a12', 'p': '#ff8ac8', 'n': '#8a5a34', 's': '#9a9ca8', 'S': '#6a6c78'}
+       'r': '#e0343e', 'R': '#9a1a2e', 'o': '#ff8a12', 'p': '#ff8ac8', 'n': '#8a5a34', 's': '#9a9ca8', 'S': '#6a6c78',
+       'v': '#8a4ad8', 'V': '#4a1a7a', 'l': '#7aff4a', 'L': '#3aa82a', 'h': '#8ab870', 'H': '#5a8a48', 'd': '#4a3220', 'm': '#e8c060'}
 
 ICONES = {
     'estrelas': ['.....y.....', '....yyy....', '..yyyyyyy..', '...yyyyy...', '...yy.yy...', '..y.....y..', '...........', '.y.....y...', 'y.......y..', '...........'],
@@ -37,6 +38,39 @@ ICONES = {
     'turbulencia': ['...yyyyy...', '..yrrrrry..', '.yyyyyyyyy.', 'YYYYYYYYYYY', '...........', '.cc..cc..cc', 'c..cc..cc..', '...........', '...........', '...........'],
     'fichas': ['...........', '..yyyyyyy..', '.yyYyyyYyy.', 'yyyYyyyYyyy', 'yyyYyyyYyyy', '.yyYyyyYyy.', '..yyyyyyy..', '...........', '...........', '...........'],
     'cometa': ['.........yy', '........yyy', '......ww.yy', '....www....', '..www......', '.ww........', 'w..........', '...........', '...........', '...........'],
+    # Eventos avulsos (sem tema): bolhas, aviõezinhos, patinhos, abelhas, planeta, circo, balada, baleia, balão gigante e fada.
+    'bolhas': ['...bbbbb...', '..bcccccb..', '.bcwwcccpb.', '.bcwccccpb.', '.bccccccpb.', '.bcccccppb.', '..bcccppb.c', '...bbbbb.cw', '..........c', '...........'],
+    'avioes': ['...........', '........ww.', '......wwwww', '..wwwwwwwcw', '.wwwwwcccc.', '..wwcccss..', '...wcssS...', '....s......', '...........', '...........'],
+    'patinhos': ['...........', '....yyy....', '...yykyyoo.', '...yyyyyoo.', '....yyy....', '.yy.yyyyy..', 'yyyyyyyyyy.', '.yyyYyyyy..', '..yyyyyy...', '...........'],
+    'abelhas': ['...ww......', '..wwww.....', '..yykyky.k.', '.yyykykyykk', '.yyykykyykk', '..yykyky.k.', '...yyyyy...', '...........', '..........o', '.........o.'],
+    'planetas': ['.........c.', '....ooo....', '..ooooooo..', 'nnnooyooonn', '.ooooooooo.', '..ooyyooo..', '....ooo....', '...........', 'w..........', '...........'],
+    'circo': ['..r.y.b.g..', '.rryybbggg.', '..wwwwwww..', '..wkwwwkw..', '..wwwrwww..', '..wrrrrrw..', '...wwwww...', '..yyyyyyy..', '.yyrryrryy.', '...........'],
+    'balada': ['.....k.....', '...sssss...', '..swswswsw.', '.swswswswsw', '.wswswswsws', '.swswswswsw', '..swswswsw.', '...sssss...', '.p.y...c.g.', '...........'],
+    'baleia': ['.......c.c.', '........c..', '..bbbbbbbb.', 'bbbbbbbbbbb', '.bbbbbbkbbb', '.bwwwwwwbb.', '..wwwwwww..', '...........', '.o.........', '..........o'],
+    'baloagigante': ['...g.g.g...', '...ggggg...', '..nnnnnnn..', '.nnnnnnnnn.', '.nwknnwknn.', '.nnnnnnnnn.', '..nnrrrnn..', '...nnnnn...', '....nnn....', '.....r.....'],
+    'fada': ['.......y...', '......yyy..', '.cc.c..y...', 'cccwcc.o...', '.ccpcc.o...', '...ppp.....', '..ppppp....', '...p.p.....', '...........', '...........'],
+    # Segunda leva de avulsos: chapéus, pelada, toupeiras, coelho, aurora, vaca e lua, jatinhos e tubarão.
+    'chapeus': ['...........', '...kkkkk...', '...kkkkk...', '...kkkkk...', '...rrrrr...', '...kkkkk...', '.kkkkkkkkk.', '.kkkkkkkkk.', '...........', '...........'],
+    'pelada': ['...kkkkk...', '..kwwkwwk..', '.kwwkkkwwk.', '.kwkkkkkwk.', '.kkkkwkkkk.', '.kwkkkkkwk.', '.kwwkkkwwk.', '..kwwkwwk..', '...kkkkk...', '...........'],
+    'toupeiras': ['...yyyyy...', '..yyyyyyy..', '..nnnnnnn..', '.nnknnnknn.', '.nnnpppnnn.', '.nnnnnnnnn.', 'dddnnnnnddd', 'ddddddddddd', '...........', '...........'],
+    'coelho': ['..w.....w..', '..w.....w..', '..wp...pw..', '..wp...pw..', '...wwwww...', '..wkwwwkw..', '..wwwpwww..', '...wwwww...', '.kkkkkkkkk.', '.kkkkkkkkk.'],
+    'aurora': ['.g...c...v.', '.gg..cc..vv', '.ggg.ccc.vv', '..gg..cc.vv', '..gg..cc..v', '.ggg.ccc..v', '.gg..cc..vv', '..g...c...v', '...........', '.w....w..w.'],
+    'vacalua': ['..kw.kwk...', '.wwwwwwww..', '.w.w..w.w..', '...........', '...yyyyy...', '..yyyyyyy..', '.yyyyyyyyy.', '.yyyyyyyyy.', '..yyyyyyy..', '...yyyyy...'],
+    'fumaca': ['...........', '...........', 'gggg.......', '.yyyyg.ss..', '..bbbbwwww.', '...yyywwwb.', '....g......', '...........', '...........', '...........'],
+    'tubaroes': ['.....s.....', '....ss.....', '...sss...s.', '..ssssssss.', 'ssssssksss.', 'swwwwwwwww.', '.wwwwwwww..', '...........', '..S.S.S.S..', '.S.S.S.S.S.'],
+    # Eventos de tema (só com um conjunto completo do tema vestido): dinossauros, Halloween e zumbis.
+    'pterodatilos': ['o.........o', 'oo.......oo', '.oo.....oo.', '..oo.r.oo..', '...ooggoo..', '....ggggyy.', '.....gg.yy.', '..........r', '...........', '...........'],
+    'manada': ['.........gg', '........ggk', '........g..', '.......gg..', '..ggggggg..', 'gggggggggg.', '.gggggggg..', '..g.g.g.g..', '..G.G.G.G..', 'nnnnnnnnnnn'],
+    'ovos': ['....www....', '...wwwww...', '..wwgwwww..', '..wwwwwgw..', '.wwgwwwwww.', '.wwwwkwwww.', '.wwwwwkwww.', '..wwwkwww..', '...wwwww...', '..mmmmmmm..'],
+    'meteoro': ['y..........', '.oy........', '..oo..rrr..', '...oorkkkr.', '....rkkokkr', '...rkkkkkkr', '...rkkokkkr', '....rkkkkr.', '.....rrrr..', '...........'],
+    'bruxas': ['.....k.....', '....kkk....', '....koo....', '...kkkkk...', '.kkkkkkkkk.', '...........', 'nnnnnnnnnmm', '........mYm', '.........mm', '...........'],
+    'abobora': ['.....gg....', '..ooogoooo.', '.oyyooyyoo.', 'ooyyyoyyyoo', 'ooooooooooo', 'oyoyoyoyooo', '.oyyyyyyyo.', '..ooooooo..', '...........', '...........'],
+    'fantasmas': ['...wwwww...', '..wwwwwww..', '.wwkwwwkww.', '.wwkwwwkww.', '.wwwwkwwww.', '.wwwwkwwww.', '.wwwwwwwww.', '.wwwwwwwww.', '.ww.www.ww.', '...........'],
+    'luasangue': ['.rrrrr.....', 'rrrRrrr....', 'rrrrrRr..k.', 'rrrrrrr..k.', '.rrrrr...k.', '........kkk', '.......kkRk', '......k.kkk', '.........k.', '...........'],
+    'horda': ['..kkkkkk...', '.hhhhhhhh..', '.hwkhhwrh..', '.hhhhhhhh..', '.hhkkkkhh..', '..hhhhhh...', '.rrrrrrrr..', 'rryrrrryrr.', 'rrrrrrrrrr.', '...........'],
+    'gosma': ['.....l.....', '....lll....', '...lllll...', '..lllllll..', '..lllwlll..', '..lllllll..', '...lllll...', '...........', '.l..lLl..l.', 'lLl.....lLl'],
+    'helicoptero': ['.ssssssssss', '......k....', '..GGGGGGGk.', '.GGGGccGGGk', 'GGGGGccGGGG', '.GGrrGGGGG.', '..GGGGGG...', '..sssssss..', '...........', '...........'],
+    'surto': ['..h.h.h.h..', '..h.h.h.h..', '..hhhhhhh..', '...hhhhh...', '....hhh....', '....hhh....', 'ss..hhh.ss.', 'ssdddddddss', 'sddddddddds', '...........'],
     # o botão da placa: um planetinha azul com terra verde
     'ui:mundo': ['...bbbbb...', '..bbgggbb..', '.bbggGgbbb.', '.bbbgggbbb.', '.bgggbbbbb.', '.bggGbbgbb.', '.bbbbbgggb.', '..bbbbgGb..', '...bbbbb...', '...........'],
 }

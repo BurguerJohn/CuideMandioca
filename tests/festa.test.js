@@ -1721,6 +1721,9 @@ test('prêmios dos minigames: quem esbarra no passeio conversa (o segundo respon
 
 test('eventos do mundo: cada um desenha na festa, os alvos são clicáveis até serem pegos, o temporal traz chuva e o vento sopra', () => {
   const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
   require('../src/festa-mundo.js');
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -1797,7 +1800,7 @@ test('eventos do mundo: cada um desenha na festa, os alvos são clicáveis até 
     assert.deepEqual(ids(), []);
     assert.ok(festa.probe().rain < 0.05, `${entry.id}: sem chuva depois`);
     // Alguns eventos deixam vestígios no chão por uns minutos; depois apagam.
-    const traced = ['petalas', 'granizo', 'pipoca', 'redemoinho', 'fogos', 'vagalumes', 'neve', 'cheia'].includes(entry.id);
+    const traced = ['petalas', 'granizo', 'pipoca', 'redemoinho', 'fogos', 'vagalumes', 'neve', 'cheia', 'ovos', 'gosma', 'chapeus'].includes(entry.id);
     assert.equal(festa.probe().mundoTrace, traced ? entry.id : null, `${entry.id}: vestígios`);
     if (traced) {
       run(2000);
@@ -1827,6 +1830,9 @@ test('eventos do mundo: cada um desenha na festa, os alvos são clicáveis até 
 
 test('eventos do mundo (onda 7): o tremor balança o quadro nas pisadas e some no fim, a neve esfria a festa e a cheia pinta a água barrenta', () => {
   const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
   require('../src/festa-mundo.js');
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -1905,6 +1911,9 @@ test('eventos do mundo (onda 7): o tremor balança o quadro nas pisadas e some n
 
 test('eventos do mundo (onda 8): o Cruzeiro do Sul liga as estrelas na ordem, os sapos pulam e coaxam e o trem leva os passageiros pela festa', () => {
   const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
   require('../src/festa-mundo.js');
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -1983,6 +1992,9 @@ test('eventos do mundo (onda 8): o Cruzeiro do Sul liga as estrelas na ordem, os
 
 test('eventos do mundo (onda 9): a pinhata balança mais depois do golpe, o galo canta uma vez cada e a turbulência balança a ilha com as coisas escorregando', () => {
   const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
   require('../src/festa-mundo.js');
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -2085,6 +2097,9 @@ test('eventos do mundo (onda 9): a pinhata balança mais depois do golpe, o galo
 
 test('eventos do mundo: a turma solta uma fala do evento de tempos em tempos (uma das duas, só durante o evento)', () => {
   const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
   require('../src/festa-mundo.js');
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -2124,6 +2139,9 @@ test('eventos do mundo: a turma solta uma fala do evento de tempos em tempos (um
 
 test('eventos do mundo: na chuva de fichas várias fichas douradas ficam no ar ao mesmo tempo e cada uma é clicável', () => {
   const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
   require('../src/festa-mundo.js');
   globalThis.document = fakeDocument([], { drawImage: 0 });
   globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
@@ -2155,4 +2173,248 @@ test('eventos do mundo: na chuva de fichas várias fichas douradas ficam no ar a
   assert.ok(most >= 2 && most <= 5, `umas três de cada vez no ar (${most})`);
   assert.equal(seen.size, 15, 'todas as quinze passaram');
   assert.ok(draws.has('#a8740a') && draws.has('#fff07a'), 'as fichas douradas');
+});
+
+// Os jogos da festa dão peso aos acertos: anel que se abre, faíscas, letreiro grande e um solavanco na festa inteira.
+test('pote, saco, burro, leilão, cobra e folclore reagem com anéis, letreiros grandes e um solavanco', () => {
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const festa = globalThis.ArraiaFesta.create(globalThis.document.createElement('canvas'), bundle);
+  festa.setScale(3);
+  const engine = lateGame();
+  let now = 5000;
+  engine.debug('leilao');
+  for (let i = 0; i < 20; i++) festa.draw(engine, (now += 30));
+  assert.ok(festa.probe().leilao, 'o leiloeiro subiu ao palco');
+  assert.equal(festa.probe().rings, 0);
+  assert.equal(festa.probe().impact, null);
+  const cases = [
+    [{ type: 'pote-break', amount: 10, tickets: 1 }, 1.5],
+    [{ type: 'saco-go' }, 0.5],
+    [{ type: 'burro-pin', grade: 'mosca', amount: 10, tickets: 1, dx: 0, dy: 0 }, 1.2],
+    [{ type: 'leilao-sold', winner: 'voce', prize: { item: null }, price: 5 }, 1.2],
+  ];
+  for (const [event, power] of cases) {
+    festa.onEvents(engine, [event], now);
+    const probe = festa.probe();
+    assert.ok(probe.rings >= 1, `${event.type}: anel`);
+    assert.ok(probe.impact && probe.impact.power >= power, `${event.type}: solavanco de ${probe.impact?.power}`);
+    for (let i = 0; i < 40; i++) festa.draw(engine, (now += 30));
+    assert.equal(festa.probe().rings, 0, `${event.type}: os anéis somem sozinhos`);
+    assert.equal(festa.probe().impact, null, `${event.type}: o solavanco passa`);
+  }
+  festa.onEvents(engine, [{ type: 'pote-break', amount: 10, tickets: 1 }], now);
+  assert.ok(festa.probe().bigTexts >= 1, 'o POTE grande aparece em letras do dobro do tamanho');
+  const before = festa.probe().shake;
+  const moved = [false, false];
+  for (let i = 0; i < 8; i++) {
+    festa.draw(engine, (now += 30));
+    festa.probe().push.forEach((value, axis) => { if (value !== 0) moved[axis] = true; });
+  }
+  assert.deepEqual(moved, [true, true], 'o quadro treme de verdade nos dois eixos durante o solavanco');
+  assert.deepEqual(festa.probe().shake, before, 'o solavanco não mexe no tremor dos eventos do mundo');
+  festa.onEvents(engine, [{ type: 'pote-break', amount: 10, tickets: 1 }], now);
+  festa.setCalm(true);
+  festa.draw(engine, (now += 30));
+  assert.equal(festa.probe().impact, null, 'no modo calmo o solavanco some na hora');
+  assert.deepEqual(festa.probe().push, [0, 0]);
+});
+
+test('eventos de tema na festa: a manada balança o quadro nas pisadas, o ovo estala a cada golpe e choca uma cria, e o zumbi que ganha a pamonha é curado', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, translate() {}, fillRect() {} });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  const events = () => festa.onEvents(engine, engine.drainEvents(), now);
+  run(300);
+  // A manada: o quadro treme só nas pisadas (no máximo 1 px) e para quando o evento acaba; os outros eventos de céu não tremem.
+  engine.mundo.start('manada');
+  events();
+  run(3500);
+  const seen = new Set();
+  for (let i = 0; i < 80; i++) { run(33); seen.add(festa.probe().shake.join(',')); }
+  assert.ok([...seen].some(value => value !== '0,0'), `treme em alguma pisada: ${[...seen]}`);
+  assert.ok(seen.has('0,0'), 'e para entre as pisadas');
+  for (const value of seen) for (const part of value.split(',')) assert.ok(Math.abs(Number(part)) <= 1, `no máximo 1 px: ${value}`);
+  engine.state.mundo.active = null;
+  run(66);
+  assert.deepEqual(festa.probe().shake, [0, 0], 'acabou: o quadro fica parado');
+  engine.mundo.start('estrelas');
+  events();
+  run(4000);
+  const quiet = new Set();
+  for (let i = 0; i < 40; i++) { run(33); quiet.add(festa.probe().shake.join(',')); }
+  assert.deepEqual([...quiet], ['0,0'], 'só a manada balança');
+  // Os ovos: cada golpe estala (e é lembrado pela festa), e o último solta a cria.
+  engine.state.mundo.active = null;
+  engine.mundo.start('ovos');
+  events();
+  run(2500);
+  assert.deepEqual([festa.probe().mundo.temas.hatchlings, festa.probe().mundo.temas.hits], [0, 0]);
+  const before = festa.probe().particles;
+  assert.equal(engine.mundo.catchTarget(0).partial, true);
+  events();
+  run(33);
+  assert.equal(festa.probe().mundo.temas.hits, 1, 'o golpe foi anotado');
+  assert.ok(festa.probe().particles > before, 'cacos de casca voando');
+  engine.mundo.catchTarget(0);
+  events();
+  engine.mundo.catchTarget(0);
+  events();
+  run(33);
+  assert.equal(festa.probe().mundo.temas.hatchlings, 1, 'a cria saiu do ovo');
+  run(4000);
+  assert.equal(festa.probe().mundo.temas.hatchlings, 0, 'e foi embora');
+  // A horda: o zumbi que ganha a pamonha vira gente e pula um pouco.
+  engine.state.mundo.active = null;
+  engine.mundo.start('horda');
+  events();
+  let probe = null;
+  for (let second = 0; second < 30 && !(probe && probe.items.length); second++) { run(1000); probe = festa.probe().mundo; }
+  assert.equal(probe.temas.cured, 0);
+  assert.equal(engine.mundo.catchTarget(probe.items[0]).ok, true);
+  events();
+  run(33);
+  assert.equal(festa.probe().mundo.temas.cured, 1, 'o zumbi foi curado');
+  run(3000);
+  assert.equal(festa.probe().mundo.temas.cured, 0, 'e depois de um tempinho some');
+});
+
+test('eventos avulsos na festa: o canhão do circo dispara a cada tiro, a fada e o balão lembram dos golpes e acabar o evento limpa tudo', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, translate() {}, fillRect() {} });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  const events = () => festa.onEvents(engine, engine.drainEvents(), now);
+  run(300);
+  // O circo: o primeiro tiro sai uns 2,5 s depois de começar e o segundo uns 9,5 s depois.
+  engine.mundo.start('circo');
+  events();
+  run(1500);
+  assert.equal(festa.probe().mundo.extras.fired, 0, 'ainda não atirou');
+  run(2500);
+  assert.equal(festa.probe().mundo.extras.fired, 1, 'primeiro tiro');
+  run(6000);
+  assert.equal(festa.probe().mundo.extras.fired, 1, 'um tiro só por vez');
+  run(4000);
+  assert.equal(festa.probe().mundo.extras.fired, 2, 'segundo tiro');
+  // A fada e o balão lembram dos golpes (a festa guarda quando cada um levou o último).
+  engine.state.mundo.active = null;
+  engine.mundo.start('fada');
+  events();
+  run(2500);
+  assert.equal(festa.probe().mundo.extras.hits, 0, 'o evento novo começou do zero');
+  assert.equal(engine.mundo.catchTarget(0).partial, true);
+  events();
+  run(33);
+  assert.equal(festa.probe().mundo.extras.hits, 1, 'o golpe foi anotado');
+  const before = festa.probe().particles;
+  assert.equal(engine.mundo.catchTarget(0).partial, true);
+  events();
+  run(33);
+  assert.ok(festa.probe().particles > before, 'purpurina no lugar onde ela sumiu');
+  // Pegar a fada de vez: chuva de purpurina.
+  for (let i = 0; i < 3; i++) engine.mundo.catchTarget(0);
+  events();
+  run(33);
+  assert.ok(festa.probe().mundo.taken.includes(0));
+  // O balão gigante: cada golpe só balança (nada é pago) e o último estoura.
+  engine.state.mundo.active = null;
+  engine.mundo.start('baloagigante');
+  events();
+  run(3000);
+  for (let i = 0; i < 6; i++) { assert.equal(engine.mundo.catchTarget(0).partial, true); events(); run(33); }
+  assert.equal(engine.state.mundo.caught.baloagigante, undefined);
+  assert.equal(engine.mundo.catchTarget(0).ok, true);
+  events();
+  run(33);
+  assert.ok(festa.probe().mundo.taken.includes(0), 'estourou');
+});
+
+test('eventos avulsos (segunda leva) na festa: o gol da pelada, a cartola do coelho e a limpeza no fim do evento', () => {
+  const { fakeContext } = require('./fake-dom');
+  require('../src/festa-mundo-temas.js');
+  require('../src/festa-mundo-extras.js');
+  require('../src/festa-mundo-extras2.js');
+  require('../src/festa-mundo.js');
+  globalThis.document = fakeDocument([], { drawImage: 0 });
+  globalThis.Image = class { set src(value) { this.value = value; this.complete = true; this.width = 12; this.onload?.(); } };
+  require('../src/festa.js');
+  const canvas = globalThis.document.createElement('canvas');
+  canvas.getContext = () => ({ ...fakeContext(), drawImage() {}, translate() {}, fillRect() {} });
+  const festa = globalThis.ArraiaFesta.create(canvas, bundle, {});
+  festa.setScale(3);
+  const clock = { t: 1_700_000_000_000 };
+  const engine = new GameEngine(data, null, { rng: () => 0.3, now: () => clock.t });
+  engine.state.size = engine.state.records.size = 110;
+  engine.state.weather.nextAt = 1e18;
+  engine.state.mundo.nextAt = 1e18;
+  let now = 5000;
+  const run = ms => { for (let spent = 0; spent < ms; spent += 33) { now += 33; clock.t += 33; festa.draw(engine, now); } };
+  const events = () => festa.onEvents(engine, engine.drainEvents(), now);
+  run(300);
+  // A pelada: cada chute é lembrado e o sexto (o gol) marca o gol; no fim do evento a festa esquece tudo.
+  engine.mundo.start('pelada');
+  events();
+  run(2500);
+  assert.deepEqual([festa.probe().mundo.extras2.hits, festa.probe().mundo.extras2.goal], [0, false]);
+  const before = festa.probe().particles;
+  assert.equal(engine.mundo.catchTarget(0).partial, true);
+  events();
+  run(33);
+  assert.equal(festa.probe().mundo.extras2.hits, 1, 'o chute foi anotado');
+  assert.ok(festa.probe().particles > before, 'pedacinhos de grama');
+  for (let i = 0; i < 4; i++) { engine.mundo.catchTarget(0); events(); }
+  assert.equal(engine.mundo.catchTarget(0).ok, true, 'o sexto chute é o gol');
+  events();
+  run(33);
+  assert.equal(festa.probe().mundo.extras2.goal, true, 'gol');
+  assert.ok(festa.probe().mundo.taken.includes(0));
+  // O coelho: uma nuvem de estrelas da cartola a cada coelho que sai.
+  engine.state.mundo.active = null;
+  engine.mundo.start('coelho');
+  events();
+  run(1500);
+  assert.equal(festa.probe().mundo.extras2.fired, 0, 'ainda não saiu coelho');
+  run(2000);
+  assert.equal(festa.probe().mundo.extras2.fired, 1, 'o primeiro coelho');
+  run(9000);
+  assert.equal(festa.probe().mundo.extras2.fired, 2, 'o segundo');
+  // Um evento novo (a cartola solta o primeiro coelho de novo: cada evento tem chaves novas, as antigas ficam guardadas).
+  engine.state.mundo.active = null;
+  engine.mundo.start('coelho');
+  events();
+  run(4000);
+  assert.equal(festa.probe().mundo.extras2.fired, 3, 'mais um tiro de estrelas no evento novo');
 });

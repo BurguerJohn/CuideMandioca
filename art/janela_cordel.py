@@ -57,6 +57,54 @@ def icones():
     return saida
 
 
+def painel():
+    """O painel de baixo (224 x 48): uma mesa de madeira escura e, em cima, o folheto de cordel pendurado num barbante com dois pregadores
+    (papel creme com a moldura de xilogravura em volta do bloco dos versos) e a trilha das bolinhas das páginas."""
+    import random
+    from casa import Tela as _Tela
+    t = _Tela(W, H - CENA)
+    gerador = random.Random(21)
+    t.rect(0, 0, W - 1, H - CENA - 1, '#3a2418')
+    for y in range(0, H - CENA, 3):
+        for x in range(W):
+            if (x * 7 + y * 13) % 11 < 2:
+                t.put(x, y, '#46301f')
+    t.rect(0, 0, W - 1, 0, '#8a5a30')
+    t.rect(0, 1, W - 1, 1, '#d8a860')
+    t.rect(0, 2, W - 1, 2, '#10100c')
+    # O barbante e os pregadores (a folha pende dele).
+    for x in range(W):
+        t.put(x, 3 + (1 if 40 < x < 184 and x % 24 < 12 else 0), '#c8a868')
+    # O papel do folheto: creme, com fibras, bordas gastas e a moldura de dentinhos pretos.
+    t.rect(2, 3, 221, 35, '#e8d4a0')
+    for _ in range(90):
+        t.put(gerador.randrange(3, 221), gerador.randrange(4, 35), gerador.choice(['#d8c088', '#f4e4b8', '#c8b078']))
+    t.rect(2, 3, 221, 3, '#f4e4b8')
+    t.rect(2, 35, 221, 35, '#b89a58')
+    t.rect(2, 3, 2, 35, '#f0dca8')
+    t.rect(221, 3, 221, 35, '#b89a58')
+    for y in range(5, 34, 4):                           # dentinhos de xilogravura nas margens dos lados
+        t.rect(4, y, 6, y + 1, '#26242e')
+        t.rect(217, y + 1, 219, y + 2, '#26242e')
+    # O bloco escuro dos versos (onde a janela escreve): 4 linhas de texto cabem dentro dele.
+    t.rect(10, 4, 213, 34, '#10100c')
+    t.rect(11, 5, 212, 33, '#2a1a10')
+    # Pregadores de madeira segurando o papel.
+    for px in (34, 188):
+        t.rect(px, 1, px + 4, 8, '#b07a48')
+        t.rect(px, 1, px, 8, '#d8a060')
+        t.rect(px + 4, 1, px + 4, 8, '#7a4a28')
+        t.rect(px + 1, 4, px + 3, 4, '#5a3418')
+        t.put(px + 2, 2, '#ffe0a0')
+    # A trilha das bolinhas e as casinhas dos botões, fundas na madeira.
+    t.rect(21, 37, 202, 47, '#150c06')
+    t.rect(22, 38, 201, 46, '#241608')
+    t.rect(22, 47, 201, 47, '#6a4428')
+    for x0 in (3, W - 17):
+        t.rect(x0 - 1, 36, x0 + 14, 48, '#150c06')
+    return t.im
+
+
 def exportar(add):
     paginas = []
     for numero in range(1, PAGINAS + 1):
@@ -67,4 +115,4 @@ def exportar(add):
         paginas.append(meta)
     nomes = list(ICONES)
     imagens = icones()
-    return {'paginas': paginas, 'ui': {**add('cordel-ui', [imagens[nome] for nome in nomes]), 'ids': nomes}, 'w': W, 'h': H, 'cena': CENA}
+    return {'paginas': paginas, 'ui': {**add('cordel-ui', [imagens[nome] for nome in nomes]), 'ids': nomes}, 'painel': add('cordel-painel', painel()), 'w': W, 'h': H, 'cena': CENA}

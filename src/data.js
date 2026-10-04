@@ -740,15 +740,16 @@ globalThis.GAME_DATA = {
     // perfeitos valem 3, bons 2, sobre 3 por nota) dá 0 a 3 estrelas (`stars`: o mínimo de cada uma) e o prêmio de `rewards`; a
     // primeira vez que uma música tira 3 estrelas rende `firstThree` a mais. Depois de um show premiado o palco descansa `wait` s
     // (dá para ensaiar nesse tempo, sem prêmio). Cada música só abre depois de 1 estrela na anterior. As notas saem de `seed`
-    // (sempre as mesmas) a cada meio tempo, `lead` ms depois de começar.
+    // (sempre as mesmas) a cada meio tempo, `lead` ms depois de começar. Cada música tem a sua trilha (src/som.js, no mesmo `bpm`); `key` é
+    // quantos semitons a tonalidade dela fica abaixo do sol, para o acorde de sanfona da pista casar com a trilha.
     palco: {
       lead: 2200, travel: 1700, perfect: 80, good: 150, wait: 480, stars: [0.45, 0.7, 0.9],
       rewards: [{}, { cheer: 60 }, { cheer: 150, love: 3 }, { cheer: 300, love: 6, tickets: 1 }], firstThree: { tickets: 2 },
       songs: [
-        { id: 'xote', name: 'Xote da Mandioca', bpm: 100, notes: 26, seed: 11 },
-        { id: 'baiao', name: 'Baião Quentinho', bpm: 118, notes: 34, seed: 23 },
-        { id: 'forro-ouro', name: 'Forró de Ouro', bpm: 136, notes: 42, seed: 37 },
-        { id: 'arrasta-pe', name: 'Arrasta-pé', bpm: 150, notes: 52, seed: 41 }
+        { id: 'xote', name: 'Xote da Mandioca', bpm: 100, notes: 26, seed: 11, key: 0 },
+        { id: 'baiao', name: 'Baião Quentinho', bpm: 118, notes: 34, seed: 23, key: -5 },
+        { id: 'forro-ouro', name: 'Forró de Ouro', bpm: 136, notes: 42, seed: 37, key: -7 },
+        { id: 'arrasta-pe', name: 'Arrasta-pé', bpm: 150, notes: 52, seed: 41, key: -5 }
       ]
     },
 
@@ -1057,6 +1058,9 @@ globalThis.GAME_DATA = {
   // pagar `cost` fichas dá `bonus` de Animação por `seconds` segundos (os nomes das barracas são `shop0`, `shop1`...). Sem alvos (`targets: 0`) o evento
   // só dá o bônus; no tesouro (`loot`) cada alvo guarda um prêmio sorteado dessa lista; com `ordered` os alvos só valem na ordem (0, 1, 2...); com `hits` cada alvo aguenta tantos golpes (cliques) antes de pagar (só o último paga).
   // `chat0` e `chat1` são as duas falas da turma durante o evento (só A-Z, 0-9 e ` .,:!?+%-`, até 24 letras: vão na fonte de pixel).
+  // Eventos de tema (`tema`: dino, halloween ou zumbi, os ids de `themes`): só entram no sorteio com um conjunto completo daquele tema vestido (chapéu, mão e
+  // tecido do mesmo tema: Era Jurássica, Bruxa, Zumbi de Festa...). Vestido, cada sorteio tem `temaChance` de sair da lista do tema; trocar de roupa refaz a
+  // previsão na hora. Ver o evento de tema sem o conjunto só dá pelo botão de teste.
   // Nos dias de santo (`saintDays`, ids de `specialDays`) a pausa entre eventos cai pela metade, e em cada dia especial de `dayBoost` alguns eventos
   // ficam `x` vezes mais comuns no sorteio (os da época: pétalas e procissão em Santo Antônio, fogos e pinhata em São João, temporal em São Pedro).
   // `chains`: ao acabar um evento, com a chance dada o seguinte vem `delay` segundos depois (e aparece na previsão); só se já couber na festa.
@@ -1066,6 +1070,7 @@ globalThis.GAME_DATA = {
     completeKinds: 12,
     // A placa avisa "Em breve" quando o próximo evento está a `soon` segundos ou menos.
     soon: 90,
+    temaChance: 0.5,
     dayBoost: {
       namorados: { ids: ['petalas', 'estrelas', 'lua', 'constelacao'], x: 3 },
       antonio: { ids: ['petalas', 'procissao', 'revoada', 'baloes'], x: 3 },
@@ -1147,7 +1152,79 @@ globalThis.GAME_DATA = {
       { id: 'fichas', chat0: 'CHOVE FICHA!', chat1: 'PEGA, PEGA, PEGA!', name: 'Chuva de fichas', text: 'Fichas douradas caem do céu aos montes e por pouco tempo: seja rápido e pegue todas.', seconds: 25, weight: 1, minSize: 50, bonus: 0.05, targets: 15,
         reward: { tickets: 2 }, finale: { tickets: 24, cheer: 400 } },
       { id: 'cometa', chat0: 'UM COMETA!', chat1: 'NUNCA VI IGUAL!', name: 'Cometa de São João', text: 'Um cometa raro cruza o céu devagar: o pedido feito nele sempre se realiza.', seconds: 28, weight: 1, minSize: 40, bonus: 0.2, targets: 1,
-        reward: { tickets: 10, cheer: 300 }, finale: { tickets: 10, love: 10, cheer: 300 } }
+        reward: { tickets: 10, cheer: 300 }, finale: { tickets: 10, love: 10, cheer: 300 } },
+
+      // Eventos avulsos (sem tema e nem precisam ser de São João): bolhas, aviõezinhos de papel, abelhas, patinhos de borracha, planeta com luas, canhão do circo,
+      // balão gigante da Mandioca, balada, baleia voadora e uma fada desastrada (src/festa-mundo-extras.js).
+      { id: 'bolhas', chat0: 'QUE BOLHA GRANDE!', chat1: 'NAO ESTOURA ELA!', name: 'Bolhas de sabão gigantes', text: 'Bolhas de sabão enormes sobem pela festa brilhando em todas as cores: estoure cada uma com um clique antes que subam demais.', seconds: 45, weight: 3, minSize: 12, bonus: 0.05, targets: 8,
+        reward: { love: 1, cheer: 25 }, finale: { tickets: 4, belly: 10, love: 3 } },
+      { id: 'avioes', chat0: 'OLHA O AVIAOZINHO!', chat1: 'DOBRA OUTRO DAI!', name: 'Esquadrilha de aviõezinhos de papel', text: 'Aviões de papel dobrados pela turma planam pela festa fazendo piruetas: clique em cada um antes que pouse.', seconds: 42, weight: 3, minSize: 15, bonus: 0.05, targets: 6,
+        reward: { tickets: 1, cheer: 20 }, finale: { tickets: 4, wood: 3, love: 2 } },
+      { id: 'patinhos', chat0: 'QUAC QUAC QUAC!', chat1: 'QUE FOFURA DE PATO!', name: 'Parada de patinhos de borracha', text: 'Uma fila de patinhos de borracha desfila pelo chão da festa apitando: cumprimente cada patinho com um clique.', seconds: 45, weight: 2, minSize: 20, bonus: 0.06, targets: 6,
+        reward: { love: 2, cheer: 20 }, finale: { tickets: 5, belly: 10, love: 4 } },
+      { id: 'abelhas', chat0: 'ZZZZZ! ABELHAS!', chat1: 'CUIDADO COM O FERRAO!', name: 'Enxame de abelhas', text: 'Um enxame de abelhas zumbe pela festa em zigue-zague: clique nelas rápido, que elas não param, e leve o mel!', seconds: 40, weight: 2, minSize: 20, bonus: 0.07, targets: 7,
+        reward: { belly: 6, cheer: 25 }, finale: { tickets: 4, belly: 20, love: 3 } },
+      { id: 'planetas', chat0: 'OLHA O PLANETA!', chat1: 'TEM ANEL E TUDO!', name: 'Alinhamento planetário', text: 'Um planeta de anéis aparece no céu com as luas girando em volta: clique nas luas em órbita.', seconds: 50, weight: 2, minSize: 30, bonus: 0.08, targets: 5,
+        reward: { love: 1, cheer: 40 }, finale: { tickets: 6, wood: 3, love: 4, cheer: 80 } },
+      { id: 'circo', chat0: 'PALHACO NO AR!', chat1: 'LA VAI O HOMEM-BALA!', name: 'Canhão do circo', text: 'O circo chegou! O canhão dispara palhaços pelo céu da festa: clique em cada palhaço no ar antes que ele caia na rede.', seconds: 50, weight: 2, minSize: 35, bonus: 0.08, targets: 5,
+        reward: { tickets: 1, cheer: 40 }, finale: { tickets: 6, wood: 4, love: 4, cheer: 60 } },
+      { id: 'balada', chat0: 'ABRE A RODA!', chat1: 'SOBE O SOM!', name: 'Noite de balada', text: 'Uma bola de espelhos desce do céu e a festa vira balada: raios de luz colorida varrem o mapa e dá para pegar os pontinhos de luz que dançam no chão.', seconds: 50, weight: 2, minSize: 40, bonus: 0.12, targets: 6,
+        reward: { love: 1, cheer: 45 }, finale: { tickets: 6, belly: 15, love: 5, cheer: 80 } },
+      { id: 'baleia', chat0: 'UMA BALEIA NO CEU!', chat1: 'OLHA O CARDUME!', name: 'Baleia voadora', text: 'Uma baleia azul gigante nada pelo céu seguida de um cardume de peixinhos: pegue os peixes enquanto ela passa.', seconds: 50, weight: 2, minSize: 45, bonus: 0.1, targets: 6,
+        reward: { belly: 5, love: 1, cheer: 30 }, finale: { tickets: 6, belly: 20, love: 5, cheer: 60 } },
+      { id: 'baloagigante', chat0: 'QUE BALAO ENORME!', chat1: 'E A MANDIOCA!', name: 'Balão gigante da Mandioca', text: 'Um balão inflável gigante da Mandioca cruza o céu da festa: cutuque o balão várias vezes até ele estourar numa chuva de confete e prêmios.', seconds: 45, weight: 1, minSize: 50, bonus: 0.15, targets: 1, hits: 7,
+        reward: { tickets: 10, cheer: 400, love: 6 }, finale: { tickets: 14, wood: 10, love: 8, cheer: 400, belly: 20 } },
+      { id: 'fada', chat0: 'UMA FADA NA FESTA!', chat1: 'ELA ESCAPOU DE NOVO!', name: 'Fada desastrada', text: 'Uma fadinha atrapalhada voa pela festa espalhando purpurina: ela some e reaparece em outro lugar a cada clique, então cutuque a fada cinco vezes para pegar o desejo dela.', seconds: 45, weight: 1, minSize: 40, bonus: 0.12, targets: 1, hits: 5,
+        reward: { tickets: 8, cheer: 300, love: 6 }, finale: { tickets: 12, wood: 6, love: 10, cheer: 300 } },
+
+      // Segunda leva de eventos avulsos (src/festa-mundo-extras2.js): chuva de chapéus, pelada, toupeiras, coelho da cartola, aurora, a vaca e a lua, Esquadrilha da Fumaça
+      // e o tornado de tubarões.
+      { id: 'chapeus', chat0: 'ESSE CHAPEU E MEU!', chat1: 'CHOVEU CHAPEU!', name: 'Chuva de chapéus', text: 'Chapéus de todos os tipos caem do céu, de cartola a chapéu de pirata: pegue cada um antes que chegue ao chão.', seconds: 45, weight: 3, minSize: 15, bonus: 0.05, targets: 8,
+        reward: { love: 1, cheer: 20 }, finale: { tickets: 4, wood: 3, love: 2 } },
+      { id: 'toupeiras', chat0: 'OLHA A TOUPEIRA!', chat1: 'CADE ELA AGORA?', name: 'Toupeiras no terreiro', text: 'Toupeiras de capacete aparecem nos buracos do terreiro e se escondem logo: acerte cada uma antes que ela suma.', seconds: 45, weight: 2, minSize: 20, bonus: 0.06, targets: 8,
+        reward: { belly: 3, cheer: 25 }, finale: { tickets: 5, belly: 12, love: 3 } },
+      { id: 'pelada', chat0: 'PASSA A BOLA!', chat1: 'CHUTA PRO GOL!', name: 'Pelada de futebol', text: 'Uma bola de futebol quica pela festa: dê vários chutes (cliques) nela até ela entrar no gol.', seconds: 45, weight: 2, minSize: 25, bonus: 0.08, targets: 1, hits: 6,
+        reward: { tickets: 3, cheer: 120, love: 2 }, finale: { tickets: 6, wood: 4, belly: 12, love: 3 } },
+      { id: 'vacalua', chat0: 'A VACA PULOU A LUA!', chat1: 'MUUUUU NO CEU!', name: 'A vaca pulou a lua', text: 'Uma lua enorme sobe e a vaca pula por cima dela: clique na vaca no ar (e olha o prato fugindo com a colher).', seconds: 40, weight: 2, minSize: 25, bonus: 0.07, targets: 4,
+        reward: { tickets: 1, cheer: 40, love: 1 }, finale: { tickets: 6, wood: 3, love: 5, cheer: 90 } },
+      { id: 'coelho', chat0: 'ABRACADABRA!', chat1: 'SAIU UM COELHO!', name: 'Coelho da cartola', text: 'Um mágico tira coelhos de uma cartola gigante: clique em cada coelho enquanto ele pula para longe.', seconds: 45, weight: 2, minSize: 30, bonus: 0.07, targets: 6,
+        reward: { love: 2, cheer: 30 }, finale: { tickets: 5, wood: 3, love: 5, cheer: 60 } },
+      { id: 'fumaca', chat0: 'E A FUMACA!', chat1: 'QUE VOO LINDO!', name: 'Esquadrilha da Fumaça', text: 'Jatinhos de acrobacia cruzam o céu deixando rastros de fumaça verde, amarela e azul: clique em cada jato.', seconds: 50, weight: 2, minSize: 35, bonus: 0.08, targets: 6,
+        reward: { tickets: 1, cheer: 30 }, finale: { tickets: 5, wood: 3, love: 3 } },
+      { id: 'aurora', chat0: 'QUE LUZES BONITAS!', chat1: 'PARECE MAGICA!', name: 'Aurora na festa', text: 'Cortinas de luz verde e roxa dançam no céu e espíritos da aurora passeiam: clique neles.', seconds: 50, weight: 2, minSize: 35, bonus: 0.12, targets: 5,
+        reward: { love: 1, cheer: 35 }, finale: { tickets: 5, love: 6, cheer: 100 } },
+      { id: 'tubaroes', chat0: 'CHOVEU TUBARAO!', chat1: 'FUJAM PARA AS COLINAS!', name: 'Tornado de tubarões', text: 'Um tornado passa pela festa levando tubarões de pelúcia: clique em cada tubarão que gira no vento.', seconds: 50, weight: 1, minSize: 40, bonus: 0.12, targets: 6,
+        reward: { tickets: 2, cheer: 120 }, finale: { tickets: 12, wood: 6, love: 8, cheer: 250 } },
+
+      // Dinossauros (com um conjunto de dinossauros vestido).
+      { id: 'pterodatilos', tema: 'dino', chat0: 'LEVOU MINHA BANDEIRA!', chat1: 'OLHA O PTERODATILO!', name: 'Revoada de pterodátilos', text: 'Pterodátilos atravessam o céu levando bandeirinhas no bico: clique em cada um antes que sumam com elas.', seconds: 42, weight: 3, minSize: 12, bonus: 0.05, targets: 5,
+        reward: { love: 2, cheer: 30 }, finale: { tickets: 4, wood: 3, love: 2 } },
+      { id: 'manada', tema: 'dino', chat0: 'O CHAO ESTA TREMENDO!', chat1: 'QUE FILHOTE FOFO!', name: 'Debandada da manada', text: 'Uma manada de dinossauros passa correndo ao longe e o chão treme: pegue os filhotinhos de chapéu de palha que vão atrás.', seconds: 48, weight: 2, minSize: 12, bonus: 0.08, targets: 6,
+        reward: { tickets: 1, cheer: 35 }, finale: { tickets: 5, belly: 15, love: 3 } },
+      { id: 'ovos', tema: 'dino', chat0: 'ELE VAI NASCER!', chat1: 'OVO RACHANDO!', name: 'Choca-choca de ovos', text: 'Quatro ovos de dinossauro estão quase chocando na frente da festa: clique três vezes em cada um para ajudar o bichinho a sair da casca.', seconds: 55, weight: 2, minSize: 12, bonus: 0.06, targets: 4, hits: 3,
+        reward: { love: 2, cheer: 50 }, finale: { tickets: 6, wood: 4, love: 4 } },
+      { id: 'meteoro', tema: 'dino', chat0: 'OLHA O METEORO!', chat1: 'SALVE-SE QUEM PUDER!', name: 'Meteoro da extinção', text: 'Uma bola de fogo gigante desce do céu: clique várias vezes para quebrar o meteoro antes que ele chegue (os dinossauros agradecem).', seconds: 40, weight: 1, minSize: 25, bonus: 0.12, targets: 1, hits: 8,
+        reward: { tickets: 10, cheer: 300, love: 4 }, finale: { tickets: 12, wood: 8, love: 8, cheer: 300 } },
+
+      // Halloween (com um conjunto de Halloween vestido).
+      { id: 'bruxas', tema: 'halloween', chat0: 'HIHIHI! QUE SUSTO!', chat1: 'VASSOURA VELOZ!', name: 'Revoada de bruxas', text: 'Bruxas em vassouras cruzam o céu da festa cacarejando: clique em cada bruxa para ganhar o doce dela.', seconds: 45, weight: 3, minSize: 12, bonus: 0.05, targets: 5,
+        reward: { tickets: 1, cheer: 30 }, finale: { tickets: 5, wood: 3, love: 3 } },
+      { id: 'abobora', tema: 'halloween', chat0: 'ABOBORA SORRINDO!', chat1: 'DOCE OU TRAVESSURA!', name: 'Abóboras acesas', text: 'Abóboras com vela dentro vão acendendo uma de cada vez no escuro: clique nelas na ordem em que acendem.', seconds: 50, weight: 2, minSize: 12, bonus: 0.08, targets: 6, ordered: true,
+        reward: { love: 2, cheer: 25 }, finale: { tickets: 6, belly: 15, love: 5 } },
+      { id: 'fantasmas', tema: 'halloween', chat0: 'BUUU! QUE ARREPIO!', chat1: 'TEM FANTASMA DANCANDO!', name: 'Fantasmas na quadrilha', text: 'Fantasmas de chapéu de palha aparecem e somem no escuro, dançando no meio da turma: clique neles enquanto dá para ver.', seconds: 50, weight: 2, minSize: 12, bonus: 0.08, targets: 6,
+        reward: { tickets: 1, cheer: 40, love: 1 }, finale: { tickets: 5, wood: 3, love: 5 } },
+      { id: 'luasangue', tema: 'halloween', chat0: 'A LUA FICOU VERMELHA!', chat1: 'QUE ARANHA GRANDE!', name: 'Lua de sangue', text: 'Uma lua vermelha sobe e as aranhas descem pelos fios das bandeirinhas: clique três vezes em cada aranha para derrubá-la.', seconds: 55, weight: 1, minSize: 25, bonus: 0.12, targets: 3, hits: 3,
+        reward: { tickets: 4, cheer: 120 }, finale: { tickets: 14, wood: 8, love: 8, cheer: 250 } },
+
+      // Zumbis (com um conjunto de zumbi vestido).
+      { id: 'horda', tema: 'zumbi', chat0: 'MIOOOLO!', chat1: 'QUERO PAMONHA!', name: 'Horda de zumbis', text: 'Zumbis de camisa de chita arrastam os pés pela festa atrás de pamonha (e de miolo): clique em cada um para dar a pamonha e matar a fome dele.', seconds: 50, weight: 3, minSize: 12, bonus: 0.05, targets: 6,
+        reward: { wood: 1, cheer: 30 }, finale: { tickets: 5, wood: 4, love: 3 } },
+      { id: 'gosma', tema: 'zumbi', chat0: 'QUE NOJO!', chat1: 'NAO PISA NA GOSMA!', name: 'Chuva de gosma', text: 'Gotas de gosma tóxica caem do céu e fazem poças que borbulham: estoure as gotas grandes antes que cheguem ao chão.', seconds: 45, weight: 2, minSize: 12, bonus: 0.07, targets: 8,
+        reward: { belly: 5, cheer: 30 }, finale: { tickets: 5, belly: 20, love: 3 } },
+      { id: 'helicoptero', tema: 'zumbi', chat0: 'OLHA A CAIXA CAINDO!', chat1: 'CHEGOU O RESGATE!', name: 'Suprimentos do helicóptero', text: 'Um helicóptero passa lançando caixas de suprimentos de paraquedas: pegue as caixas antes que toquem o chão.', seconds: 45, weight: 2, minSize: 12, bonus: 0.08, targets: 5,
+        reward: { tickets: 1, wood: 1, cheer: 20 }, finale: { tickets: 6, wood: 5, love: 3 } },
+      { id: 'surto', tema: 'zumbi', chat0: 'MAO SAINDO DA TERRA!', chat1: 'FUJAM! E O SURTO!', name: 'Surto zumbi', text: 'A sirene toca e mãos de zumbi saem das covas: clique três vezes em cada mão para empurrá-la de volta para baixo da terra.', seconds: 55, weight: 1, minSize: 25, bonus: 0.12, targets: 4, hits: 3,
+        reward: { tickets: 3, cheer: 100 }, finale: { tickets: 14, wood: 10, love: 8, cheer: 250 } }
     ]
   },
 
@@ -1307,7 +1384,7 @@ globalThis.GAME_DATA = {
     { id: 'colecionador', name: 'Colecionador de prêmios', text: 'Liberar 10 prêmios dos minigames.' },
     { id: 'elenco-completo', name: 'Elenco completo', text: 'Ter os 35 personagens dos minigames na festa.' },
     { id: 'festa-de-ouro', name: 'Festa de ouro', text: 'Conseguir os 35 troféus de ouro dos minigames.' },
-    { id: 'ceu-aberto', name: 'Céu aberto', text: 'Ver todos os 31 eventos do mundo (estrelas, ventania, eclipse, cometa...).' },
+    { id: 'ceu-aberto', name: 'Céu aberto', text: 'Ver todos os 61 eventos do mundo (estrelas, ventania, eclipse, cometa, bolhas, baleia, tornado de tubarões, meteoro, bruxas, zumbis...).' },
     { id: 'cacador-de-alvos', name: 'Caçador de alvos', text: 'Pegar 100 alvos dos eventos do mundo.' },
     { id: 'ceu-completo', name: 'Céu completo', text: 'Pegar todos os alvos de 12 tipos diferentes de evento do mundo.' },
     { id: 'mestre-da-pinhata', name: 'Mestre da pinhata', text: 'Estourar 9 pinhatas gigantes.' },

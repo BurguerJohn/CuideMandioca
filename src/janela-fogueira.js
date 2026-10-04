@@ -22,6 +22,8 @@
     let jump = null;
     let smokeAt = 0;
     const flights = [];                              // comidas voando do espeto até quem vai comer
+    const logs = [];                                 // lenha voando da pilha até o fogo
+    const feel = { flare: -1e9 };                    // o fogo acabou de ganhar lenha (a chama cresce e o termômetro pisca)
     const hops = meta.bancos.map(() => 0);           // quando cada espectador pulou (comeu) pela última vez
     const steamAt = new Map();
     const nameOf = id => engineRef?.data.minis.fogueira.foods.find(entry => entry.id === id)?.name || id;
@@ -135,7 +137,7 @@
             (stick.left === null ? tr('mini.fogueira.tipNoHeat') : tr('mini.fogueira.tipLeft', { n: stick.left }));
         }
       }
-      base.region(`espeto:${slot}`, tx - 14, ty - 14, 28, 24, { espeto: slot, tip });
+      base.region(`espeto:${slot}`, tx - 14, ty - 14, 28, 24, { espeto: slot, tip, hot: !stick || stick.ready });
     }
 
     // A bolha branca com um coração vermelho (a comida está pronta: é só comer).
@@ -154,7 +156,7 @@
     }
 
     // O termômetro do fogo (tubo com bulbo): azul sem fogo, laranja e vermelho com fogo; a marca branca é onde a comida começa a assar.
-    function drawGauge(info) {
+    function drawGauge(info, now) {
       const [x0, y0, x1, y1] = meta.medidor;
       const g = base.g;
       const cfg = engineRef.data.minis.fogueira;
@@ -162,6 +164,7 @@
       const top = y0 + 4;
       const bottom = y1 - 8;
       const height = bottom - top;
+      const shown = base.ease('heat', info.heat, now, 5);
       g.fillStyle = '#26242e';
       g.fillRect(tx - 1, top - 1, 8, height + 3);
       g.fillRect(tx - 2, bottom - 1, 10, 10);
@@ -171,15 +174,27 @@
       g.fillStyle = color;
       g.fillRect(tx - 1, bottom, 8, 7);
       g.fillRect(tx, bottom - 1, 6, 1);
-      const fill = Math.round(height * info.heat / info.heatMax);
+      const fill = Math.round(height * shown / info.heatMax);
       g.fillRect(tx + 1, bottom - fill, 4, fill + 1);
       g.fillStyle = '#ffffff';
       g.fillRect(tx + 1, bottom + 1, 2, 2);
       const mark = bottom - Math.round(height * cfg.minHeat / info.heatMax);
+      // Tem comida no fogo mas ele está frio demais para assar: a marca pisca em vermelho (ponha lenha).
+      const stalled = info.heat < cfg.minHeat && info.sticks.some(stick => stick && !stick.ready);
+      g.fillStyle = stalled && Math.floor(now / 260) % 2 === 0 ? '#ff5a5a' : '#ffffff';
       g.fillRect(tx - 2, mark, 10, 1);
+      // Lenha nova: o tubo brilha por um instante.
+      const pulse = now - feel.flare;
+      if (pulse < 420) {
+        g.globalAlpha = 0.6 * (1 - pulse / 420);
+        g.fillStyle = '#fff2b0';
+        g.fillRect(tx - 1, top - 1, 8, height + 3);
+        g.globalAlpha = 1;
+      }
       // A chama em cima do termômetro.
       g.fillStyle = info.heat < cfg.minHeat ? '#7a8aa8' : '#ffb84a';
       for (const [dx, dy, w] of [[2, 0, 2], [1, 1, 4], [1, 2, 4], [0, 3, 6], [1, 4, 4]]) g.fillRect(tx + dx, y0 - 5 + dy, w, 1);
+      if (stalled) base.glow(tx + 3, mark, 8, '#ff5a5a', 0.1 + 0.06 * Math.sin(now / 130));
       base.region('termometro', x0 - 2, y0 - 8, x1 - x0 + 8, y1 - y0 + 10, { tip: tr('mini.fogueira.tipHeat', { n: Math.round(info.heat), min: cfg.minHeat }) });
     }
 
@@ -204,8 +219,11 @@
           hops[f.bench] = now;
           base.spawn('coracao', to.x - 4, to.y - small.h - 4, now);
           base.spawn('estrela', to.x + 2, to.y - small.h - 10, now);
-          base.say(tr('mini.fogueira.eat'), to.x, to.y - small.h - 18, now, '#9ef05a');
-          f.lines.forEach((line, k) => base.say(line, to.x, to.y - small.h - 26 - k * 7, now, '#ffe27a'));
+          base.bits(to.x, to.y - small.h, 14, now, { colors: ['#ffd21e', '#ff8aa8', '#ffffff', '#9ef05a', '#ff8a12'], speed: 44, up: 24, gravity: 90, ms: 850 });
+          base.ring(to.x, to.y - small.h * 0.6, now, { from: 3, to: 20, color: '#ffe27a', ms: 500, thick: 2 });
+          base.pop(tr('mini.fogueira.eat'), to.x, to.y - small.h - 14, now, '#9ef05a', { scale: 2, ms: 1200, rise: 10 });
+          base.tag(f.lines.map(line => [line, '#ffe27a']), to.x, to.y - small.h - 24, now);
+          base.shake(0.8, 200, now);
           flights.splice(i, 1);
           continue;
         }
@@ -213,6 +231,32 @@
         const x = f.from[0] + (to.x - f.from[0]) * t;
         const y = f.from[1] + (to.y - small.h * 0.6 - f.from[1]) * t - Math.sin(Math.PI * t) * 26;
         base.sprite(meta.comidas, f.index, x - meta.comidas.w / 2, y - meta.comidas.h / 2);
+      }
+    }
+
+    // Uma tora sai da pilha em arco e cai no fogo: faísca, anel, clarão laranja e o fogo cresce.
+    function drawLogs(now) {
+      for (let i = logs.length - 1; i >= 0; i--) {
+        const l = logs[i];
+        const t = (now - l.t0) / 380;
+        if (t >= 1) {
+          logs.splice(i, 1);
+          feel.flare = now;
+          base.bits(meta.fogo[0], meta.fogo[1] - 8, 14, now, { colors: ['#ffd21e', '#ff8a12', '#ff5a2a', '#fff0a0'], speed: 46, arc: [-2.8, -0.35], gravity: 80, ms: 800 });
+          base.ring(meta.fogo[0], meta.fogo[1] - 6, now, { from: 3, to: 18, color: '#ffb84a', ms: 440 });
+          base.flash('#ff9a3a', 0.1, 220, now, { x: meta.fogo[0] - 30, y: meta.fogo[1] - 50, w: 60, h: 56 });
+          continue;
+        }
+        const x = l.from[0] + (meta.fogo[0] - l.from[0]) * t;
+        const y = l.from[1] + (meta.fogo[1] - 6 - l.from[1]) * t - Math.sin(Math.PI * t) * 28;
+        base.g.fillStyle = '#26242e';
+        base.g.fillRect(Math.round(x) - 5, Math.round(y) - 2, 11, 5);
+        base.g.fillStyle = '#8a5a34';
+        base.g.fillRect(Math.round(x) - 4, Math.round(y) - 1, 9, 3);
+        base.g.fillStyle = '#c88a50';
+        base.g.fillRect(Math.round(x) - 4, Math.round(y) - 1, 9, 1);
+        base.g.fillStyle = '#e8c488';
+        base.g.fillRect(Math.round(x) + 4, Math.round(y) - 1, 1, 3);
       }
     }
 
@@ -226,11 +270,13 @@
       drawFireflies(now);
       drawSpectators(now);
       // O fogo, as pedras da frente, e os espetos por cima: a comida assando fica na frente das chamas, não escondida atrás delas.
+      const flareT = now - feel.flare;
+      if (flareT < 700) base.glow(meta.fogo[0], meta.fogo[1] - 10, 30, '#ff8a2a', 0.2 * (1 - flareT / 700));
       const fireTop = drawFire(info, now);
       base.picture(meta.frente.image);
       const hitTop = Math.min(meta.fogo[1] - 40, fireTop ?? meta.fogo[1] - 40);
       base.region('fogo', meta.fogo[0] - 22, hitTop, 44, meta.fogo[1] + 6 - hitTop, { tip: info.canJump ? tr('mini.fogueira.tipFire')
-        : info.heat < cfg.jumpMinHeat ? tr('mini.fogueira.tipFireCold') : tr('mini.fogueira.tipFireWait', { n: Math.ceil(info.jumpWait) }) });
+        : info.heat < cfg.jumpMinHeat ? tr('mini.fogueira.tipFireCold') : tr('mini.fogueira.tipFireWait', { n: Math.ceil(info.jumpWait) }), hot: info.canJump });
       info.sticks.forEach((stick, slot) => drawStick(slot, stick, info, now));
       // Quem pula passa por cima do fogo.
       if (jump) {
@@ -247,11 +293,11 @@
           base.sprite(small, Math.floor(now / 120) % 2, x - 7, y - 20, { w: 14, h: 20, flip: false });
         }
       }
-      drawGauge(info);
+      drawGauge(info, now);
       // Lenha (a pilha clicável, com o que sobrou) e o menu de comidas.
       const [lx0, ly0, lx1, ly1] = meta.lenha;
       base.text(String(info.wood), (lx0 + lx1) / 2, ly0 - 8, info.wood > 0 ? '#ffe27a' : '#9a9ca8');
-      base.region('lenha', lx0, ly0, lx1 - lx0, ly1 - ly0, { tip: tr('mini.fogueira.tipWood', { n: info.wood }) });
+      base.region('lenha', lx0, ly0, lx1 - lx0, ly1 - ly0, { tip: tr('mini.fogueira.tipWood', { n: info.wood }), hot: info.wood > 0 && info.heat < info.heatMax - 1 });
       info.foods.forEach((item, i) => {
         const x = meta.menuX[i];
         const chosen = info.selected === item.id;
@@ -262,11 +308,13 @@
           base.g.fillRect(x, meta.menu + 2, 27, H - meta.menu - 5);
         }
         base.sprite(meta.comidas, i * 3 + 2, x + 1, meta.menu + 2);
-        base.region(`comida:${item.id}`, x - 1, meta.menu + 1, 29, H - meta.menu - 3, { comida: item.id, tip: tr('mini.fogueira.tipFood', { food: nameOf(item.id) }) });
+        base.region(`comida:${item.id}`, x - 1, meta.menu + 1, 29, H - meta.menu - 3, { comida: item.id, tip: tr('mini.fogueira.tipFood', { food: nameOf(item.id) }), hot: !chosen });
       });
+      drawLogs(now);
       drawFlights(now);
       base.drawParticles(now);
       base.drawSays(now);
+      base.drawFx(now);
       return true;
     }
 
@@ -281,7 +329,13 @@
         if (got.ok) {
           hooks.sound?.('lenha');
           for (let k = 0; k < 3; k++) base.spawn('faisca', meta.fogo[0] - 6 + k * 6, meta.fogo[1] - 14, now);
-        } else { hooks.sound?.('erro'); base.say(tr(got.reason === 'wood' ? 'mini.fogueira.noWood' : 'mini.fogueira.full'), lx0 + 18, ly0 - 14, now, '#ff9a8a'); }
+          logs.push({ t0: now, from: [lx0 + 14, ly0 + 6] });
+          base.bits(lx0 + 14, ly0 + 4, 4, now, { colors: ['#c88a50', '#8a5a34', '#e8c488'], speed: 16, up: 12, gravity: 60, ms: 400 });
+        } else {
+          hooks.sound?.('erro');
+          base.say(tr(got.reason === 'wood' ? 'mini.fogueira.noWood' : 'mini.fogueira.full'), lx0 + 18, ly0 - 14, now, '#ff9a8a');
+          base.tap(found.point.x, found.point.y, now);
+        }
         return true;
       }
       if (found.comida) { if (model.select(found.comida)) hooks.sound?.('clique'); return true; }
@@ -290,9 +344,18 @@
         if (got.ok) {
           hooks.sound?.('pulo');
           jump = { t0: now, to: seat(1).x };
-          base.say(tr('mini.fogueira.jumped'), meta.fogo[0], meta.fogo[1] - 52, now, '#fff8e8');
-          rewardLines(got.reward).forEach((line, i) => base.say(line, meta.fogo[0], meta.fogo[1] - 60 - i * 7, now, '#ffe27a'));
-        } else { hooks.sound?.('erro'); base.say(tr(got.reason === 'cold' ? 'mini.fogueira.cold' : 'mini.fogueira.waitJump'), meta.fogo[0], meta.fogo[1] - 40, now, '#ff9a8a'); }
+          base.pop(tr('mini.fogueira.jumped'), meta.fogo[0], meta.fogo[1] - 56, now, '#fff8e8', { scale: 2, ms: 1400, rise: 8 });
+          base.tag(rewardLines(got.reward).map(line => [line, '#ffe27a']), meta.fogo[0], meta.fogo[1] - 66, now);
+          // O fogo sopra uma coluna de faíscas para o alto e a janela inteira dá uma sacudida.
+          base.bits(meta.fogo[0], meta.fogo[1] - 12, 22, now, { colors: ['#ffd21e', '#ff8a12', '#ff5a2a', '#fff0a0'], speed: 52, arc: [-2.4, -0.75], gravity: 60, ms: 1000 });
+          base.ring(meta.fogo[0], meta.fogo[1] - 6, now, { from: 4, to: 28, color: '#ffb84a', ms: 560, thick: 2 });
+          base.flash('#ffb04a', 0.18, 300, now);
+          base.shake(1.4, 320, now);
+        } else {
+          hooks.sound?.('erro');
+          base.say(tr(got.reason === 'cold' ? 'mini.fogueira.cold' : 'mini.fogueira.waitJump'), meta.fogo[0], meta.fogo[1] - 40, now, '#ff9a8a');
+          base.tap(found.point.x, found.point.y, now);
+        }
         return true;
       }
       if (found.espeto === undefined) return true;
@@ -300,10 +363,15 @@
       const [tx, ty] = meta.pontas[slot];
       const stick = model.info().sticks[slot];
       if (!stick) {
-        if (model.put(slot).ok) { hooks.sound?.('clique'); base.spawn('poeira', tx, ty, now, { dx: 1 }); }
+        if (model.put(slot).ok) {
+          hooks.sound?.('clique');
+          base.spawn('poeira', tx, ty, now, { dx: 1 });
+          base.ring(tx, ty, now, { from: 2, to: 10, color: '#fff8e8', ms: 340 });
+          base.bits(tx, ty, 5, now, { colors: ['#ffe27a', '#fff8e8'], speed: 18, up: 12, gravity: 60, ms: 450 });
+        }
         return true;
       }
-      if (!stick.ready) { hooks.sound?.('erro'); base.say(tr('mini.fogueira.notYet'), tx, ty - 18, now, '#8ed6ff'); return true; }
+      if (!stick.ready) { hooks.sound?.('erro'); base.say(tr('mini.fogueira.notYet'), tx, ty - 18, now, '#8ed6ff'); base.tap(tx, ty, now); return true; }
       const got = model.eat(slot);
       if (got.ok) {
         hooks.sound?.('carinho');
@@ -311,6 +379,8 @@
         // A comida voa até o espectador do banco mais perto; o prêmio aparece quando ela chega.
         flights.push({ index, from: [tx, ty], bench: benchOf(slot), t0: now, lines: rewardLines(got.reward) });
         base.spawn('brilho', tx - 2, ty - 8, now);
+        base.ring(tx, ty, now, { from: 3, to: 14, color: '#ffe27a', ms: 400 });
+        base.bits(tx, ty, 8, now, { colors: ['#ffd21e', '#fff0a0', '#ffffff'], speed: 28, up: 16, gravity: 70, ms: 550 });
       }
       return true;
     }
@@ -329,6 +399,10 @@
           hooks.toast?.(tr('mini.fogueira.readyToast', { food: nameOf(event.food) }));
           const [tx, ty] = meta.pontas[event.slot] || meta.fogo;
           base.spawn('estrela', tx - 3, ty - 10, now);
+          // Ficou no ponto: estouro de brilhos e o aviso em cima do espeto.
+          base.ring(tx, ty - 4, now, { from: 3, to: 16, color: '#9ef05a', ms: 520, thick: 2 });
+          base.bits(tx, ty - 4, 10, now, { colors: ['#ffd21e', '#fff0a0', '#9ef05a'], speed: 30, up: 14, gravity: 40, ms: 700 });
+          base.pop(`${tr('mini.fogueira.state.pronto')}!`, tx, ty - 22, now, '#9ef05a', { ms: 1300 });
         }
       }
     }

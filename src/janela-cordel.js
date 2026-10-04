@@ -21,12 +21,13 @@
   function create(canvas, bundle, hooks = {}) {
     const meta = bundle.janelas.cordel;
     const base = Base.create(canvas, bundle, { width: W, height: H, sound: hooks.sound,
-      images: [...meta.paginas.map(page => page.image), meta.ui.image, ...Object.values(bundle.chars).map(entry => entry.image)] });
+      images: [...meta.paginas.map(page => page.image), meta.ui.image, meta.painel.image, ...Object.values(bundle.chars).map(entry => entry.image)] });
     const tr = hooks.t || Base.tr;
     let engineRef = null;
     let shown = 0;                   // a página que está na tela (a do motor, depois da virada)
     let turn = null;                 // { from, to, born }
     let reaction = null;             // { page, born }
+    const feel = { clicks: -1, page: 0, filledAt: {}, doneAt: {} };   // para os pontinhos acenderem com estalo e a página completa carimbar
 
     function ui(name, x, y, alpha = 1) {
       const index = meta.ui.ids.indexOf(name);
@@ -104,36 +105,31 @@
     // --- Quadro de versos e botões -------------------------------------------------------------------------------------------------
     function drawPanel(info, n, now) {
       const g = base.g;
-      g.fillStyle = '#3a2418';
-      g.fillRect(0, SCENE, W, H - SCENE);
-      g.fillStyle = '#7a4e2c';
-      g.fillRect(0, SCENE, W, 1);
-      g.fillStyle = '#10100c';
-      g.fillRect(0, SCENE + 1, W, 1);
-      // o folheto: papel com os versos
-      g.fillStyle = '#10100c';
-      g.fillRect(3, SCENE + 2, W - 6, 31);
-      g.fillStyle = '#2a1a10';
-      g.fillRect(4, SCENE + 3, W - 8, 29);
+      base.sprite(meta.painel, 0, 0, SCENE);
+      // o folheto: papel com os versos (a faixa colorida da esquerda é o trecho da história)
       g.fillStyle = ARC[pageData(n).arc];
-      g.fillRect(4, SCENE + 3, 2, 29);
+      g.fillRect(11, SCENE + 5, 2, 29);
       pageText(n).split('\n').forEach((line, i) => base.text(plain(line), W / 2 + 1, SCENE + 5 + i * 7, '#fff0cc'));
       // setas e as bolinhas das páginas
       const y = SCENE + 35;
       const canPrev = info.page > 1;
       const canNext = info.page < info.total;
-      g.fillStyle = '#10100c';
-      g.fillRect(3, y, 14, 12);
-      g.fillStyle = '#5a3820';
-      g.fillRect(4, y + 1, 12, 10);
+      for (const x of [3, W - 17]) {
+        g.fillStyle = '#10100c';
+        g.fillRect(x, y, 14, 12);
+        g.fillStyle = '#6a4428';
+        g.fillRect(x + 1, y + 1, 12, 10);
+        g.fillStyle = '#a8743c';
+        g.fillRect(x + 1, y + 1, 12, 1);
+        g.fillRect(x + 1, y + 1, 1, 10);
+        g.fillStyle = '#3a2210';
+        g.fillRect(x + 1, y + 10, 12, 1);
+        g.fillRect(x + 12, y + 1, 1, 10);
+      }
       ui('esq', 4.5, y + 0.5, canPrev ? 1 : 0.3);
-      base.region('prev', 3, y, 14, 12, { prev: true, tip: tr('mini.cordel.tipPrev') });
-      g.fillStyle = '#10100c';
-      g.fillRect(W - 17, y, 14, 12);
-      g.fillStyle = '#5a3820';
-      g.fillRect(W - 16, y + 1, 12, 10);
+      base.region('prev', 3, y, 14, 12, { prev: true, hot: canPrev, tip: tr('mini.cordel.tipPrev') });
       ui('dir', W - 14.5, y + 0.5, canNext ? 1 : 0.3);
-      base.region('next', W - 17, y, 14, 12, { next: true,
+      base.region('next', W - 17, y, 14, 12, { next: true, hot: canNext,
         tip: !canNext ? tr('mini.cordel.tipEnd') : info.page < info.unlocked ? tr('mini.cordel.tipNext') : tr('mini.cordel.tipNextLocked', { n: (info.page + 1) * info.every }) });
       const x0 = 22 + Math.round((W - 44 - info.total * 8) / 2);
       info.list.forEach(entry => {
@@ -144,11 +140,18 @@
         g.fillRect(x - 1, dy - 1, 8, 8);
         let cor = '#4a3020';
         if (entry.open) cor = entry.done ? '#ffd21e' : entry.fresh && Math.floor(now / 350) % 2 ? '#fff6b8' : ARC[entry.arc];
+        // A bolinha que acabou de completar dá um estalo (cresce e volta) e a página nova pisca com um anel de tempos em tempos.
+        const since = now - (feel.doneAt[entry.n] ?? -1e9);
+        const grow = since < 320 ? Math.round(Math.sin(since / 320 * Math.PI) * 2) : 0;
         g.fillStyle = cor;
-        g.fillRect(x, dy, 6, 6);
+        g.fillRect(x - grow, dy - grow, 6 + grow * 2, 6 + grow * 2);
+        if (entry.open && entry.fresh && Math.floor(now / 1400) !== feel['ring' + entry.n]) {
+          feel['ring' + entry.n] = Math.floor(now / 1400);
+          base.ring(x + 3, dy + 3, now, { from: 3, to: 10, color: '#fff6b8', ms: 520 });
+        }
         const title = pageData(entry.n).title;
         const tip = entry.open ? `${entry.n}. ${title}${entry.done ? ` ${tr('mini.cordel.tipDone')}` : ''}` : tr('mini.cordel.tipLockedPage', { n: entry.n, guests: entry.n * info.every });
-        base.region(`pagina:${entry.n}`, x - 1, dy - 2, 8, 10, { go: entry.n, tip });
+        base.region(`pagina:${entry.n}`, x - 1, dy - 2, 8, 10, { go: entry.n, tip, hot: entry.open && !current });
       });
     }
 
@@ -159,14 +162,18 @@
       const data = pageData(info.page);
       const cx = px + pw / 2;
       const clicks = `${entry.clicks}/${entry.goal}`;
-      base.region('ponto', px, py, pw, ph, { spot: true, tip: `${data.hint}\n${tr('mini.cordel.tipClicks', { n: entry.clicks, m: entry.goal })}` });
+      base.region('ponto', px, py, pw, ph, { spot: true, hot: !entry.done, tip: `${data.hint}\n${tr('mini.cordel.tipClicks', { n: entry.clicks, m: entry.goal })}` });
+      // Cada clique que conta acende uma bolinha com um clarão (e a seta some quando a página está completa).
+      if (feel.page !== info.page) { feel.page = info.page; feel.clicks = entry.clicks; }
+      else if (entry.clicks > feel.clicks) { feel.filledAt[entry.clicks - 1] = now; feel.clicks = entry.clicks; }
       if (!entry.done && !reacting) ui('seta', cx - 5, Math.max(1, py - 12) + Math.round(Math.sin(now / 160) * 2));
       const top = Math.max(2, py - 14);
       for (let i = 0; i < entry.goal; i++) {
         const bx = Math.round(cx - entry.goal * 3.5 + i * 7);
         base.g.fillStyle = '#10100c';
         base.g.fillRect(bx - 1, top + 11, 6, 6);
-        base.g.fillStyle = i < entry.clicks ? '#ffd21e' : '#9a8a78';
+        const flash = now - (feel.filledAt[i] ?? -1e9) < 240 && i < entry.clicks;
+        base.g.fillStyle = flash ? '#ffffff' : i < entry.clicks ? '#ffd21e' : '#9a8a78';
         base.g.fillRect(bx, top + 12, 4, 4);
       }
       if (entry.done) ui('estrela', cx - 5, top - 2 + Math.round(Math.sin(now / 300) * 1));
@@ -189,6 +196,12 @@
         const dir = turn.to > turn.from ? 1 : -1;
         drawScene(turn.from, Math.round(-dir * W * t), now);
         drawScene(turn.to, Math.round(dir * W * (1 - t)), now);
+        // A dobra da página: uma sombra que acompanha a borda de quem entra.
+        const seam = Math.round(dir > 0 ? W * (1 - t) : W * t);
+        base.g.globalAlpha = 0.35 * Math.sin(t * Math.PI);
+        base.g.fillStyle = '#10100c';
+        for (let k = 0; k < 7; k++) base.g.fillRect(seam + (dir > 0 ? -k - 1 : k), 0, 1, SCENE);
+        base.g.globalAlpha = 1;
         n = t < 0.5 ? turn.from : turn.to;
         if (t >= 1) { shown = turn.to; turn = null; n = shown; }
       } else {
@@ -203,6 +216,7 @@
       base.drawParticles(now);
       base.drawSays(now);
       drawPanel(info, n, now);
+      base.drawFx(now);
       return true;
     }
 
@@ -237,17 +251,24 @@
         const cx = px + pw / 2;
         reaction = { page, born: now };
         hooks.sound?.(data.sound);
-        base.say(plain(data.say), cx, Math.max(8, py - 2), now, '#ffe27a');
+        base.pop(plain(data.say), cx, Math.max(8, py - 2), now, '#ffe27a', { ms: 1000, rise: 10 });
         base.spawn('brilho', cx - 4, py + ph / 2, now);
         base.spawn('estrela', cx + 6, py + ph / 3, now);
+        base.ring(cx, py + ph / 2, now, { from: 4, to: 22, color: '#ffe27a', ms: 440, thick: 2 });
+        base.bits(cx, py + ph / 2, 10, now, { colors: ['#ffd21e', '#fff0a0', '#ffffff', '#ff8aa8'], speed: 40, gravity: 60, ms: 700 });
         if (got.finished) {
+          // Página completa: carimbo grande, confete da cena inteira, a bolinha da página estala e o prêmio sobe num painel.
           hooks.sound?.('conquista');
-          base.say(plain(data.done), W / 2, 12, now, '#9ef05a');
+          feel.doneAt[page] = now;
+          base.pop(plain(data.done), W / 2, 34, now, '#9ef05a', { scale: 2, ms: 2000, rise: 6 });
           for (let i = 0; i < 6; i++) base.spawn(i % 2 ? 'estrela' : 'coracao', cx - 24 + i * 10, py + ph / 2 - (i % 3) * 5, now);
+          base.bits(W / 2, 20, 44, now, { colors: ['#ffd21e', '#ff4f9e', '#3a6cf0', '#35a03a', '#ff8a12', '#ffffff'], speed: 72, arc: [0.2, 2.9], gravity: 60, ms: 1500 });
+          base.flash('#fff6c0', 0.14, 300, now, { x: 0, y: 0, w: W, h: SCENE });
+          base.shake(1.2, 260, now);
           const lines = [];
           if (got.reward?.cheer) lines.push(tr('gain.cheer', { n: compact(got.reward.cheer) }));
           if (got.reward?.tickets) lines.push(tr('gain.tickets', { n: got.reward.tickets }));
-          lines.forEach((line, i) => base.say(line, W / 2, 22 + i * 7, now, '#ffe27a'));
+          base.tag(lines.map(line => [line, '#ffe27a']), W / 2, 66, now, { ms: 3000 });
         }
         return true;
       }

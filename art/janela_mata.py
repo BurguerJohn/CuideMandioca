@@ -342,6 +342,43 @@ def fundos():
     return [cenario() for cenario in CENARIOS]
 
 
+def painel():
+    """O painel de baixo (224 x 72): madeira escura com veios, filete dourado em cima, três faixas fundas (botões, status e itens) com
+    rebites nos cantos e um cipó com folhinhas nas pontas."""
+    t = Tela(W, H - ARENA)
+    gerador = random.Random(17)
+    t.rect(0, 0, W - 1, H - ARENA - 1, '#3a2418')
+    for y in range(0, H - ARENA, 3):
+        for x in range(W):
+            if (x * 7 + y * 13) % 11 < 2:
+                t.put(x, y, '#46301f')
+            if (x * 5 + y * 3) % 17 == 0:
+                t.put(x, y + 1, '#2e1c12')
+    t.rect(0, 0, W - 1, 0, '#8a5a30')
+    t.rect(0, 1, W - 1, 1, '#d8a860')
+    t.rect(0, 2, W - 1, 2, '#10100c')
+    t.rect(0, H - ARENA - 1, W - 1, H - ARENA - 1, '#1e120a')
+    for x0, y0, x1, y1, funda in ((2, 3, 221, 19, '#2e1c12'), (2, 21, 221, 37, '#2e1c12'), (2, 39, 221, 62, '#241608'), (2, 64, 221, 70, '#2e1c12')):
+        t.rect(x0 - 1, y0 - 1, x1 + 1, y1 + 1, '#150c06')
+        t.rect(x0, y0, x1, y1, funda)
+        t.rect(x0, y1 + 1, x1, y1 + 1, '#6a4428')
+        t.rect(x0 - 1, y1 + 1, x0 - 1, y1 + 1, '#6a4428')
+        for dx, dy in ((x0 + 1, y0 + 1), (x1 - 2, y0 + 1)):
+            t.rect(dx, dy, dx + 1, dy + 1, '#8a6a30')
+            t.put(dx, dy, '#ffd860')
+        for _ in range((x1 - x0) // 9):
+            t.put(gerador.randrange(x0 + 3, x1 - 3), gerador.randrange(y0 + 1, y1), '#3a2618')
+    # Cipó com folhinhas pelas pontas da faixa do meio.
+    for lado, x in ((0, 0), (1, W - 1)):
+        for k in range(14):
+            xx = x + (k // 3 if lado == 0 else -(k // 3))
+            t.put(xx, 21 + k, '#2e8a44')
+            if k % 4 == 1:
+                t.put(xx + (2 if lado == 0 else -2), 21 + k, '#56c860')
+                t.put(xx + (3 if lado == 0 else -3), 20 + k, '#46a85a')
+    return t.im
+
+
 # --- Criaturas ---------------------------------------------------------------------------------------------------------------
 def celulas(tabela):
     """As criaturas numa só tira: cada uma com 2 quadros, centrada na célula (a maior de todas) e encostada embaixo."""
@@ -413,5 +450,6 @@ def exportar(add):
         'comuns': {**add('mata-comuns', quadros_comuns), 'ids': ids_comuns},
         'chefes': {**add('mata-chefes', quadros_chefes), 'ids': ids_chefes},
         'ui': {**add('mata-ui', [imagens[nome] for nome in nomes]), 'ids': nomes},
+        'painel': add('mata-painel', painel()),
         'chao': CHAO, 'arena': ARENA, 'w': W, 'h': H,
     }

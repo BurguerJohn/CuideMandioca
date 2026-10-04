@@ -4,6 +4,7 @@ const data = require('../src/data.js');
 const { GameEngine } = require('../src/core.js');
 
 const cfg = data.mundo;
+const TOTAL = cfg.eventos.length;
 
 function newEngine(size = 40, rngValue = 0.5, saved = null) {
   const clock = { t: 1_700_000_000_000 };
@@ -19,13 +20,16 @@ function grab(engine, k) {
 }
 const tick = (engine, clock, seconds) => { clock.t += seconds * 1000; engine.tick(Math.min(1, seconds)); };
 
-test('mundo: os trinta e um eventos têm nome, texto, tempo, peso, alvos e prêmios válidos', () => {
-  assert.equal(cfg.eventos.length, 31);
+test('mundo: todos os eventos têm nome, texto, tempo, peso, alvos e prêmios válidos', () => {
+  assert.equal(cfg.eventos.length, 61);
+  assert.equal(cfg.eventos.filter(entry => !entry.tema).length, 49, 'os 31 do céu e do tempo e os 18 avulsos');
+  assert.equal(cfg.eventos.filter(entry => entry.tema).length, 12, 'mais 12 de tema (4 de cada)');
   const ids = new Set();
   for (const entry of cfg.eventos) {
     assert.ok(!ids.has(entry.id), `${entry.id}: id repetido`);
     ids.add(entry.id);
     assert.ok(entry.name && entry.text, entry.id);
+    if (entry.tema) assert.ok(data.themes.some(theme => theme.id === entry.tema), `${entry.id}: tema que existe`);
     assert.ok(entry.seconds >= 20 && entry.seconds <= 120, `${entry.id}: tempo`);
     assert.ok(entry.weight >= 1, `${entry.id}: peso`);
     assert.ok(Number.isInteger(entry.targets) && entry.targets >= 0 && entry.targets <= 16, `${entry.id}: alvos`);
@@ -81,7 +85,7 @@ test('mundo: só começa com convidados suficientes, depois da pausa sorteada, e
 
 test('mundo: só entra no sorteio o que cabe na festa, pelo peso, e nunca repete o último', () => {
   const small = newEngine(cfg.minSize).engine;
-  const fit = cfg.eventos.filter(entry => entry.minSize <= cfg.minSize).map(entry => entry.id);
+  const fit = cfg.eventos.filter(entry => entry.minSize <= cfg.minSize && !entry.tema).map(entry => entry.id);
   for (let i = 0; i < 20; i++) {
     small.state.mundo.last = '';
     assert.ok(fit.includes(small.mundo.pick()), 'só os que cabem');
@@ -90,7 +94,7 @@ test('mundo: só entra no sorteio o que cabe na festa, pelo peso, e nunca repete
   const big = newEngine(200, 0).engine;
   assert.equal(big.mundo.pick(), cfg.eventos[0].id);
   const last = newEngine(200, 0.999999).engine;
-  assert.equal(last.mundo.pick(), cfg.eventos.at(-1).id);
+  assert.equal(last.mundo.pick(), cfg.eventos.filter(entry => !entry.tema).at(-1).id, 'sem conjunto de tema só entram os do céu e do tempo');
   // Nunca o mesmo duas vezes seguidas.
   const again = newEngine(200, 0).engine;
   again.state.mundo.last = cfg.eventos[0].id;
@@ -243,7 +247,7 @@ test('mundo: o botão de teste chama os eventos um a um, na ordem, e encerra o q
 
 test('mundo: a informação para a tela conta quantas vezes e quantos tipos já passaram', () => {
   const { engine } = newEngine(120);
-  assert.deepEqual([engine.mundo.info().seenTotal, engine.mundo.info().seenKinds, engine.mundo.info().kinds], [0, 0, 31]);
+  assert.deepEqual([engine.mundo.info().seenTotal, engine.mundo.info().seenKinds, engine.mundo.info().kinds], [0, 0, TOTAL]);
   engine.mundo.start('estrelas');
   engine.state.mundo.active = null;
   engine.mundo.start('estrelas');
@@ -253,15 +257,15 @@ test('mundo: a informação para a tela conta quantas vezes e quantos tipos já 
   assert.equal(engine.mundo.start('nao-existe'), false);
 });
 
-test('mundo: as conquistas do céu (ver os 15 eventos e juntar 100 alvos)', () => {
+test('mundo: as conquistas do céu (ver todos os eventos e juntar 100 alvos)', () => {
   const { engine } = newEngine(200);
-  assert.deepEqual(engine.achievementProgress('ceu-aberto'), [0, 31]);
+  assert.deepEqual(engine.achievementProgress('ceu-aberto'), [0, TOTAL]);
   assert.deepEqual(engine.achievementProgress('cacador-de-alvos'), [0, 100]);
   const done = () => engine.state.achievements.filter(id => ['ceu-aberto', 'cacador-de-alvos'].includes(id));
   // Cada tipo uma vez: só o último abre o Céu aberto.
   for (const entry of cfg.eventos.slice(0, -1)) { engine.state.mundo.active = null; engine.mundo.start(entry.id); }
   assert.deepEqual(done(), []);
-  assert.deepEqual(engine.achievementProgress('ceu-aberto'), [30, 31]);
+  assert.deepEqual(engine.achievementProgress('ceu-aberto'), [TOTAL - 1, TOTAL]);
   engine.state.mundo.active = null;
   engine.mundo.start(cfg.eventos.at(-1).id);
   assert.deepEqual(done(), ['ceu-aberto']);
@@ -763,7 +767,7 @@ test('almanaque: a raridade vem do peso do sorteio e os raros pagam bem mais que
   const byRarity = { common: [], uncommon: [], rare: [] };
   for (const entry of cfg.eventos) byRarity[engine.mundo.rarity(entry)].push(entry);
   assert.equal(byRarity.common.length + byRarity.uncommon.length + byRarity.rare.length, cfg.eventos.length);
-  assert.deepEqual(byRarity.rare.map(entry => entry.id), ['eclipse', 'boitata', 'ovni', 'neve', 'cheia', 'sapos', 'fichas', 'cometa']);
+  assert.deepEqual(byRarity.rare.map(entry => entry.id), ['eclipse', 'boitata', 'ovni', 'neve', 'cheia', 'sapos', 'fichas', 'cometa', 'baloagigante', 'fada', 'tubaroes', 'meteoro', 'luasangue', 'surto']);
   assert.ok(byRarity.rare.every(entry => entry.weight === 1) && byRarity.common.every(entry => entry.weight >= 3));
   // O prêmio final de cada raro (fichas + animação/10 + carinho + lenha + barriga) vale pelo menos o dobro do de um evento comum.
   const worth = entry => { const f = entry.finale || {}; return (f.tickets || 0) + (f.cheer || 0) / 25 + (f.love || 0) + (f.wood || 0) + (f.belly || 0) / 4; };
@@ -803,7 +807,7 @@ test('almanaque: uma linha por evento com o que passou, a raridade, se já cabe 
   rows = engine.mundo.almanac();
   assert.deepEqual([row('estrelas').seen, row('estrelas').caught, row('estrelas').done], [3, 17, 2]);
   const info = engine.mundo.info();
-  assert.equal(info.rareKinds, 8);
+  assert.equal(info.rareKinds, 14);
   assert.equal(info.rareSeen, 0);
   assert.equal(info.doneKinds, 1);
   engine.state.mundo.seen.cometa = 1;

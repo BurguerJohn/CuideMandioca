@@ -412,9 +412,10 @@
     const count = list => `${list.filter(row => row.mine).length}/${list.length}`;
     const pills = [{ id: 'todos', list: rows }, ...GROUPS.map(group => ({ ...group, list: rows.filter(row => row.group === group.id) }))]
       .filter(pill => pill.id === 'todos' || pill.list.length);
-    return `<div class="vfiltros" role="group">` + pills.map(pill => `<button class="vfiltro ${pill.id === active ? 'ativa' : ''}" data-action="vitrine-grupo" ` +
+    // As pílulas rolam de lado numa faixa só delas; o `extra` (Esquerda/Direita dos itens de cenário) fica fora da rolagem, sempre à vista.
+    return `<div class="vfiltros-linha"><div class="vfiltros" role="group">` + pills.map(pill => `<button class="vfiltro ${pill.id === active ? 'ativa' : ''}" data-action="vitrine-grupo" ` +
       `data-grupo="${pill.id}"${pill.id === 'todos' ? '' : ` data-cor="${pill.id}"`}>${pill.icon ? ctx.icon(pill.icon, 'icone-aba') : ''}` +
-      `<span>${esc(t(`grupo.${pill.id}`))}</span><small>${count(pill.list)}</small></button>`).join('') + extra + `</div>`;
+      `<span>${esc(t(`grupo.${pill.id}`))}</span><small>${count(pill.list)}</small></button>`).join('') + `</div>` + extra + `</div>`;
   }
 
   // O detalhe de um item (ou de um conjunto, com `set:<id>`) na faixa de baixo da vitrine: ícone, nome, etiquetas (grupo, preço ou porte), o texto e
@@ -633,7 +634,7 @@
     const cap = engine.cfg.prizeCap;
     const odds = engine.data.rarities.map(r => `${r.name} ${percent(r.chance)}`).join(' · ');
     return header(tabName('pescaria'), esc(t('fish.subtitle'))) +
-      `<div class="cartao pesca"><div class="prendas">${Array.from({ length: cap }, (_, i) =>
+      `<div class="cartao pesca"><div class="pescaria-cena" data-action="pescar" data-pescaria-cena title="${esc(t('fish.fish'))}"></div><div class="prendas">${Array.from({ length: cap }, (_, i) =>
         `<div class="prenda ${i < f.ready ? 'cheia' : ''}">${i < f.ready ? ctx.icon('ui:pescaria', 'grande') : ''}</div>`).join('')}</div>` +
       `<div class="botoes"><button class="btn grande" data-action="pescar"${f.ready ? '' : ' disabled'}>${esc(t('fish.fish'))}</button></div>` +
       `<p>${f.ready >= cap ? esc(t('fish.full')) : t('fish.next', { time: until(f.nextAt, ctx.now) })}</p>` +
@@ -841,14 +842,19 @@
     const counts = { todos: rows.length, faltam: rows.filter(row => !row.seen).length, raros: rows.filter(row => row.rarity === 'rare').length, vistos: rows.filter(row => row.seen).length };
     const shown = rows.filter(row => filter === 'todos' || (filter === 'faltam' && !row.seen) || (filter === 'raros' && row.rarity === 'rare') || (filter === 'vistos' && row.seen));
     if (filter === 'faltam') shown.sort((a, b) => a.entry.minSize - b.entry.minSize);
+    // Os eventos de tema só vêm com um conjunto completo do tema vestido: o cartão mostra o tema (e, sem ele, a dica).
+    const temaName = row => (row.tema ? t(`grupo.${row.tema}`).toLowerCase() : '');
     const badge = row => `<span class="selo raridade ${row.rarity}">${esc(t(`mundo.rarity.${row.rarity}`))}</span>`;
+    // O cartão de um evento de tema ganha a faixa da cor do tema na lateral (as mesmas cores dos filtros da loja).
+    const temaAttr = row => (row.tema ? ` data-tema="${row.tema}"` : '');
     const cards = shown.map(row => {
       const { entry, seen } = row;
       if (!seen) {
         const viaName = row.via.length ? engine.mundo.event(row.via[0]).name : '';
-        return `<div class="cartao evento-mundo desconhecido" data-raridade="${row.rarity}">${badge(row)}<div class="linha"><b class="vazio">?</b><div><h3>${esc(t('mundo.unknown'))}</h3>` +
+        return `<div class="cartao evento-mundo desconhecido" data-raridade="${row.rarity}"${temaAttr(row)}>${badge(row)}<div class="linha"><b class="vazio">?</b><div><h3>${esc(t('mundo.unknown'))}</h3>` +
           `<p class="miudo">${esc(t('mundo.needs', { n: entry.minSize }))}</p>` +
-          `<small class="${row.unlocked ? 'pronto' : ''}">${esc(row.unlocked ? t('mundo.canNow') : t('mundo.missing', { m: row.needs }))}</small>` +
+          `<small class="${row.unlocked && row.themeOn ? 'pronto' : ''}">${esc(!row.unlocked ? t('mundo.missing', { m: row.needs }) : !row.tema ? t('mundo.canNow') :
+            row.themeOn ? t('mundo.temaOn') : t('mundo.hintTema', { tema: temaName(row) }))}</small>` +
           (viaName ? `<small>${esc(t('mundo.hintVia', { name: viaName }))}</small>` : '') +
           (row.days.length ? `<small>${esc(t('mundo.hintDay', { day: t(`mundo.day.${row.days[0]}`) }))}</small>` : '') + `</div></div></div>`;
       }
@@ -858,11 +864,12 @@
       const follow = link ? `<small>${esc(state.seen[link.id] ? t('mundo.chain', { name: engine.mundo.event(link.id).name }) : t('mundo.chainUnknown'))}</small>` : '';
       const boosted = engine.mundo.boost(entry) > 1 ? ` <span class="selo ouro">${esc(t('mundo.boosted'))}</span>` : '';
       const prize = gains(Object.keys(entry.finale || {}).length ? entry.finale : entry.reward || {});
-      return `<div class="cartao evento-mundo ${on ? 'agora' : ''}" data-raridade="${row.rarity}">${badge(row)}<div class="linha">${ctx.icon(`mundo:${entry.id}`, 'grande')}<div><h3>${esc(entry.name)}${boosted}</h3>` +
+      return `<div class="cartao evento-mundo ${on ? 'agora' : ''}" data-raridade="${row.rarity}"${temaAttr(row)}>${badge(row)}<div class="linha">${ctx.icon(`mundo:${entry.id}`, 'grande')}<div><h3>${esc(entry.name)}${boosted}</h3>` +
         `<p class="miudo">${esc(entry.text)}</p>` +
         `<small>${esc(t(entry.targets ? 'mundo.stats' : 'mundo.statsSemAlvo', { seen, caught: row.caught, n: entry.targets, v: Math.round(entry.bonus * 100) }))}` +
         `${row.done ? ` · ${esc(t('mundo.doneTimes', { n: row.done }))}` : ''}</small>` +
         (prize ? `<small class="premio-mundo">${esc(t('mundo.prize', { gains: prize }))}</small>` : '') + follow +
+        (row.tema ? `<small>${esc(t('mundo.temaOnly', { tema: temaName(row) }))}</small>` : '') +
         (on ? `<small class="pronto">${t(active.n ? 'mundo.now' : 'mundo.nowSemAlvo', { got: active.got.length, n: active.n, time: until(active.until, now) })}</small>` : '') + `</div></div></div>`;
     }).join('');
     const plan = engine.mundo.forecast();
@@ -1022,6 +1029,7 @@
     }
     if (entry.op === 'tempo') return t('debug.time', { n: Math.round(n / 60) });
     if (entry.op === 'animacao' && entry.amount) return t('gain.cheer', { n: entry.amount });
+    if (entry.op === 'evento' && entry.id) return t('debug.eventoStart', { name: engine.mundo.event(entry.id)?.name || entry.id });
     return I18N.has(`debug.${entry.op}`) || I18N.has(`debug.${entry.op}`, I18N.FALLBACK)
       ? t(`debug.${entry.op}`, { n }) : entry.note || entry.op;
   }
@@ -1175,13 +1183,17 @@
 
   const RENDER = { festa, historico, conquistas, ajustes };
   // Modo de teste: atalhos para dar recursos e avançar o tempo (só aparece com config.debugMenu).
-  function teste(engine) {
+  function teste(engine, ctx = {}) {
     const button = (op, value, label) => `<button class="btn claro" data-action="debug" data-op="${op}" data-value="${value}">` +
       `${esc(label)}</button>`;
     const group = (title, buttons, note = '') => `<div class="cartao"><div class="rotulo">${esc(title)}</div>` +
       `<div class="botoes">${buttons.join('')}</div>${note ? `<p class="miudo">${esc(note)}</p>` : ''}</div>`;
+    const tab = ctx.testeTab === 'mundo' ? 'mundo' : 'geral';
+    const tabs = `<div class="chips">` + ['geral', 'mundo'].map(id => `<button class="chip ${tab === id ? 'ativa' : ''}" data-action="teste-aba" data-value="${id}">` +
+      `${esc(t(`debug.tab.${id}`))}</button>`).join('') + `</div>`;
+    if (tab === 'mundo') return header(t('tab.teste'), esc(t('debug.subtitle'))) + tabs + testeMundo(engine, group);
     const rate = engine.cheerPerSecond();
-    return header(t('tab.teste'), esc(t('debug.subtitle'))) +
+    return header(t('tab.teste'), esc(t('debug.subtitle'))) + tabs +
       group(t('res.cheer'), [button('animacao', 60, t('debug.plusMinutes', { n: 1 })), button('animacao', 600, t('debug.plusMinutes', { n: 10 })),
         button('animacao', 3600, t('debug.plusHours', { n: 1 })), button('animacao', 86400, t('debug.plusDays', { n: 1 }))],
       t('debug.cheerNote', { rate: rate < 10 ? number(rate, 1) : compact(rate) })) +
@@ -1196,6 +1208,22 @@
       group(t('debug.atParty'), [button('pedido', 0, t('debug.callRequest')), button('penetra', 0, t('debug.callCrasher')),
         button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('aviso', 0, t('debug.callAnnounce')), button('frio', 0, t('debug.callCold')), button('sanfoneiro', 0, t('debug.callVisitor')), button('cobra', 0, t('debug.callSnake')), button('fotografo', 0, t('debug.callPhotographer')), button('burro', 0, t('debug.callBurro')), button('folclore', 0, t('debug.callFolclore')), button('premio', 0, t('debug.callPremio')), button('mundo', 0, t('debug.callMundo')), button('desfile', 0, t('debug.callDesfile')), button('fantasia', 0, t('debug.callFantasia')), button('cozinha', 0, t('debug.callCook')), button('feliz', 0, t('debug.feliz')), button('triste', 0, t('debug.triste')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
         button('argolas', 0, t('debug.cheapRings'))]);
+  }
+
+  // A aba "Eventos do mundo" do modo de teste: um botão para cada evento (em grupos: céu e tempo, e um por tema), que o começa na hora e antes completa o que
+  // ele pede (o porte mínimo e, nos de tema, o conjunto do tema vestido). O que está no ar fica marcado, e um botão encerra o evento.
+  function testeMundo(engine, group) {
+    const active = engine.mundo.active();
+    const eventButton = entry => `<button class="btn claro ${active && active.entry.id === entry.id ? 'ativa' : ''}" data-action="debug" data-op="evento" data-value="${entry.id}" ` +
+      `title="${esc(t(entry.tema ? 'debug.mundoNeedsTema' : 'debug.mundoNeeds', { n: entry.minSize, tema: entry.tema ? t(`grupo.${entry.tema}`).toLowerCase() : '' }))}">` +
+      `${esc(entry.name)} <small>${entry.minSize}</small></button>`;
+    const events = engine.data.mundo.eventos;
+    const stop = `<button class="btn claro" data-action="debug" data-op="evento-fim" data-value="0">${esc(t('debug.endEvent'))}</button>`;
+    return `<div class="cartao"><p class="miudo">${esc(t('debug.mundoNote'))}</p><div class="botoes">${stop}</div>` +
+      `<p class="miudo">${esc(active ? t('debug.mundoNow', { name: active.entry.name }) : t('debug.mundoNone'))}</p></div>` +
+      group(t('debug.mundoSky'), events.filter(entry => !entry.tema).map(eventButton), t('debug.mundoSkyNote')) +
+      engine.data.themes.map(theme => group(t(`grupo.${theme.id}`), events.filter(entry => entry.tema === theme.id).map(eventButton),
+        t('debug.mundoThemeNote', { tema: t(`grupo.${theme.id}`).toLowerCase() }))).join('');
   }
 
   // Bingo da quermesse: a cartela (o meio é livre, as casas sorteadas ganham um grão de milho), os últimos números e a compra.
@@ -1222,7 +1250,8 @@
         body += `<div class="cartao bilhete"><p>${esc(t('bingo.lost'))}</p></div>`;
       } else if (round.line) body += `<p class="miudo">${esc(t('bingo.lineDone'))}</p>`;
     }
-    return header(t('tab.bingo'), esc(t('bingo.subtitle', { s: number(engine.cfg.bingoEvery, 1) }))) + body +
+    return header(t('tab.bingo'), esc(t('bingo.subtitle', { s: number(engine.cfg.bingoEvery, 1) }))) +
+      `<div class="bingo-cena" data-bingo-cena></div>` + body +
       `<div class="botoes">` + (playing ? `<button class="btn" disabled>${esc(t('bingo.playing'))}</button>`
         : costButton('bingo-comprar', '', cost, 'tickets', t(round ? 'bingo.again' : 'bingo.buy'), ctx.icon('ui:fichas'))) + `</div>` +
       `<p class="miudo">${esc(t('bingo.rules', { line: Math.ceil(cost / 2), prize: cost * engine.cfg.bingoPrize }))}</p>` +

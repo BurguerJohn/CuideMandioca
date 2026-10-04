@@ -33,6 +33,8 @@ import tema_halloween
 import tema_zumbi
 import mundo_icones
 import placa_icones
+import bingo_cena
+import pescaria_cena
 import premios
 import rafael
 import tamanhos
@@ -1169,6 +1171,43 @@ def export_rings():
     for k, prize in enumerate(prizes):
         x = round(14 + k * step - prize.width / 2)
         background.alpha_composite(prize, (x, shelf - prize.height + 1))
+    # O trilho do gancho (a argola balança pendurada nele), o feltro verde do balcão, a faixa pintada da frente e o escurecido das pontas.
+    def rgbc(code):
+        return hex_rgb(PALETTE[code]) + (255,) if code in PALETTE else hex_rgb(code) + (255,)
+    for x in range(4, width - 4):
+        background.putpixel((x, 17), rgbc('#5a5d68'))
+        background.putpixel((x, 18), rgbc('#c8ccd6'))
+        background.putpixel((x, 19), rgbc('#7a7a90'))
+        background.putpixel((x, 20), rgbc('#26242e'))
+    for x0 in (2, width - 6):
+        for y in range(15, 23):
+            for x in range(x0, x0 + 4):
+                background.putpixel((x, y), rgbc('#5a5d68'))
+            background.putpixel((x0, y), rgbc('#9a9ca8'))
+        background.putpixel((x0 + 2, 17), rgbc('#c8ccd6'))
+        background.putpixel((x0 + 2, 20), rgbc('#26242e'))
+    for x in range(width):
+        background.putpixel((x, 79), rgbc('#46a868'))
+        background.putpixel((x, 80), rgbc('#2a7a46'))
+    for x in range(0, width - 8, 12):
+        for k, (dx, dy) in enumerate(((0, 0), (-1, 1), (0, 1), (1, 1), (-2, 2), (-1, 2), (0, 2), (1, 2), (2, 2), (-1, 3), (0, 3), (1, 3), (0, 4))):
+            color = '#ee2f3c' if (x // 12) % 2 else '#ffd21e'
+            background.putpixel((x + 6 + dx, 84 + dy), rgbc(color))
+        background.putpixel((x + 6, 85), rgbc('#ffffff'))
+    for x in range(width):
+        background.putpixel((x, 83), rgbc('T'))
+        background.putpixel((x, 90), rgbc('u'))
+    for x in range(0, width - 14, 24):
+        background.putpixel((x + 12, 92), rgbc('#ffd860'))
+        background.putpixel((x + 13, 92), rgbc('#a07818'))
+    vinheta = Image.new('RGBA', background.size, (0, 0, 0, 0))
+    vp = vinheta.load()
+    for y in range(height):
+        for x in range(width):
+            borda = min(x, width - 1 - x)
+            if borda < 22:
+                vp[x, y] = (10, 4, 8, round(70 * (1 - borda / 22) ** 2))
+    background.alpha_composite(vinheta)
     # Luz quente de cima: as tábuas mais claras perto do toldo e mais escuras embaixo, só um toque.
     glow = Image.new('RGBA', background.size, (0, 0, 0, 0))
     gp = glow.load()
@@ -1217,6 +1256,14 @@ def export_rings():
             ring.put(7 + 6 * math.cos(a), 2.5 + 2 * math.sin(a), color)
         ring.put(4, 1, 'X')
         rings.append(outline(ring.image))
+    # As mesmas argolas vistas de lado (fininhas), para a argola que gira no ar: quadros 3 a 5.
+    for color in 'RAC':
+        flat = Layer(14, 6)
+        for angle in range(0, 360, 4):
+            a = math.radians(angle)
+            flat.put(7 + 6 * math.cos(a), 2.5 + 0.8 * math.sin(a), color)
+        flat.put(4, 2, 'X')
+        rings.append(outline(flat.image))
     # Vão da argola: os pixels coloridos ficam a 6 do centro, então cabe uma boca de até 11 pixels.
     manifest['rings']['argola'] = add('argolas-argola', rings, open=11)
 
@@ -1515,6 +1562,8 @@ def main():
     manifest['scenery'] = cenario.export(add)
     manifest['casa'] = casa_salas.exportar(add, icons)
     manifest['janelas'] = janelas.exportar(add, icons)
+    manifest['pescaria'] = pescaria_cena.exportar(add)
+    manifest['bingo'] = bingo_cena.exportar(add)
     manifest['premios'] = premios.exportar(add, icons)
     mundo_icones.exportar(icons)
     placa_icones.exportar(icons)

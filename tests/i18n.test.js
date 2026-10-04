@@ -2,6 +2,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const I18N = require('../src/i18n.js');
 const data = require('../src/data.js');
+// Quantos eventos do mundo existem (e quantos são raros: peso 1): os testes contam a partir dos dados, para um evento novo não quebrar a conta.
+const TOTAL = data.mundo.eventos.length;
+const RARES = data.mundo.eventos.filter(entry => entry.weight === 1).length;
 const { GameEngine } = require('../src/core.js');
 const UI = require('../src/ui.js');
 
@@ -231,7 +234,7 @@ test('os eventos do mundo têm nome e texto em todos os idiomas, e a tela deles 
       assert.doesNotMatch(html, /Lua cheia|Eventos? do mundo/, `${id}: sobrou português na placa`);
       assert.match(html, id === 'en' ? /Full moon 0\/3/ : /Luna llena 0\/3/);
       const panel = UI.panel(engine, { tab: 'festa', icon: () => '', now: 1_700_000_000_000, settings: {}, desktop: true });
-      assert.match(panel, id === 'en' ? /World events: 1 seen, 1 of 31 kinds\./ : /Eventos del mundo: 1 vistos, 1 de 31 tipos\./);
+      assert.match(panel, id === 'en' ? new RegExp(`World events: 1 seen, 1 of ${TOTAL} kinds\\.`) : new RegExp(`Eventos del mundo: 1 vistos, 1 de ${TOTAL} tipos\\.`));
       const page = UI.tela(engine, { tela: 'mundo', icon: () => '', now: 1_700_000_000_000, settings: {}, desktop: true });
       assert.doesNotMatch(page, /Evento ainda|Aparece com|alvos pegos|bônus de|Próximo evento|Previsão do tempo|Mais comum hoje|Em breve|Às vezes puxa|Passou \d|minutos depois/, `${id}: sobrou português na tela dos eventos`);
       assert.match(page, id === 'en' ? /<h3>Full moon<\/h3>/ : /<h3>Luna llena<\/h3>/);
@@ -278,5 +281,30 @@ test('Ajustes: a linha da nuvem da Steam aparece só com a Steam ligada, diz se 
     }
   } finally {
     I18N.setLanguage('pt-BR');
+  }
+});
+
+test('modo de teste: a aba dos eventos do mundo e o aviso do diário existem em inglês e espanhol, sem sobrar português', () => {
+  for (const id of ids.filter(lang => lang !== I18N.SOURCE)) {
+    I18N.setLanguage(id);
+    try {
+      const engine = new GameEngine(localized(id), null, { now: () => 1_700_000_000_000 });
+      engine.state.size = engine.state.records.size = 60;
+      const ctx = { tela: 'teste', testeTab: 'mundo', icon: () => '', now: 1_700_000_000_000, settings: {}, desktop: true };
+      let page = UI.tela(engine, ctx);
+      assert.doesNotMatch(page, /Eventos do mundo|Céu e tempo|Pede \d|Encerrar o evento|Nenhum evento no ar|No ar agora|Geral<|Só entram|dá e veste/, `${id}: sobrou português`);
+      assert.match(page, id === 'en' ? /World events<\/button>/ : /Eventos del mundo<\/button>/);
+      assert.match(page, id === 'en' ? /Sky and weather/ : /Cielo y clima/);
+      assert.match(page, id === 'en' ? /Needs 12 guests or more and a full dinosaurs set worn\./ : /Pide 12 invitados o más y un conjunto completo de dinosaurios puesto\./);
+      assert.match(page, id === 'en' ? /No event in the air\./ : /Ningún evento en el aire\./);
+      engine.debug('evento', 'meteoro');
+      page = UI.tela(engine, ctx);
+      assert.match(page, id === 'en' ? /In the air now: Extinction meteor\./ : /En el aire ahora: Meteorito de la extinción\./);
+      assert.equal(UI.debugText(engine, engine.state.log.at(-1)), id === 'en' ? 'World event: Extinction meteor' : 'Evento del mundo: Meteorito de la extinción');
+      engine.debug('evento-fim');
+      assert.equal(UI.debugText(engine, engine.state.log.at(-1)), id === 'en' ? 'World event ended' : 'Evento del mundo terminado');
+    } finally {
+      I18N.setLanguage(I18N.SOURCE);
+    }
   }
 });

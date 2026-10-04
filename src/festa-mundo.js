@@ -372,8 +372,9 @@
       const flip = Math.floor(now / 45) % 2;
       // A turbulência balança a ilha devagar (sobe e desce uns 2 px, com um vaivém de 1 px para os lados).
       const heave = a.id === 'turbulencia';
-      fx().shakeX = stomp ? (flip ? 1 : -1) : (heave ? Math.round(Math.sin(now / 910 + 1) * 1.2 * k) : 0);
-      fx().shakeY = stomp ? (flip ? 0 : 1) : (heave ? Math.round(Math.sin(now / 540) * 2.4 * k) : 0);
+      const herdShake = packs.map(pack => pack.api.shake(c, now)).find(Boolean) || null;
+      fx().shakeX = herdShake ? herdShake.x : stomp ? (flip ? 1 : -1) : (heave ? Math.round(Math.sin(now / 910 + 1) * 1.2 * k) : 0);
+      fx().shakeY = herdShake ? herdShake.y : stomp ? (flip ? 0 : 1) : (heave ? Math.round(Math.sin(now / 540) * 2.4 * k) : 0);
       // O vento sopra de verdade: as bandeirinhas, a pipa e o chapéu leem `windNow`.
       if (a.id === 'ventania') fx().windNow = a.dir * k;
       else if (a.id === 'redemoinho') fx().windNow = a.dir * k * 0.6;
@@ -409,6 +410,16 @@
         if (palette[ch]) { g.fillStyle = palette[ch]; g.fillRect(Math.round(x + dx * scale), Math.round(y + dy * scale), scale, scale); }
       }));
     };
+
+    // Os pacotes de eventos (src/festa-mundo-temas.js: dinossauros, Halloween e zumbis; src/festa-mundo-extras.js: os eventos avulsos) trazem os próprios
+    // alvos, céu, ar, vestígios e reações. Cada pacote só mexe nos eventos dele.
+    const helpers = { g, halo, say, float, confetti, sound, rng, fx, layout, ground, poleTop, tint, particle, rnd, clamp, spread, step, tr };
+    const packs = [root.ArraiaMundoTemas, root.ArraiaMundoExtras, root.ArraiaMundoExtras2].filter(Boolean).map(pack => ({ api: pack.create(helpers), traceMs: pack.TRACE_MS }));
+    for (const pack of packs) {
+      Object.assign(TARGETS, pack.api.TARGETS);
+      Object.assign(TRACE_MS, pack.traceMs);
+    }
+    const temas = packs[0] ? packs[0].api : null;
 
     // A cobra de fogo: a posição do segmento `i` (da cabeça para trás), ou null se está fora da festa.
     const SNAKE_SEGMENTS = 16;
@@ -1227,7 +1238,7 @@
           g.fillRect(Math.round(sx + Math.cos(ang) * 14), Math.round(sy + Math.sin(ang) * 14), 1, 1);
         }
         g.globalAlpha = 1;
-      }
+      } else packs.forEach(pack => { if (pack.api.SKY[c.id]) pack.api.SKY[c.id](c, now); });
     }
 
     // O que muda a luz e o ar do mapa inteiro, por evento.
@@ -1556,7 +1567,7 @@
           const pos = TARGETS.feira(c, i, lay);
           stall(pos.x, i, c.entry.shop[i].cost, c.got.has(i), now);
         }
-      }
+      } else packs.forEach(pack => { if (pack.api.OVER[c.id]) pack.api.OVER[c.id](c, now); });
       // A turma comenta o evento de vez em quando (as duas falas de cada evento ficam em `chat0` e `chat1`, nos dados).
       if (c.entry.chat0 && now >= nextChat) {
         nextChat = now + 5500 + rng() * 4500;
@@ -1648,7 +1659,7 @@
             g.fillRect(Math.round(at(i)), ground() + (i % 3), 1, 1);
           }
         }
-      }
+      } else packs.forEach(pack => { if (pack.api.TRACE[trace.id]) pack.api.TRACE[trace.id](left, at, now, lay, seed); });
       g.globalAlpha = 1;
     }
 
@@ -1670,6 +1681,7 @@
       const y = item ? item.y : ground() - 30;
       for (let i = 0; i < 4; i++) float('brilho', x + (i - 1.5) * 6, y + (i % 2) * 4, now, ['#ffd21e', '#fff07a']);
       confetti(now, x, y, event.all ? 28 : 10);
+      for (const pack of packs) pack.api.catchFx(cur, event, x, y, now);
       if (event.all) say(tr('fx.mundoTudo'), clamp(x, lay.L + 30, lay.R - 30), Math.max(10, y - 10), now, '#9ef05a', 2200, 8);
       else if (cur.id === 'fogos') burst(x, y, 34, now);
       else if (cur.id === 'feira') { for (let i = 0; i < 5; i++) float('brilho', x + (i - 2) * 4, y - 8 - i, now, ['#ffd21e', '#fff07a']); }
@@ -1690,6 +1702,7 @@
       const item = lastItems.get(event.k);
       const x = item ? item.x : lay.L + lay.width / 2;
       const y = item ? item.y : 46;
+      if (packs.map(pack => pack.api.hitFx(cur, event, x, y, now)).some(Boolean)) { effects++; return; }
       confetti(now, x, y + 6, 5 + event.n * 2);
       if (sound) sound('martelo');
       effects++;
@@ -1703,10 +1716,11 @@
       if (cur) for (const item of cur.items) lastItems.set(item.k, item);
     }
 
-    function reset() { nextChat = 0; chats = 0; lastChat = ''; hitAt.clear(); crowed.clear(); beatAt = -1; if (fx()) { fx().shakeX = 0; fx().shakeY = 0; } cur = null; trace = null; said = null; lastBolt = 0; effects = 0; streaks.length = 0; landed.clear(); burstDone.clear(); lastItems.clear(); }
+    function reset() { for (const pack of packs) pack.api.reset(); nextChat = 0; chats = 0; lastChat = ''; hitAt.clear(); crowed.clear(); beatAt = -1; if (fx()) { fx().shakeX = 0; fx().shakeY = 0; } cur = null; trace = null; said = null; lastBolt = 0; effects = 0; streaks.length = 0; landed.clear(); burstDone.clear(); lastItems.clear(); }
 
     function probe() {
-      return cur ? { id: cur.id, k: cur.k, items: cur.items.map(item => item.k), xs: cur.items.map(item => Math.round(item.x)), taken: [...cur.got], effects, chats, chat: lastChat } : null;
+      return cur ? { id: cur.id, k: cur.k, items: cur.items.map(item => item.k), xs: cur.items.map(item => Math.round(item.x)), taken: [...cur.got], effects, chats, chat: lastChat,
+        temas: temas ? temas.probe() : null, extras: packs[1] ? packs[1].api.probe() : null, extras2: packs[2] ? packs[2].api.probe() : null } : null;
     }
 
     const traceId = () => (trace ? trace.id : null);

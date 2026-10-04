@@ -57,49 +57,90 @@ def plantas_douradas():
 
 # --- Solo ---------------------------------------------------------------------------------------------------------------------
 def solo():
-    """3 quadros: terra seca, terra regada e canteiro fechado (grama com cerquinha e cadeado). Os dois primeiros têm moldura de tábua."""
+    """3 quadros: terra seca, terra regada e canteiro fechado (grama com cerquinha e cadeado). Os dois primeiros têm moldura de tábua
+    com veios, pregos e musgo nos cantos, e a terra por dentro tem torrões, pedrinhas, rachaduras (seca) ou brilho de umidade (regada)."""
     quadros = []
     for tipo in range(3):
         t = Tela(*PLOT)
         if tipo < 2:
             seco = tipo == 0
-            base, sulco, luz = ('#8a6a3a', '#6a4a24', '#a8844a') if seco else ('#6a4c2c', '#4e341c', '#80603a')
-            # A moldura de tábua (luz em cima e à esquerda, sombra embaixo e à direita).
+            base, sulco, luz, torrao = (('#8a6a3a', '#6a4a24', '#a8844a', '#b8945a') if seco else ('#5e4226', '#46301a', '#7a5a36', '#8a6a42'))
+            gerador = random.Random(40 + tipo)
+            # A moldura de tábua (luz em cima e à esquerda, sombra embaixo e à direita), com veios.
             t.rect(0, 0, PLOT[0] - 1, PLOT[1] - 1, '#a8682e')
+            for x in range(1, PLOT[0] - 1):
+                if (x * 7) % 5 == 0:
+                    t.put(x, 0, '#c07a3c')
+                    t.put(x, PLOT[1] - 1, '#6e4020')
             t.rect(0, 0, PLOT[0] - 1, 0, '#d89a56')
             t.rect(0, 0, 0, PLOT[1] - 1, '#c07a3c')
             t.rect(0, PLOT[1] - 1, PLOT[0] - 1, PLOT[1] - 1, '#5a3418')
             t.rect(PLOT[0] - 1, 0, PLOT[0] - 1, PLOT[1] - 1, '#6e4020')
-            for x in (3, PLOT[0] - 4):
-                t.put(x, 1, '#4a2a14')
-                t.put(x, PLOT[1] - 2, '#4a2a14')
+            for x, y in ((2, 1), (PLOT[0] - 3, 1), (2, PLOT[1] - 2), (PLOT[0] - 3, PLOT[1] - 2)):
+                t.put(x, y, '#2e1a0c')
+                t.put(x - 1 if x > 3 else x + 1, y, '#d8d0c0')
             # A terra por dentro.
             t.rect(2, 2, PLOT[0] - 3, PLOT[1] - 3, base)
             for y in range(5, PLOT[1] - 3, 5):
                 t.rect(3, y, PLOT[0] - 4, y, sulco)
                 t.rect(3, y - 1, PLOT[0] - 4, y - 1, luz)
-            janelas.ruido(t, 3, 3, PLOT[0] - 4, PLOT[1] - 4, 22, 4 + tipo, [luz, sulco])
-            t.rect(2, 2, PLOT[0] - 3, 2, '#4a3018')
-            if not seco:
-                # Terra molhada: brilho azulado e uma poça pequena.
+            janelas.ruido(t, 3, 3, PLOT[0] - 4, PLOT[1] - 4, 26, 4 + tipo, [luz, sulco])
+            t.rect(2, 2, PLOT[0] - 3, 2, '#3a2410')
+            t.rect(2, 3, PLOT[0] - 3, 3, sulco)
+            # Torrões de dois pixels com sombrinha e pedrinhas.
+            for _ in range(9):
+                x, y = gerador.randrange(4, PLOT[0] - 6), gerador.randrange(4, PLOT[1] - 5)
+                t.rect(x, y, x + 1, y, torrao)
+                t.put(x + 1, y + 1, sulco)
+            for x, y in ((6, 17), (21, 9)):
+                t.put(x, y, '#9a9ca8')
+                t.put(x + 1, y, '#6e707c')
+            if seco:
+                # Rachaduras finas.
+                for x0, y0 in ((8, 6), (19, 12)):
+                    t.put(x0, y0, sulco)
+                    t.put(x0 + 1, y0 + 1, sulco)
+                    t.put(x0 + 1, y0 + 2, sulco)
+                    t.put(x0 + 2, y0 + 3, sulco)
+            else:
+                # Terra molhada: brilho azulado, poça pequena e a luz refletida.
                 for x, y in ((6, 8), (14, 12), (21, 7), (10, 15), (19, 15)):
                     t.put(x, y, '#7ab8e8')
                     t.put(x + 1, y, '#a8d8f8')
+                t.rect(12, 16, 17, 16, '#4a88c0')
+                t.rect(13, 16, 15, 16, '#8ac0f0')
+            # Musgo e capim nos cantos de fora.
+            for x, y in ((1, 1), (PLOT[0] - 2, PLOT[1] - 2), (PLOT[0] - 2, 1)):
+                t.put(x, y, '#56b858')
+            for x in (5, 12, 22):
+                t.put(x, 0, '#46a85a')
         else:
             t.rect(0, 0, PLOT[0] - 1, PLOT[1] - 1, '#3a7a44')
-            janelas.ruido(t, 0, 0, PLOT[0] - 1, PLOT[1] - 1, 50, 9, ['#46a85a', '#2e6a38', '#56b860'])
+            janelas.ruido(t, 0, 0, PLOT[0] - 1, PLOT[1] - 1, 60, 9, ['#46a85a', '#2e6a38', '#56b860', '#285a30'])
             for x in (1, PLOT[0] - 3):
                 t.rect(x, 3, x + 1, PLOT[1] - 2, '#8a5a34')
                 t.rect(x, 3, x, PLOT[1] - 2, '#b07a48')
+                t.put(x, 2, '#6e3c1c')
+                t.put(x + 1, 2, '#8a5a34')
             t.rect(1, 6, PLOT[0] - 2, 7, '#a66a34')
             t.rect(1, 14, PLOT[0] - 2, 15, '#a66a34')
             t.rect(1, 6, PLOT[0] - 2, 6, '#c8884a')
+            t.rect(1, 14, PLOT[0] - 2, 14, '#c8884a')
+            t.rect(1, 7, PLOT[0] - 2, 7, '#6e4020')
+            t.rect(1, 15, PLOT[0] - 2, 15, '#6e4020')
+            # Cadeado dourado com a argola.
             t.rect(11, 8, 17, 14, '#ffd21e')
             t.rect(12, 9, 16, 13, '#c89a10')
+            t.rect(11, 8, 17, 8, '#fff2a0')
             t.rect(13, 5, 15, 8, '#9a9ca8')
             t.rect(13, 5, 13, 7, '#c8ccd8')
             t.put(14, 11, '#26242e')
             t.rect(14, 12, 14, 12, '#26242e')
+            # Ervas daninhas pelo canteiro fechado.
+            for x, y in ((5, 17), (21, 18), (8, 3), (19, 3)):
+                t.rect(x, y, x, y + 2, '#2a6a34')
+                t.put(x - 1, y + 1, '#56b860')
+                t.put(x + 1, y, '#56b860')
         quadros.append(t.im)
     return quadros
 

@@ -4,6 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const data = require('../src/data.js');
+// Quantos eventos do mundo existem (e quantos são raros: peso 1): os testes contam a partir dos dados, para um evento novo não quebrar a conta.
+const TOTAL = data.mundo.eventos.length;
+const RARES = data.mundo.eventos.filter(entry => entry.weight === 1).length;
 const core = require('../src/core.js');
 const UI = require('../src/ui.js');
 const { fakeDocument } = require('./fake-dom');
@@ -4401,5 +4404,210 @@ test('eventos do mundo: o começo toca uma fanfarra própria (a dos raros é mai
   click({ action: 'mundo-filtro', value: 'raros' });
   assert.equal(game.ui.mundoFilter, 'raros');
   assert.match(document.nodes.get('#tela-corpo').innerHTML, /chip ativa" data-action="mundo-filtro" data-value="raros"/);
-  assert.equal((document.nodes.get('#tela-corpo').innerHTML.match(/data-raridade="rare"/g) || []).length, 8);
+  assert.equal((document.nodes.get('#tela-corpo').innerHTML.match(/data-raridade="rare"/g) || []).length, RARES);
+});
+
+test('palco: a música do show começa com o show, para quando ele acaba (com o acorde se deu estrela) e não toca com a festa escondida', async () => {
+  const frames = [];
+  const calls = [];
+  let game;
+  const som = { set() {}, setMusic() {}, unlock() {}, play() { return true; },
+    startShow: (id, options) => { calls.push(['start', id, options]); return true; },
+    stopShow: options => { calls.push(['stop', options.stars]); return true; } };
+  const clock = { t: 1000 };
+  boot({ performance: { now: () => clock.t }, requestAnimationFrame: fn => frames.push(fn), ArraiaSom: { create: () => som },
+    ArraiaFesta: { create: () => fakeFesta() }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  clock.t = 20000;
+  const engine = game.engine();
+  const palco = engine.mini('palco');
+  let t = 2000;
+  const frame = () => frames.shift()((t += 100));
+  frame();
+  assert.deepEqual(calls, [], 'sem show não há música');
+  palco.start('xote');
+  frame();
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].slice(0, 2), ['start', 'xote']);
+  assert.equal(calls[0][2].bpm, 100, 'o andamento é o da música no jogo');
+  assert.equal(calls[0][2].lead, 2200, 'e a contagem é a mesma da pista');
+  assert.ok(calls[0][2].elapsed >= 0 && calls[0][2].elapsed < 1000, 'começa do começo');
+  frame();
+  assert.equal(calls.length, 1, 'não recomeça a cada quadro');
+  // Esconder a festa no meio do show cala a música; mostrar de novo volta no ponto em que o show estiver.
+  game.ui.settings.hidden = true;
+  frame();
+  assert.deepEqual(calls.at(-1), ['stop', 0]);
+  game.ui.settings.hidden = false;
+  engine.state.minis.palco.show.startAt -= 3000;
+  frame();
+  assert.equal(calls.at(-1)[0], 'start');
+  assert.ok(calls.at(-1)[2].elapsed >= 3000, 'a música volta no ponto do show');
+  // Show completo, três estrelas: a música fecha com o acorde (o show acaba no relógio do jogo).
+  engine.state.minis.palco.show.notes.forEach(note => { note.state = 'perfect'; });
+  engine.state.minis.palco.show.startAt -= 1e6;
+  palco.tick();
+  frame();
+  assert.deepEqual(calls.at(-1), ['stop', 3]);
+  // Um show parado no meio: a música só some, sem acorde.
+  palco.start('xote');
+  frame();
+  assert.equal(calls.at(-1)[0], 'start');
+  palco.abort();
+  frame();
+  assert.deepEqual(calls.at(-1), ['stop', 0]);
+  // Um show que acaba sem acertar nada (zero estrelas) também só some.
+  palco.start('xote');
+  frame();
+  engine.state.minis.palco.show.startAt -= 1e6;
+  palco.tick();
+  frame();
+  assert.deepEqual(calls.at(-1), ['stop', 0]);
+});
+
+test('eventos de tema: cada um chega com o seu som, as abóboras pedem a ordem com aviso próprio e vestir um conjunto de tema avisa que os eventos dele podem vir', async () => {
+  const Som = require('../src/som.js');
+  const frames = [];
+  const timers = [];
+  const plays = [];
+  let game;
+  let target = 'mundo:2';
+  const som = { set() {}, setMusic() {}, unlock() {}, play: name => { plays.push(name); return true; } };
+  const festa = fakeFesta({ hit: () => target });
+  const clock = { t: 1000 };
+  const { document } = boot({ performance: { now: () => clock.t }, requestAnimationFrame: fn => frames.push(fn), setTimeout: (fn, ms) => { timers.push([fn, ms]); return 1; },
+    ArraiaSom: { create: () => som }, ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  clock.t = 20000;
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 80;
+  const toasts = () => document.nodes.get('#avisos').children.map(item => item.textContent).join('|');
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const event = { target: canvas, button: 0, clientX: 100, clientY: 100, preventDefault() {} };
+  const click = () => { document.listeners.pointerdown(event); document.listeners.pointerup({ ...event, buttons: 0 }); };
+  // O som de cada um (o dos raros vem um pouco depois da fanfarra maior).
+  const sounds = { pterodatilos: 'papagaio', manada: 'rugido', ovos: 'quebra', meteoro: 'chama', bruxas: 'bruxa', abobora: 'sinos', fantasmas: 'canto', luasangue: 'uivo',
+    horda: 'gemido', gosma: 'bolha', helicoptero: 'helice', surto: 'sirene' };
+  let at = 2000;
+  for (const [id, sound] of Object.entries(sounds)) {
+    engine.state.mundo.active = null;
+    plays.length = 0;
+    timers.length = 0;
+    engine.mundo.start(id);
+    frames.shift()((at += 100));
+    const rare = engine.mundo.rarity(engine.mundo.event(id)) === 'rare';
+    assert.equal(plays[0], rare ? 'evento-raro' : 'evento', `${id}: fanfarra`);
+    timers.find(([, ms]) => ms === (rare ? 1100 : 700))[0]();
+    assert.equal(plays.at(-1), sound, `${id}: som próprio`);
+    assert.ok(Som.SONS.includes(sound), `${sound} existe`);
+  }
+  // As abóboras: fora da ordem só avisa (com a abóbora, não a estrela), e na ordem vale.
+  engine.state.mundo.active = null;
+  engine.mundo.start('abobora');
+  frames.shift()((at += 100));
+  click();
+  assert.match(toasts(), /Na ordem! Clique na abóbora que está acesa\./);
+  assert.deepEqual(engine.state.mundo.active.got, []);
+  target = 'mundo:0';
+  click();
+  assert.deepEqual(engine.state.mundo.active.got, [0]);
+  // Vestir um conjunto de tema avisa (um conjunto comum não).
+  const wear = id => { const set = data.sets.find(item => item.id === id); for (const piece of [set.hat, set.hand, set.fabric]) { if (!engine.owned(piece)) engine.state.inventory.push(piece); engine.equip(piece); } };
+  wear('caipira');
+  frames.shift()((at += 100));
+  assert.doesNotMatch(toasts(), /eventos do mundo desse tema/);
+  wear('era-jurassica');
+  frames.shift()((at += 100));
+  assert.match(toasts(), /Conjunto de dinossauros! Agora os eventos do mundo desse tema podem acontecer na festa\./);
+});
+
+test('modo de teste: a aba Eventos do mundo troca na tela, o botão do evento começa o evento (com o porte e o conjunto) e avisa', async () => {
+  const { document } = boot();
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  const digitar = texto => { for (const key of texto) document.listeners.keydown({ key, target: { closest: () => null }, preventDefault() {} }); };
+  click({ action: 'tab', tab: 'historico' });
+  digitar('banana');
+  click({ action: 'tela', tela: 'teste' });
+  assert.match(node('#tela-corpo').innerHTML, /data-op="animacao"/, 'abre na aba Geral');
+  click({ action: 'teste-aba', value: 'mundo' });
+  assert.match(node('#tela-corpo').innerHTML, /data-op="evento" data-value="meteoro"/);
+  assert.doesNotMatch(node('#tela-corpo').innerHTML, /data-op="animacao"/);
+  // Chamar um evento de tema: o motor completa o porte e veste o conjunto, e a tela marca o evento no ar.
+  click({ action: 'debug', op: 'evento', value: 'meteoro' });
+  assert.match(node('#avisos').children.map(item => item.textContent).join('|'), /Evento do mundo: Meteoro da extinção/);
+  assert.match(node('#tela-corpo').innerHTML, /btn claro ativa" data-action="debug" data-op="evento" data-value="meteoro"/);
+  assert.match(node('#tela-corpo').innerHTML, /No ar agora: Meteoro da extinção\./);
+  click({ action: 'debug', op: 'evento-fim', value: '0' });
+  assert.match(node('#tela-corpo').innerHTML, /Nenhum evento no ar\./);
+  // Voltar para Geral (e um valor estranho também cai nela).
+  click({ action: 'teste-aba', value: 'geral' });
+  assert.match(node('#tela-corpo').innerHTML, /data-op="animacao"/);
+  click({ action: 'teste-aba', value: 'mundo' });
+  click({ action: 'teste-aba', value: 'x' });
+  assert.match(node('#tela-corpo').innerHTML, /data-op="animacao"/);
+});
+
+test('eventos avulsos: cada um chega com a fanfarra certa (os raros com a maior) e o som próprio', async () => {
+  const frames = [];
+  const timers = [];
+  const plays = [];
+  let game;
+  const som = { set() {}, setMusic() {}, unlock() {}, play: name => { plays.push(name); return true; } };
+  const clock = { t: 1000 };
+  boot({ performance: { now: () => clock.t }, requestAnimationFrame: fn => frames.push(fn), setTimeout: (fn, ms) => { timers.push([fn, ms]); return 1; },
+    ArraiaSom: { create: () => som }, ArraiaFesta: { create: () => fakeFesta() }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  clock.t = 20000;
+  const Som = require('../src/som.js');
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 80;
+  const sounds = { bolhas: 'bolha', avioes: 'assobio', patinhos: 'pato', abelhas: 'zumbido', planetas: 'brilho', circo: 'canhao', balada: 'palco-zabumba', baleia: 'baleia',
+    baloagigante: 'crescer', fada: 'brilho' };
+  let at = 2000;
+  for (const [id, sound] of Object.entries(sounds)) {
+    engine.state.mundo.active = null;
+    plays.length = 0;
+    timers.length = 0;
+    engine.mundo.start(id);
+    frames.shift()((at += 100));
+    const rare = engine.mundo.rarity(engine.mundo.event(id)) === 'rare';
+    assert.equal(plays[0], rare ? 'evento-raro' : 'evento', `${id}: fanfarra`);
+    timers.find(([, ms]) => ms === (rare ? 1100 : 700))[0]();
+    assert.equal(plays.at(-1), sound, `${id}: som próprio`);
+    assert.ok(Som.SONS.includes(sound), `${sound} existe`);
+  }
+});
+
+test('eventos avulsos (segunda leva): cada um chega com a fanfarra certa (o raro com a maior) e o som próprio', async () => {
+  const frames = [];
+  const timers = [];
+  const plays = [];
+  let game;
+  const som = { set() {}, setMusic() {}, unlock() {}, play: name => { plays.push(name); return true; } };
+  const clock = { t: 1000 };
+  boot({ performance: { now: () => clock.t }, requestAnimationFrame: fn => frames.push(fn), setTimeout: (fn, ms) => { timers.push([fn, ms]); return 1; },
+    ArraiaSom: { create: () => som }, ArraiaFesta: { create: () => fakeFesta() }, FESTA_SPRITES: {}, __gravador: api => { game = api; } });
+  await Promise.resolve();
+  clock.t = 20000;
+  const Som = require('../src/som.js');
+  const engine = game.engine();
+  engine.state.size = engine.state.records.size = 80;
+  const sounds = { chapeus: 'equipar', toupeiras: 'tombo', pelada: 'apito', vacalua: 'boi', coelho: 'brilho', fumaca: 'assobio', aurora: 'sinos', tubaroes: 'trovao' };
+  let at = 2000;
+  for (const [id, sound] of Object.entries(sounds)) {
+    engine.state.mundo.active = null;
+    plays.length = 0;
+    timers.length = 0;
+    engine.mundo.start(id);
+    frames.shift()((at += 100));
+    const rare = engine.mundo.rarity(engine.mundo.event(id)) === 'rare';
+    assert.equal(plays[0], rare ? 'evento-raro' : 'evento', `${id}: fanfarra`);
+    timers.find(([, ms]) => ms === (rare ? 1100 : 700))[0]();
+    assert.equal(plays.at(-1), sound, `${id}: som próprio`);
+    assert.ok(Som.SONS.includes(sound), `${sound} existe`);
+  }
 });

@@ -137,6 +137,9 @@ body.jogo-desfocado .casa, body.jogo-desfocado.placa-passar.sobre-festa .casa { 
 .btn.mini { font-size: 13px; padding: 1px 7px 2px; margin-left: auto; }
 .btn.grande { font-size: 22px; padding: 7px 26px 9px; }
 .btn.verde:disabled { filter: none; opacity: 1; cursor: default; }
+/* Modo de teste, aba dos eventos do mundo: o evento que está no ar fica marcado e o porte mínimo vai miudinho no botão. */
+.botoes .btn.ativa { background: #fff3a0; box-shadow: inset 0 0 0 3px #e8a812; }
+.botoes .btn small { font-size: 10px; opacity: .6; margin-left: 3px; }
 .preco { display: inline-flex; align-items: center; gap: 3px; }
 
 /* Painel */
@@ -224,6 +227,10 @@ select.campo { flex: 1; min-width: 0; }
 input[type=range] { width: 100%; accent-color: var(--vermelho); }
 
 .cartao.pesca { text-align: center; }
+.bingo-cena { display: flex; justify-content: center; margin: 4px 0 8px; }
+.bingo-cena canvas { display: block; flex: none; max-width: 100%; height: auto !important; image-rendering: pixelated; border: 3px solid var(--tinta); }
+.pescaria-cena { display: flex; justify-content: center; margin: 4px 0 8px; cursor: pointer; }
+.pescaria-cena canvas { display: block; flex: none; max-width: 100%; height: auto !important; image-rendering: pixelated; border: 3px solid var(--tinta); }
 .cartao.pesca .botoes { justify-content: center; }
 .prendas { display: flex; justify-content: center; gap: 14px; margin: 6px 0; }
 .prenda { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; background: var(--papel); border: 3px dashed var(--madeira); }
@@ -442,7 +449,8 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 [data-grupo="zumbi"], [data-cor="zumbi"] { --tema: #4f9a8a; --tema-claro: #cfe9e2; }
 [data-grupo="premios"], [data-cor="premios"] { --tema: #d8a010; --tema-claro: #fff0b0; }
 .vitrine-itens { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.vfiltros { flex: none; display: flex; align-items: center; gap: 4px; height: 26px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.vfiltros-linha { flex: none; display: flex; align-items: center; gap: 8px; height: 26px; min-width: 0; }
+.vfiltros { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 4px; height: 26px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .vfiltros::-webkit-scrollbar { display: none; }
 .vfiltro {
   flex: none; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px 0 6px; font: inherit; font-size: 13px; font-weight: 700;
@@ -454,8 +462,8 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .vfiltro:hover, .vfiltro:focus-visible { background: #fff3a0; outline: none; }
 .vfiltro.ativa { color: #fff; background: var(--tema, var(--tinta)); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .25); text-shadow: 1px 1px 0 rgba(0, 0, 0, .35); }
 .vfiltro.ativa small { opacity: 1; }
-.vfiltros .vlados { margin-left: auto; display: inline-flex; gap: 4px; }
-.vfiltros .vlados .chip { margin: 0; font-size: 12px; padding: 0 8px; height: 24px; }
+.vfiltros-linha .vlados { flex: none; display: inline-flex; flex-direction: row; gap: 4px; }
+.vfiltros-linha .vlados .chip { margin: 0; font-size: 12px; padding: 0 8px; height: 24px; }
 .vgrade {
   flex: 1; min-width: 0; display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, minmax(0, 1fr)); grid-auto-columns: 168px;
   gap: 6px; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px;
@@ -684,6 +692,10 @@ input[type=range] { width: 100%; accent-color: var(--vermelho); }
 .alma-linha.raro .alma-barra i { background: #e8a812; }
 .alma-filtros { margin-bottom: 10px; }
 .evento-mundo.desconhecido { opacity: 0.75; }
+/* Eventos de tema (só com um conjunto do tema vestido): uma faixa na lateral com a cor do tema, a mesma dos filtros da loja. */
+.evento-mundo[data-tema="dino"] { border-left: 6px solid #3fae4a; }
+.evento-mundo[data-tema="halloween"] { border-left: 6px solid #ff8a12; }
+.evento-mundo[data-tema="zumbi"] { border-left: 6px solid #4f9a8a; }
 .evento-mundo .vazio { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border: 2px dashed #b08a5a; border-radius: 6px; color: #b08a5a; font-size: 18px; }
 .premio .barra { height: 6px; margin: 4px 0 2px; }
 

@@ -162,3 +162,224 @@ test('música: religar não devolve o som às notas que estavam agendadas antes 
   assert.equal(som.music, true, 'a nova sequência fica ligada');
   som.setMusic(false);
 });
+
+// --- A música de cada show do Palco do Forró -----------------------------------------------------------------------------------------------
+
+const Dados = require('../src/data.js');
+const { GameEngine } = require('../src/core.js');
+
+// Áudio de mentira que guarda a hora de início de cada nota e o relógio que o teste anda à mão.
+function showSetup(options = {}) {
+  const { AudioContext, log } = fakeAudio();
+  const clock = { t: 0 };
+  const starts = [];
+  class Recording extends AudioContext {
+    get currentTime() { return clock.t; }
+    set currentTime(_) {}
+    createOscillator() {
+      const osc = super.createOscillator();
+      osc.frequency.setValueAtTime = (freq, at) => starts.push({ at, freq, type: osc.type });
+      return osc;
+    }
+  }
+  const timers = new Map();
+  let next = 1;
+  const som = Som.create({ AudioContext: Recording, enabled: true, volume: 0.5, ...options,
+    setInterval: fn => { timers.set(next, fn); return next++; }, clearInterval: id => timers.delete(id) });
+  const advance = seconds => { const end = clock.t + seconds; while (clock.t < end) { clock.t += 0.2; timers.forEach(fn => fn()); } };
+  return { som, log, clock, starts, timers, advance };
+}
+const palco = Dados.minis.palco;
+const songOf = id => palco.songs.find(entry => entry.id === id);
+
+// Uma voz de mentira para ver o que um passo toca: cada tom e cada ruído com a hora relativa e a altura.
+function fakeVoice() {
+  const calls = [];
+  return { calls, tom: (at, dur, freq, opts = {}) => calls.push({ kind: 'tom', at, dur, freq, ...opts }), ruido: (at, dur, opts = {}) => calls.push({ kind: 'ruido', at, dur, ...opts }) };
+}
+
+test('show do palco: cada música que dá para jogar tem a sua música, com a mesma tonalidade e o mesmo compasso da pista', () => {
+  assert.deepEqual(Object.keys(Som.SHOWS).sort(), palco.songs.map(entry => entry.id).sort(), 'uma música para cada música jogável');
+  const seen = new Set();
+  for (const entry of palco.songs) {
+    const info = Som.SHOWS[entry.id];
+    assert.ok(info.compassos >= 16 && info.volta < info.compassos, `${entry.id}: tem corpo e um ponto de volta`);
+    // Tocando a partitura inteira, a música tem notas de melodia (sanfona) e de ritmo, e termina no acorde da tonalidade.
+    const melodia = [];
+    let ritmo = 0;
+    for (let n = 0; n < info.compassos * 8; n++) {
+      const v = fakeVoice();
+      Som.passoShow(entry.id, v, 8 + n, 8, 0.15);
+      ritmo += v.calls.filter(call => call.kind === 'ruido' || (call.kind === 'tom' && call.freq < 200)).length;
+      melodia.push(v.calls.filter(call => call.type === 'sawtooth' && call.freq > 480).length);
+    }
+    assert.ok(ritmo > info.compassos * 4, `${entry.id}: zabumba e aro em todos os compassos`);
+    assert.ok(melodia.filter(Boolean).length > info.compassos * 2, `${entry.id}: a melodia tem notas`);
+    // A contagem (um bumbo por tempo) leva uma pancadinha de sanfona no último tempo, no acorde em que a música termina.
+    const sanfonas = [...Array(8).keys()].map(n => { const v = fakeVoice(); Som.passoShow(entry.id, v, n, 8, 0.15); return v.calls.filter(call => call.type === 'sawtooth').length; });
+    assert.deepEqual(sanfonas.map(Boolean), [false, false, false, false, true, false, false, false], `${entry.id}: contagem com a sanfona só no último tempo`);
+    assert.deepEqual([0, 4].map(n => { const v = fakeVoice(); Som.passoShow(entry.id, v, n, 8, 0.15); return v.calls.filter(call => call.freq < 200 && call.type === 'sine').length; }), [1, 1], `${entry.id}: bumbo em cada tempo da contagem`);
+    const assinatura = JSON.stringify([...Array(64).keys()].map(n => { const v = fakeVoice(); Som.passoShow(entry.id, v, 8 + n, 8, 0.15); return v.calls.map(call => [call.kind, call.at, call.freq && Math.round(call.freq)]); }));
+    assert.ok(!seen.has(assinatura), `${entry.id}: não repete a música de outra`);
+    seen.add(assinatura);
+  }
+});
+
+test('show do palco: a trilha cai na grade das notas do jogo (a primeira nota da partitura no `lead` e uma contagem antes)', () => {
+  const engine = new GameEngine(Dados, null, { rng: () => 0.5 });
+  for (const entry of palco.songs) {
+    const { som, starts, clock, advance } = showSetup();
+    clock.t = 10;
+    assert.equal(som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead }), true);
+    assert.equal(som.showing, entry.id);
+    advance(palco.lead / 1000 + 4);
+    const sec = 60 / entry.bpm / 4;
+    // Toda nota começa numa semicolcheia da grade que parte do `lead` (a hora da primeira nota da pista)...
+    const origem = 10 + palco.lead / 1000;
+    assert.ok(starts.length > 50, `${entry.id}: tocou`);
+    for (const note of starts) {
+      const k = (note.at - origem) / sec;
+      assert.ok(Math.abs(k - Math.round(k)) < 1e-6, `${entry.id}: nota fora da grade (${k})`);
+    }
+    // ... a contagem cabe antes dela, sem passar de um tempo de folga, e nada começa antes do show.
+    const primeira = Math.min(...starts.map(note => note.at));
+    assert.ok(primeira >= 10 - 1e-9, `${entry.id}: nada antes do show começar`);
+    assert.ok(primeira - 10 < sec * 4 + 1e-9, `${entry.id}: a contagem ocupa quase todo o \`lead\``);
+    // E toda nota da partitura do jogo cai num passo par: a grade do jogo é de meio tempo, e a da trilha de um quarto.
+    for (const note of engine.mini('palco').chart(entry.id)) {
+      const k = (note.t - palco.lead) / 1000 / sec;
+      assert.ok(Math.abs(k / 2 - Math.round(k / 2)) < 0.01, `${entry.id}: a nota em ${note.t} ms está fora do tempo da trilha`);
+    }
+    som.stopShow();
+  }
+});
+
+test('show do palco: entrar no meio (elapsed) pula o que já passou, e passando do fim a trilha volta ao ponto de volta', () => {
+  const entry = songOf('xote');
+  const { som, starts, clock, advance } = showSetup();
+  clock.t = 30;
+  som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead, elapsed: 5000 });
+  assert.ok(starts.length > 0);
+  assert.ok(starts.every(note => note.at >= 30 - 0.04 - 1e-9), 'nada que já passou volta a tocar');
+  // E a grade continua a de quem começou 5 s antes (a música não recomeça do zero no meio do show).
+  const sec = 60 / entry.bpm / 4;
+  for (const note of starts) {
+    const k = (note.at - (25 + palco.lead / 1000)) / sec;
+    assert.ok(Math.abs(k - Math.round(k)) < 1e-6, `nota fora da grade do show (${k})`);
+  }
+  // Muito depois do fim da partitura segue tocando (o show pode durar mais que a trilha).
+  const antes = starts.length;
+  advance(60);
+  assert.ok(starts.length > antes + 100);
+  // A volta cai no ponto de volta: o passo logo depois do fim soa como o primeiro do ponto de volta.
+  const info = Som.SHOWS[entry.id];
+  const voltar = n => { const v = fakeVoice(); Som.passoShow(entry.id, v, n, 8, 0.15); return JSON.stringify(v.calls); };
+  assert.equal(voltar(8 + info.compassos * 8), voltar(8 + info.volta * 8), 'depois do último compasso volta ao ponto de volta');
+  assert.equal(voltar(8 + (info.compassos + 3) * 8 + 2), voltar(8 + (info.volta + 3) * 8 + 2));
+  som.stopShow();
+});
+
+test('show do palco: a música de fundo cede enquanto o show toca e volta depois; parar fecha com o acorde só quando o show deu estrela', () => {
+  const entry = songOf('baiao');
+  const { som, log, timers, advance } = showSetup();
+  assert.equal(som.setMusic(true), true);
+  assert.equal(timers.size, 1);
+  assert.equal(som.startShow('nao-existe', { bpm: 100 }), false, 'música desconhecida não toca');
+  assert.equal(som.startShow(entry.id, { bpm: 0 }), false, 'sem andamento não toca');
+  assert.equal(som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead }), true);
+  assert.equal(log.master.at(-1), 0, 'a via da música de fundo é silenciada');
+  assert.equal(timers.size, 2, 'um relógio para a música de fundo e outro para o show');
+  // Com o show rolando a música de fundo não agenda nada novo: o mesmo tempo, sem música de fundo, agenda o mesmo tanto.
+  const depois = log.oscillators;
+  advance(5);
+  const comFundo = log.oscillators - depois;
+  const sem = showSetup();
+  sem.som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead });
+  const base = sem.log.oscillators;
+  sem.advance(5);
+  assert.equal(comFundo, sem.log.oscillators - base, 'a música de fundo espera o show acabar');
+  sem.som.stopShow();
+  // Sem estrela: só some (nenhuma nota nova do fecho).
+  let osc = log.oscillators;
+  assert.equal(som.stopShow(), true);
+  assert.equal(som.showing, null);
+  assert.equal(timers.size, 1, 'o relógio do show para');
+  assert.equal(log.oscillators, osc, 'sem estrela não há acorde final');
+  assert.equal(log.master.at(-1), 1, 'a música de fundo volta');
+  assert.equal(som.stopShow(), false, 'parar de novo não faz nada');
+  // Com estrelas: o acorde final (e mais brilho com três).
+  som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead });
+  osc = log.oscillators;
+  som.stopShow({ stars: 1 });
+  const um = log.oscillators - osc;
+  assert.ok(um >= 8, 'bumbo, acorde, baixo e ping');
+  som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead });
+  osc = log.oscillators;
+  som.stopShow({ stars: 3 });
+  assert.ok(log.oscillators - osc > um, 'três estrelas soltam um arpejo a mais');
+  som.setMusic(false);
+});
+
+test('show do palco: começar outra música no meio de um show troca a trilha sem deixar o relógio da anterior rodando', () => {
+  const { som, timers, advance } = showSetup();
+  const [um, outro] = palco.songs;
+  som.startShow(um.id, { bpm: um.bpm, lead: palco.lead });
+  advance(1);
+  som.startShow(outro.id, { bpm: outro.bpm, lead: palco.lead });
+  assert.equal(som.showing, outro.id);
+  assert.equal(timers.size, 1, 'um relógio só');
+  som.stopShow();
+  assert.equal(timers.size, 0);
+});
+
+test('show do palco: com o som desligado ou sem volume não toca, e desligar no meio do show para a trilha', () => {
+  const entry = songOf('arrasta-pe');
+  const off = showSetup({ enabled: false });
+  assert.equal(off.som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead }), false);
+  assert.equal(off.som.showing, null);
+  assert.equal(off.timers.size, 0);
+  const mute = showSetup({ volume: 0 });
+  assert.equal(mute.som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead }), false);
+  const { som, timers, log, advance } = showSetup();
+  assert.equal(som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead }), true);
+  advance(1);
+  som.set({ enabled: false });
+  assert.equal(som.showing, null, 'desligar o som no meio encerra a trilha');
+  assert.equal(timers.size, 0);
+  const osc = log.oscillators;
+  advance(3);
+  assert.equal(log.oscillators, osc);
+  // Sem Web Audio nada quebra.
+  assert.equal(Som.create({ AudioContext: null }).startShow(entry.id, { bpm: entry.bpm }), false);
+  assert.equal(Som.create({ AudioContext: null }).stopShow(), false);
+});
+
+test('show do palco: com o áudio suspenso espera, e ao voltar pula o que passou em vez de tocar tudo de uma vez', () => {
+  const entry = songOf('forro-ouro');
+  const { AudioContext, log } = fakeAudio();
+  const clock = { t: 0 };
+  const starts = [];
+  let state = 'running';
+  class Gated extends AudioContext {
+    get currentTime() { return clock.t; }
+    set currentTime(_) {}
+    get state() { return state; }
+    set state(_) {}
+    createOscillator() { const osc = super.createOscillator(); osc.frequency.setValueAtTime = (freq, at) => starts.push(at); return osc; }
+  }
+  const timers = [];
+  const som = Som.create({ AudioContext: Gated, enabled: true, volume: 0.5, setInterval: fn => { timers.push(fn); return timers.length; }, clearInterval() {} });
+  som.startShow(entry.id, { bpm: entry.bpm, lead: palco.lead });
+  const first = starts.length;
+  state = 'suspended';
+  clock.t = 12;
+  timers.forEach(fn => fn());
+  assert.equal(starts.length, first, 'suspenso não agenda');
+  state = 'running';
+  timers.forEach(fn => fn());
+  assert.ok(starts.length > first);
+  assert.ok(starts.slice(first).every(at => at >= 12 - 0.04 - 1e-9), 'só o que ainda vem; nada do tempo parado');
+  assert.ok(starts.length - first < 80, 'não despeja a música inteira de uma vez');
+  som.stopShow();
+  assert.ok(log.oscillators > 0);
+});

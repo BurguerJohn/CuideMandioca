@@ -1,6 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const data = require('../src/data.js');
+// Quantos eventos do mundo existem (e quantos são raros: peso 1): os testes contam a partir dos dados, para um evento novo não quebrar a conta.
+const TOTAL = data.mundo.eventos.length;
+const RARES = data.mundo.eventos.filter(entry => entry.weight === 1).length;
 const { GameEngine } = require('../src/core.js');
 const UI = require('../src/ui.js');
 
@@ -592,14 +595,14 @@ test('eventos do mundo: a placa mostra o evento no ar com os alvos pegos e o tem
   engine.state.size = engine.state.records.size = 60;
   const now = clock.t;
   assert.doesNotMatch(UI.hud(engine, ctx(engine, { now })), /Chuva de estrelas/);
-  assert.match(UI.panel(engine, ctx(engine, { tab: 'festa' })), /Eventos do mundo: 0 vistos, 0 de 31 tipos\./);
+  assert.match(UI.panel(engine, ctx(engine, { tab: 'festa' })), new RegExp(`Eventos do mundo: 0 vistos, 0 de ${TOTAL} tipos\\.`));
   engine.mundo.start('estrelas');
   const hud = UI.hud(engine, ctx(engine, { now }));
   assert.match(hud, /Chuva de estrelas 0\/8 <b data-until="\d+">/);
   assert.match(hud, /title="Uma chuva de estrelas cadentes risca o céu/);
   engine.mundo.catchTarget(0);
   assert.match(UI.hud(engine, ctx(engine, { now })), /Chuva de estrelas 1\/8/);
-  assert.match(UI.panel(engine, ctx(engine, { tab: 'festa' })), /Eventos do mundo: 1 vistos, 1 de 31 tipos\./);
+  assert.match(UI.panel(engine, ctx(engine, { tab: 'festa' })), new RegExp(`Eventos do mundo: 1 vistos, 1 de ${TOTAL} tipos\\.`));
   assert.match(UI.panel(engine, ctx(engine, { tab: 'historico', logFilter: 'tudo' })), /Evento do mundo: Chuva de estrelas/);
   for (let k = 1; k < 8; k++) engine.mundo.catchTarget(k);
   assert.match(UI.panel(engine, ctx(engine, { tab: 'historico', logFilter: 'tudo' })), /Evento do mundo completo: Chuva de estrelas/);
@@ -618,14 +621,14 @@ test('tela dos eventos do mundo: um cartão por evento, o que não passou aparec
   const icons = [];
   const view = () => UI.tela(engine, { ...ctx(engine, { tela: 'mundo', now: clock.t }), icon: key => { icons.push(key); return ''; } });
   let page = view();
-  assert.equal((page.match(/class="cartao evento-mundo/g) || []).length, 31, 'um cartão por evento');
-  assert.equal((page.match(/class="cartao evento-mundo desconhecido/g) || []).length, 31, 'nenhum passou ainda');
+  assert.equal((page.match(/class="cartao evento-mundo/g) || []).length, TOTAL, 'um cartão por evento');
+  assert.equal((page.match(/class="cartao evento-mundo desconhecido/g) || []).length, TOTAL, 'nenhum passou ainda');
   assert.match(page, /Eventos do mundo/);
-  assert.match(page, /0 de 31/);
+  assert.match(page, new RegExp(`0 de ${TOTAL}`));
   assert.match(page, /De 15 a 30 minutos depois do último/);
   assert.match(page, /Aparece com 12 convidados ou mais\./);
   assert.match(page, /Aparece com 40 convidados ou mais\./);
-  assert.equal((page.match(/class="vazio">\?/g) || []).length, 31);
+  assert.equal((page.match(/class="vazio">\?/g) || []).length, TOTAL);
   clock.t += 1000;
   engine.tick(1);
   // A previsão: o evento sorteado para a hora marcada aparece pelo nome (e some quando ele começa).
@@ -645,7 +648,7 @@ test('tela dos eventos do mundo: um cartão por evento, o que não passou aparec
   assert.doesNotMatch(page, /Próximo evento/, 'enquanto passa não tem próximo marcado');
   assert.ok(icons.includes('mundo:estrelas'));
   assert.ok(!icons.includes('mundo:cometa'), 'o que não passou não mostra o ícone');
-  assert.match(page, /1 de 31/);
+  assert.match(page, new RegExp(`1 de ${TOTAL}`));
   engine.mundo.catchTarget(0);
   engine.mundo.catchTarget(1);
   page = view();
@@ -792,6 +795,11 @@ test('vitrine: o cartão traz o grupo, o ícone e o estado (preço, usar, em uso
   const engine = new GameEngine(data, null, { rng: () => 0.5 });
   const lado = UI.vitrine(engine, ctx(engine, { dockCat: 'lado' }));
   assert.match(lado, /<span class="vlados">[\s\S]*data-action="vitrine-lado" data-side="esquerda"[\s\S]*data-action="vitrine-lado" data-side="direita"/);
+  // Esquerda/Direita ficam fora da faixa de pílulas que rola de lado (com muitos temas, ficavam escondidas no fim dela).
+  const pills = lado.match(/<div class="vfiltros" role="group">([\s\S]*?)<\/div><span class="vlados">/);
+  assert.ok(pills, 'a faixa das pílulas fecha antes dos botões dos lados');
+  assert.ok(!pills[1].includes('vitrine-lado'), 'nenhum botão de lado dentro da faixa que rola');
+  assert.match(lado, /<div class="vfiltros-linha"><div class="vfiltros" role="group">/);
   assert.match(lado, /data-grupo="dino" data-preview="rex-sanfoneiro"/);
   assert.match(lado, /vcard item especial" role="button" tabindex="0" data-action="vitrine-item" data-id="rex-sanfoneiro"[\s\S]*?🔒 Festa da Cidade|🔒/);
   const card = id => UI.vitrine(engine, ctx(engine, { dockCat: 'chapeu' })).match(new RegExp(`<div class="vcard item[^>]+data-id="${id}"[\\s\\S]*?</span></div>`))[0];
@@ -916,15 +924,15 @@ test('almanaque dos eventos do mundo: progresso, filtros, raridade, prêmio, dic
   const view = filter => UI.tela(engine, { ...ctx(engine, { tela: 'mundo', now: clock.t }), mundoFilter: filter, icon: () => '' });
   let page = view('todos');
   // O progresso no alto: vistos, completos (da meta do Céu Completo) e raros.
-  assert.match(page, /<span>Vistos <b>0\/31<\/b><\/span><div class="alma-barra"><i style="width:0%"><\/i><\/div>/);
+  assert.match(page, new RegExp(`<span>Vistos <b>0/${TOTAL}</b></span><div class="alma-barra"><i style="width:0%"></i></div>`));
   assert.match(page, /<span>Completos <b>0\/12<\/b>/);
-  assert.match(page, /<span>Raros vistos <b>0\/8<\/b>/);
+  assert.match(page, new RegExp(`<span>Raros vistos <b>0/${RARES}</b>`));
   assert.match(page, /Com 35 convidados chega um evento novo ao céu\./, 'o próximo que se destrava (com 30 já cabem os de 30)');
   // Os filtros, com as contas.
-  assert.match(page, /data-action="mundo-filtro" data-value="todos">Todos \(31\)</);
+  assert.match(page, new RegExp(`data-action="mundo-filtro" data-value="todos">Todos \\(${TOTAL}\\)<`));
   assert.match(page, /chip ativa" data-action="mundo-filtro" data-value="todos"/);
-  assert.match(page, /data-value="faltam">Faltam \(31\)</);
-  assert.match(page, /data-value="raros">Raros \(8\)</);
+  assert.match(page, new RegExp(`data-value="faltam">Faltam \\(${TOTAL}\\)<`));
+  assert.match(page, new RegExp(`data-value="raros">Raros \\(${RARES}\\)<`));
   assert.match(page, /data-value="vistos">Vistos \(0\)</);
   // Cada cartão que falta diz a raridade, se já cabe e quantos convidados faltam, e traz as dicas de onde vem.
   assert.match(page, /data-raridade="rare"><span class="selo raridade rare">Raro<\/span>/);
@@ -941,10 +949,10 @@ test('almanaque dos eventos do mundo: progresso, filtros, raridade, prêmio, dic
   assert.match(page, /chip ativa" data-action="mundo-filtro" data-value="faltam"/);
   const order = [...page.matchAll(/Aparece com (\d+) convidados ou mais\./g)].map(match => Number(match[1]));
   assert.deepEqual(order, [...order].sort((a, b) => a - b), 'do que cabe agora para o mais difícil');
-  assert.equal((page.match(/class="cartao evento-mundo/g) || []).length, 30, 'o calorão já passou');
+  assert.equal((page.match(/class="cartao evento-mundo/g) || []).length, TOTAL - 1, 'o calorão já passou');
   page = view('raros');
-  assert.equal((page.match(/class="cartao evento-mundo/g) || []).length, 8);
-  assert.equal((page.match(/data-raridade="rare"/g) || []).length, 8);
+  assert.equal((page.match(/class="cartao evento-mundo/g) || []).length, RARES);
+  assert.equal((page.match(/data-raridade="rare"/g) || []).length, RARES);
   // O que já passou mostra o prêmio de pegar tudo (o raro em destaque), as vezes que foi completo e a raridade.
   engine.state.mundo.seen.cometa = 2;
   engine.state.mundo.seen.estrelas = 1;
@@ -955,10 +963,44 @@ test('almanaque dos eventos do mundo: progresso, filtros, raridade, prêmio, dic
   assert.match(page, /<h3>Cometa de São João<\/h3>/);
   assert.match(page, /Pegando tudo: \+10 fichas \+300 de Animação \+10 de Amor/);
   assert.match(page, /completo 3×|completo 3x/);
-  assert.match(page, /<span>Raros vistos <b>1\/8<\/b>/);
-  assert.match(page, /<span>Vistos <b>3\/31<\/b>/);
+  assert.match(page, new RegExp(`<span>Raros vistos <b>1/${RARES}</b>`));
+  assert.match(page, new RegExp(`<span>Vistos <b>3/${TOTAL}</b>`));
   // Filtro vazio e filtro desconhecido.
   engine.state.mundo.seen = {};
   assert.match(view('vistos'), /Nenhum evento neste filtro\./);
   assert.match(view('qualquer-coisa'), /chip ativa" data-action="mundo-filtro" data-value="todos"/);
+});
+
+test('modo de teste: duas abas (Geral e Eventos do mundo), a segunda com um botão por evento, o porte mínimo em cada um e o que está no ar marcado', () => {
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  const page = (extra = {}) => UI.tela(engine, { ...ctx(engine, { tela: 'teste' }), ...extra, icon: () => '' });
+  // Geral (de fábrica): as abas e os atalhos de sempre, sem os botões dos eventos.
+  let html = page();
+  assert.match(html, /<button class="chip ativa" data-action="teste-aba" data-value="geral">Geral<\/button>/);
+  assert.match(html, /<button class="chip " data-action="teste-aba" data-value="mundo">Eventos do mundo<\/button>/);
+  assert.match(html, /data-op="animacao"/);
+  assert.doesNotMatch(html, /data-op="evento"/);
+  // Eventos do mundo: um botão para cada evento, em grupos (céu e tempo e os três temas), com o porte mínimo e o requisito no título.
+  html = page({ testeTab: 'mundo' });
+  assert.match(html, /<button class="chip ativa" data-action="teste-aba" data-value="mundo">Eventos do mundo<\/button>/);
+  assert.doesNotMatch(html, /data-op="animacao"/);
+  assert.equal((html.match(/data-op="evento" data-value="/g) || []).length, TOTAL);
+  assert.match(html, /data-op="evento" data-value="eclipse" title="Pede 35 convidados ou mais\.">Eclipse <small>35<\/small><\/button>/);
+  assert.match(html, /data-op="evento" data-value="ovos" title="Pede 12 convidados ou mais e um conjunto completo de dinossauros vestido\.">Choca-choca de ovos <small>12<\/small><\/button>/);
+  assert.match(html, /data-op="evento-fim"/);
+  for (const group of ['Céu e tempo', 'Dinossauros', 'Halloween', 'Zumbis']) assert.match(html, new RegExp(`<div class="rotulo">${group}</div>`), group);
+  assert.match(html, /Nenhum evento no ar\./);
+  assert.doesNotMatch(html, /class="btn claro ativa"/);
+  // O que está no ar fica marcado, com o nome.
+  engine.state.size = engine.state.records.size = 60;
+  engine.mundo.start('lua');
+  html = page({ testeTab: 'mundo' });
+  assert.match(html, /<button class="btn claro ativa" data-action="debug" data-op="evento" data-value="lua"/);
+  assert.equal((html.match(/class="btn claro ativa"/g) || []).length, 1);
+  assert.match(html, /No ar agora: Lua cheia\./);
+  // Qualquer outro valor de aba cai em Geral.
+  assert.match(page({ testeTab: 'qualquer' }), /data-op="animacao"/);
+  // O diário mostra o evento chamado pelo teste no idioma atual.
+  engine.debug('evento', 'meteoro');
+  assert.equal(UI.debugText(engine, engine.state.log.at(-1)), 'Evento do mundo: Meteoro da extinção');
 });

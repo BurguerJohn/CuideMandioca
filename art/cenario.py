@@ -992,17 +992,39 @@ JEGUE_PAPEL = ['...L.L..............',
 
 
 def burro():
+    """O cavalete do Rabo no burro: pés de madeira com a bandeja, o papel com um campinho (céu, sol, morro e nuvens) onde o jegue está
+    desenhado sem rabo e, no lugar dele, o alvo de argolas vermelhas e brancas (o X antigo)."""
     layer = Layer(28, 28)
     layer.line(5, 10, 2, 27, 'D')
     layer.line(22, 10, 25, 27, 'D')
+    layer.line(5, 10, 3, 27, 'l')
     layer.line(14, 12, 14, 27, 'd')
     layer.rect(3, 22, 24, 22, 'D')
+    layer.rect(3, 22, 24, 22, 'l')
+    layer.rect(3, 23, 24, 23, 'u')
     layer.rect(1, 1, 26, 19, 'D')
-    layer.rect(2, 2, 25, 18, 'W')
+    layer.rect(1, 1, 26, 1, 'l')
+    layer.rect(2, 2, 25, 18, 'b')
+    # Céu com nuvens, sol e o morro verde em duas camadas.
+    for x in range(2, 26):
+        layer.put(x, 2, 'W')
+    layer.rect(5, 3, 8, 3, 'W')
+    layer.rect(6, 4, 9, 4, 'W')
+    layer.rect(14, 3, 17, 3, 'W')
+    layer.rect(15, 4, 19, 4, 'W')
+    layer.rect(23, 3, 24, 4, 'A')
+    for x in range(2, 26):
+        topo = 12 + round(1.4 * ((x * 5) % 7) / 6)
+        layer.rect(x, topo, x, 18, 'G')
+        layer.rect(x, topo + 3, x, 18, 'g')
     layer.grid(JEGUE_PAPEL, 3, 4)
-    for d in (-1, 0, 1):
-        layer.put(22 + d, 9 + d, 'R')
-        layer.put(22 + d, 9 - d, 'R')
+    # O alvo: três anéis (vermelho, branco, vermelho) onde o rabo vai.
+    for r, cor in ((3, 'R'), (2, 'W'), (1, 'R')):
+        for dx in range(-r, r + 1):
+            for dy in range(-r, r + 1):
+                if dx * dx + dy * dy <= r * r + 1 and (abs(dx) == r or abs(dy) == r or r == 1):
+                    layer.put(22 + dx, 9 + dy, cor)
+    layer.put(22, 9, 'R')
     for px, py in ((2, 2), (25, 2), (2, 18), (25, 18)):
         layer.put(px, py, 's')
     return [outline(layer.image)]

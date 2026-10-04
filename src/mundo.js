@@ -24,6 +24,9 @@
 
     fresh() { return { nextAt: 0, nextId: '', active: null, seen: {}, caught: {}, done: {}, last: '', buffs: [] }; }
 
+    // Os eventos de tema (`tema`) só entram no sorteio com um conjunto completo do tema vestido; os outros sempre.
+    eligible(entry) { return !entry.tema || this.engine.wornTheme() === entry.tema; }
+
     // O que passou fica (quantas vezes cada evento veio e quantos alvos já foram pegos); o evento que estava no meio não volta.
     load(raw) {
       const base = this.fresh();
@@ -113,10 +116,16 @@
       const weather = this.engine.state.weather;
       if (weather.rain || weather.rainbow) return;
       if (this.engine.state.size < this.cfg.minSize) { s.nextAt = 0; return; }
+      // Trocou de roupa (ou tirou o conjunto): a previsão é sorteada de novo na hora, para valer o tema de agora. (A primeira vez só anota a roupa.)
+      const theme = this.engine.wornTheme();
+      const changed = this.theme !== undefined && theme !== this.theme;
+      this.theme = theme;
       if (!s.nextAt) { this.schedule(); return; }
+      if (changed) s.nextId = this.pick() || '';
       if (now < s.nextAt) return;
-      // O que a previsão disse, se ainda cabe na festa; senão sorteia de novo.
-      const planned = s.nextId && this.event(s.nextId) && this.engine.state.size >= (this.event(s.nextId).minSize || 0) ? s.nextId : this.pick();
+      // O que a previsão disse, se ainda cabe na festa (e no tema); senão sorteia de novo.
+      const plan = s.nextId ? this.event(s.nextId) : null;
+      const planned = plan && this.engine.state.size >= (plan.minSize || 0) && this.eligible(plan) ? s.nextId : this.pick();
       if (planned) this.start(planned);
       else this.schedule();
     }
@@ -132,14 +141,17 @@
     follow(entry) {
       const link = entry && this.cfg.chains ? this.cfg.chains[entry.id] : null;
       const next = link ? this.event(link.id) : null;
-      if (!next || this.engine.state.size < (next.minSize || 0)) return '';
+      if (!next || this.engine.state.size < (next.minSize || 0) || !this.eligible(next)) return '';
       return this.engine.rng() < link.chance ? next.id : '';
     }
 
-    // O próximo evento: sorteado pelo peso entre os que já cabem na festa, sem repetir o último (se houver outro).
+    // O próximo evento: sorteado pelo peso entre os que já cabem na festa, sem repetir o último (se houver outro). Com um conjunto de tema vestido, a cada
+    // sorteio há `temaChance` de sair da lista do tema (e só dela); fora isso, os eventos sem tema.
     pick() {
       const size = this.engine.state.size;
-      let pool = this.cfg.eventos.filter(entry => size >= (entry.minSize || 0));
+      let pool = this.cfg.eventos.filter(entry => size >= (entry.minSize || 0) && this.eligible(entry));
+      if (pool.some(entry => entry.tema) && this.engine.rng() < this.cfg.temaChance) pool = pool.filter(entry => entry.tema);
+      else pool = pool.filter(entry => !entry.tema);
       if (pool.length > 1) pool = pool.filter(entry => entry.id !== this.state.last);
       const total = pool.reduce((sum, entry) => sum + entry.weight * this.boost(entry), 0);
       if (!total) return null;
@@ -295,7 +307,7 @@
         const via = Object.keys(cfg.chains || {}).filter(from => cfg.chains[from].id === entry.id && s.seen[from]);
         const days = Object.keys(cfg.dayBoost || {}).filter(day => cfg.dayBoost[day].ids.includes(entry.id));
         return { entry, seen: s.seen[entry.id] || 0, caught: s.caught[entry.id] || 0, done: s.done[entry.id] || 0, rarity: this.rarity(entry),
-          unlocked: size >= entry.minSize, needs: Math.max(0, Math.ceil(entry.minSize - size)), via, days };
+          unlocked: size >= entry.minSize, needs: Math.max(0, Math.ceil(entry.minSize - size)), via, days, tema: entry.tema || null, themeOn: this.eligible(entry) };
       });
     }
   }

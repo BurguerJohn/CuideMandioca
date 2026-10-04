@@ -15,6 +15,7 @@
 
   function create(ctx) {
     const { bundle, g, sprite, spriteCut, shadow, halo, say, float, confetti, dust, sound, region, rng, fx, layout, ground, poleTop } = ctx;
+    const { tr = key => key, ringFx = () => {}, starBurst = () => {}, impact = () => {}, sayBig = say } = ctx;
     let cur = null;           // a visita que está sendo desenhada: { key, items, ... }
 
     // A arte da criatura: { meta, base, w, h } (`base` é o primeiro dos dois quadros).
@@ -449,6 +450,8 @@
       if (!a.done && st.head && now >= st.said) {
         st.said = now + 9000;
         say(entry.say, st.head.x, st.head.y - 4, now, '#fff07a', 1800, 6);
+        // Cada grito abre um aro suave na cor da criatura (e quem passou longe percebe de onde veio).
+        ringFx(st.head.x, st.head.y + 8, now, GLOW[a.id] || '#fff07a', 24, 700);
       }
       // O clique: confete e fagulhas onde ela estava.
       if (a.done && !st.caught) {
@@ -457,6 +460,13 @@
         if (st.head) {
           confetti(now, st.head.x, st.head.y + 10, 18);
           for (let i = 0; i < 4; i++) float('brilho', st.head.x + (i - 1.5) * 8, st.head.y + 14, now, ['#ffd21e', '#fff07a']);
+          // Pegou: dois anéis (da cor da criatura e branco), uma chuva de faíscas, o letreiro grande e um solavanco na festa.
+          const tint = GLOW[a.id] || '#ffd21e';
+          ringFx(st.head.x, st.head.y + 12, now, tint, 32, 580, 3);
+          ringFx(st.head.x, st.head.y + 12, now, '#fff8e8', 20, 420);
+          starBurst(st.head.x, st.head.y + 12, now, [tint, '#fffff0', '#ffd21e', '#ffffff'], 20, 0.055);
+          sayBig(tr('fx.folcloreCatch'), st.head.x, Math.max(14, st.head.y - 10), now, '#9ef05a', 1500, 8);
+          impact(1.1, 340, now);
         }
       }
     }

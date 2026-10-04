@@ -8,6 +8,10 @@
   const compact = n => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
   const timeText = seconds => (seconds >= 90 ? `${Math.ceil(seconds / 60)} min` : `${Math.max(1, Math.ceil(seconds))} s`);
   const TAU = Math.PI * 2;
+  // As cores de cada planta: o confete da colheita e do plantio saem delas.
+  const CROP_COLORS = { milho: ['#ffd21e', '#fff0a0'], amendoim: ['#d8a050', '#f0c880'], 'batata-doce': ['#b868a8', '#e0a0d0'],
+    mandioca: ['#b88a52', '#e0c090'], abobora: ['#f08a2a', '#ffc070'] };
+  const cropColors = id => CROP_COLORS[id] || ['#ffd21e', '#fff0a0'];
   const smooth = value => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 
   function create(canvas, bundle, hooks = {}) {
@@ -230,8 +234,15 @@
         const { x, y } = spot(plot.index);
         base.spawn('brilho', x + 6, y - 2, now);
         base.spawn('brilho', x + 18, y + 2, now);
+        base.ring(x + PW / 2, y + PH - 6, now, { from: 3, to: 13, color: '#9ef05a', ms: 460 });
+        base.bits(x + PW / 2, y + PH - 8, 6, now, { colors: ['#56b858', '#9ef05a', '#d8ffa0'], speed: 20, up: 14, gravity: 40, ms: 600 });
       } else if (plot.crop && prev && prev.crop === plot.crop && plot.stage === 3 && prev.stage < 3) {
+        // Ficou pronta: o canteiro solta um clarão dourado e brilhos (a planta chama para colher).
         pop[plot.index] = now;
+        const { x, y } = spot(plot.index);
+        base.ring(x + PW / 2, y + PH - 8, now, { from: 3, to: 16, color: '#ffe27a', ms: 560, thick: 2 });
+        base.bits(x + PW / 2, y + 6, 10, now, { colors: ['#ffd21e', '#fff0a0', '#ffffff'], speed: 30, up: 16, gravity: 30, ms: 700 });
+        hooks.sound?.('brilho');
       }
       seen[plot.index] = plot.crop ? { crop: plot.crop, stage: plot.stage } : null;
     }
@@ -257,6 +268,8 @@
         const cycle = (now / 1000 + plot.index * 0.61) % 2.8;
         const lift = plot.ready && cycle < 0.45 ? -Math.round(Math.sin(cycle / 0.45 * Math.PI) * 2) : 0;
         if (plot.luck === 'dourada') glow(px + 13, py + 14, 15, '#ffd21e', 0.16 + 0.07 * Math.sin(now / 260 + plot.index));
+        // No ponto de colher: um brilho quente por baixo (e a borda do canteiro pisca) para a planta chamar.
+        if (plot.ready) base.glow(x + PW / 2, y + PH - 6, 13, '#ffe27a', 0.07 + 0.04 * Math.sin(now / 300 + plot.index));
         // Em dobro: a segunda plantinha aparece atrás quando a primeira já cresceu.
         if (plot.luck === 'dobro' && plot.stage >= 1) bentSprite(sheet, index, px - 6, py + 1 + lift, -wind, squash);
         bentSprite(sheet, index, px + (plot.luck === 'dobro' && plot.stage >= 1 ? 5 : 0), py + lift, wind, squash);
@@ -287,7 +300,18 @@
       // A folha tem linhas transparentes no topo: a região só cobre a parte que tem planta (a da fileira da frente não pega a de trás).
       const top = plot.crop ? y + PH - meta.plantas.h + 6 : y;
       const bottom = y + PH + (plot.crop ? 1 : 0);
-      base.region(`plot:${plot.index}`, x, top, PW, bottom - top, { plot: plot.index, tip });
+      base.region(`plot:${plot.index}`, x, top, PW, bottom - top, { plot: plot.index, tip, hot: plot.open });
+      // O corvo está de olho nesta planta: moldura vermelha piscando (mais rápido quando falta pouco).
+      if (info.crow && info.crow.plot === plot.index) {
+        const hurry = info.crow.left < 6;
+        if (Math.floor(now / (hurry ? 140 : 320)) % 2 === 0) {
+          g.fillStyle = '#ff5a5a';
+          g.fillRect(x - 1, y - 1, PW + 2, 1);
+          g.fillRect(x - 1, y + PH, PW + 2, 1);
+          g.fillRect(x - 1, y - 1, 1, PH + 2);
+          g.fillRect(x + PW, y - 1, 1, PH + 2);
+        }
+      }
     }
 
     // --- Prateleira, quadro, bichos ------------------------------------------------------------------------------------------------
@@ -319,19 +343,19 @@
         if (today) sunBadge(x + 1, y + 1, now);
         const tip = (today ? `${tr('mini.horta.tipToday', { v: Math.round(engineRef.data.minis.horta.daily.bonus * 100) })} ` : '') + tr('mini.horta.tipSeed', { crop: nameOf(item.id), time: timeText(item.minutes * 60), buff: effectText(item.buff), m: info.buffMinutes, friends,
           perm: tr(have ? 'mini.horta.permHave' : 'mini.horta.permNew', { v: info.permanentPct }) });
-        base.region(`semente:${item.id}`, x, y, meta.pacotes.w, meta.pacotes.h, { semente: item.id, tip });
+        base.region(`semente:${item.id}`, x, y, meta.pacotes.w, meta.pacotes.h, { semente: item.id, tip, hot: !chosen });
       });
       // A regadora (rega tudo), a cesta (colhe tudo) e a pá (planta em todos os canteiros livres), cada uma com o número do que dá para fazer.
       const can = SLOTS.can;
       base.sprite(meta.regadora, info.water > 0 ? 0 : 2, can.x, can.y);
       badge(String(info.water), can.x + 13, can.y - 3, info.water > 0 ? '#8ed6ff' : '#9a9ca8');
-      base.region('regadora', can.x, can.y, 19, 16, { tip: tr('mini.horta.tipCan', { n: info.water, max: info.waterMax }) });
+      base.region('regadora', can.x, can.y, 19, 16, { tip: tr('mini.horta.tipCan', { n: info.water, max: info.waterMax }), hot: info.water > 0 });
       const basket = SLOTS.basket;
       const jiggle = now - toy.jiggle < 300 ? Math.round(Math.sin((now - toy.jiggle) / 40)) : 0;
       const bounce = info.ready > 0 && Math.floor(now / 1700) % 2 === 0 && now % 1700 < 300 ? -1 : 0;
       base.sprite(meta.cesta, info.ready > 0 ? 1 : 0, basket.x, basket.y + jiggle + bounce);
       if (info.ready > 0) badge(String(info.ready), basket.x + 14, basket.y - 3, '#ffe27a');
-      base.region('cesta', basket.x, basket.y, 20, 17, { tip: tr('mini.horta.tipBasket', { n: info.ready }) });
+      base.region('cesta', basket.x, basket.y, 20, 17, { tip: tr('mini.horta.tipBasket', { n: info.ready }), hot: info.ready > 0 });
       if (info.combo.n >= 2) {
         base.text(`X${info.combo.n}`, basket.x + 10, basket.y - 9, '#ffe27a');
         g.fillStyle = '#26242e';
@@ -342,7 +366,7 @@
       const shovel = SLOTS.shovel;
       base.sprite(meta.pa, now - toy.dig < 450 ? 1 : 0, shovel.x, shovel.y);
       if (info.empty > 0) badge(String(info.empty), shovel.x + 8, shovel.y - 3, '#fff8e8');
-      base.region('pa', shovel.x, shovel.y, 16, 19, { tip: tr('mini.horta.tipShovel', { crop: nameOf(info.seed), n: info.empty }) });
+      base.region('pa', shovel.x, shovel.y, 16, 19, { tip: tr('mini.horta.tipShovel', { crop: nameOf(info.seed), n: info.empty }), hot: info.empty > 0 });
     }
 
     function drawBoard(info) {
@@ -387,6 +411,11 @@
         if (t < 0) continue;
         if (t > 700) { toy.pours.splice(i, 1); continue; }
         const { x, y } = spot(p.plot);
+        if (!p.splashed && t > 260) {
+          p.splashed = true;
+          base.ring(x + PW / 2, y + PH - 8, now, { from: 2, to: 11, color: '#b8e8ff', ms: 420 });
+          base.bits(x + PW / 2, y + PH - 8, 8, now, { colors: ['#8ed6ff', '#d8f4ff', '#56c8ee'], speed: 22, arc: [-2.6, -0.5], gravity: 90, ms: 520 });
+        }
         base.sprite(meta.regadora, 1, x - 6, y - 15 + Math.round(Math.sin(t / 60)));
         for (let k = 0; k < 3; k++) {
           const dy = ((t / 4 + k * 9) % 22);
@@ -408,7 +437,15 @@
       g.fillRect(x + 2, y + 2, 24, 3);
       g.fillStyle = '#ff5a5a';
       g.fillRect(x + 3, y + 3, Math.round(22 * info.crow.left / total), 1);
-      base.region('corvo', x + 5, y - 12 + bob, meta.corvo.w, meta.corvo.h, { crowPlot: info.crow.plot, until: info.crow.until, tip: tr('mini.horta.tipCrow') });
+      base.region('corvo', x + 5, y - 12 + bob, meta.corvo.w, meta.corvo.h, { crowPlot: info.crow.plot, until: info.crow.until, tip: tr('mini.horta.tipCrow'), hot: true });
+      // O corvo acabou de pousar: penas pretas, um "!" e uma tremidinha.
+      const key = `${info.crow.plot}:${info.crow.until}`;
+      if (toy.crowKey !== key) {
+        toy.crowKey = key;
+        base.spawn('exclama', x + 9, y - 18, now);
+        base.bits(x + 12, y - 4, 7, now, { colors: ['#26242e', '#4a4658', '#6a6678'], speed: 24, up: 10, gravity: 50, ms: 700 });
+        base.shake(0.7, 180, now);
+      }
     }
 
     // A borboleta da sorte voa em oito pela horta; a posição vem do relógio do jogo (a mesma que o clique usa).
@@ -423,7 +460,7 @@
       glow(x + 4, y + 4, 9, '#ffd21e', 0.22 + 0.08 * Math.sin(now / 150));
       base.sprite(meta.borboleta, 2 + (Math.floor(now / 110) % 2), x, y);
       if (now >= (hearted.butterfly || 0)) { hearted.butterfly = now + 260; base.spawn('brilho', x + 4, y + 7, now); }
-      base.region('borboleta', x - 3, y - 3, 15, 14, { tip: tr('mini.horta.tipButterfly', { s: Math.ceil(info.butterfly.left) }) });
+      base.region('borboleta', x - 3, y - 3, 15, 14, { tip: tr('mini.horta.tipButterfly', { s: Math.ceil(info.butterfly.left) }), hot: true });
     }
 
     function draw(engine, now) {
@@ -446,6 +483,7 @@
       drawRain(now, info);
       base.drawParticles(now);
       base.drawSays(now);
+      base.drawFx(now);
       return true;
     }
 
@@ -459,25 +497,42 @@
         toy.flights.push({ at: now + k * 110, x: x + 14, y: y + 8, icon: meta.plantas.ids.indexOf(got.crop.id) });
         base.spawn('estrela', x + 6, y - 4, now);
         base.spawn('brilho', x + 18, y - 6, now);
+        // A planta sai da terra: confete da cor dela, terra voando e um anel.
+        base.bits(x + 14, y + 8, 12, now + k * 110, { colors: [...cropColors(got.crop.id), '#56b858'], speed: 40, up: 22, gravity: 90, ms: 850 });
+        base.bits(x + 14, y + PH - 4, 6, now + k * 110, { colors: ['#8a6a3a', '#6a4a24', '#a8844a'], speed: 22, up: 12, gravity: 80, ms: 520 });
+        base.ring(x + 14, y + 10, now + k * 110, { from: 3, to: 18, color: got.luck === 'dourada' ? '#ffd21e' : '#fff8e8', ms: 500, thick: got.luck === 'dourada' ? 2 : 1 });
         for (const [key, value] of Object.entries(got.reward)) total[key] = (total[key] || 0) + value;
         best = Math.max(best, got.combo);
       });
       const last = results[results.length - 1];
       const { x, y } = spot(last.index);
-      const lines = rewardLines(total).map(line => [line, '#ffe27a']);
+      const lines = rewardLines({ ...total, cheer: 0 }).map(line => [line, '#ffe27a']);
       if (results.some(got => got.luck === 'dourada')) lines.push([tr('mini.horta.golden', { m: engineRef.data.minis.horta.goldenMult }), '#ffd21e']);
       else if (results.some(got => got.luck === 'dobro')) lines.push([tr('mini.horta.double', { m: engineRef.data.minis.horta.doubleMult }), '#fff8e8']);
       const friends = Math.max(...results.map(got => got.friends));
       if (friends) lines.push([tr('mini.horta.friendSay', { v: Math.round(Math.min(engineRef.data.minis.horta.friendMax, friends * engineRef.data.minis.horta.friendBonus) * 100) }), '#ffb0c8']);
       if (best >= 2) lines.push([tr('mini.horta.combo', { n: best }), '#ff8a5a']);
+      // O prêmio principal pula grande em cima da planta; o resto (fichas, lenha, sorte, amigas, combo...) vai num painel que se lê, e os
+      // bônus de planta nova (para sempre, por alguns minutos) sobem em letras soltas embaixo do canteiro.
+      const main = total.cheer ? `+${compact(total.cheer)}` : '';
+      const where = { x: bulk ? SLOTS.basket.x + 8 : x + 14, top: bulk ? shelf - 18 : y - 8 };
+      if (main) base.pop(main, where.x, where.top + 2, now, '#ffe27a', { scale: 2, ms: 1500, rise: 14 });
+      base.tag(lines, where.x, where.top - (main ? 14 : 0), now, { border: best >= 3 ? '#ff8a5a' : '#ffd85a' });
       const first = results.find(got => got.permanent);
-      if (first) lines.push([tr('mini.horta.permSay', { v: first.permanent }), '#9ef05a']);
       const buff = results.find(got => got.buff)?.buff;
-      if (buff && !bulk) lines.push([tr('mini.horta.buffSay', { effect: effectText(buff), m: buff.minutes }), '#8ed6ff']);
-      lines.forEach(([line, color], i) => base.say(line, bulk ? SLOTS.basket.x + 8 : x + 14, (bulk ? shelf - 12 : y - 8) - i * 7, now, color));
+      const small = [];
+      if (first) small.push([tr('mini.horta.permSay', { v: first.permanent }), '#9ef05a']);
+      if (buff && !bulk) small.push([tr('mini.horta.buffSay', { effect: effectText(buff), m: buff.minutes }), '#8ed6ff']);
+      small.forEach(([line, color], i) => base.say(line, bulk ? SLOTS.basket.x + 8 : x + 14, (bulk ? shelf - 4 : y + PH + 2) + i * 7, now, color));
+      if (best >= 3 || results.some(got => got.luck === 'dourada') || bulk) {
+        base.flash('#fff2b0', best >= 3 ? 0.2 : 0.12, 260, now);
+        base.shake(best >= 3 ? 1.4 : 0.8, 260, now);
+      }
       for (const got of results) if (got.first) hooks.toast?.(tr('mini.horta.first', { crop: nameOf(got.crop.id), v: got.permanent, total: got.total }), 'ouro');
       for (const got of results) for (const order of got.orders || []) {
         base.say(tr('mini.horta.orderDone'), meta.quadro.x + 19, meta.quadro.y + 12, now, '#9ef05a');
+        base.bits(meta.quadro.x + 19, meta.quadro.y + 14, 22, now, { colors: ['#ffd21e', '#ff4f9e', '#3a6cf0', '#35a03a', '#ff8a12'], speed: 52, gravity: 60, ms: 1100, arc: [-3.0, -0.1] });
+        base.ring(meta.quadro.x + 19, meta.quadro.y + 14, now, { from: 4, to: 22, color: '#9ef05a', ms: 520, thick: 2 });
         for (let k = 0; k < 4; k++) base.spawn('estrela', meta.quadro.x + 6 + k * 8, meta.quadro.y + 16 - (k % 2) * 4, now + k * 60);
         hooks.sound?.('conquista');
         hooks.toast?.(tr('mini.horta.orderToast', { n: order.n, crop: nameOf(order.crop), gains: rewardLines(order.reward).join(' ') }), 'ouro');
@@ -496,6 +551,8 @@
           hooks.sound?.('brilho');
           base.say(tr('mini.horta.butterflyCaught'), found.point.x, found.point.y - 6, now, '#ffe27a');
           for (let k = 0; k < 5; k++) base.spawn(k % 2 ? 'coracao' : 'estrela', found.x + 2 + k * 3, found.y + 4, now);
+          base.bits(found.x + 6, found.y + 5, 14, now, { colors: ['#ffd21e', '#ff8aa8', '#ffffff', '#9ef05a'], speed: 38, gravity: 20, ms: 800 });
+          base.ring(found.x + 6, found.y + 5, now, { from: 3, to: 18, color: '#ffe27a', ms: 480, thick: 2 });
           if (got.index !== null) {
             const { x, y } = spot(got.index);
             base.say(tr('mini.horta.pollinated'), x + 14, y - 6, now, '#ffb0c8');
@@ -514,7 +571,10 @@
           const { x, y } = spot(got.index);
           base.spawn('estrela', x + 8, y - 6, now);
           base.say(tr('mini.horta.scared'), x + 14, y - 14, now, '#fff8e8');
-          rewardLines(got.reward).forEach((line, i) => base.say(line, x + 14, y - 22 - i * 7, now, '#ffe27a'));
+          base.bits(x + 12, y - 6, 12, now, { colors: ['#26242e', '#4a4658', '#ffffff'], speed: 46, up: 14, gravity: 60, ms: 800 });
+          base.ring(x + 12, y - 4, now, { from: 3, to: 20, color: '#fff8e8', ms: 460, thick: 2 });
+          base.shake(1, 220, now);
+          base.tag(rewardLines(got.reward).map(line => [line, '#ffe27a']), x + 14, y - 20, now);
         }
         return true;
       }
@@ -524,6 +584,7 @@
         if (got.ok) {
           hooks.sound?.('bola');
           got.wet.forEach((index, k) => toy.pours.push({ plot: index, at: now + k * 260 }));
+          base.ring(SLOTS.can.x + 8, SLOTS.can.y + 4, now, { from: 3, to: 12, color: '#8ed6ff', ms: 420 });
           base.say(tr('mini.horta.wateredAll', { n: got.wet.length }), SLOTS.can.x + 8, shelf - 10, now, '#8ed6ff');
         } else if (info.water <= 0) { hooks.sound?.('erro'); base.say(tr('mini.horta.noWater'), SLOTS.can.x + 8, shelf - 10, now, '#ff9a8a'); }
         else base.say(tr('mini.horta.nothingToWater'), SLOTS.can.x + 8, shelf - 10, now, '#fff8e8');
@@ -543,6 +604,7 @@
           for (const index of got.planted) {
             const { x, y } = spot(index);
             for (let k = 0; k < 4; k++) base.spawn('poeira', x + 8 + k * 4, y + 12, now, { dx: k % 2 ? 1 : -1 });
+            base.bits(x + 14, y + 12, 6, now, { colors: ['#8a6a3a', '#a8844a', '#6a4a24'], speed: 20, up: 12, gravity: 80, ms: 480 });
           }
           base.say(tr('mini.horta.plantedAll', { n: got.planted.length }), SLOTS.shovel.x + 6, shelf - 19, now, '#ffe27a');
         } else { hooks.sound?.('erro'); base.say(tr('mini.horta.noFreePlot'), SLOTS.shovel.x + 6, shelf - 19, now, '#fff8e8'); }
@@ -589,6 +651,8 @@
           hooks.sound?.('pulo');
           pop[found.plot] = now;
           for (let k = 0; k < 4; k++) base.spawn('poeira', x + 8 + k * 4, y + 12, now, { dx: k % 2 ? 1 : -1 });
+          base.bits(x + 14, y + 12, 7, now, { colors: ['#8a6a3a', '#a8844a', '#6a4a24'], speed: 22, up: 14, gravity: 80, ms: 500 });
+          base.ring(x + 14, y + 14, now, { from: 2, to: 10, color: '#d8c090', ms: 380 });
           if (got.luck) {
             base.say(tr(got.luck === 'dourada' ? 'mini.horta.goldenSeed' : 'mini.horta.doubleSeed'), x + 14, y - 6, now, got.luck === 'dourada' ? '#ffd21e' : '#fff8e8');
             for (let k = 0; k < 4; k++) base.spawn('brilho', x + 4 + k * 6, y + 2, now);
@@ -605,7 +669,7 @@
       if (got.ok) {
         hooks.sound?.('bola');
         toy.pours.push({ plot: found.plot, at: now });
-      } else if (got.reason === 'water') { hooks.sound?.('erro'); base.say(tr('mini.horta.noWater'), x + 14, y, now, '#ff9a8a'); }
+      } else if (got.reason === 'water') { hooks.sound?.('erro'); base.say(tr('mini.horta.noWater'), x + 14, y, now, '#ff9a8a'); base.tap(found.point.x, found.point.y, now); }
       else if (got.reason === 'watered') base.say(tr('mini.horta.alreadyWatered'), x + 14, y, now, '#8ed6ff');
       return true;
     }
@@ -634,7 +698,15 @@
       for (const event of events) {
         if (event.type !== 'mini' || event.mini !== 'horta') continue;
         if (event.kind === 'crow') { hooks.sound?.('papagaio'); hooks.toast?.(tr('mini.horta.crowLanded'), ''); }
-        else if (event.kind === 'crow-ate') hooks.toast?.(tr('mini.horta.crowAte', { crop: nameOf(event.crop) }), 'erro');
+        else if (event.kind === 'crow-ate') {
+          hooks.toast?.(tr('mini.horta.crowAte', { crop: nameOf(event.crop) }), 'erro');
+          if (Number.isInteger(event.index)) {
+            const { x, y } = spot(event.index);
+            base.bits(x + 14, y + 8, 12, now, { colors: ['#26242e', '#4a4658', '#ff5a5a'], speed: 36, up: 10, gravity: 60, ms: 700 });
+            base.ring(x + 14, y + 10, now, { from: 3, to: 16, color: '#ff5a5a', ms: 520 });
+            base.shake(1, 240, now);
+          }
+        }
         else if (event.kind === 'butterfly') { hooks.sound?.('brilho'); hooks.toast?.(tr('mini.horta.butterflyLanded'), 'ouro'); }
       }
     }

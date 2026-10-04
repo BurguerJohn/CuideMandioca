@@ -86,10 +86,11 @@
     return String(Math.max(1, Math.round(value)));
   }
 
-  function pixelText(g, text, cx, y, color, alpha = 1) {
+  // `scale` aumenta o texto em pixels inteiros (2 = letras do dobro do tamanho, com o mesmo contorno de 1 pixel).
+  function pixelText(g, text, cx, y, color, alpha = 1, scale = 1) {
     text = String(text).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
     g.globalAlpha = alpha;
-    const x = Math.round(cx - (text.length * 4 - 1) / 2);
+    const x = Math.round(cx - (text.length * 4 * scale - scale) / 2);
     y = Math.round(y);
     for (const pass of [INK, color]) {
       let cursor = x;
@@ -99,13 +100,13 @@
         if (glyph) {
           for (let i = 0; i < 15; i++) {
             if (glyph[i] !== '1') continue;
-            const gx = cursor + (i % 3);
-            const gy = y + Math.floor(i / 3);
-            if (pass === INK) g.fillRect(gx - 1, gy - 1, 3, 3);
-            else g.fillRect(gx, gy, 1, 1);
+            const gx = cursor + (i % 3) * scale;
+            const gy = y + Math.floor(i / 3) * scale;
+            if (pass === INK) g.fillRect(gx - 1, gy - 1, scale + 2, scale + 2);
+            else g.fillRect(gx, gy, scale, scale);
           }
         }
-        cursor += 4;
+        cursor += 4 * scale;
       }
     }
     g.globalAlpha = 1;
@@ -179,7 +180,7 @@
       particles: [], texts: [], arrivals: new Map(), shown: {}, celebrateUntil: 0, jumpUntil: 0,
       nextBlink: 0, blinkUntil: 0, nextSpark: 0, nextSweat: 0, nextFirework: 0, nextNote: 0, nextHeart: {}, frame: 0, previous: 0,
       lastDraw: 0, stepSum: 0, stepCrit: false, stepAt: 0, crasherSeen: null, leaving: null,
-      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, shakeX: 0, shakeY: 0, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, rafael: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
+      frog: {}, jailUntil: 0, nextPlea: 0, spinners: {}, lanternId: 0, sprout: null, wet: 0, wetAt: 0, wind: null, nextWind: 0, windNow: 0, shakeX: 0, shakeY: 0, rings: [], impact: null, pote: { sway: 0, at: 0 }, potePos: null, look: null, announce: null, sticker: null, cold: 0, coldAt: 0, nextBreath: 0, saco: { hop: null, exit: null, last: null, nextYou: 0 }, sacoPos: null, leilao: { hit: 0, sold: null, bid: 0 }, leilaoPos: null, scorecards: null, scoreUntil: 0, pigeon: null, nextChat: 0, weddingStage: -1, riceUntil: 0, ring: null, nextRing: 0, kidDraw: [], hen: {}, goat: {}, boi: {}, jegue: {}, dog: {}, peddler: {}, bunny: {}, rafael: {}, chicks: [], kids: [], lanterns: [], nextLantern: 0, wave: null, nextWave: 0,
       nextZ: 0, nextSmoke: 0, pops: [],
       light: null, nextFireSmoke: 0, dustAt: 0, rockets: [], flashes: [], shooting: null, nextShoot: 0, glintAt: 0
     });
@@ -384,7 +385,7 @@
       g.globalAlpha = 1;
     }
 
-    const write = (text, cx, y, color, alpha) => pixelText(g, text, cx, y, color, alpha);
+    const write = (text, cx, y, color, alpha, scale = 1) => pixelText(g, text, cx, y, color, alpha, scale);
 
     // Terreiro flutuante gerado na hora, com a paleta do terreiro equipado.
     function buildTerrain(width, palette, seed) {
@@ -1901,6 +1902,7 @@
         halo(f.x, f.y, 11, f.color, 0.5 * (1 - age / 320));
         halo(f.x, f.y, 4, '#fffff0', 0.7 * (1 - age / 320));
       }
+      drawImpactRings(now);
     }
 
     // Papel picado: cada pedaço tem frente e verso (vira enquanto cai), balança de lado e cai devagar.
@@ -1911,6 +1913,57 @@
           born: now, ttl: 1800 + rng() * 900, colors: [CONFETTI[k], CONFETTI_BACK[k]], flip: 70 + rng() * 90,
           wobble: rng() * 6 });
       }
+    }
+
+    // Anel de pixels que se abre de `from` a `to` e some (o "pof" de uma pancada, de um acerto, de uma comemoração).
+    function ringFx(x, y, now, color = '#fff8e8', to = 18, ms = 480, from = 2) {
+      fx.rings.push({ x, y, born: now, ms, color, to, from });
+      if (fx.rings.length > 16) fx.rings.shift();
+    }
+    function drawImpactRings(now) {
+      for (let i = fx.rings.length - 1; i >= 0; i--) {
+        const r = fx.rings[i];
+        const t = (now - r.born) / r.ms;
+        if (t >= 1) { fx.rings.splice(i, 1); continue; }
+        if (t < 0) continue;
+        const radius = Math.round(r.from + (r.to - r.from) * (1 - (1 - t) * (1 - t)));
+        g.globalAlpha = 1 - t;
+        g.fillStyle = r.color;
+        const steps = Math.max(12, radius * 5);
+        for (let k = 0; k < steps; k++) {
+          const a = k / steps * Math.PI * 2;
+          g.fillRect(Math.round(r.x + Math.cos(a) * radius), Math.round(r.y + Math.sin(a) * radius * 0.7), 1, 1);
+        }
+      }
+      g.globalAlpha = 1;
+    }
+    // A festa treme um pouquinho (`power` pixels de ida e volta, por `ms`): o peso de uma pancada, de um martelo, de uma queda.
+    function impact(power, ms, now) {
+      const cur = fx.impact;
+      if (cur && now - cur.at < cur.ms && cur.power * (1 - (now - cur.at) / cur.ms) >= power) return;
+      fx.impact = { power, ms, at: now };
+    }
+    function impactOffset(now) {
+      const cur = fx.impact;
+      if (!cur) return [0, 0];
+      const t = (now - cur.at) / cur.ms;
+      if (t >= 1 || calm) { fx.impact = null; return [0, 0]; }
+      const k = (1 - t) * cur.power;
+      return [Math.round(Math.sin(now * 0.09) * k), Math.round(Math.cos(now * 0.13) * k * 0.6)];
+    }
+    // Estouro de faíscas em volta de (x, y): `n` pontinhos que saem para todos os lados e caem (cores à escolha).
+    function starBurst(x, y, now, colors, n = 14, speed = 0.04, gravity = 0.00008) {
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2 + rng() * 0.3;
+        const v = speed * (0.5 + rng() * 0.5);
+        fx.particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 0.01, gravity, born: now, ttl: 600 + rng() * 400, colors, trail: true });
+      }
+    }
+    // Letreiro grande (letras do dobro do tamanho): para os acertos e as vitórias.
+    function sayBig(text, x, y, now, color, ttl = 1300, rise = 12) {
+      const item = say(text, x, y, now, color, ttl, rise);
+      item.scale = 2;
+      return item;
     }
 
     // Poeirinha do chão a cada passo da Mandioca.
@@ -3475,6 +3528,7 @@
     // As visitas do folclore (src/festa-folclore.js): as criaturas da Mata passam pela festa e quem clica nelas pega o prêmio.
     const folclore = root.ArraiaFestaFolclore ? root.ArraiaFestaFolclore.create({
       bundle, g, sprite, spriteCut, shadow, halo, say, float, confetti, dust, sound, rng, fx: () => fx, layout: () => layout, ground: () => GROUND,
+      tr, ringFx, starBurst, impact, sayBig,
       poleTop: () => GROUND - POLE_H[layout.tier], region: (id, x, y, w, h) => regions.push({ id, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) })
     }) : null;
 
@@ -4205,9 +4259,11 @@
         const t = age / item.ttl;
         // O letreiro inteiro dentro da festa: perto da borda (o mastro, a barraca do canto), ele desliza para dentro em vez
         // de sair cortado. Cada letra tem 4 px.
-        const half = (String(item.text).length * 4 + 1) / 2 + 1;
+        const scale = item.scale || 1;
+        const half = (String(item.text).length * 4 * scale + 1) / 2 + 1;
         const x = view.width > half * 2 ? Math.max(half, Math.min(view.width - half, item.x)) : item.x;
-        write(item.text, x, item.y - item.rise * Math.min(1, t * 1.6), item.color, t > 0.75 ? (1 - t) * 4 : 1);
+        // Letreiro grande (`scale` 2): nasce um pixel maior e encolhe um instante depois, como um estalo.
+        write(item.text, x, item.y - item.rise * Math.min(1, t * 1.6), item.color, t > 0.75 ? (1 - t) * 4 : 1, scale > 1 && age < 120 ? scale + 1 : scale);
       }
       const bugs = Math.min(40, 3 + (layout.scenery.counts.vagalume || 0));
       // Vaga-lumes: três desde o começo e mais um a cada vaga-lume que o cenário ganha.
@@ -4377,7 +4433,12 @@
           fx.scoreUntil = now + 5200;
           const centre = layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2;
           say(tr(`fx.contest.${event.place}`), centre, Math.max(10, GROUND - POLE_H[layout.tier] - 16), now + 1600, '#ffd21e', 2600, 8);
-          if (event.place === 1) { confetti(now + 1600, centre, GROUND - 40, 50); for (let k = 0; k < 3; k++) spawnFirework(now, 1700 + k * 250); }
+          if (event.place === 1) {
+            confetti(now + 1600, centre, GROUND - 40, 50);
+            for (let k = 0; k < 3; k++) spawnFirework(now, 1700 + k * 250);
+            ringFx(centre, GROUND - 8, now + 1600, '#ffd21e', 44, 700, 4);
+            ringFx(centre, GROUND - 8, now + 1700, '#ffffff', 28, 500);
+          }
         } else if (event.type === 'quadrilha' && event.contest) {
           say(tr('fx.contestStart'), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
             Math.max(10, GROUND - POLE_H[layout.tier] - 30), now, '#9fc8ff', 2200, 8);
@@ -4393,7 +4454,10 @@
         } else if (event.type === 'bingo-win') {
           fx.celebrateUntil = now + 1500;
           confetti(now, hostX, up(40), 40);
-          say(tr('fx.bingo'), hostX, up(78), now, '#ffd21e', 2200, 10);
+          sayBig(tr('fx.bingo'), hostX, up(78), now, '#ffd21e', 2200, 10);
+          ringFx(hostX, up(30), now, '#ffd21e', 40, 640, 4);
+          starBurst(hostX, up(34), now, CONFETTI, 26, 0.06);
+          impact(1.2, 420, now);
         } else if (event.type === 'bingo-lost' && layout.audience.length) {
           const guest = layout.audience[Math.floor(rng() * layout.audience.length)];
           say(tr('fx.bingo'), guest.x + 6, GROUND - 40, now, '#ff907a', 1800, 8);
@@ -4405,6 +4469,10 @@
           const at = fx.potePos;
           if (at) {
             say(tr(`fx.poc.${event.hits % 3}`), at.x, at.y - 14, now, '#ffd21e', 700, 6);
+            // A paulada pega: anel dourado no pote, faíscas e a festa dá um solavanco que cresce a cada pancada.
+            ringFx(at.x, at.y - 2, now, '#ffd21e', 12 + event.hits * 2, 360);
+            starBurst(at.x, at.y - 2, now, ['#fffff0', '#ffd21e', '#ff8ac8'], 6 + event.hits, 0.03);
+            impact(0.5 + 0.15 * event.hits, 160 + event.hits * 20, now);
             for (let i = 0; i < 4; i++) {
               fx.particles.push({ x: at.x, y: at.y - 2, vx: (rng() - 0.5) * 0.03, vy: -0.01 - rng() * 0.012, gravity: 0.00004,
                 born: now, ttl: 500 + rng() * 300, colors: ['#c07a36', '#7c421e', '#dca66a'] });
@@ -4415,7 +4483,13 @@
           const at = fx.potePos || { x: layout.L + layout.width / 2, y: GROUND - 60 };
           fx.celebrateUntil = now + 1500;
           fx.jumpUntil = now + 320;
-          say(tr('fx.poteBreak'), at.x, Math.max(10, at.y - 14), now, '#ff8ac8', 1800, 8);
+          sayBig(tr('fx.poteBreak'), at.x, Math.max(14, at.y - 16), now, '#ff8ac8', 1800, 8);
+          // O pote estoura: dois anéis, um clarão, uma chuva de balas coloridas e a festa treme de verdade.
+          ringFx(at.x, at.y, now, '#fff8e8', 30, 560, 3);
+          ringFx(at.x, at.y, now, '#ffd21e', 20, 420);
+          fx.flashes.push({ x: at.x, y: at.y, born: now, color: '#ffd21e' });
+          starBurst(at.x, at.y, now, CONFETTI, 30, 0.07, 0.00009);
+          impact(1.8, 480, now);
           for (let i = 0; i < 12; i++) {
             fx.particles.push({ x: at.x, y: at.y, vx: (rng() - 0.5) * 0.05, vy: -0.015 - rng() * 0.02, gravity: 0.00005,
               born: now, ttl: 900 + rng() * 500, colors: ['#c07a36', '#7c421e', '#dca66a'] });
@@ -4427,6 +4501,8 @@
             fx.sticker = { key: sticker.icon, at: now };
             iconImage(sticker.icon);
             say(tr('fx.sticker'), layout.host.x + 12, GROUND - Math.round(58 * fx.scale) - 44, now, '#ffd21e', 1800, 6);
+            ringFx(layout.host.x + 12, GROUND - Math.round(58 * fx.scale) - 30, now, '#ffd21e', 22, 520);
+            starBurst(layout.host.x + 12, GROUND - Math.round(58 * fx.scale) - 30, now, ['#ffd21e', '#fff07a', '#ffffff'], 12, 0.045);
           }
         } else if (event.type === 'cobra') {
           fx.cobra = { start: now, dir: event.dir || 1, caught: null, shouts: 0 };
@@ -4443,8 +4519,14 @@
             fx.cobra.caught = now;
             fx.cobra.at = { x: at.x };
             const x = at.x + (bundle.scenery.cobra?.w || 20) / 2;
-            say(tr('fx.cobraPega'), Math.min(layout.R - 40, Math.max(layout.L + 40, x)), Math.max(10, GROUND - 40), now, '#9ef05a', 1600, 8);
+            sayBig(tr('fx.cobraPega'), Math.min(layout.R - 40, Math.max(layout.L + 40, x)), Math.max(14, GROUND - 42), now, '#9ef05a', 1600, 8);
             confetti(now, x, GROUND - 12, 14);
+            // Pegou a cobra: anéis verdes, faíscas e um solavanco (a plateia pula).
+            ringFx(x, GROUND - 8, now, '#9ef05a', 26, 520, 3);
+            ringFx(x, GROUND - 8, now, '#fff8e8', 16, 380);
+            starBurst(x, GROUND - 10, now, ['#9ef05a', '#fff07a', '#ffffff', '#35a03a'], 16, 0.05);
+            impact(1.1, 320, now);
+            fx.jumpUntil = now + 320;
           }
         } else if (event.type === 'cobra-end') {
           fx.cobra = null;
@@ -4456,10 +4538,21 @@
           if (flashOn) fx.flashUntil = now + 90;
           fx.celebrateUntil = now + 900;
           say(tr('fx.selfie'), hostX, up(66), now, '#ffffff', 1400, 8);
+          // O clique da câmera: anel branco em volta da Mandioca, faíscas de flash e um solavancozinho.
+          ringFx(hostX, up(30), now, '#ffffff', 34, 520, 3);
+          starBurst(hostX, up(34), now, ['#ffffff', '#fffff0', '#fff07a'], 14, 0.05);
+          impact(0.6, 200, now);
         } else if (event.type === 'cook-ready') {
-          if (fx.stovePos) say(tr('fx.cook.ready'), fx.stovePos.x, Math.max(10, fx.stovePos.y - 14), now, '#ffd21e', 1800, 8);
+          if (fx.stovePos) {
+            say(tr('fx.cook.ready'), fx.stovePos.x, Math.max(10, fx.stovePos.y - 14), now, '#ffd21e', 1800, 8);
+            ringFx(fx.stovePos.x, fx.stovePos.y - 4, now, '#ffd21e', 20, 520);
+            starBurst(fx.stovePos.x, fx.stovePos.y - 8, now, ['#ffd21e', '#fff07a', '#ffffff'], 10, 0.04);
+          }
         } else if (event.type === 'cook-served') {
-          if (fx.stovePos) fx.dishFly = { at: now, id: event.id, from: { ...fx.stovePos } };
+          if (fx.stovePos) {
+            fx.dishFly = { at: now, id: event.id, from: { ...fx.stovePos } };
+            ringFx(fx.stovePos.x, fx.stovePos.y - 4, now, '#fff8e8', 16, 380);
+          }
         } else if (event.type === 'feed') {
           // Comida da loja: cai do alto, um pouco à esquerda, e faz a curvinha até a boca dela.
           fx.dishFly = { at: now, id: event.id, kind: 'comidas', from: { x: layout.host.x - 26, y: Math.max(8, GROUND - Math.round(80 * fx.scale)) } };
@@ -4469,6 +4562,8 @@
           if (c) c.witnessed = true;
           confetti(now, mid, GROUND - 20, 16);
           say(tr('fx.compadre.testemunha'), mid, Math.max(10, GROUND - layout.fire.meta.h - 22), now, '#9ef05a', 1600, 8);
+          ringFx(mid, GROUND - 24, now, '#9ef05a', 26, 520, 3);
+          starBurst(mid, GROUND - 24, now, ['#9ef05a', '#fff07a', '#ffffff'], 12, 0.045);
         } else if (event.type === 'flag-caught') {
           const f = fx.looseFlag;
           if (f) {
@@ -4476,6 +4571,8 @@
             const x = f.x + f.dir * 30 * t;
             confetti(now, x, GROUND - 30, 10);
             say(tr('fx.flag'), x, Math.max(10, GROUND - 44), now, '#9ef05a', 1400, 8);
+            ringFx(x, GROUND - 30, now, '#9ef05a', 18, 420);
+            starBurst(x, GROUND - 30, now, ['#9ef05a', '#fff07a'], 8, 0.035);
           }
           fx.looseFlag = null;
         } else if (event.type === 'burro') {
@@ -4489,6 +4586,15 @@
           const at = fx.burroPos || { x: layout.danceLeft + 16, y: GROUND - 30 };
           say(tr(`fx.burroPin.${event.grade}`), at.x, Math.max(10, at.y - 10), now, event.grade === 'mosca' ? '#9ef05a' : '#fff07a', 1800, 8);
           if (event.grade === 'mosca') { confetti(now, at.x, at.y + 6, 24); fx.celebrateUntil = now + 900; }
+          // Onde o rabo pegou: um anel (dourado na mosca, branco perto, cinza longe) e faíscas, e a festa treme mais quanto melhor o acerto.
+          const metaBurro = bundle.scenery.burro;
+          const px = at.x - (metaBurro ? metaBurro.w / 2 : 14) + BURRO_ALVO[0] + (event.dx || 0);
+          const py = at.y + BURRO_ALVO[1] + (event.dy || 0);
+          const tint = { mosca: '#ffd21e', perto: '#fff8e8', longe: '#c8ccd6', fora: '#ff907a' }[event.grade] || '#fff8e8';
+          ringFx(px, py, now, tint, event.grade === 'mosca' ? 26 : event.grade === 'perto' ? 18 : 12, event.grade === 'mosca' ? 560 : 380);
+          starBurst(px, py, now, event.grade === 'mosca' ? ['#fffff0', '#ffd21e', '#9ef05a', '#ff8ac8'] : [tint, '#ffffff'], event.grade === 'mosca' ? 18 : 6, event.grade === 'mosca' ? 0.05 : 0.025);
+          impact({ mosca: 1.5, perto: 0.9, longe: 0.5, fora: 0.4 }[event.grade] || 0.5, 320, now);
+          if (event.grade === 'mosca') fx.flashes.push({ x: px, y: py, born: now, color: '#ffd21e' });
         } else if (event.type === 'fotografo') {
           fx.fotoCallAt = now + 7000;
         } else if (event.type === 'visitor') {
@@ -4497,6 +4603,7 @@
           const at = fx.visitorPos;
           if (at) {
             say(tr('fx.visitorThanks'), at.x, Math.max(10, at.y - 10), now, '#9ef05a', 1400, 8);
+            ringFx(at.x, at.y - 4, now, '#9ef05a', 20, 460);
             for (let i = 0; i < 4; i++) float('coracao', at.x + (i - 1.5) * 5, at.y - 4 - (i % 2) * 3, now, ['#ff4f9e', '#ff8a96']);
           }
         } else if (event.type === 'cold') {
@@ -4522,7 +4629,13 @@
           // Lance: o seu sai em cima do leiloeiro; o da plateia, de alguém da plateia de trás.
           const at = fx.leilaoPos;
           const text = tr('fx.leilaoBid', { n: event.price });
-          if (event.who === 'voce' && at) say(text, at.x, Math.max(10, at.y - 34), now, '#ffd21e', 900, 6);
+          if (event.who === 'voce' && at) {
+            say(text, at.x, Math.max(10, at.y - 34), now, '#ffd21e', 900, 6);
+            // O seu lance: moedinhas de luz sobem da plaquinha e um anel dourado abre em volta dela.
+            ringFx(at.x, at.y - 30, now, '#ffd21e', 16, 360);
+            starBurst(at.x, at.y - 30, now, ['#ffd21e', '#fff07a', '#ffffff'], 8, 0.03);
+            impact(0.4, 140, now);
+          }
           else if (event.who === 'plateia') {
             const rows = [layout.audience3, layout.audience2, layout.audience].filter(list => list.length);
             const list = rows[0];
@@ -4533,12 +4646,24 @@
         } else if (event.type === 'leilao-call') {
           fx.leilao.hit = now;
           const at = fx.leilaoPos;
-          if (at) say(tr(`fx.leilaoCall.${event.n}`), at.x, Math.max(10, at.y - 30), now, '#ff907a', 1400, 6);
+          if (at) {
+            say(tr(`fx.leilaoCall.${event.n}`), at.x, Math.max(10, at.y - 30), now, '#ff907a', 1400, 6);
+            // A cada "dou-lhe": uma batidinha de martelo (anel vermelho, cada vez maior).
+            ringFx(at.x, at.y - 8, now, '#ff907a', 10 + event.n * 6, 360);
+            impact(0.4 + 0.3 * event.n, 180, now);
+          }
         } else if (event.type === 'leilao-sold') {
           fx.leilao.hit = now;
           fx.leilao.sold = { at: now, winner: event.winner, prize: event.prize };
           const at = fx.leilaoPos;
-          if (at && event.winner) say(tr('fx.leilaoSold'), at.x, Math.max(10, at.y - 30), now, '#ffd21e', 1800, 8);
+          if (at && event.winner) sayBig(tr('fx.leilaoSold'), at.x, Math.max(14, at.y - 32), now, '#ffd21e', 1800, 8);
+          // Martelo batido: anel largo, clarão e um solavanco (maior se foi você que arrematou).
+          if (at) {
+            ringFx(at.x, at.y - 8, now, '#fff8e8', 30, 520, 3);
+            fx.flashes.push({ x: at.x, y: at.y - 10, born: now, color: '#ffd21e' });
+            starBurst(at.x, at.y - 10, now, event.winner === 'voce' ? CONFETTI : ['#ffd21e', '#fff8e8'], event.winner === 'voce' ? 26 : 10, 0.05);
+          }
+          impact(event.winner === 'voce' ? 1.6 : 1.0, 420, now);
           if (event.winner === 'voce') {
             // Arrematou: confete no palco e a festa comemora.
             fx.celebrateUntil = now + 1500;
@@ -4551,7 +4676,10 @@
           say(tr('fx.saco'), Math.round((x0 + x1) / 2), Math.max(10, GROUND - 44), now, '#ffd21e', 2400, 8);
         } else if (event.type === 'saco-go') {
           const { x0 } = sacoTrack();
-          say(tr('fx.sacoGo'), x0 + 12, GROUND - 34, now, '#9ef05a', 900, 8);
+          sayBig(tr('fx.sacoGo'), x0 + 12, GROUND - 38, now, '#9ef05a', 900, 8);
+          // A largada: apito, anel verde no chão e um solavanco.
+          ringFx(x0 + 12, GROUND - 2, now, '#9ef05a', 22, 460);
+          impact(0.8, 200, now);
         } else if (event.type === 'saco-hop') {
           fx.saco.hop = { at: now, from: event.hops - 1, to: event.hops };
           const at = fx.sacoPos;
@@ -4561,12 +4689,17 @@
                 born: now, ttl: 300 + rng() * 200, colors: ['#dca66a', '#c07a36'] });
             }
             if (event.hops % 4 === 0) say(tr(`fx.sacoHop.${Math.floor(rng() * 3)}`), at.x, at.y - 2, now, '#9ef05a', 600, 6);
+            // Cada pulo levanta um aneizinho de poeira onde o saco bate no chão.
+            ringFx(at.x - 2, GROUND, now + 200, '#dca66a', 9, 300, 1);
           }
         } else if (event.type === 'saco-fall') {
           fx.saco.hop = null;
           const at = fx.sacoPos;
           if (at) {
-            say(tr(`fx.sacoFall.${Math.floor(rng() * 3)}`), at.x, Math.max(10, at.y - 2), now, '#ff907a', 900, 6);
+            sayBig(tr(`fx.sacoFall.${Math.floor(rng() * 3)}`), at.x, Math.max(14, at.y - 2), now, '#ff907a', 900, 6);
+            ringFx(at.x + 4, GROUND - 2, now, '#ff907a', 16, 420);
+            starBurst(at.x + 6, GROUND - 6, now, ['#fff07a', '#ffd21e', '#ffffff'], 6, 0.03);
+            impact(1.2, 260, now);
             for (let i = 0; i < 6; i++) {
               fx.particles.push({ x: at.x + 4, y: GROUND - 2, vx: (rng() - 0.5) * 0.04, vy: -0.01 - rng() * 0.01, gravity: 0.00005,
                 born: now, ttl: 400 + rng() * 250, colors: ['#dca66a', '#c07a36', '#7c421e'] });
@@ -4583,15 +4716,24 @@
             fx.celebrateUntil = now + 1500;
             fx.jumpUntil = now + 320;
             confetti(now, x1 + 8, GROUND - 24, 30);
-          }
+            // Campeão: fogos na chegada, anéis dourados e a festa treme de alegria.
+            for (let k = 0; k < 2; k++) spawnFirework(now, k * 250);
+            ringFx(x1 + 8, GROUND - 6, now, '#ffd21e', 34, 600, 3);
+            ringFx(x1 + 8, GROUND - 6, now, '#fff8e8', 22, 420);
+            starBurst(x1 + 8, GROUND - 16, now, CONFETTI, 24, 0.06);
+            impact(1.4, 520, now);
+          } else if (place > 1) ringFx(x1 + 8, GROUND - 4, now, '#fff8e8', 16, 360);
           const text = place ? tr(`fx.sacoPlace.${place}`) : tr('fx.sacoGone');
-          say(text, place ? x1 : Math.round((x0 + x1) / 2), Math.max(10, GROUND - 34), now, place === 1 ? '#ffd21e' : '#fff8e8', 1800, 8);
+          if (place === 1) sayBig(text, x1, Math.max(14, GROUND - 38), now, '#ffd21e', 1800, 8);
+          else say(text, place ? x1 : Math.round((x0 + x1) / 2), Math.max(10, GROUND - 34), now, '#fff8e8', 1800, 8);
         } else if (event.type === 'wedding') {
           fx.weddingStage = -1;
           const w = layout.wedding;
           if (!w) continue;
           confetti(now, w.left + w.width / 2, GROUND - 30, 36);
           say(tr('fx.wedding'), w.left + w.width / 2, Math.max(10, GROUND - POLE_H[layout.tier] - 14), now, '#ff8ac8', 2400, 8);
+          ringFx(w.left + w.width / 2, GROUND - 26, now, '#ff8ac8', 34, 640, 3);
+          starBurst(w.left + w.width / 2, GROUND - 28, now, ['#ff8ac8', '#ffffff', '#ffd21e', '#ff4f9e'], 18, 0.05);
         } else if (event.type === 'rice' && layout.wedding) {
           // Chuva de arroz: uns grãos brancos caem de cima dos noivos.
           const w = layout.wedding;
@@ -4605,6 +4747,10 @@
           fx.celebrateUntil = now + 1500;
           fx.jumpUntil = now + 320;
           confetti(now, w.left + w.width / 2, GROUND - 30, 30 + Math.round(event.share * 40));
+          ringFx(w.left + w.width / 2, GROUND - 26, now, '#ffd21e', 36, 600, 3);
+          ringFx(w.left + w.width / 2, GROUND - 26, now, '#ffffff', 22, 420);
+          starBurst(w.left + w.width / 2, GROUND - 28, now, ['#ffd21e', '#ff8ac8', '#ffffff'], 22, 0.055);
+          impact(1.0, 380, now);
         } else if (event.type === 'quadrilha') {
           fx.tunnelSaid = false;
           fx.bichosUntil = now + engine.cfg.quadrilhaSeconds * 1000;
@@ -4615,11 +4761,15 @@
           }
           fx.jumpUntil = now + 320;
           confetti(now, layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2, GROUND - 40, 30);
+          ringFx(layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2, GROUND - 6, now, '#ffd21e', 40, 640, 4);
+          impact(0.7, 260, now);
           say(tr('fx.quadrilha'), layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2,
             Math.max(10, GROUND - POLE_H[layout.tier] - 18), now, '#ffd21e', 2000, 8);
         } else if (event.type === 'quadrilha-call') {
           // A marcadora grita e todo mundo dá um pulinho.
           fx.jumpUntil = now + 320;
+          ringFx(layout.danceLeft + (layout.danceRight - layout.danceLeft) / 2, GROUND - 6, now, ['#ff907a', '#9ef05a', '#9fc8ff', '#fff07a'][event.n % 4], 30, 480, 3);
+          impact(0.35, 160, now);
           // O quarto grito varia (caminho da roça, cumprimenta a dama, então é São João); o da cobra e o da chuva ficam no lugar.
           const call = event.n % 8 === 3 ? [3, 6, 7][Math.floor(rng() * 3)] : event.n % 8;
           // O grito vira movimento: no caminho da roça a fila anda para o lado e volta; no cumprimento, os pares se curvam.
@@ -4979,8 +5129,9 @@
         power: flicker * (engine.flareActive ? 1.3 : 1) * (1 - 0.3 * (fx.wx ? fx.wx.rain : 0)), reach: 60 + fire.meta.w * 1.8 };
       g.clearRect(0, 0, buffer.width, buffer.height);
       // O tremor de forró (evento do mundo) balança o quadro inteiro um pixel para cada lado; o clique acompanha o deslocamento.
-      view.shakeX = fx.shakeX || 0;
-      view.shakeY = fx.shakeY || 0;
+      const [pushX, pushY] = impactOffset(now);
+      view.shakeX = (fx.shakeX || 0) + pushX;
+      view.shakeY = (fx.shakeY || 0) + pushY;
       g.save();
       g.translate(view.shakeX, view.float + view.shakeY);
       // Um erro no meio do quadro não deixa o pincel torto (deslocamento, transparência, modo de mistura) para os
@@ -5141,7 +5292,7 @@
     function setSleepy(on) { sleepy = on === true; }
 
     // Estado dos enfeites que vêm e vão sozinhos (para os testes e as fotos): vento (-1 a 1) e ciranda das crianças.
-    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rafael: fx.rafael.x === undefined ? null : { x: fx.rafael.x, mode: fx.rafael.mode, yeahAt: fx.rafael.yeahAt ?? null, shout: fx.rafael.shout ?? null }, folclore: folclore ? folclore.probe() : null, premios: premios ? premios.probe() : null, mundo: mundo ? mundo.probe() : null, mundoTrace: mundo ? mundo.traceId() : null, shake: [fx.shakeX || 0, fx.shakeY || 0], rain: fx.wx ? Math.round(fx.wx.rain * 100) / 100 : 0, rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
+    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rafael: fx.rafael.x === undefined ? null : { x: fx.rafael.x, mode: fx.rafael.mode, yeahAt: fx.rafael.yeahAt ?? null, shout: fx.rafael.shout ?? null }, folclore: folclore ? folclore.probe() : null, premios: premios ? premios.probe() : null, mundo: mundo ? mundo.probe() : null, mundoTrace: mundo ? mundo.traceId() : null, shake: [fx.shakeX || 0, fx.shakeY || 0], push: [view.shakeX || 0, view.shakeY || 0], rings: fx.rings.length, impact: fx.impact ? { power: fx.impact.power } : null, bigTexts: fx.texts.filter(item => item.scale > 1).length, rain: fx.wx ? Math.round(fx.wx.rain * 100) / 100 : 0, rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
 
     // A pessoa voltou para a festa depois de um tempo fora: a Mandioca dá um pulinho, faz o olhar felizinho e cumprimenta.
     const GREETINGS = 4;

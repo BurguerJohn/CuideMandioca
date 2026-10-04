@@ -22,15 +22,16 @@ function setup(level, options = {}) {
   engine.state.records.size = level;
   const settings = { zoom: 1, hidden: false, minis: options.minis || {} };
   const sounds = [];
+  const soundCalls = [];
   const toasts = [];
   const host = globalThis.ArraiaJanelas.create({
     document: globalThis.document, engine, sprites: bundle,
     anchor: () => ({ left: 400, width: 800, lift: 20, top: 100 }),
     settings: () => settings, changeSettings: options.changeSettings || (partial => Object.assign(settings, partial)),
     placaRect: () => null, size: () => ({ width: 1600, height: 1000 }),
-    t: options.t || (key => key), sound: name => sounds.push(name), toast: text => toasts.push(text), focused: options.focused
+    t: options.t || (key => key), sound: (name, opts) => { sounds.push(name); soundCalls.push([name, opts]); }, toast: text => toasts.push(text), focused: options.focused
   });
-  return { host, engine, settings, sounds, toasts, clock, bundle };
+  return { host, engine, settings, sounds, soundCalls, toasts, clock, bundle };
 }
 
 // Clica no meio de uma área da janela (as áreas ficam em pixels de arte; o canvas de mentira tem 474x612).
@@ -820,7 +821,8 @@ test('fogueira: lenha, escolher a comida, pôr no espeto, esperar ficar pronta (
   assert.ok(sounds.includes('carinho'));
   for (let i = 0; i < 20; i++) host.draw((now += 40));
   assert.equal(view.probe().flights, 0, 'chegou: o espectador comeu e o prêmio aparece');
-  assert.ok(view.probe().says >= 2, 'NHAM e o prêmio na tela');
+  assert.ok(view.probe().fx.pops >= 1, 'NHAM pula na tela');
+  assert.ok(view.probe().fx.tags >= 1, 'o prêmio aparece num painel');
 
   // Pular a fogueira: precisa de calor; a animação dura um instante.
   const cheer = engine.state.cheer;
@@ -886,6 +888,31 @@ test('fogueira: o topo da chama alta também pula o fogo após mudar a escala e 
 });
 
 // --- Palco do Forró -------------------------------------------------------------------------------------------------------
+test('palco: o acorde de sanfona da pista acompanha a tonalidade da música (o triângulo e a zabumba não mudam)', () => {
+  for (const [id, key] of [['xote', 0], ['baiao', -5], ['forro-ouro', -7], ['arrasta-pe', -5]]) {
+    const { host, engine, soundCalls, clock } = setup(40, { minis: { palco: { hidden: false } } });
+    host.restore();
+    for (const song of engine.data.minis.palco.songs) engine.state.minis.palco.best[song.id] = 1;
+    assert.equal(engine.data.minis.palco.songs.find(entry => entry.id === id).key, key);
+    let now = 1000;
+    host.draw((now += 40));
+    clickArea(host, 'palco', `musica:${id}`, now);
+    const startAt = engine.state.minis.palco.show.startAt;
+    const expected = [];
+    for (const note of engine.mini('palco').chart(id).slice(0, 24)) {
+      clock.t = startAt + note.t;
+      host.draw((now += 40));
+      clickArea(host, 'palco', `pista:${note.lane}`, now);
+      if (note.lane === 2) expected.push([0, 2, 4, 7][engine.state.minis.palco.show.combo % 4] + key);
+    }
+    const pitchOf = name => soundCalls.filter(([sound]) => sound === name).map(([, opts]) => opts.pitch);
+    assert.ok(expected.length >= 2, `${id}: a sanfona toca mais de uma vez`);
+    assert.deepEqual(pitchOf('palco-sanfona'), expected, `${id}: o acorde de sanfona segue a tonalidade`);
+    const others = pitchOf('palco-zabumba').concat(pitchOf('palco-triangulo'));
+    assert.ok(others.length >= 2 && others.every(pitch => [0, 2, 4, 7].includes(pitch)), `${id}: zabumba e triângulo seguem sem a tonalidade`);
+  }
+});
+
 test('palco: escolhe a música, marca o ritmo nas pistas, vê o resultado e fecha', () => {
   const { host, engine, sounds, clock, toasts } = setup(40, { minis: { palco: { hidden: false } } });
   host.restore();

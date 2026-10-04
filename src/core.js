@@ -609,6 +609,24 @@
           s.weather.rain = s.weather.rainbow = null;
           this.mundo.start(next.id);
           note = `Evento do mundo: ${next.name}`;
+        } else if (op === 'evento') {
+          // Começa o evento do mundo `value` (o id), completando antes o que ele pede para valer como no jogo: o porte mínimo (convidados) e, nos eventos
+          // de tema, um conjunto completo do tema vestido (as peças são dadas). Encerra o que estiver no ar e a chuva.
+          const entry = this.mundo.event(String(value));
+          if (!entry) return null;
+          while (s.size < (entry.minSize || 0)) this.addFame(this.fameNeed() - s.fame);
+          if (entry.tema && this.wornTheme() !== entry.tema) {
+            const set = this.data.sets.find(item => [item.hat, item.hand, item.fabric].every(id => this.items[id]?.tema === entry.tema));
+            if (set) for (const id of [set.hat, set.hand, set.fabric]) { this.addItem(id); this.equip(id); }
+          }
+          s.mundo.active = null;
+          s.weather.rain = s.weather.rainbow = null;
+          this.mundo.start(entry.id);
+          extra = { id: entry.id };
+          note = `Evento do mundo: ${entry.name}`;
+        } else if (op === 'evento-fim') {
+          note = s.mundo.active ? 'Evento do mundo encerrado' : 'Nenhum evento no ar';
+          if (s.mundo.active) this.mundo.end();
         } else if (op === 'desfile') {
           note = this.premios.startParade() ? 'Desfile dos Prêmios' : 'Nenhum personagem na festa ainda';
         } else if (op === 'premio') {
@@ -1335,6 +1353,14 @@
       return this.data.sets.find(set => e.chapeu === set.hat && e.mao === set.hand && e.tecido === set.fabric) || null;
     }
     setBonus() { return this.activeSet()?.bonus || 0; }
+    // O tema do conjunto que está valendo (dino, halloween ou zumbi), se as três peças dele são do mesmo tema; senão null. Os eventos de tema do mundo
+    // só entram no sorteio com um conjunto completo do tema vestido.
+    wornTheme() {
+      const set = this.activeSet();
+      if (!set) return null;
+      const themes = [set.hat, set.hand, set.fabric].map(id => this.items[id]?.tema || null);
+      return themes[0] && themes.every(theme => theme === themes[0]) ? themes[0] : null;
+    }
 
     // Relógios de tempo real: pescaria, cartas, pedidos, penetras.
     fishingInterval() { return this.cfg.fishingMinutes * MINUTE * (1 - Math.min(0.6, this.effect('fishing'))); }

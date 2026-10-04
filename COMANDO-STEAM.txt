@@ -1,0 +1,37 @@
+COMO ENVIAR O JOGO PARA A STEAM (SteamPipe)
+===========================================
+
+Comando (rode na pasta do projeto):
+
+    npm run steam:upload -- SEU_LOGIN_DA_STEAM
+
+SEU_LOGIN_DA_STEAM é o nome da conta (não o e-mail). Sem ele, o script pergunta.
+
+O que o comando faz:
+  1. Refaz o build do Windows (dist\CuideBemDaSuaMandioca-win32-x64).
+  2. Confere se o build tem o .exe e a biblioteca da Steam, e se o App ID é o de verdade (5343830).
+  3. Roda o steamcmd com steam\app_build_5343830.vdf (depot 5343831).
+  A senha e o código do Steam Guard são digitados no próprio steamcmd (nada fica salvo no projeto).
+  Depois do primeiro login o steamcmd lembra a sessão neste PC.
+
+Variações:
+  - Sem refazer o build (usa o que já está em dist\):
+        npm run steam:upload -- SEU_LOGIN_DA_STEAM --sem-build
+  - Só montar o build, sem enviar:
+        npm run build:win
+
+Depois de enviar:
+  O build chega ao Steamworks sem ir ao ar. Ative-o no ramo "default" em
+  https://partner.steamgames.com/apps/builds/5343830
+  (a Steam não deixa ativar o ramo padrão por script).
+
+Antes de enviar:
+  - O botão de teste (debugMenu em src\data.js) precisa estar desligado (o script avisa se estiver ligado).
+  - Os testes: node --test --test-isolation=none tests/*.test.js
+
+Requisitos:
+  - A pasta steamworks_sdk_165 ao lado do projeto (já está em C:\Users\Gabriel\Downloads), ou a variável STEAMWORKS_SDK
+    apontando para ela, com tools\ContentBuilder\builder\steamcmd.exe dentro.
+  - Também dá para passar o login pela variável STEAM_LOGIN.
+
+Os logs do envio ficam em steam-build-output\.

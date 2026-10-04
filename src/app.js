@@ -76,7 +76,7 @@
     // Botão de teste ligado pelo código "banana" no Histórico: só vale nesta sessão (não é salvo).
     debug: false, segredo: '',
     interactive: null, festa: null, game: null, drag: null, hold: null, pointer: null, panelPos: null, ringsPos: null,
-    hudKey: '', lastLive: 0, lastSave: 0, saveSoon: 0, closeArmedUntil: 0, tocou: false, redesenhar: false,
+    hudKey: '', lastLive: 0, lastSave: 0, saveSoon: 0, closeArmedUntil: 0, tocou: false, redesenhar: false, showMusic: null,
     // Ao abrir, o jogo recupera o tempo fora (convidados, conquistas...): esses sons de uma vez só viram barulho.
     quietUntil: performance.now() + 2000
   };
@@ -592,7 +592,7 @@
       lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
       settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side, dockGroups: ui.dock.groups,
       ringPlaying: ui.rings.playing, ringResult: ui.rings.result, zoomLabel: zoomLabel(),
-      closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter, mundoFilter: ui.mundoFilter };
+      closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter, mundoFilter: ui.mundoFilter, testeTab: ui.testeTab };
   }
 
   // Painel (números, conquistas, ajustes) e a janela da tela de jogo aberta, redesenhados juntos.
@@ -656,6 +656,11 @@
     const scroll = body.scrollTop;
     body.innerHTML = UI.tela(engine, context());
     body.scrollTop = scroll;
+    // A cena da Pescaria é um canvas que sobrevive às redesenhadas da tela: volta para o espaço dela.
+    const slot = ui.tela.id === 'pescaria' ? body.querySelector?.('[data-pescaria-cena]') : null;
+    if (slot && ui.pescaCanvas) slot.appendChild(ui.pescaCanvas);
+    const bingoSlot = ui.tela.id === 'bingo' ? body.querySelector?.('[data-bingo-cena]') : null;
+    if (bingoSlot && ui.bingoCanvas) bingoSlot.appendChild(ui.bingoCanvas);
     $('#tela-titulo').textContent = UI.telaName(ui.tela.id);
     $('#tela').classList.toggle('modo-teste', ui.tela.id === 'teste');
     refreshLive(true);
@@ -1106,6 +1111,7 @@
     if (a === 'tela-fechar') { closeTela(); return; }
     if (a === 'historico-filtro') { ui.logFilter = d.value; renderWindows(); return; }
     if (a === 'mundo-filtro') { ui.mundoFilter = d.value; renderWindows(); return; }
+    if (a === 'teste-aba') { ui.testeTab = d.value === 'mundo' ? 'mundo' : 'geral'; renderWindows(); return; }
     if (a === 'debug') {
       const note = engine.debug(d.op, d.value);
       const entry = engine.state.log.at(-1);
@@ -1201,7 +1207,12 @@
     if (a === 'melhorar') { done(engine.buyLevel(d.stat), null, t('app.needCheer'), 'nivel'); return; }
     if (a === 'pescar') {
       const result = engine.fish();
-      if (result) { fishReveal(result); done(true); }
+      if (result) {
+        // Com a cena da barraca na tela, a vara joga, o peixinho morde e só depois abre o resultado; sem ela, abre na hora.
+        if (ui.pesca && ui.tela.open && ui.tela.id === 'pescaria') ui.pesca.cast(result, performance.now(), () => fishReveal(result));
+        else fishReveal(result);
+        done(true);
+      }
       return;
     }
     if (a === 'role-enviar') {
@@ -1399,7 +1410,7 @@
       const result = engine.mundo.catchTarget(Number(region.slice(6)));
       if (!result.ok && result.reason === 'order') {
         tocar('errou');
-        toast(t('app.mundoOrdem'));
+        toast(t(result.id === 'abobora' ? 'app.mundoOrdemAbobora' : 'app.mundoOrdem'));
       } else if (result.ok && result.partial) {
         // Um golpe numa pinhata: só a festa reage (balança, solta doce e toca o martelo); o prêmio vem no último.
       } else if (!result.ok && result.reason === 'poor') {
@@ -1545,7 +1556,7 @@
   const BICHO_SONS = { sapo: 'sapo', trem: 'apito', kombi: 'buzina', 'carro-boi': 'boi', papagaio: 'papagaio', jegue: 'zurro', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca', rafael: 'yeah' };
 
   // O som da chegada de cada evento do mundo (src/som.js).
-  const MUNDO_SONS = { estrelas: 'brilho', ventania: 'assobio', vagalumes: 'bolha', calorao: 'fogo', feira: 'quadrilha', poente: 'sinos', tesouro: 'moeda', neve: 'brilho', tremor: 'lenha', cheia: 'bolha', constelacao: 'brilho', sapos: 'sapo', trem: 'apito', pinhata: 'arremesso', amanhecer: 'canto', turbulencia: 'assobio', fichas: 'moeda', temporal: 'trovao', lua: 'uivo', petalas: 'carinho', baloes: 'arremesso', granizo: 'chuva', eclipse: 'sinos', redemoinho: 'assobio', pipoca: 'galinha', fogos: 'fogo', boitata: 'chama', revoada: 'pombo', procissao: 'sinos', ovni: 'bolha', cometa: 'crescer' };
+  const MUNDO_SONS = { estrelas: 'brilho', ventania: 'assobio', vagalumes: 'bolha', calorao: 'fogo', feira: 'quadrilha', poente: 'sinos', tesouro: 'moeda', neve: 'brilho', tremor: 'lenha', cheia: 'bolha', constelacao: 'brilho', sapos: 'sapo', trem: 'apito', pinhata: 'arremesso', amanhecer: 'canto', turbulencia: 'assobio', fichas: 'moeda', chapeus: 'equipar', pelada: 'apito', toupeiras: 'tombo', coelho: 'brilho', aurora: 'sinos', vacalua: 'boi', fumaca: 'assobio', tubaroes: 'trovao', bolhas: 'bolha', avioes: 'assobio', patinhos: 'pato', abelhas: 'zumbido', planetas: 'brilho', circo: 'canhao', balada: 'palco-zabumba', baleia: 'baleia', baloagigante: 'crescer', fada: 'brilho', pterodatilos: 'papagaio', manada: 'rugido', ovos: 'quebra', meteoro: 'chama', bruxas: 'bruxa', abobora: 'sinos', fantasmas: 'canto', luasangue: 'uivo', horda: 'gemido', gosma: 'bolha', helicoptero: 'helice', surto: 'sirene', temporal: 'trovao', lua: 'uivo', petalas: 'carinho', baloes: 'arremesso', granizo: 'chuva', eclipse: 'sinos', redemoinho: 'assobio', pipoca: 'galinha', fogos: 'fogo', boitata: 'chama', revoada: 'pombo', procissao: 'sinos', ovni: 'bolha', cometa: 'crescer' };
 
   // O som de cada coisa dos prêmios quando clicada (src/som.js).
   const PREMIO_SONS = { ursinhos: 'carinho', 'balde-peixes': 'pesca', 'globo-bingo': 'bola', burrico: 'zurro', 'fita-chegada': 'apito', 'pote-enfeitado': 'pote',
@@ -1703,6 +1714,9 @@
         refresh = true;
       } else if (event.type === 'set') {
         toast(t('app.setOn', { name: engine.data.sets.find(set => set.id === event.id)?.name || event.id, v: Math.round(event.bonus * 100) }), 'ouro');
+        // Um conjunto completo de dinossauros, Halloween ou zumbis chama os eventos do mundo desse tema.
+        const theme = engine.wornTheme();
+        if (theme) toast(t('app.setTema', { tema: t(`grupo.${theme}`).toLowerCase() }), 'ouro');
       } else if (event.type === 'cobra') {
         // Só ensina enquanto a pessoa nunca pegou uma.
         if (!engine.state.stats.cobras) toast(t('app.cobra'));
@@ -2318,6 +2332,21 @@
     }
     return woke;
   }
+  // A música do show do Palco do Forró (src/som.js): começa com o show, no ponto em que ele estiver, e para quando ele acaba, escondendo a festa,
+  // desligando o som... Se o show termina bem (1 a 3 estrelas), fecha com um acorde da música.
+  function syncShowMusic(events) {
+    const show = ui.settings.hidden ? null : engine.state.minis?.palco?.show;
+    if (show) {
+      if (ui.showMusic === show.startAt) return;
+      const config = engine.data.minis.palco;
+      const song = config.songs.find(entry => entry.id === show.song);
+      if (song && som?.startShow?.(song.id, { bpm: song.bpm, lead: config.lead, elapsed: engine.now() - show.startAt })) ui.showMusic = show.startAt;
+    } else if (ui.showMusic !== null) {
+      ui.showMusic = null;
+      const end = events.find(event => event.type === 'mini' && event.mini === 'palco' && event.kind === 'show-end');
+      som?.stopShow?.({ stars: end && !end.aborted ? end.stars : 0 });
+    }
+  }
   function frame(t) {
     const delta = Math.max(0, (t - lastFrame) / 1000);
     lastFrame = Math.max(lastFrame, t);
@@ -2334,6 +2363,7 @@
       // Conquista salva logo: o save leva a lista para a Steam.
       if (events.some(event => ['size-up', 'tier-up', 'fished', 'outing-done', 'achievement', 'item'].includes(event.type))) saveLater();
     }
+    syncShowMusic(events);
     if (ui.saveSoon && t >= ui.saveSoon) { ui.saveSoon = 0; save(); }
     if (t - ui.lastSave > 30000) save();
     hostHoverCheck();
@@ -2362,6 +2392,11 @@
       });
     }
     if (ui.rings.open) safely(() => ui.game?.draw(t));
+    if (ui.bingoView && ui.tela.open && ui.tela.id === 'bingo') safely(() => ui.bingoView.draw(t, engine.state.bingo.round));
+    if (ui.pesca) {
+      if (ui.tela.open && ui.tela.id === 'pescaria') safely(() => ui.pesca.draw(t, { ready: engine.state.fishing.unlocked ? engine.state.fishing.ready : 0 }));
+      else if (ui.pesca.busy) safely(() => ui.pesca.flush());
+    }
     // As janelas extras: desenhadas só quando aparecem (não escondidas nem com o jogo sem foco).
     if (ui.janelas && !document.body.classList.contains('jogo-desfocado')) safely(() => ui.janelas.draw(t));
     // A casa: desenhada só quando aparece (não escondida nem com o jogo sem foco), e a 30 quadros por segundo.
@@ -2435,6 +2470,22 @@
       onLand: ({ hit, prize }) => tocar(hit ? 'acerto' : 'errou',
         { pitch: hit && (prize?.mult || prize?.factor || prize?.kind === 'item') ? 5 : 0 })
     });
+  }
+  if (globalThis.ArraiaPescaria && sprites?.pescaria && typeof document.createElement === 'function') {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'pescaria-canvas';
+    if (typeof canvas.getContext === 'function') {
+      ui.pescaCanvas = canvas;
+      ui.pesca = globalThis.ArraiaPescaria.create(canvas, sprites, { sound: (name, options) => tocar(name, options) });
+    }
+  }
+  if (globalThis.ArraiaBingo && sprites?.bingo && typeof document.createElement === 'function') {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'bingo-canvas';
+    if (typeof canvas.getContext === 'function') {
+      ui.bingoCanvas = canvas;
+      ui.bingoView = globalThis.ArraiaBingo.create(canvas, sprites, { sound: (name, options) => tocar(name, options) });
+    }
   }
   applySettings(ui.settings);
   if (desktop) {
