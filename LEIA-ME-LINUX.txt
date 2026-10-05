@@ -1,0 +1,78 @@
+CUIDE BEM DA SUA MANDIOCA - COMO ABRIR NO LINUX
+===============================================
+
+O jogo é um app Electron (x64). No Windows a festa é uma janela transparente por cima da área de trabalho, com o clique atravessando
+onde não tem jogo. No Linux isso só funciona direito no X11 com compositor, então o jogo escolhe sozinho entre dois modos:
+
+  sobreposicao   a festa transparente por cima da tela (X11 com compositor: GNOME/Xorg, KDE/X11, XFCE, Cinnamon... com efeitos ligados)
+  janela         uma janela comum, com o céu de fundo e a festa embaixo (Wayland, ou X11 sem compositor)
+
+O inicializador (iniciar-linux.sh) decide pelo seu ambiente. Para mudar na mão, veja "Opções" abaixo.
+
+
+1) JOGO EMPACOTADO (arquivo CuideBemDaSuaMandioca-linux-x64.tar.gz)
+-------------------------------------------------------------------
+    tar -xzf CuideBemDaSuaMandioca-linux-x64.tar.gz
+    cd CuideBemDaSuaMandioca-linux-x64
+    bash iniciar-linux.sh
+
+Para ter o jogo no menu de aplicativos (e, se quiser, abrindo ao iniciar a sessão):
+
+    bash instalar-linux.sh                  (só o atalho no menu)
+    bash instalar-linux.sh --autostart      (atalho + abrir ao iniciar a sessão)
+    bash instalar-linux.sh --remover        (tira os atalhos)
+
+Os atalhos apontam para esta pasta: se mudar a pasta de lugar, rode o instalador de novo.
+
+
+2) A PARTIR DO PROJETO (código-fonte)
+-------------------------------------
+    npm install
+    bash iniciar-linux.sh          (ou:  npm run start:linux)
+
+Para gerar o pacote de Linux (pode ser feito no Windows também):
+
+    npm run build:linux            (saída em dist/: a pasta e o .tar.gz)
+
+
+3) OPÇÕES DO INICIALIZADOR
+--------------------------
+    bash iniciar-linux.sh --janela            sempre em janela comum (sem transparência)
+    bash iniciar-linux.sh --sobreposicao      sempre a festa transparente por cima da tela
+    bash iniciar-linux.sh --sem-gpu           sem aceleração por placa de vídeo
+    bash iniciar-linux.sh --sem-sandbox       sem o sandbox do Chromium (veja o item 4)
+    bash iniciar-linux.sh --mostrar-comando   só mostra o que seria executado
+    bash iniciar-linux.sh --ajuda
+
+Também dá para fixar por variável de ambiente: ARRAIA_MODO=janela (ou sobreposicao) e ARRAIA_SEM_GPU=1.
+
+
+4) SE ALGO DER ERRADO
+---------------------
+- Abre, mas o fundo transparente aparece PRETO ou a tela pisca: o seu ambiente não tem compositor (ou o driver não entrega transparência).
+  Abra em janela:  bash iniciar-linux.sh --janela   (ou tente --sem-gpu).
+- Wayland (GNOME, KDE Plasma em Wayland, Sway...): o inicializador abre em janela. Dá para forçar a sobreposição com --sobreposicao
+  (usa o XWayland), mas lá o jogo não descobre onde está o mouse quando o clique atravessa; só use para experimentar.
+- Erro de "sandbox" / "chrome-sandbox": o Chromium precisa de permissão para criar o sandbox. O inicializador já abre com --no-sandbox
+  sozinho quando o sistema não deixa (comum no Ubuntu 24.04 e derivados). Se preferir o sandbox ligado, rode UMA vez, como administrador:
+      sudo chown root chrome-sandbox && sudo chmod 4755 chrome-sandbox
+- Sem ícone na bandeja (GNOME puro): o jogo continua funcionando; o painel e os ajustes abrem pela placa do jogo. Para ver o ícone,
+  instale a extensão "AppIndicator and KStatusNotifierItem Support".
+- Falta alguma biblioteca ao abrir: instale as dependências do Chromium (no Debian/Ubuntu: libnss3 libgtk-3-0 libxss1 libasound2).
+- No modo janela, o jogo abre sem prender sobre as outras janelas (a opção "fixar" está nos Ajustes e na bandeja) e lembra o tamanho
+  e o lugar da janela.
+
+
+5) ONDE FICAM OS DADOS
+----------------------
+O save, os ajustes e o diário de erros ficam em  ~/.config/Cuide bem da sua mandioca/  (save.json, window-settings.json, erros.log).
+Se o jogo não abrir ou fechar sozinho, o erros.log ajuda a achar o motivo.
+
+
+6) STEAM
+--------
+O passo a passo completo (depot de Linux, opção de lançamento, pacotes, loja e o envio) está em COMANDO-STEAM.txt, no fim, em
+"Versão de Linux na Steam". Em resumo: um segundo depot no mesmo app, e a opção de lançamento do Linux abre  iniciar-linux.sh.
+O Steam Cloud, as conquistas e a "sobreposição" funcionam como no Windows (a biblioteca libsteam_api.so vai junto, em
+resources/app.asar.unpacked). Em desenvolvimento, sem a Steam aberta, o jogo roda normalmente.
+Atenção: enviar o depot de Linux de um Windows perde o bit de executável (veja o item D do COMANDO-STEAM.txt).

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Fredoka";
+        src: url("assets/fontes/Fredoka.ttf") format("truetype");
+        font-weight: 300 700;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #1c183a; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Fredoka", sans-serif;
+        background: linear-gradient(#1c183a, #251939); }
+
+      /* Câmera: cada gravação 4K vertical (2160x3840) vive num "mundo" que só escala e translada (origem no canto).
+         Escalas de pixel exato (4 px da gravação por pixel da arte): 2,5 (10 px), 1 (4 px), 0,75 (3 px) e 0,5 (2 px). */
+      .mundo { position: absolute; left: 0; top: 0; width: 2160px; height: 3840px; transform-origin: 0 0; will-change: transform; }
+      /* Bordas do vídeo que ficam à mostra nos planos abertos somem no fundo da noite (sem emenda) */
+      .mundo.fade { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 140px), transparent 100%), linear-gradient(to right, #000 calc(100% - 300px), transparent 100%);
+        -webkit-mask-composite: source-in; mask-image: linear-gradient(to bottom, #000 calc(100% - 140px), transparent 100%), linear-gradient(to right, #000 calc(100% - 300px), transparent 100%);
+        mask-composite: intersect; }
+      .mundo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; image-rendering: pixelated; }
+
+      /* Cara de gravador de tela */
+      .rec { position: absolute; left: 44px; top: 196px; display: flex; align-items: center; gap: 12px; padding: 9px 22px 11px 18px;
+        background: rgba(12, 10, 28, 0.78); border-radius: 999px; font-family: "Space Mono", monospace; font-weight: 700; font-size: 34px; color: #fff4e4; }
+      .rec i { display: block; width: 24px; height: 24px; border-radius: 50%; background: #ff2b3d; }
+      .nome { position: absolute; right: 44px; top: 196px; padding: 9px 24px 11px; background: rgba(12, 10, 28, 0.78); border-radius: 999px;
+        font-weight: 700; font-size: 34px; color: #fff4e4; letter-spacing: 0.01em; white-space: nowrap; }
+      .nome b { color: #ffd21e; font-weight: 700; }
+
+      /* Cursor e clique */
+      #cur { position: absolute; left: 0; top: 0; width: 60px; height: 84px; margin: 0; transform-origin: 6px 4px; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.35)); }
+      .toque { position: absolute; left: 0; top: 0; width: 110px; height: 110px; margin: -55px 0 0 -55px; border-radius: 50%;
+        border: 8px solid #fff4e4; opacity: 0; box-shadow: 0 0 0 4px rgba(18, 9, 6, 0.35); }
+
+      /* Legendas (estilo do TikTok: creme com contorno escuro, palavra-chave em amarelo) */
+      .legenda { position: absolute; left: 50px; right: 50px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+      .frase { max-width: 980px; text-align: center; font-weight: 700; font-size: 92px; line-height: 1.02; color: #fff4e4;
+        letter-spacing: -0.01em; -webkit-text-stroke: 18px #14102a; paint-order: stroke fill; text-shadow: 0 12px 0 rgba(8, 5, 18, 0.6); }
+      .frase em { font-style: normal; color: #ffd21e; }
+      .frase.p { font-size: 64px; }
+
+      /* Cartão final */
+      #escuro { background: rgba(20, 16, 44, 0.8); }
+      #topo { background: linear-gradient(rgba(12, 10, 28, 0.72) 0, rgba(12, 10, 28, 0.55) 40%, rgba(12, 10, 28, 0) 100%); }
+      .placa { position: absolute; left: 90px; top: 520px; width: 900px; padding: 28px 38px 34px; display: flex; flex-direction: column; align-items: center;
+        background: #fff4e4; border: 6px solid #2e1812; transform-origin: 50% 0;
+        box-shadow: 0 0 0 9px #c07a36, 0 0 0 18px #7c421e, 0 0 0 24px #2e1812, 16px 20px 0 24px rgba(18, 9, 6, 0.5); }
+      .placa .l1 { font-weight: 700; font-size: 52px; line-height: 1; color: #2e1812; letter-spacing: 0.02em; }
+      .placa .l2 { font-weight: 700; font-size: 150px; line-height: 0.95; color: #ee2f3c; letter-spacing: -0.03em;
+        -webkit-text-stroke: 8px #2e1812; paint-order: stroke fill; text-shadow: 0 8px 0 #8a1030; }
+      .fim-tag { position: absolute; left: 100px; right: 100px; top: 960px; text-align: center; font-weight: 700; font-size: 58px; line-height: 1.12;
+        color: #fff4e4; -webkit-text-stroke: 12px #14102a; paint-order: stroke fill; }
+      .fim-cta { position: absolute; left: 90px; right: 90px; top: 1200px; text-align: center; font-weight: 700; font-size: 50px; line-height: 1.12;
+        color: #2e1812; background: #ffd21e; border: 6px solid #2e1812; border-radius: 48px; padding: 18px 28px 22px; box-shadow: 0 10px 0 #2e1812; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="caos" data-start="0" data-duration="23.4" data-width="1080" data-height="1920">
+      <!-- Gameplay: uma gravação por cena, cada uma no seu "mundo" (a câmera é o transform dele) -->
+      <div class="mundo fade" id="m-tornado"><video id="v-tornado" src="assets/gameplay/caos-tornado.mp4" data-start="0" data-duration="5.6" data-media-start="0" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo" id="m-mesa"><video id="v-mesa" src="assets/gameplay/caos-mesa.mp4" data-start="5.6" data-duration="3.4" data-media-start="0" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo fade" id="m-surto"><video id="v-surto" src="assets/gameplay/caos-surto.mp4" data-start="9" data-duration="2" data-media-start="1.5" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo fade" id="m-meteoro"><video id="v-meteoro" src="assets/gameplay/caos-meteoro.mp4" data-start="11" data-duration="2" data-media-start="1.6" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo fade" id="m-circo"><video id="v-circo" src="assets/gameplay/caos-circo.mp4" data-start="13" data-duration="2" data-media-start="1.4" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo fade" id="m-balao"><video id="v-balao" src="assets/gameplay/caos-balao.mp4" data-start="15" data-duration="2.2" data-media-start="0.9" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo fade" id="m-manada"><video id="v-manada" src="assets/gameplay/caos-manada.mp4" data-start="17.2" data-duration="1.6" data-media-start="0.5" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo fade" id="m-balada"><video id="v-balada" src="assets/gameplay/caos-balada.mp4" data-start="18.8" data-duration="1.6" data-media-start="0.5" data-track-index="0" muted playsinline></video></div>
+      <div class="mundo fade" id="m-final"><video id="v-final" src="assets/gameplay/caos-final.mp4" data-start="20.4" data-duration="3" data-media-start="0.3" data-track-index="0" muted playsinline></video></div>
+
+      <div id="topo" class="clip" data-start="5.6" data-duration="3.4" data-track-index="1" style="position:absolute;left:0;right:0;top:0;height:760px"></div>
+
+      <!-- Etiquetas de gravação: o nome do jogo aparece desde o primeiro quadro -->
+      <div id="etiquetas" class="clip" data-start="0" data-duration="21.2" data-track-index="2" style="position:absolute;inset:0">
+        <div class="rec" id="rec"><i id="recbola"></i><span id="rect">00:00</span></div>
+        <div class="nome" id="nome">Cuide bem da sua <b>mandioca</b></div>
+      </div>
+
+      <!-- Legendas -->
+      <div id="c1" class="clip" data-start="0" data-duration="3.2" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 310px"><div class="frase" id="c1f">isso é um jogo de<br><em>festa junina</em>?! 🦈</div></div>
+      </div>
+      <div id="c2" class="clip" data-start="3.3" data-duration="2.3" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 310px"><div class="frase" id="c2f">e a festa<br><em>nem liga</em> 💃</div></div>
+      </div>
+      <div id="c3" class="clip" data-start="5.7" data-duration="3.3" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 310px"><div class="frase p" id="c3f">é um joguinho que fica<br>na sua <em>área de trabalho</em> 🖥️</div></div>
+      </div>
+      <div id="c4" class="clip" data-start="9" data-duration="2" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 330px"><div class="frase p" id="c4a">do nada...</div><div class="frase" id="c4f"><em>ZUMBIS</em> 🧟</div></div>
+      </div>
+      <div id="c5" class="clip" data-start="11" data-duration="2" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 330px"><div class="frase p" id="c5a">do nada...</div><div class="frase" id="c5f"><em>METEORO</em> ☄️</div></div>
+      </div>
+      <div id="c6" class="clip" data-start="13" data-duration="2" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 330px"><div class="frase p" id="c6a">do nada...</div><div class="frase" id="c6f"><em>PALHAÇO-BALA</em> 🤡</div></div>
+      </div>
+      <div id="c7" class="clip" data-start="15" data-duration="2.2" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 330px"><div class="frase p" id="c7a">do nada...</div><div class="frase" id="c7f"><em>BALÃO</em> gigante 🎈</div></div>
+      </div>
+      <div id="c8" class="clip" data-start="17.2" data-duration="1.6" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 330px"><div class="frase p" id="c8a">do nada...</div><div class="frase" id="c8f"><em>DINOSSAUROS</em> 🦖</div></div>
+      </div>
+      <div id="c9" class="clip" data-start="18.8" data-duration="1.6" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 330px"><div class="frase p" id="c9a">do nada...</div><div class="frase" id="c9f"><em>BALADA</em> 🪩</div></div>
+      </div>
+      <div id="c10" class="clip" data-start="20.4" data-duration="1.1" data-track-index="3" style="position:absolute;inset:0">
+        <div class="legenda" style="top: 330px"><div class="frase" id="c10f">são <em>61</em> eventos<br>assim 🤯</div></div>
+      </div>
+
+      <!-- Cursor do mouse e cliques (posições medidas nas gravações) -->
+      <div id="mouse" class="clip" data-start="5.6" data-duration="15" data-track-index="5" style="position:absolute;inset:0">
+        <div class="toque" id="toque"></div>
+        <svg id="cur" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg"><path d="M3 2 L3 33 L11 26 L16.5 39 L22 36.5 L16.5 24 L27 24 Z" fill="#fff" stroke="#14102a" stroke-width="3" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- Cartão final -->
+      <div id="escuro" class="clip" data-start="21.4" data-duration="2" data-track-index="4" style="position:absolute;inset:0"></div>
+      <div id="fim" class="clip" data-start="21.4" data-duration="2" data-track-index="6" style="position:absolute;inset:0">
+        <div class="placa" id="placa"><span class="l1">CUIDE BEM DA SUA</span><span class="l2">MANDIOCA</span></div>
+        <div class="fim-tag" id="fimt">o jogo de festa junina que fica na sua área de trabalho</div>
+        <div class="fim-cta" id="fimc">qual evento você quer ver? 👇</div>
+      </div>
+
+      <!-- Sons do próprio jogo (sintetizados pelo src/som.js) e alguns efeitos; sem trilha: o som em alta entra pelo TikTok -->
+      <audio id="s-trovao" src="assets/audio/jogo-trovao.wav" data-start="0" data-duration="2.6" data-track-index="10" data-volume="0.9"></audio>
+      <audio id="s-raro" src="assets/audio/jogo-evento-raro.wav" data-start="0.1" data-duration="3.2" data-track-index="11" data-volume="0.6"></audio>
+      <audio id="s-whoosh1" src="assets/audio/whoosh.wav" data-start="3.2" data-duration="0.45" data-track-index="10" data-volume="0.7"></audio>
+      <audio id="s-pato" src="assets/audio/jogo-pato.wav" data-start="4.5" data-duration="0.5" data-track-index="10" data-volume="0.8"></audio>
+      <audio id="s-pop1" src="assets/audio/pop.wav" data-start="5.65" data-duration="0.18" data-track-index="10" data-volume="0.6"></audio>
+      <audio id="s-clique1" src="assets/audio/jogo-clique.wav" data-start="8.0" data-duration="0.2" data-track-index="10" data-volume="0.7"></audio>
+      <audio id="s-carinho1" src="assets/audio/jogo-carinho.wav" data-start="8.02" data-duration="0.6" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="s-clique2" src="assets/audio/jogo-clique.wav" data-start="8.5" data-duration="0.2" data-track-index="10" data-volume="0.7"></audio>
+      <audio id="s-carinho2" src="assets/audio/jogo-carinho.wav" data-start="8.52" data-duration="0.6" data-track-index="12" data-volume="0.7"></audio>
+
+      <audio id="s-sirene" src="assets/audio/jogo-sirene.wav" data-start="9" data-duration="2" data-track-index="10" data-volume="0.55"></audio>
+      <audio id="s-lenha" src="assets/audio/jogo-lenha.wav" data-start="9.69" data-duration="0.6" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="s-ac1" src="assets/audio/jogo-acerto.wav" data-start="9.25" data-duration="0.8" data-track-index="12" data-volume="0.6"></audio>
+      <audio id="s-ac2" src="assets/audio/jogo-acerto.wav" data-start="9.47" data-duration="0.8" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="s-ac3" src="assets/audio/jogo-acerto.wav" data-start="10.1" data-duration="0.8" data-track-index="12" data-volume="0.6"></audio>
+      <audio id="s-ac4" src="assets/audio/jogo-acerto.wav" data-start="10.32" data-duration="0.8" data-track-index="11" data-volume="0.6"></audio>
+
+      <audio id="s-chama" src="assets/audio/jogo-chama.wav" data-start="11" data-duration="1.2" data-track-index="10" data-volume="0.7"></audio>
+      <audio id="s-m1" src="assets/audio/jogo-acerto.wav" data-start="11.0" data-duration="0.8" data-track-index="12" data-volume="0.55"></audio>
+      <audio id="s-m2" src="assets/audio/jogo-acerto.wav" data-start="11.3" data-duration="0.8" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="s-m3" src="assets/audio/jogo-acerto.wav" data-start="11.6" data-duration="0.8" data-track-index="13" data-volume="0.55"></audio>
+      <audio id="s-m4" src="assets/audio/jogo-acerto.wav" data-start="11.9" data-duration="0.8" data-track-index="12" data-volume="0.55"></audio>
+      <audio id="s-quebra" src="assets/audio/jogo-quebra.wav" data-start="12.55" data-duration="0.7" data-track-index="10" data-volume="0.8"></audio>
+      <audio id="s-trovao2" src="assets/audio/jogo-trovao.wav" data-start="12.6" data-duration="1.4" data-track-index="11" data-volume="0.6"></audio>
+
+      <audio id="s-canhao" src="assets/audio/jogo-canhao.wav" data-start="13.0" data-duration="1.2" data-track-index="12" data-volume="0.85"></audio>
+      <audio id="s-assobio" src="assets/audio/jogo-assobio.wav" data-start="13.2" data-duration="1.2" data-track-index="13" data-volume="0.6"></audio>
+
+      <audio id="s-b1" src="assets/audio/jogo-carinho.wav" data-start="15.0" data-duration="0.6" data-track-index="10" data-volume="0.6"></audio>
+      <audio id="s-b2" src="assets/audio/jogo-carinho.wav" data-start="15.35" data-duration="0.6" data-track-index="11" data-volume="0.6"></audio>
+      <audio id="s-b3" src="assets/audio/jogo-carinho.wav" data-start="15.7" data-duration="0.6" data-track-index="10" data-volume="0.6"></audio>
+      <audio id="s-b4" src="assets/audio/jogo-carinho.wav" data-start="16.05" data-duration="0.6" data-track-index="11" data-volume="0.6"></audio>
+      <audio id="s-b5" src="assets/audio/jogo-carinho.wav" data-start="16.4" data-duration="0.6" data-track-index="10" data-volume="0.6"></audio>
+      <audio id="s-b6" src="assets/audio/jogo-carinho.wav" data-start="16.75" data-duration="0.6" data-track-index="11" data-volume="0.6"></audio>
+      <audio id="s-murchar" src="assets/audio/jogo-murchar.wav" data-start="16.1" data-duration="1.1" data-track-index="12" data-volume="0.8"></audio>
+
+      <audio id="s-rugido" src="assets/audio/jogo-rugido.wav" data-start="17.3" data-duration="1.6" data-track-index="10" data-volume="0.85"></audio>
+      <audio id="s-galope" src="assets/audio/jogo-galope.wav" data-start="17.5" data-duration="1.2" data-track-index="11" data-volume="0.6"></audio>
+
+      <audio id="s-z1" src="assets/audio/jogo-palco-zabumba.wav" data-start="18.8" data-duration="0.5" data-track-index="11" data-volume="0.9"></audio>
+      <audio id="s-z2" src="assets/audio/jogo-palco-zabumba.wav" data-start="19.2" data-duration="0.5" data-track-index="10" data-volume="0.9"></audio>
+      <audio id="s-z3" src="assets/audio/jogo-palco-zabumba.wav" data-start="19.6" data-duration="0.5" data-track-index="11" data-volume="0.9"></audio>
+      <audio id="s-z4" src="assets/audio/jogo-palco-zabumba.wav" data-start="20.0" data-duration="0.5" data-track-index="10" data-volume="0.9"></audio>
+      <audio id="s-t1" src="assets/audio/jogo-palco-triangulo.wav" data-start="19.0" data-duration="0.8" data-track-index="12" data-volume="0.6"></audio>
+      <audio id="s-t2" src="assets/audio/jogo-palco-triangulo.wav" data-start="19.8" data-duration="0.8" data-track-index="12" data-volume="0.6"></audio>
+
+      <audio id="s-brilho" src="assets/audio/jogo-brilho.wav" data-start="20.45" data-duration="1.0" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="s-whoosh2" src="assets/audio/whoosh.wav" data-start="21.35" data-duration="0.45" data-track-index="10" data-volume="0.7"></audio>
+      <audio id="s-tada" src="assets/audio/tada.wav" data-start="21.7" data-duration="1.1" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="s-pop2" src="assets/audio/pop.wav" data-start="22.3" data-duration="0.18" data-track-index="10" data-volume="0.6"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // Câmera: ponto p da gravação → S·p + T na tela. `ancora` põe o ponto (px, py) em (sx, sy) da tela, com translação inteira.
+      const camera = (id, s, px, py, sx = 540, sy = 900) => {
+        const c = { s, x: Math.round(sx - s * px), y: Math.round(sy - s * py) };
+        document.getElementById(id).style.transform = `translate(${c.x}px, ${c.y}px) scale(${s})`;
+        return c;
+      };
+      const ligar = (id, c) => { const el = document.getElementById(id); return () => { el.style.transform = `translate(${c.x}px, ${c.y}px) scale(${c.s})`; }; };
+      const tela = (c, px, py) => [Math.round(c.s * px + c.x), Math.round(c.s * py + c.y)];
+
+      // 1) Tornado de tubarões: close de 10 px por pixel da arte, depois puxa para a festa inteira (cada pixel 2 px).
+      // A câmera é função do tempo (um tween só, seguro para saltos de tempo): segue o funil até 3,2 s e puxa em 1,3 s (expo.out).
+      const tornado = document.getElementById("m-tornado");
+      const sh = { x: 0, y: 0 };
+      const relogioT = { t: 0 };
+      const expoOut = gsap.parseEase("expo.out");
+      const sine = gsap.parseEase("sine.inOut");
+      const PERTO0 = { s: 2.5, x: Math.round(540 - 2.5 * 800), y: Math.round(880 - 2.5 * 3400) };
+      const PERTO1 = { s: 2.5, x: Math.round(540 - 2.5 * 770), y: PERTO0.y };
+      const LONGE = { s: 0.5, x: Math.round(540 - 0.5 * 1272), y: Math.round(1090 - 0.5 * 3380) };
+      const mistura = (a, b, k) => a + (b - a) * k;
+      const aplicarT = () => {
+        const t = relogioT.t;
+        let c;
+        if (t < 3.2) { const k = sine(t / 3.2); c = { s: 2.5, x: mistura(PERTO0.x, PERTO1.x, k), y: PERTO0.y }; }
+        else { const k = expoOut(Math.min(1, (t - 3.2) / 1.3)); c = { s: mistura(2.5, LONGE.s, k), x: mistura(PERTO1.x, LONGE.x, k), y: mistura(PERTO1.y, LONGE.y, k) }; }
+        tornado.style.transform = `translate(${Math.round(c.x + sh.x)}px, ${Math.round(c.y + sh.y)}px) scale(${c.s})`;
+      };
+      tl.fromTo(relogioT, { t: 0 }, { t: 5.6, duration: 5.6, ease: "none", onUpdate: aplicarT }, 0);
+      aplicarT();
+      // gancho: tremida de tela que acalma em meio segundo (o quadro 0 já é o susto inteiro)
+      for (let i = 0; i < 15; i++) {
+        const amp = 18 * (1 - i / 15);
+        tl.to(sh, { x: Math.round(Math.sin(i * 12.9) * amp), y: Math.round(Math.cos(i * 7.3) * amp), duration: 1 / 30, ease: "none", onUpdate: aplicarT }, i / 30);
+      }
+
+      // 2) Área de trabalho inteira (2160 → 1080 = 0,5)
+      const cM = camera("m-mesa", 0.5, 1080, 1920, 540, 960);
+
+      // 3) Eventos: janelas de pixel exato (3 ou 4 px por pixel da arte)
+      const cS = camera("m-surto", 1, 1212, 3400, 540, 1010);
+      const cMe = camera("m-meteoro", 1, 1060, 3250, 540, 900);
+      const cC = camera("m-circo", 1, 960, 3350, 540, 960);
+      const cB = camera("m-balao", 1, 980, 3250, 540, 900);
+      const cMa = camera("m-manada", 1, 1272, 3400, 540, 1010);
+      const cBa = camera("m-balada", 1, 1272, 3400, 540, 1010);
+      const cF = camera("m-final", 0.5, 1272, 3380, 540, 1090);
+
+      // punch-in em cada evento (1,06 → 1), como quem dá zoom no editor de tela
+      const punch = (id, c, t) => {
+        const aplicar = ligar(id, c);
+        const base = { ...c };
+        tl.fromTo(c, { s: base.s * 1.06, x: base.x - (1080 * 0.03), y: base.y - (900 * 0.06) }, { s: base.s, x: base.x, y: base.y, duration: 0.35, ease: "power3.out", onUpdate: aplicar, immediateRender: false }, t);
+      };
+      punch("m-surto", cS, 9); punch("m-meteoro", cMe, 11); punch("m-circo", cC, 13); punch("m-balao", cB, 15);
+      punch("m-manada", cMa, 17.2); punch("m-balada", cBa, 18.8);
+
+      // Cronômetro do gravador e bolinha piscando
+      const relogio = { v: 0 };
+      const rect = document.getElementById("rect");
+      const mostrarRelogio = () => {
+        const s = Math.floor(relogio.v);
+        rect.textContent = `00:${String(s).padStart(2, "0")}`;
+      };
+      tl.fromTo(relogio, { v: 0 }, { v: 21, duration: 21, ease: "none", onUpdate: mostrarRelogio }, 0);
+      tl.fromTo("#recbola", { opacity: 1 }, { opacity: 0.15, duration: 0.5, ease: "steps(1)", repeat: 41, yoyo: true }, 0);
+
+      // Cursor: entra na área de trabalho, faz carinho na Mandioca e depois clica nos eventos
+      const cur = document.getElementById("cur");
+      const toque = document.getElementById("toque");
+      const ponto = { x: 1180, y: 1500 };
+      const mover = () => { cur.style.left = `${ponto.x}px`; cur.style.top = `${ponto.y}px`; toque.style.left = `${ponto.x + 6}px`; toque.style.top = `${ponto.y + 4}px`; };
+      mover();
+      const ir = (x, y, t, dur = 0.35, ease = "power2.inOut") => tl.to(ponto, { x, y, duration: dur, ease, onUpdate: mover }, t);
+      const clicar = t => {
+        tl.fromTo("#cur", { scale: 1 }, { scale: 0.82, duration: 0.07, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, t);
+        tl.fromTo("#toque", { scale: 0.3, opacity: 0.9 }, { scale: 1.1, opacity: 0, duration: 0.35, ease: "power2.out", immediateRender: false }, t);
+      };
+      // mesa: Mandioca na festa (host) em (568, 1786); dois carinhos em 8,0 e 8,5
+      ir(...tela(cM, 1136, 3572).map((v, i) => v - [28, 20][i]), 5.9, 2.0, "power3.out");
+      clicar(8.0); clicar(8.5);
+      ir(1000, 1500, 8.7, 0.3, "power2.in");
+      // surto: sepulturas 1 e 2 (três cliques cada, no tempo em que a gravação os fez)
+      const g1 = tela(cS, 966, 3640), g2 = tela(cS, 1458, 3640);
+      ir(g1[0], g1[1], 8.9, 0.3);
+      [9.25, 9.47, 9.69].forEach(clicar);
+      ir(g2[0], g2[1], 9.85, 0.22);
+      [10.1, 10.32, 10.54].forEach(clicar);
+      // meteoro: seis toques na bola de fogo
+      const me = tela(cMe, 1070, 3125);
+      ir(me[0], me[1], 10.8, 0.2);
+      [11.0, 11.3, 11.6, 11.9, 12.2, 12.5].forEach(clicar);
+      // circo: acompanha o homem-bala (776 → 1136) sem clicar
+      const ci0 = tela(cC, 810, 3382), ci1 = tela(cC, 1170, 3342);
+      ir(ci0[0], ci0[1], 13.0, 0.4);
+      ir(ci1[0], ci1[1], 13.4, 1.5, "power1.inOut");
+      // balão: seis carinhos
+      const ba = tela(cB, 975, 3170);
+      ir(ba[0], ba[1], 14.9, 0.3);
+      [15.0, 15.35, 15.7, 16.05, 16.4, 16.75].forEach(clicar);
+      // some do enquadramento no resto
+      ir(1160, 1560, 17.0, 0.2, "power2.in");
+
+      // Legendas: entram com um tranco curto (nada de transição elaborada)
+      tl.fromTo("#c1f", { scale: 1.18, y: -14 }, { scale: 1, y: 0, duration: 0.3, ease: "power4.out" }, 0);
+      tl.fromTo("#c2f", { scale: 0.7, opacity: 0, rotation: -3 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.35, ease: "back.out(2)" }, 3.3);
+      tl.fromTo("#c3f", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 5.7);
+      [[4, 9], [5, 11], [6, 13], [7, 15], [8, 17.2], [9, 18.8]].forEach(([n, t]) => {
+        tl.fromTo(`#c${n}a`, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, t);
+        tl.fromTo(`#c${n}f`, { scale: 0.5, opacity: 0, rotation: -4 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.4, ease: "back.out(2.2)" }, t + 0.18);
+      });
+      tl.fromTo("#c10f", { scale: 1.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power4.out" }, 20.4);
+
+      // Cartão final
+      tl.fromTo("#escuro", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 21.4);
+      tl.fromTo("#placa", { y: -420, rotation: -4 }, { y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.5)", immediateRender: false }, 21.45);
+      tl.fromTo("#fimt", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 21.9);
+      tl.fromTo("#fimc", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.8)" }, 22.3);
+
+      window.__timelines["caos"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -18,10 +18,15 @@ const GRAVACOES = {
   turma: ['palco'],
   // "Esqueci de cuidar da minha mandioca" (gravado em 4K vertical para o zoom em pixel exato).
   cuidar: ['cuidar'],
+  // "Caos" (TikTok, só em português): gravação de tela crua, um clipe por cena (4K vertical).
+  caos: ['caos-tornado', 'caos-mesa', 'caos-surto', 'caos-meteoro', 'caos-circo', 'caos-balao', 'caos-balada', 'caos-manada', 'caos-final'],
   // Trailer da Steam (16:9, gravado em 4K): uma gravação por cena (a v3 não usa mais o palco no fim da cena 4).
   steam: ['steam-quintal', 'steam-melhorias', 'steam-quermesse', 'steam-cidade', 'steam-regional', 'steam-maior',
     'steam-final']
 };
+
+// Vídeos feitos só em português (o pedido foi "em português"): o traduzir.js e o renderizar.js não geram en/es deles.
+const SO_PT = ['caos'];
 
 const copiarPasta = (origem, destino) => {
   fs.mkdirSync(destino, { recursive: true });
@@ -53,4 +58,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { GRAVACOES, copiarAssets };
+module.exports = { GRAVACOES, SO_PT, copiarAssets };

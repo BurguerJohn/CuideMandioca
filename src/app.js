@@ -34,6 +34,8 @@
   }
 
   document.body.classList.add(desktop ? 'desktop' : 'web');
+  // Janela comum (Linux sem compositor ou no Wayland): o fundo é pintado pela página, já que a janela não é transparente.
+  if (desktop?.mode === 'janela') document.body.classList.add('janela');
 
   function readJSON(key) {
     try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (_) { return null; }
@@ -590,7 +592,7 @@
   function context() {
     return { tab: ui.tab, panelOpen: ui.open, debug: ui.debug, casaVisible: casaVisible(), minis: ui.janelas ? ui.janelas.items() : [],
       lastLetter: ui.lastLetter, language, steam: desktop?.steam || null,
-      settings: ui.settings, desktop: !!desktop, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side, dockGroups: ui.dock.groups,
+      settings: ui.settings, desktop: !!desktop, platform: desktop?.platform || null, icon, now: now(), dockCat: ui.dock.cat, dockSide: ui.dock.side, dockGroups: ui.dock.groups,
       ringPlaying: ui.rings.playing, ringResult: ui.rings.result, zoomLabel: zoomLabel(),
       closeArmed: now() < ui.closeArmedUntil, tela: ui.tela.open ? ui.tela.id : null, logFilter: ui.logFilter, mundoFilter: ui.mundoFilter, testeTab: ui.testeTab };
   }
@@ -1111,7 +1113,9 @@
     if (a === 'tela-fechar') { closeTela(); return; }
     if (a === 'historico-filtro') { ui.logFilter = d.value; renderWindows(); return; }
     if (a === 'mundo-filtro') { ui.mundoFilter = d.value; renderWindows(); return; }
-    if (a === 'teste-aba') { ui.testeTab = d.value === 'mundo' ? 'mundo' : 'geral'; renderWindows(); return; }
+    if (a === 'teste-aba') { ui.testeTab = ['mundo', 'plateia'].includes(d.value) ? d.value : 'geral'; renderWindows(); return; }
+    // Modo de teste: um número da plateia agora (ids em src/festa-plateia.js).
+    if (a === 'plateia') { ui.festa?.provocar?.('plateia', { ordem: d.value }); return; }
     if (a === 'debug') {
       const note = engine.debug(d.op, d.value);
       const entry = engine.state.log.at(-1);
@@ -1444,7 +1448,10 @@
       } else if (entry) tocar(PREMIO_SONS[entry.id] || 'clique');
     } else if (typeof region === 'string' && region.startsWith('bicho:')) {
       ui.festa?.poke(region);
-      tocar(BICHO_SONS[region.split(':')[1]] || 'clique');
+      const [, kind, which] = region.split(':');
+      // Cada mandioquinha das raízes tem a sua voz (um tom só dela).
+      const voice = kind === 'mandioquinha' ? globalThis.ArraiaFestaMandioquinhas?.CAST[Number(which) - 1]?.voice : undefined;
+      tocar(BICHO_SONS[kind] || 'clique', voice === undefined ? undefined : { pitch: voice });
       // O carreiro do carro de boi deixa lenha para a fogueira (uma vez por passada).
       if (region === 'bicho:carro-boi') {
         const cart = engine.cartWood();
@@ -1553,7 +1560,7 @@
   const LADO_SONS = { 'barraca-beijo': 'carinho', 'barraca-comidas': 'bola', cadeia: 'penetra', espantalho: 'galinha', fardo: 'pintinho',
     mastro: 'equipar', carroca: 'lenha', 'barril-quentao': 'bola', 'fogao-lenha': 'fogo', 'barraca-cordel': 'revelar' };
   // O som de cada bicho da festa que reage ao clique.
-  const BICHO_SONS = { sapo: 'sapo', trem: 'apito', kombi: 'buzina', 'carro-boi': 'boi', papagaio: 'papagaio', jegue: 'zurro', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca', rafael: 'yeah' };
+  const BICHO_SONS = { plateia: 'convidado', mandioquinha: 'pintinho', sapo: 'sapo', trem: 'apito', kombi: 'buzina', 'carro-boi': 'boi', papagaio: 'papagaio', jegue: 'zurro', carrossel: 'arremesso', catavento: 'arremesso', caramelo: 'latido', roda: 'arremesso', lua: 'carinho', pipa: 'arremesso', igreja: 'sino', galinha: 'galinha', pintinho: 'pintinho', bode: 'bode', gato: 'gato', boi: 'boi', crianca: 'crianca', amendoim: 'crianca', rafael: 'yeah' };
 
   // O som da chegada de cada evento do mundo (src/som.js).
   const MUNDO_SONS = { estrelas: 'brilho', ventania: 'assobio', vagalumes: 'bolha', calorao: 'fogo', feira: 'quadrilha', poente: 'sinos', tesouro: 'moeda', neve: 'brilho', tremor: 'lenha', cheia: 'bolha', constelacao: 'brilho', sapos: 'sapo', trem: 'apito', pinhata: 'arremesso', amanhecer: 'canto', turbulencia: 'assobio', fichas: 'moeda', chapeus: 'equipar', pelada: 'apito', toupeiras: 'tombo', coelho: 'brilho', aurora: 'sinos', vacalua: 'boi', fumaca: 'assobio', tubaroes: 'trovao', bolhas: 'bolha', avioes: 'assobio', patinhos: 'pato', abelhas: 'zumbido', planetas: 'brilho', circo: 'canhao', balada: 'palco-zabumba', baleia: 'baleia', baloagigante: 'crescer', fada: 'brilho', pterodatilos: 'papagaio', manada: 'rugido', ovos: 'quebra', meteoro: 'chama', bruxas: 'bruxa', abobora: 'sinos', fantasmas: 'canto', luasangue: 'uivo', horda: 'gemido', gosma: 'bolha', helicoptero: 'helice', surto: 'sirene', temporal: 'trovao', lua: 'uivo', petalas: 'carinho', baloes: 'arremesso', granizo: 'chuva', eclipse: 'sinos', redemoinho: 'assobio', pipoca: 'galinha', fogos: 'fogo', boitata: 'chama', revoada: 'pombo', procissao: 'sinos', ovni: 'bolha', cometa: 'crescer' };
@@ -2433,7 +2440,7 @@
 
   const canvas = $('#festa-canvas');
   if (globalThis.ArraiaFesta && sprites && typeof canvas?.getContext === 'function') {
-    ui.festa = globalThis.ArraiaFesta.create(canvas, sprites, { sound: name => tocar(name) });
+    ui.festa = globalThis.ArraiaFesta.create(canvas, sprites, { sound: name => tocar(name), seed: Date.now() >>> 0 });
     scaleFesta();
   }
   const houseCanvas = $('#casa-canvas');

@@ -10,6 +10,8 @@
     "start": "electron .",
     "start:web": "python -m http.server 8000",
     "build:win": "node desktop/package-win.js",
+    "build:linux": "node desktop/package-linux.js",
+    "start:linux": "bash iniciar-linux.sh",
     "build:art": "py -3.12 art/exportar.py",
     "simulate": "node tools/simulate.js",
     "steam:config": "node desktop/prepare-steam.js",

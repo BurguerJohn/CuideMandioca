@@ -3,7 +3,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, dialog, powerMonitor } = require('electron');
+const { execFileSync } = require('node:child_process');
 const { normalizeSettings, mergeSettings, publicSettings, pickDisplay } = require('./window-state');
+const Plataforma = require('./plataforma');
 const { loadSave, writeSave } = require('./save-store');
 const { createSteam } = require('./steam');
 const { createCloudSave } = require('./cloud-save');
@@ -15,6 +17,17 @@ const t = (key, vars) => I18N.t(key, vars);
 // Tamanhos prontos do menu da bandeja: os mesmos dos Ajustes, do menor ao maior que a alça de arrastar alcança.
 const ZOOMS = [0.25, 0.5, 0.75, 1, 1.5, 2, 3];
 const steam = createSteam();
+// Como a festa abre: sobreposição transparente (Windows, macOS e Linux X11 com compositor) ou janela comum (Linux sem compositor ou no Wayland;
+// ver desktop/plataforma.js). `--janela`, `--sobreposicao` ou ARRAIA_MODO escolhem na mão.
+const runXprop = (command, args) => execFileSync(command, args, { encoding: 'utf8', timeout: 1500, stdio: ['ignore', 'pipe', 'ignore'] });
+const compositor = process.platform === 'linux' && !Plataforma.modoEscolhido(process.argv, process.env) && Plataforma.sessao(process.env) === 'x11'
+  ? Plataforma.temCompositor(runXprop) : null;
+const ambiente = { platform: process.platform, env: process.env, argv: process.argv };
+const abertura = Plataforma.escolherModo({ ...ambiente, compositor });
+const OVERLAY = abertura.modo === 'sobreposicao';
+for (const [name, value] of Plataforma.chavesChromium({ ...ambiente, modo: abertura.modo })) {
+  if (value === undefined) app.commandLine.appendSwitch(name); else app.commandLine.appendSwitch(name, value);
+}
 // Na versão da Steam (App ID de verdade e "required"), o jogo só roda aberto por ela. Em desenvolvimento, nunca trava.
 const steamOnly = steam.config.required && app.isPackaged;
 
@@ -173,7 +186,7 @@ if (steamOnly && steam.restartIfNeeded()) {
 
   // A janela cobre a área útil do monitor; a festa e o painel são desenhados dentro dela.
   function place() {
-    if (alive()) win.setBounds(currentDisplay().workArea);
+    if (OVERLAY && alive()) win.setBounds(currentDisplay().workArea);
   }
 
   function showInactive(created = win) {
@@ -199,8 +212,25 @@ if (steamOnly && steam.restartIfNeeded()) {
   // (restartIfNeeded), então ele sempre roda pela Steam. Em desenvolvimento (electron .) não registra nada.
   function applyStartup() {
     if (!app.isPackaged) return;
+    if (process.platform === 'linux') { applyLinuxStartup(); return; }
     try { app.setLoginItemSettings({ openAtLogin: settings.startup }); }
     catch (error) { console.warn('Não deu para mudar a abertura com o Windows:', error.message); }
+  }
+
+  // No Linux não há "abrir com o sistema" no Electron: o atalho de abrir ao iniciar a sessão é um .desktop em ~/.config/autostart (pelo
+  // iniciar-linux.sh que acompanha o jogo, que escolhe o modo certo; sem ele, direto pelo executável).
+  function applyLinuxStartup() {
+    try {
+      const config = process.env.XDG_CONFIG_HOME || path.join(app.getPath('home'), '.config');
+      const file = path.join(config, 'autostart', 'cuidebemdasuamandioca.desktop');
+      if (!settings.startup) { fs.rmSync(file, { force: true }); return; }
+      const folder = path.dirname(process.execPath);
+      const launcher = path.join(folder, 'iniciar-linux.sh');
+      const exec = fs.existsSync(launcher) ? ['bash', launcher] : [process.execPath];
+      const icon = path.join(folder, 'icone.png');
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, Plataforma.entradaDesktop({ nome: t('app.title'), exec, icone: fs.existsSync(icon) ? icon : '', pasta: folder, autostart: true }), 'utf8');
+    } catch (error) { console.warn('Não deu para mudar a abertura com a sessão:', error.message); }
   }
 
   function change(partial) {
@@ -281,7 +311,7 @@ if (steamOnly && steam.restartIfNeeded()) {
   }
 
   function watchCursor() {
-    setInterval(sendCursor, 120);
+    if (OVERLAY) setInterval(sendCursor, 120);
   }
 
 
@@ -306,7 +336,8 @@ if (steamOnly && steam.restartIfNeeded()) {
   // uma janela nova, como na troca de idioma: a velha salva ao fechar e a nova carrega o save. Não depende do aviso de
   // bloqueio: se ele se perdesse, a festa nunca mais trocaria de janela. Dois avisos juntos viram uma troca só.
   function wakeUp() {
-    if (quitting) return;
+    // A janela comum não perde o mouse depois do repouso (só a camada transparente perde).
+    if (quitting || !OVERLAY) return;
     clearTimeout(wakeTimer);
     wakeTimer = setTimeout(() => {
       if (!alive() || replacing || quitting) return;
@@ -351,7 +382,7 @@ if (steamOnly && steam.restartIfNeeded()) {
         click: item => changeAndTell({ sound: item.checked }) },
       { label: t('tray.music'), type: 'checkbox', checked: settings.music,
         click: item => changeAndTell({ music: item.checked }) },
-      { label: t('settings.startup'), type: 'checkbox', checked: settings.startup,
+      { label: t(process.platform === 'linux' ? 'settings.startupLinux' : 'settings.startup'), type: 'checkbox', checked: settings.startup,
         click: item => changeAndTell({ startup: item.checked }) },
       { label: t('tray.perf'), submenu: ['suave', 'normal', 'economia'].map(perf => ({ label: t(`settings.perf.${perf}`),
         type: 'radio', checked: settings.perf === perf, click: () => changeAndTell({ perf }) })) },
@@ -375,24 +406,35 @@ if (steamOnly && steam.restartIfNeeded()) {
   // A festa: uma janela transparente do tamanho da área útil, que deixa o clique passar fora do jogo.
   // `quiet`: janela trocada sozinha (ao acordar, autocura) abre sem pegar o foco de quem está usando outro programa.
   function openWindow({ quiet = false, minimized = false } = {}) {
-    const created = new BrowserWindow({
+    // Sobreposição: a janela cobre a área útil, transparente e sem moldura. Janela comum: com moldura, fundo e o tamanho que ficou salvo.
+    let wasMaximized = false;
+    const frameOptions = OVERLAY ? {
       ...currentDisplay().workArea,
-      show: false,
       frame: false,
       transparent: true,
       backgroundColor: '#00000000',
       hasShadow: false,
       resizable: false,
       movable: false,
-      minimizable: true,
       maximizable: false,
-      fullscreenable: false,
+      fullscreenable: false
+    } : (() => {
+      const bounds = Plataforma.limitesJanela({ salvo: readJanela(), monitores: screen.getAllDisplays() });
+      wasMaximized = bounds.maximizada;
+      return { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height, minWidth: Plataforma.JANELA_MINIMA.width,
+        minHeight: Plataforma.JANELA_MINIMA.height, frame: true, transparent: false, backgroundColor: '#1c1a3a', resizable: true,
+        maximizable: true, fullscreenable: true, autoHideMenuBar: true };
+    })();
+    const created = new BrowserWindow({
+      ...frameOptions,
+      show: false,
+      minimizable: true,
       // A janela continua focável: alternar setFocusable no Windows pode interromper os eventos de mouse.
       // Fora da festa os cliques passam pelo setIgnoreMouseEvents, sem alterar os estilos nativos de foco.
       focusable: true,
       skipTaskbar: false,
       title: t('app.title'),
-      icon: path.join(__dirname, 'icon.ico'),
+      icon: path.join(__dirname, process.platform === 'linux' ? 'icon.png' : 'icon.ico'),
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
         nodeIntegration: false,
@@ -403,10 +445,20 @@ if (steamOnly && steam.restartIfNeeded()) {
     });
     win = created;
     windowLoaded = false;
-    ignoring = true;
+    ignoring = OVERLAY;
     cursorKey = '';
     focusRequest = 0;
-    created.setIgnoreMouseEvents(true, { forward: true });
+    if (OVERLAY) created.setIgnoreMouseEvents(true, { forward: true });
+    else {
+      created.removeMenu();
+      if (wasMaximized) created.maximize();
+      // O tamanho e o lugar da janela comum ficam salvos (a cada mexida, sem esperar o fim).
+      let janelaTimer = null;
+      const remember = () => { clearTimeout(janelaTimer); janelaTimer = setTimeout(() => { if (win === created && !created.isDestroyed()) writeJanela(created); }, 400); };
+      created.on('resize', remember);
+      created.on('move', remember);
+      created.on('close', () => { clearTimeout(janelaTimer); if (!created.isDestroyed()) writeJanela(created); });
+    }
     created.setAlwaysOnTop(settings.pinned, 'floating');
     created.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     created.webContents.on('will-navigate', event => event.preventDefault());
@@ -470,6 +522,19 @@ if (steamOnly && steam.restartIfNeeded()) {
     created.loadFile(path.join(__dirname, '..', 'index.html'));
   }
 
+  // Janela comum: onde ela estava (para abrir no mesmo lugar e com o mesmo tamanho).
+  function janelaPath() { return path.join(app.getPath('userData'), 'janela.json'); }
+  function readJanela() {
+    try { return JSON.parse(fs.readFileSync(janelaPath(), 'utf8')); } catch (_) { return null; }
+  }
+  function writeJanela(target) {
+    try {
+      const bounds = target.getNormalBounds();
+      fs.mkdirSync(path.dirname(janelaPath()), { recursive: true });
+      fs.writeFileSync(janelaPath(), JSON.stringify({ ...bounds, maximizada: target.isMaximized() }), 'utf8');
+    } catch (error) { console.warn('Não deu para salvar o lugar da janela:', error.message); }
+  }
+
   // Nunca recarregar a página da festa: no Windows, depois de um reload o Electron segue mandando o movimento do
   // mouse para a janela interna antiga do Chromium (setIgnoreMouseEvents com forward). A festa deixa de saber onde está
   // o cursor e os cliques no menu passam direto para o que está atrás. Por isso a troca é de janela: a velha fecha
@@ -498,15 +563,23 @@ if (steamOnly && steam.restartIfNeeded()) {
     try { loaded = JSON.parse(fs.readFileSync(settingsPath, 'utf8')); }
     catch (error) { if (error.code !== 'ENOENT') console.warn('Preferências da janela ignoradas:', error); }
     settings = normalizeSettings(loaded);
+    // Na janela comum, a primeira abertura não prende o jogo por cima das outras janelas (dá para fixar pelos Ajustes ou pela bandeja).
+    if (!OVERLAY && loaded === null) settings = mergeSettings(settings, { pinned: false });
     // Confere o registro a cada abertura: se a biblioteca da Steam mudou de lugar, o caminho do exe é atualizado.
     applyStartup();
     I18N.setLanguage(languageInfo().id);
     openWindow();
 
-    tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'tray.png')));
-    tray.setToolTip(t('app.title'));
-    tray.on('click', showGame);
-    updateTray();
+    // No Linux a bandeja depende do ambiente (o GNOME puro não mostra ícones); sem ela o jogo continua pelo painel e pelo menu da janela.
+    try {
+      tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'tray.png')));
+      tray.setToolTip(t('app.title'));
+      tray.on('click', showGame);
+      updateTray();
+    } catch (error) {
+      tray = null;
+      logLine(`bandeja indisponível: ${error.message}`);
+    }
     screen.on('display-removed', () => { place(); updateTray(); });
     // O monitor voltou (acordando, o Windows às vezes some com ele e traz de novo): a festa volta para a área útil dele.
     screen.on('display-added', () => { place(); updateTray(); });
@@ -553,7 +626,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     ipcMain.on('desktop:info', event => {
       if (!isOwnWindow(event)) { event.returnValue = null; return; }
       const reopen = reopenConsumedBy === win ? null : reopenPanel;
-      event.returnValue = { language: languageInfo(), steam: { ...steam.info(), cloud: cloud.enabled() }, reopen };
+      event.returnValue = { language: languageInfo(), steam: { ...steam.info(), cloud: cloud.enabled() }, reopen, mode: abertura.modo, platform: process.platform };
       // O preload recebe o pedido antes dos scripts da festa. Se a carga cair, a substituta ainda precisa reabrir.
       if (reopen) {
         if (windowLoaded) { reopenPanel = null; reopenConsumedBy = null; }
@@ -570,7 +643,8 @@ if (steamOnly && steam.restartIfNeeded()) {
       return change(partial);
     });
     ipcMain.on('desktop:set-interactive', (event, interactive) => {
-      if (isOwnWindow(event) && typeof interactive === 'boolean') {
+      // Na janela comum o mouse chega sempre: só a sobreposição liga e desliga o clique que atravessa.
+      if (OVERLAY && isOwnWindow(event) && typeof interactive === 'boolean') {
         ignoring = !interactive;
         win.setIgnoreMouseEvents(!interactive, { forward: true });
         cursorKey = '';
@@ -580,7 +654,7 @@ if (steamOnly && steam.restartIfNeeded()) {
     // Com a festa em foco ou fixada sobre as janelas, o mouse deveria chegar. Solta e sem foco, outra janela pode
     // estar por cima dela (o mouse passa na área da festa sem chegar nela, e isso não é defeito).
     ipcMain.on('desktop:repair', event => {
-      if (!isOwnWindow(event) || replacing || (!settings.pinned && !win.isFocused())) return;
+      if (!OVERLAY || !isOwnWindow(event) || replacing || (!settings.pinned && !win.isFocused())) return;
       logLine('a festa parou de receber o mouse: janela nova');
       replaceWindow({ quiet: !win.isFocused() });
     });

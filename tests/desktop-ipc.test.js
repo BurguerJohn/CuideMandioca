@@ -17,7 +17,9 @@ function fakeSteam(order, language = 'spanish') {
   };
 }
 
-function loadMain({ language, packaged = false, timeout = setTimeout, clear = clearTimeout, deferClose = false, deferDestroy = false, deferLoad = false, saveStore, filesystem, paths, logger = console, steamOverrides = {}, dialogAnswer = 0 } = {}) {
+function loadMain({ language, packaged = false, timeout = setTimeout, clear = clearTimeout, deferClose = false, deferDestroy = false, deferLoad = false, saveStore, filesystem, paths, logger = console, steamOverrides = {}, dialogAnswer = 0,
+  platform = 'win32', env = {}, argv = ['electron', '.'], exePath = '/opt/jogo/CuideBemDaSuaMandioca', xprop = () => { throw new Error('sem xprop'); } } = {}) {
+  const switches = [];
   const listeners = new Map();
   const power = {};
   const intervals = [];
@@ -48,6 +50,10 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
       windows.push(this);
     }
     setAlwaysOnTop(value) { this.onTop = value; }
+    removeMenu() { this.menuRemoved = true; }
+    maximize() { this.maximized = true; }
+    isMaximized() { return !!this.maximized; }
+    getNormalBounds() { return this.normalBounds || { x: 40, y: 30, width: 1000, height: 640 }; }
     setIgnoreMouseEvents(value) { this.ignore = value; }
     getContentBounds() { return this.bounds || this.options; }
     isMinimized() { return !!this.minimized; }
@@ -94,7 +100,8 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
     app: {
       requestSingleInstanceLock: () => true, whenReady: () => Promise.resolve(), getPath: name => paths?.[name] || 'C:\\dados',
       setAppUserModelId() {}, on: (name, fn) => { appEvents[name] = fn; }, quit: () => order.push('quit'),
-      getLocale: () => 'pt-BR', isPackaged: packaged, setLoginItemSettings: value => order.push(['login', value])
+      getLocale: () => 'pt-BR', isPackaged: packaged, setLoginItemSettings: value => order.push(['login', value]),
+      commandLine: { appendSwitch: (...args) => switches.push(args) }
     },
     dialog: { showErrorBox: () => order.push('dialog'), showMessageBoxSync: options => { order.push(['ask', options]); return dialogAnswer; } },
     BrowserWindow: FakeWindow,
@@ -110,8 +117,11 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
     electron,
     'node:fs': filesystem || { readFileSync: missing, existsSync: () => false, copyFileSync() {}, mkdirSync() {}, writeFileSync() {},
       renameSync() {}, statSync: missing, appendFileSync: (_file, text) => order.push(['log', text.trim().slice(27)]) },
-    'node:path': path,
+    // Em teste de Linux os caminhos são os do Linux (com /), mesmo rodando no Windows.
+    'node:path': platform === 'linux' ? path.posix : path,
     './window-state': require('../desktop/window-state'),
+    './plataforma': require('../desktop/plataforma'),
+    'node:child_process': { execFileSync: xprop },
     './save-store': saveStore || { loadSave: () => null, writeSave: (_file, state, _validate, onSnapshot) => {
       onSnapshot?.(JSON.parse(JSON.stringify(state)));
       order.push('write');
@@ -125,8 +135,9 @@ function loadMain({ language, packaged = false, timeout = setTimeout, clear = cl
   };
   const source = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'main.js'), 'utf8');
   vm.runInNewContext(source, { require: name => mocks[name], __dirname: path.join(__dirname, '..', 'desktop'),
+    process: { platform, env, argv, execPath: exePath },
     console: logger, setTimeout: timeout, clearTimeout: clear, setInterval: fn => intervals.push(fn) });
-  return { listeners, handlers, order, window: () => windowObject, windows, intervals, appEvents, cursor, tray: () => trayMenu, trayEvents, power, displays, displayEvents };
+  return { switches, listeners, handlers, order, window: () => windowObject, windows, intervals, appEvents, cursor, tray: () => trayMenu, trayEvents, power, displays, displayEvents };
 }
 
 test('preferências concluídas pelo fechamento ficam no disco sem esperar o temporizador de gravação', async () => {
@@ -1428,5 +1439,174 @@ test('nuvem da Steam no desktop: a abertura compara o save daqui com o da nuvem,
   t.appEvents['before-quit']();
   assert.deepEqual(t.cloudWrites, []);
   assert.equal(ask(t, 'desktop:info').steam.cloud, false);
+  I18N.setLanguage('pt-BR');
+});
+
+const linux = (env, extra = {}) => ({ platform: 'linux', env: { DISPLAY: ':0', ...env }, ...extra });
+const comCompositor = () => '_NET_WM_CM_S0(WINDOW): window id # 0x2e00006';
+const semCompositor = () => '_NET_WM_CM_S0:  not found.';
+const semArquivo = () => { const error = new Error('missing'); error.code = 'ENOENT'; throw error; };
+
+test('Linux no Wayland ou sem compositor: a festa abre numa janela comum (com moldura e fundo), sem clique vazando e sem vigia do cursor', async () => {
+  for (const [nome, opcoes] of [['wayland', linux({ XDG_SESSION_TYPE: 'wayland', WAYLAND_DISPLAY: 'wayland-0' })],
+    ['x11 sem compositor', linux({ XDG_SESSION_TYPE: 'x11' }, { xprop: semCompositor })],
+    ['escolha --janela (até no Windows)', { argv: ['electron', '.', '--janela'] }]]) {
+    const files = [];
+    const filesystem = { readFileSync: semArquivo, existsSync: () => false, copyFileSync() {}, mkdirSync() {}, writeFileSync: file => files.push(String(file)),
+      renameSync() {}, statSync() { throw new Error('missing'); }, appendFileSync() {} };
+    const { listeners, handlers, window, intervals, switches, order, windows, displayEvents } = loadMain({ filesystem, ...opcoes });
+    await Promise.resolve();
+    const win = window();
+    assert.equal(win.options.transparent, false, `${nome}: sem transparência`);
+    assert.equal(win.options.frame, true, `${nome}: com moldura`);
+    assert.equal(win.options.resizable, true);
+    assert.equal(win.options.backgroundColor, '#1c1a3a', `${nome}: o fundo é o céu da noite`);
+    assert.deepEqual([win.options.width, win.options.height], [1100, 720], `${nome}: tamanho padrão`);
+    assert.ok(win.options.width < 1920 && win.options.x > 0 && win.options.y > 0, `${nome}: no meio da área útil, não cobrindo a tela`);
+    assert.equal(win.menuRemoved, true, `${nome}: sem barra de menu`);
+    assert.equal(win.ignore, null, `${nome}: o clique nunca atravessa`);
+    assert.equal(intervals.length, 0, `${nome}: sem vigia do cursor`);
+    assert.equal(switches.some(([name]) => name === 'enable-transparent-visuals'), false, `${nome}: sem chave de transparência`);
+    const own = { sender: win.webContents };
+    // O jogo pede para ligar/desligar o clique que atravessa: na janela comum isso é ignorado.
+    listeners.get('desktop:set-interactive')(own, true);
+    listeners.get('desktop:set-interactive')(own, false);
+    assert.equal(win.ignore, null);
+    // A página sabe em que modo está.
+    const event = { ...own };
+    Object.defineProperty(event, 'returnValue', { set(value) { order.push(['info', value]); } });
+    listeners.get('desktop:info')(event);
+    assert.equal(order.find(entry => entry[0] === 'info')[1].mode, 'janela');
+    // Na primeira abertura a janela não prende o jogo por cima das outras.
+    assert.equal(win.onTop, false, `${nome}: não fixada de fábrica`);
+    // A janela comum não é reposicionada quando os monitores mudam (só a sobreposição cobre a área útil).
+    for (const name of ['display-metrics-changed', 'display-added', 'display-removed']) displayEvents[name]();
+    assert.equal(win.bounds, undefined, `${nome}: o tamanho é de quem usa a janela`);
+    // O lugar da janela fica salvo ao fechar.
+    win.normalBounds = { x: 100, y: 80, width: 900, height: 600 };
+    for (const fn of win.events.close || []) fn();
+    assert.ok(files.some(file => /janela\.json$/.test(file)), `${nome}: janela.json gravado`);
+    await handlers.get('desktop:update-settings')(own, { pinned: true });
+    assert.equal(win.onTop, true, `${nome}: dá para fixar pelos Ajustes`);
+    // O autoconserto da sobreposição não se aplica (a janela comum recebe o mouse sempre), nem com a festa fixada e em foco.
+    win.focused = true;
+    listeners.get('desktop:repair')(own);
+    assert.equal(windows.length, 1, `${nome}: sem janela nova`);
+  }
+  I18N.setLanguage('pt-BR');
+});
+
+test('Linux no X11 com compositor (ou sem xprop): a festa abre em sobreposição, transparente, com a chave de transparência do Chromium', async () => {
+  for (const [nome, opcoes] of [['com compositor', linux({ XDG_SESSION_TYPE: 'x11' }, { xprop: comCompositor })],
+    ['sem xprop (não dá para saber)', linux({ XDG_SESSION_TYPE: 'x11' })],
+    ['Wayland forçado com --sobreposicao', linux({ XDG_SESSION_TYPE: 'wayland' }, { argv: ['electron', '.', '--sobreposicao'] })]]) {
+    const { window, intervals, switches, listeners, order, displayEvents } = loadMain(opcoes);
+    await Promise.resolve();
+    const win = window();
+    assert.equal(win.options.transparent, true, nome);
+    displayEvents['display-metrics-changed']();
+    assert.deepEqual(win.bounds, { x: 0, y: 0, width: 1920, height: 1032 }, `${nome}: a sobreposição volta a cobrir a área útil`);
+    assert.equal(win.options.frame, false);
+    assert.equal(win.ignore, true, `${nome}: o clique vaza fora do jogo`);
+    assert.equal(intervals.length, 1, `${nome}: o vigia do cursor liga`);
+    assert.ok(switches.some(([name]) => name === 'enable-transparent-visuals'), nome);
+    assert.equal(switches.some(([name, value]) => name === 'ozone-platform' && value === 'x11'), nome.startsWith('Wayland'), nome);
+    const event = { sender: win.webContents };
+    Object.defineProperty(event, 'returnValue', { set(value) { order.push(['info', value]); } });
+    listeners.get('desktop:info')(event);
+    assert.equal(order.find(entry => entry[0] === 'info')[1].mode, 'sobreposicao');
+    assert.equal(win.onTop, true, 'fixada de fábrica, como no Windows');
+  }
+  // Fora do Linux não procura compositor nem põe chave nenhuma.
+  const windows = loadMain({ xprop: () => { throw new Error('não devia chamar o xprop'); } });
+  await Promise.resolve();
+  assert.equal(windows.switches.length, 0);
+  assert.equal(windows.window().options.transparent, true);
+  I18N.setLanguage('pt-BR');
+});
+
+test('janela comum: o tamanho que ficou salvo volta, e a maximizada também (a que ficou fora de qualquer monitor cai no meio)', async () => {
+  const salvo = JSON.stringify({ x: 200, y: 120, width: 1280, height: 800, maximizada: true });
+  const com = conteudo => ({ readFileSync: file => { if (/janela\.json$/.test(String(file))) return conteudo; return semArquivo(); },
+    existsSync: () => false, copyFileSync() {}, mkdirSync() {}, writeFileSync() {}, renameSync() {}, statSync() { throw new Error('missing'); }, appendFileSync() {} });
+  let loaded = loadMain({ filesystem: com(salvo), ...linux({ XDG_SESSION_TYPE: 'wayland' }) });
+  await Promise.resolve();
+  const options = loaded.window().options;
+  assert.deepEqual([options.x, options.y, options.width, options.height], [200, 120, 1280, 800]);
+  assert.equal(loaded.window().maximized, true);
+  loaded = loadMain({ ...linux({ XDG_SESSION_TYPE: 'wayland' }), filesystem: com(JSON.stringify({ x: 9000, y: 9000, width: 1280, height: 800 })) });
+  await Promise.resolve();
+  assert.deepEqual([loaded.window().options.width, loaded.window().options.height], [1100, 720]);
+  assert.ok(loaded.window().options.x < 1920);
+  assert.equal(!!loaded.window().maximized, false);
+  I18N.setLanguage('pt-BR');
+});
+
+test('Linux: o repouso não troca a janela comum (só a sobreposição perde o mouse), mas a sobreposição troca como no Windows', async () => {
+  for (const [modo, opcoes, janelas] of [['janela', linux({ XDG_SESSION_TYPE: 'wayland' }), 1], ['sobreposicao', linux({ XDG_SESSION_TYPE: 'x11' }, { xprop: comCompositor }), 2]]) {
+    const timers = new Map();
+    let next = 0;
+    const { power, windows } = loadMain({ ...opcoes, timeout: fn => { timers.set(++next, fn); return next; }, clear: id => timers.delete(id) });
+    await Promise.resolve();
+    power.resume();
+    power['unlock-screen']();
+    [...timers.values()].forEach(fn => fn());
+    assert.equal(windows.length, janelas, modo);
+  }
+  I18N.setLanguage('pt-BR');
+});
+
+test('abrir com a sessão no Linux: o jogo instalado grava o atalho em ~/.config/autostart (pelo iniciar-linux.sh se ele estiver ao lado) e remove ao desligar', async () => {
+  const gravados = new Map();
+  const removidos = [];
+  const barras = file => String(file).replace(/\\/g, '/');
+  const lado = new Set(['/opt/jogo/iniciar-linux.sh', '/opt/jogo/icone.png']);
+  const filesystem = { readFileSync: semArquivo, existsSync: file => lado.has(barras(file)), copyFileSync() {}, mkdirSync() {},
+    writeFileSync: (file, texto) => gravados.set(barras(file), String(texto)), renameSync() {}, statSync() { throw new Error('missing'); },
+    appendFileSync() {}, rmSync: (file, options) => removidos.push([barras(file), options]) };
+  const paths = { home: '/home/gabriel', userData: '/home/gabriel/.config/jogo' };
+  const dev = loadMain({ filesystem, packaged: false, ...linux({ XDG_SESSION_TYPE: 'wayland' }), paths });
+  await Promise.resolve();
+  await dev.handlers.get('desktop:update-settings')({ sender: dev.window().webContents }, { startup: true });
+  assert.equal([...gravados.keys()].some(file => file.includes('autostart')), false, 'em desenvolvimento não registra nada');
+
+  const { handlers, window } = loadMain({ filesystem, packaged: true, ...linux({ XDG_SESSION_TYPE: 'wayland' }), paths });
+  await Promise.resolve();
+  const alvo = '/home/gabriel/.config/autostart/cuidebemdasuamandioca.desktop';
+  assert.equal(removidos.at(-1)[0], alvo, 'ao abrir, desligado de fábrica: confere (e tira) o atalho');
+  const own = { sender: window().webContents };
+  await handlers.get('desktop:update-settings')(own, { startup: true });
+  const texto = gravados.get(alvo);
+  assert.ok(texto, 'gravou o atalho');
+  assert.match(texto, /^\[Desktop Entry\]\nType=Application\n/);
+  assert.match(texto, /^Exec=bash \/opt\/jogo\/iniciar-linux\.sh$/m, 'abre pelo inicializador, que escolhe o modo');
+  assert.match(texto, /^Icon=\/opt\/jogo\/icone\.png$/m);
+  assert.match(texto, /^Path=\/opt\/jogo$/m);
+  assert.match(texto, /^X-GNOME-Autostart-enabled=true$/m);
+  await handlers.get('desktop:update-settings')(own, { zoom: 1.5 });
+  assert.equal(removidos.length, 1, 'outras mudanças não mexem no atalho');
+  await handlers.get('desktop:update-settings')(own, { startup: false });
+  assert.equal(removidos.length, 2);
+  assert.equal(removidos.at(-1)[0], alvo);
+  // Sem o inicializador ao lado (o executável sozinho), o atalho chama o executável.
+  lado.clear();
+  gravados.clear();
+  const sozinho = loadMain({ filesystem, packaged: true, ...linux({ XDG_SESSION_TYPE: 'wayland', XDG_CONFIG_HOME: '/cfg' }), paths });
+  await Promise.resolve();
+  await sozinho.handlers.get('desktop:update-settings')({ sender: sozinho.window().webContents }, { startup: true });
+  const outro = gravados.get('/cfg/autostart/cuidebemdasuamandioca.desktop');
+  assert.match(outro, /^Exec=\/opt\/jogo\/CuideBemDaSuaMandioca$/m, 'XDG_CONFIG_HOME vale, e sem o inicializador chama o executável');
+  assert.doesNotMatch(outro, /^Icon=/m);
+  I18N.setLanguage('pt-BR');
+});
+
+test('o menu da bandeja no Linux chama a abertura de "abrir ao iniciar a sessão" (e no Windows continua "com o Windows")', async () => {
+  const linux = loadMain({ packaged: true, platform: 'linux', env: { XDG_SESSION_TYPE: 'wayland', DISPLAY: ':0' } });
+  await Promise.resolve();
+  assert.ok(linux.tray().some(item => item.label === I18N.t('settings.startupLinux')));
+  assert.equal(linux.tray().some(item => item.label === I18N.t('settings.startup')), false);
+  const win = loadMain({ packaged: true });
+  await Promise.resolve();
+  assert.ok(win.tray().some(item => item.label === I18N.t('settings.startup')));
   I18N.setLanguage('pt-BR');
 });

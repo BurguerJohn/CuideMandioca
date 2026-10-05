@@ -24,8 +24,8 @@ async function main() {
     ignore: [
       // Pastas do projeto, só na raiz (node_modules/steamworks.js/dist é a Steam e precisa ir junto).
       /^[\\/](?:dist|tests|art|assets|tools|steam|trailer|steam-build-output|\.npm-cache|\.electron-cache)(?:[\\/]|$)/,
-      /(^|[\\/])(?:README\.md|COMANDO-STEAM\.txt|package-lock\.json|_backup[^\\/]*\.zip)$/,
-      /(^|[\\/])desktop[\\/](?:package-win\.js|prepare-steam\.js|upload-steam\.js)$/,
+      /(^|[\\/])(?:README\.md|COMANDO-STEAM\.txt|LEIA-ME-LINUX\.txt|iniciar-linux\.sh|instalar-linux\.sh|package-lock\.json|\.gitattributes|_backup[^\\/]*\.zip)$/,
+      /(^|[\\/])desktop[\\/](?:package-win\.js|package-linux\.js|tar\.js|prepare-steam\.js|upload-steam\.js)$/,
       // Só o Windows é empacotado: os binários da Steam para Linux e macOS ficam de fora.
       /(^|[\\/])node_modules[\\/]steamworks\.js[\\/]dist[\\/](?:linux64|osx)(?:[\\/]|$)/
     ]

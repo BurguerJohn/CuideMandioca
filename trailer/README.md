@@ -15,6 +15,7 @@ TikTok (veja abaixo).
 | `presentes` | 18,5 s | cada convidado traz um presente · every guest brings a gift · cada invitado trae un regalo |
 | `turma` | 20 s | conheça a turma · meet the party crew · conoce a la pandilla |
 | `cuidar` | 16 s | se você não cuidar da sua mandioca… ela fica triste (só em pt-BR) |
+| `caos` | 23,4 s | isso é um jogo de festa junina?! (tornado de tubarões no primeiro quadro) · só em pt-BR |
 
 Em todos, a placa com o nome do jogo aparece desde o primeiro quadro, com o nome no idioma do vídeo (o mesmo da
 Steam): "Cuide bem da sua mandioca", "Take Good Care of Your Cassava" e "Cuida bien tu mandioca". O texto
@@ -23,6 +24,19 @@ importante fica fora das áreas que o TikTok cobre (topo, rodapé e a coluna de 
 O `cuidar` ("Esqueci de cuidar da minha mandioca", só em português) mostra o medidor de Amor e Barriga: a gameplay é
 gravada em 4K vertical (`gravar.js cuidar`) para a câmera da montagem dar zoom na Mandioca em escala exata do pixel
 (×2 no close, ×0,5 na festa inteira), e o medidor da tela é um painel da montagem sincronizado com as ações da gravação.
+
+O `caos` ("do nada... ZUMBIS, METEORO, PALHAÇO-BALA…", só em português; o `traduzir.js`/`renderizar.js` pulam os vídeos de
+`SO_PT` em `videos/copiar-assets.js`) é o vídeo com cara de **gravação de tela crua**, sem placa de título batendo: o
+primeiro quadro já é o susto (o Tornado de tubarões em close, cada pixel da arte com 10 px, com uma tremida de tela que
+acalma em meio segundo), um cronômetro "● REC 00:07" de gravador de tela, o nome do jogo numa etiqueta pequena no topo,
+um cursor de mouse desenhado que clica nos alvos (posições medidas com `gravar.js <cena> --quadro=… --medir`) e legendas
+no estilo do TikTok. Depois da puxada para a festa inteira ("e a festa nem liga") vem a área de trabalho de verdade e
+seis eventos de mundo em cortes secos, e o fecho com o número de eventos (61) e a placa com o nome. As gravações são as
+cenas `caos-*` de `captura/cenas.js` (4K vertical, calmo, sem placa); a câmera é um `transform` do vídeo em escalas de
+pixel exato (2,5 · 1 · 0,5; 10 · 4 · 2 px por pixel da arte). Os planos abertos usam `.fade` (máscara que dissolve a
+borda do vídeo no fundo da noite) porque a festa fica colada no pé da gravação. O som é o **do próprio jogo**:
+`node_modules/.bin/electron trailer/audio/renderizar-som-jogo.js` renderiza os sons do `src/som.js` (trovão, sirene,
+canhão, carinho…) com um `OfflineAudioContext` para `assets/audio/jogo-<nome>.wav`.
 
 ## Música em alta
 
@@ -43,6 +57,7 @@ ainda leva o vídeo para a página do som (e dá alcance), é este:
 - `captura/`: gravador da gameplay. Ele abre o jogo numa janela invisível do Electron, com relógio virtual
   (cada quadro avança exatos 1/30 s) e captura via DevTools para o ffmpeg. Também tem os roteiros das cenas e os saves.
 - `audio/gerar-audio.js`: gera os efeitos em WAV.
+- `audio/renderizar-som-jogo.js`: renderiza os sons do próprio jogo (`src/som.js`) em `assets/audio/jogo-*.wav`.
 - `assets/`: gravações (`gameplay/` em português, `gameplay-en/`, `gameplay-es/`), sprites extraídos do jogo, fonte
   Fredoka e áudio compartilhados.
 - `videos/<nome>/`: um projeto HyperFrames por vídeo, em português (`index.html` é a composição). O trailer da Steam

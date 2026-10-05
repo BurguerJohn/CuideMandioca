@@ -1004,3 +1004,21 @@ test('modo de teste: duas abas (Geral e Eventos do mundo), a segunda com um bot�
   engine.debug('evento', 'meteoro');
   assert.equal(UI.debugText(engine, engine.state.log.at(-1)), 'Evento do mundo: Meteoro da extinção');
 });
+
+test('modo de teste: a aba Plateia tem um botão para cada um dos 12 números, e as outras abas seguem como eram', () => {
+  const Plateia = require('../src/festa-plateia.js');
+  const engine = new GameEngine(data, null, { rng: () => 0.5 });
+  const page = (extra = {}) => UI.tela(engine, { ...ctx(engine, { tela: 'teste' }), ...extra, icon: () => '' });
+  let html = page({ testeTab: 'plateia' });
+  assert.match(html, /<button class="chip ativa" data-action="teste-aba" data-value="plateia">Plateia<\/button>/);
+  assert.match(html, /<button class="chip " data-action="teste-aba" data-value="geral">Geral<\/button>/);
+  assert.equal((html.match(/data-action="plateia" data-value="/g) || []).length, Plateia.IDS.length);
+  for (const id of Plateia.IDS) assert.match(html, new RegExp(`data-action="plateia" data-value="${id}">`), id);
+  assert.match(html, /Pula-pula<\/button>/);
+  assert.doesNotMatch(html, /data-op="animacao"|data-op="evento"/);
+  // Nas outras abas o botão não aparece, e um nome de aba estranho cai na Geral.
+  assert.doesNotMatch(page({ testeTab: 'mundo' }), /data-action="plateia"/);
+  html = page({ testeTab: 'qualquer-coisa' });
+  assert.match(html, /<button class="chip ativa" data-action="teste-aba" data-value="geral">Geral<\/button>/);
+  assert.doesNotMatch(html, /data-action="plateia"/);
+});

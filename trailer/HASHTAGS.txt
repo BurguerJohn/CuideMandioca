@@ -1,0 +1,68 @@
+HASHTAGS - Cuide bem da sua mandioca (TikTok e Instagram)
+=========================================================
+
+Como usar: copie um bloco e cole na legenda, depois da frase do video.
+TikTok rende melhor com poucas hashtags (4 a 6, a primeira sempre a da marca).
+Instagram (Reels) aceita mais (8 a 15), mas o que pesa mesmo sao as 3 ou 4 primeiras.
+
+
+1) FIXAS (em todo video)
+------------------------
+#cuidebemdasuamandioca #mandioca #festajunina
+
+
+2) TIKTOK (escolha 4 a 6: 1 da marca + 1 do tema + 2 de jogo + 1 de alcance)
+---------------------------------------------------------------------------
+Marca e tema:    #cuidebemdasuamandioca #mandioca #festajunina #saojoao #arraia #forro
+Jogo:            #indiegame #pixelart #jogoindie #gamedev #cozygame #idlegame
+Alcance:         #fyp #paravoce #gamertiktok #jogos
+
+Exemplo pronto:
+#cuidebemdasuamandioca #festajunina #pixelart #indiegame #fyp
+
+
+3) INSTAGRAM (Reels: 8 a 15)
+----------------------------
+#cuidebemdasuamandioca #mandioca #festajunina #saojoao #arraia #forro #quentao
+#pixelart #pixelartgame #indiegame #jogoindie #jogosindie #gamedev #indiedev
+#cozygame #idlegame #jogosbrasileiros #devbrasil #reels
+
+Exemplo pronto:
+#cuidebemdasuamandioca #festajunina #saojoao #pixelart #indiegame #jogoindie #gamedev #cozygame #jogosbrasileiros #reels
+
+
+4) EXTRAS POR VIDEO (some 2 ou 3 ao bloco acima)
+------------------------------------------------
+caos       (tornado de tubaroes, zumbis, meteoro...)   #sharknado #tubarao #zumbi #meteoro #dinossauro #caos #absurdo
+evolucao   (de 1 mandioca ate o maior Sao Joao)        #evolucao #idlegame #incremental #progressao
+mesa       (POV: instalou no PC do trabalho)           #pcgamer #trabalho #escritorio #meme #pov #desktopgame
+argolas    (a garrafa com 1 pixel de folga)            #argolas #minigame #satisfatorio #desafio
+presentes  (cada convidado traz um presente)           #presentes #fofo #cozygames #relaxante
+turma      (conheca a turma)                           #personagens #pixelartist #characterdesign
+cuidar     (a mandioca fica triste / feliz)            #fofo #cozy #petvirtual #carinho #mandioca
+
+
+5) SUGESTAO DE LEGENDA (pt-BR) - troque a frase e mantenha a pergunta no fim
+---------------------------------------------------------------------------
+caos:       isso e um jogo de festa junina?! tornado de tubaroes, zumbi, meteoro, palhaco-bala... sao 61 eventos assim. qual voce quer ver?
+evolucao:   comecei a cuidar de 1 mandioca e olha onde isso foi parar
+mesa:       POV: voce instalou isso no PC do trabalho. o chefe vai ver?
+argolas:    essa garrafa tem 1 pixel de folga. voce acerta?
+presentes:  cada convidado traz um presente. qual voce quer ganhar?
+turma:      conheca a turma da festa. qual e o seu favorito?
+cuidar:     esqueci de cuidar da minha mandioca. qual nome voce daria para ela?
+
+
+6) SO DEPOIS DE PUBLICAR A PAGINA NA STEAM
+------------------------------------------
+Hoje a pagina ainda nao esta publicada: nao escreva "ja disponivel" nem ponha link.
+Quando estiver no ar, acrescente:  #steam #steamgames #wishlist #novojogo
+(e o link na bio do TikTok / Instagram, nao na legenda).
+
+
+7) DICAS RAPIDAS
+----------------
+- Nao repita exatamente o mesmo bloco em todos os videos: troque 2 ou 3 hashtags a cada postagem.
+- Evite hashtags gigantes e genericas sozinhas (#love, #viral): o video se perde.
+- O som em alta se escolhe no proprio app (o video sai sem musica). Veja trailer/README.md.
+- Marque o proprio perfil do jogo e a conta de quem comentar com ideia boa: gera comentario.

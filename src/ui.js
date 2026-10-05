@@ -978,10 +978,10 @@
         `<button class="btn ${st.pinned ? 'verde' : 'claro'}" data-action="fixar">${esc(t(st.pinned ? 'settings.pinned' : 'settings.behind'))}</button>` +
         `<button class="btn claro" data-action="esconder">${esc(t('settings.hide'))}</button>` +
         `<button class="btn vermelho" data-action="sair">${esc(t('settings.quit'))}</button></div>` +
-        `<div class="rotulo">🚀 ${esc(t('settings.startup'))}</div><div class="chips">` +
+        `<div class="rotulo">🚀 ${esc(t(ctx.platform === 'linux' ? 'settings.startupLinux' : 'settings.startup'))}</div><div class="chips">` +
         [[true, 'settings.startupOn'], [false, 'settings.startupOff']].map(([value, key]) =>
           `<button class="chip ${(st.startup === true) === value ? 'ativa' : ''}" data-action="inicio" data-value="${value ? 'on' : 'off'}">` +
-          `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t('settings.startupHint'))}</p>` : '') +
+          `${esc(t(key))}</button>`).join('') + `</div><p class="miudo">${esc(t(ctx.platform === 'linux' ? 'settings.startupHintLinux' : 'settings.startupHint'))}</p>` : '') +
       `<div class="rotulo">${esc(t('settings.sign'))}</div><div class="chips">` +
       ['sempre', 'passar'].map(mode => `<button class="chip ${st.hud === mode ? 'ativa' : ''}" data-action="placa" ` +
         `data-value="${mode}">${esc(t(mode === 'sempre' ? 'settings.signAlways' : 'settings.signHover'))}</button>`).join('') +
@@ -1188,10 +1188,11 @@
       `${esc(label)}</button>`;
     const group = (title, buttons, note = '') => `<div class="cartao"><div class="rotulo">${esc(title)}</div>` +
       `<div class="botoes">${buttons.join('')}</div>${note ? `<p class="miudo">${esc(note)}</p>` : ''}</div>`;
-    const tab = ctx.testeTab === 'mundo' ? 'mundo' : 'geral';
-    const tabs = `<div class="chips">` + ['geral', 'mundo'].map(id => `<button class="chip ${tab === id ? 'ativa' : ''}" data-action="teste-aba" data-value="${id}">` +
+    const tab = ['mundo', 'plateia'].includes(ctx.testeTab) ? ctx.testeTab : 'geral';
+    const tabs = `<div class="chips">` + ['geral', 'mundo', 'plateia'].map(id => `<button class="chip ${tab === id ? 'ativa' : ''}" data-action="teste-aba" data-value="${id}">` +
       `${esc(t(`debug.tab.${id}`))}</button>`).join('') + `</div>`;
     if (tab === 'mundo') return header(t('tab.teste'), esc(t('debug.subtitle'))) + tabs + testeMundo(engine, group);
+    if (tab === 'plateia') return header(t('tab.teste'), esc(t('debug.subtitle'))) + tabs + testePlateia(group);
     const rate = engine.cheerPerSecond();
     return header(t('tab.teste'), esc(t('debug.subtitle'))) + tabs +
       group(t('res.cheer'), [button('animacao', 60, t('debug.plusMinutes', { n: 1 })), button('animacao', 600, t('debug.plusMinutes', { n: 10 })),
@@ -1208,6 +1209,13 @@
       group(t('debug.atParty'), [button('pedido', 0, t('debug.callRequest')), button('penetra', 0, t('debug.callCrasher')),
         button('balao', 0, t('debug.callBalloon')), button('chuva', 0, t('debug.callRain')), button('metas', 0, t('debug.doneGoals')), button('quadrilha', 0, t('debug.callQuadrilha')), button('casamento', 0, t('debug.callWedding')), button('pote', 0, t('debug.callPote')), button('saco', 0, t('debug.callSaco')), button('leilao', 0, t('debug.callLeilao')), button('aviso', 0, t('debug.callAnnounce')), button('frio', 0, t('debug.callCold')), button('sanfoneiro', 0, t('debug.callVisitor')), button('cobra', 0, t('debug.callSnake')), button('fotografo', 0, t('debug.callPhotographer')), button('burro', 0, t('debug.callBurro')), button('folclore', 0, t('debug.callFolclore')), button('premio', 0, t('debug.callPremio')), button('mundo', 0, t('debug.callMundo')), button('desfile', 0, t('debug.callDesfile')), button('fantasia', 0, t('debug.callFantasia')), button('cozinha', 0, t('debug.callCook')), button('feliz', 0, t('debug.feliz')), button('triste', 0, t('debug.triste')), button('bingo', 0, t('debug.callBingo')), button('concurso', 0, t('debug.callContest')),
         button('argolas', 0, t('debug.cheapRings'))]);
+  }
+
+  // Os números da plateia (src/festa-plateia.js, ids em PLATEIA_ATOS): a aba "Plateia" do modo de teste tem um botão para cada um.
+  const PLATEIA_ATOS = ['palmas', 'pulapula', 'bandeiras', 'balanco', 'fogos', 'bis', 'cantoria', 'serpente', 'pisada', 'rebola', 'oi', 'ovacao'];
+  function testePlateia(group) {
+    const buttons = PLATEIA_ATOS.map(id => `<button class="btn claro" data-action="plateia" data-value="${id}">${esc(t(`debug.plateiaAct.${id}`))}</button>`);
+    return group(t('debug.tab.plateia'), buttons, t('debug.plateiaNote'));
   }
 
   // A aba "Eventos do mundo" do modo de teste: um botão para cada evento (em grupos: céu e tempo, e um por tema), que o começa na hora e antes completa o que

@@ -303,6 +303,11 @@ test('modo de teste: a aba dos eventos do mundo e o aviso do diário existem em 
       assert.equal(UI.debugText(engine, engine.state.log.at(-1)), id === 'en' ? 'World event: Extinction meteor' : 'Evento del mundo: Meteorito de la extinción');
       engine.debug('evento-fim');
       assert.equal(UI.debugText(engine, engine.state.log.at(-1)), id === 'en' ? 'World event ended' : 'Evento del mundo terminado');
+      // A aba da plateia (os botões dos 12 números) também sem português.
+      page = UI.tela(engine, { ...ctx, testeTab: 'plateia' });
+      assert.doesNotMatch(page, /Pula-pula|Bandeirinhas|Trenzinho|Boas-vindas|Ovação|Cantoria|Faz a plateia|Plateia</, `${id}: sobrou português na aba da plateia`);
+      assert.match(page, id === 'en' ? /Conga line<\/button>/ : /Trencito<\/button>/);
+      assert.match(page, id === 'en' ? /Crowd<\/button>/ : /Público<\/button>/);
     } finally {
       I18N.setLanguage(I18N.SOURCE);
     }

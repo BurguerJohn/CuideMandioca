@@ -8,6 +8,9 @@ const info = ipcRenderer.sendSync('desktop:info') || {};
 contextBridge.exposeInMainWorld('arraiaDesktop', Object.freeze({
   language: info.language || null,
   steam: info.steam || null,
+  // 'sobreposicao' (festa transparente por cima da tela) ou 'janela' (janela comum, com fundo), e o sistema (win32, linux, darwin).
+  mode: info.mode || 'sobreposicao',
+  platform: info.platform || null,
   // Depois de trocar o idioma pelos Ajustes, a festa nova abre com eles.
   reopen: info.reopen || null,
   setLanguage: choice => ipcRenderer.send('desktop:set-language', choice),

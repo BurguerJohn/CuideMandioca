@@ -39,3 +39,11 @@ Os vídeos mostram a gameplay de verdade (gravada do próprio jogo) e falam como
 ## Som
 - Sem trilha: o som em alta é escolhido no editor do TikTok.
 - Efeitos: whoosh nos cortes, pop quando um número muda, ding em acerto, tada no clímax.
+
+## Variante "gravação de tela" (`caos`)
+- Menos trailer, mais footage: sem placa grande no começo, cortes secos, nada de transição elaborada. O nome do jogo fica numa
+  etiqueta pequena (pílula escura, "Cuide bem da sua <amarelo>mandioca</amarelo>") no topo, ao lado do "● REC 00:07".
+- Cursor de mouse branco com contorno escuro e anel de clique; legendas "do nada... / PALAVRA" em creme com contorno e a
+  palavra-chave em amarelo.
+- O primeiro quadro é o susto (sem piscada branca, que estragaria o quadro 0 e a miniatura): close do Tornado de tubarões.
+- O som é o do próprio jogo (`assets/audio/jogo-*.wav`), nunca música.

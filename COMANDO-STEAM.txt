@@ -35,3 +35,87 @@ Requisitos:
   - Também dá para passar o login pela variável STEAM_LOGIN.
 
 Os logs do envio ficam em steam-build-output\.
+
+
+VERSÃO DE LINUX NA STEAM
+========================
+
+O jogo de Linux é o pacote de  npm run build:linux  (pasta dist\CuideBemDaSuaMandioca-linux-x64 e o .tar.gz dela). Na Steam ele vira um
+SEGUNDO DEPOT no mesmo app, e a Steam abre o iniciar-linux.sh (que escolhe sozinho entre a festa transparente e uma janela comum;
+veja LEIA-ME-LINUX.txt). Fazem falta duas coisas: ajustes no Steamworks (uma vez) e o envio com os dois depots.
+
+
+A) NO STEAMWORKS (partner.steamgames.com, app 5343830) - uma vez só
+-------------------------------------------------------------------
+ 1. SteamPipe > Depots > "Add new depot": nome "Cuide bem da sua mandioca Linux x64". Anote o ID que a Steam der (o do Windows é 5343831;
+    o novo costuma ser o próximo, 5343832, mas confira na tela).
+ 2. Sistema de cada depot (SteamPipe > Depots, coluna "Operating System"):
+      - depot do Windows (5343831): troque de "[All OSes]" para "Windows";
+      - depot de Linux (o novo): "Linux" (e, se a tela mostrar, 64-bit).
+    Se o do Windows ficar em "All OSes", quem joga no Linux baixa os dois depots (o do Windows é peso morto).
+ 3. Pacotes: o depot novo precisa estar nos pacotes do jogo, senão ninguém é dono dele. Em SteamPipe > Depots > o depot novo >
+    "Associated Packages & DLC" (ou em Pacotes > editar > Depots), adicione-o ao pacote do jogo na loja e ao "Developer Comp"
+    (o pacote que dá o jogo a você e a quem você convidar para testar).
+ 4. Opção de lançamento (Edit Steamworks Settings > Installation > General > Launch Options > "Add new launch option"):
+        Executable:        iniciar-linux.sh
+        Arguments:         (vazio)
+        Launch Type:       Launch (Default)
+        Operating System:  SteamOS + Linux   (e arquitetura 64-bit, se a tela mostrar)
+    A do Windows continua como está (CuideBemDaSuaMandioca.exe, Operating System: Windows).
+ 5. Página da loja (Store Presence > Edit Store Page > System Requirements): marque SteamOS + Linux e preencha os requisitos. Sugestão:
+        Mínimo:  Linux 64 bits (Ubuntu 22.04 ou parecido, SteamOS 3)  |  Processador: dois núcleos de 2 GHz  |  Memória: 2 GB
+                 Placa de vídeo: qualquer uma com OpenGL/WebGL  |  Armazenamento: 350 MB
+        Observação: "Em X11 com compositor a festa fica transparente por cima da tela; no Wayland abre em janela."
+    O ícone de Linux/SteamOS só aparece na loja depois de "Publish" na página (as mudanças da loja têm que ser publicadas).
+
+
+B) NO PROJETO - gerar o script com os dois depots
+-------------------------------------------------
+    npm run steam:config -- 5343830 5343831 ID_DO_DEPOT_DE_LINUX
+
+  (o terceiro número é o ID do passo A.1). Isso reescreve steam\app_build_5343830.vdf com um depot por sistema (dist\ é a raiz; cada depot
+  leva a pasta do seu build) e refaz os outros arquivos da Steam (steam.json, presença e lista de conquistas) iguais aos de antes.
+  Sem o terceiro número o script volta a ter só o Windows.
+
+
+C) ENVIAR
+---------
+    npm run steam:upload -- SEU_LOGIN_DA_STEAM
+
+  Com o depot de Linux no script, o comando refaz os dois builds (npm run build:win e npm run build:linux), confere os arquivos de cada um
+  (inclusive libsteam_api.so e o .node da Steam para Linux) e roda o steamcmd com os dois depots. As mesmas variações de antes valem
+  (--sem-build etc.). Depois, ative o build no ramo "default" em https://partner.steamgames.com/apps/builds/5343830.
+
+
+D) O BIT DE EXECUTÁVEL (importante se você envia de um Windows)
+---------------------------------------------------------------
+  O SteamPipe guarda as permissões do disco de onde o steamcmd roda, e o Windows não tem bit de executável. Enviando de um Windows, o
+  iniciar-linux.sh e o CuideBemDaSuaMandioca chegam ao Linux sem permissão de executar, e a Steam pode falhar ao abrir ("permission
+  denied"). O iniciar-linux.sh devolve o bit do executável do jogo sozinho, mas ele mesmo precisa abrir primeiro.
+
+  Jeito seguro: enviar de um Linux (ou macOS, ou a Steam Deck em modo desktop), onde o .tar.gz guarda as permissões certas:
+    1. No Windows:  npm run build:win  e  npm run build:linux  (saem em dist\).
+    2. Copie para o Linux o .tar.gz de Linux e a pasta dist\CuideBemDaSuaMandioca-win32-x64, e o projeto (ou só steam\ e o SDK do
+       Steamworks; precisa de Node.js e da pasta steamworks_sdk_<versão> do Linux ao lado do projeto, com tools/ContentBuilder/builder_linux/steamcmd.sh).
+    3. No Linux, dentro do projeto:
+           mkdir -p dist
+           tar -xzf CuideBemDaSuaMandioca-linux-x64.tar.gz -C dist        (cria dist/CuideBemDaSuaMandioca-linux-x64 com as permissões)
+           cp -r CuideBemDaSuaMandioca-win32-x64 dist/
+           npm run steam:upload -- SEU_LOGIN_DA_STEAM --sem-build
+    O build tem que levar os DOIS depots (um build sem o depot do Windows apagaria o Windows quando fosse ao ar).
+  Alternativa (menos segura): enviar do Windows mesmo e testar. Se der "permission denied" na Steam, use o jeito seguro.
+
+
+E) TESTAR
+---------
+  Num Linux com a Steam (ou na Steam Deck): instale o jogo pela biblioteca (com o build ativo no ramo "default", ou num ramo de teste
+  com senha) e abra. Se não abrir, rode pelo terminal para ver a mensagem:  bash iniciar-linux.sh  (na pasta do jogo instalado,
+  ~/.local/share/Steam/steamapps/common/...). O diário de erros fica em ~/.config/Cuide bem da sua mandioca/erros.log.
+
+  Notas:
+   - "required": true em desktop\steam.json vale no Linux também: o pacote só abre pela Steam (fora dela o jogo pede para reabrir pela Steam).
+     Para experimentar o pacote sem a Steam, rode  npm run start:linux  na pasta do projeto (aí ele roda como desenvolvimento).
+   - Na Steam Deck (modo Jogo) o jogo abre em janela (o ambiente é o Wayland do gamescope); a festa fica dentro da janela.
+   - O iniciar-linux.sh tira as pastas do runtime antigo da Steam (steam-runtime) do LD_LIBRARY_PATH, porque o Chromium do Electron
+     precisa das bibliotecas do sistema. ARRAIA_MANTER_LD=1 desliga isso.
+   - Conquistas, presença e o save na nuvem são os mesmos do Windows (o jogo fala com a Steam pela biblioteca libsteam_api.so do pacote).

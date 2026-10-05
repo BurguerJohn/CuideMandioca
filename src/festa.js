@@ -1471,6 +1471,8 @@
       const aside = sheet === crowd.dancers && weddingOn(engine) ? layout.wedding.hide : null;
       // "Olha a chuva!" da marcação: os pares abrem o guarda-chuva por um instante (e é mentira).
       const joke = dancing && now < (fx.fakeRainUntil || 0);
+      // Só as três fileiras da plateia do terreiro fazem os números (não a quadrilha, nem a gente das ilhas).
+      const row = plateia && !dancing ? [layout.audience, layout.audience2, layout.audience3].indexOf(list) : -1;
       for (const guest of list) {
         if (aside && aside.has(guest.index)) continue;
         const seed = hash(guest.index, sheet === crowd.dancers ? 7 : 13);
@@ -1479,7 +1481,8 @@
         const steps = crowd.steps || 2;
         const beat = Math.floor(now / (760 / steps) + phase * steps) % steps;
         const entries = flipEvery ? [[0, false], [13, true]] : [[0, (seed >>> 3) % 2 === 0]];
-        for (const [dx, flip] of entries) {
+        for (const [dx, flipBase] of entries) {
+          let flip = flipBase;
           const type = flipEvery ? (dx ? 1 : 0) : (seed >>> 5) % 2;
           let x = guest.x + dx;
           if (weave) x += Math.round((guest.index % 2 ? 1 : -1) * Math.sin(now / 620 + guest.index * 0.9) * 9 * weave);
@@ -1492,9 +1495,20 @@
           const person = type * crowd.fabrics + (flipEvery && dx ? (fabric + 2) % crowd.fabrics : fabric);
           // Dentro da onda: braços para o alto e um pulo que sobe e desce conforme a onda passa.
           const inWave = front < 18 && crowd.ola !== undefined;
-          const frame = inWave ? crowd.ola + person : tunnel ? person * steps + (Math.floor(now / 420 + phase) % 2 ? 2 : 6) : person * steps + beat;
-          const hop = inWave ? -Math.round(4 * Math.cos(front / 18 * Math.PI / 2))
+          let frame = inWave ? crowd.ola + person : tunnel ? person * steps + (Math.floor(now / 420 + phase) % 2 ? 2 : 6) : person * steps + beat;
+          let hop = inWave ? -Math.round(4 * Math.cos(front / 18 * Math.PI / 2))
             : cheering ? -Math.round(2 * Math.abs(Math.sin(now / 130 + seed))) : 0;
+          // Um número da plateia (palmas, pula-pula, trenzinho...) muda a pose, o pulo e o lugar de quem está nele.
+          let act = null;
+          if (row >= 0 && !inWave) {
+            act = plateia.pose(row, guest, seed, x, now);
+            if (act) {
+              frame = act.step === 'ola' ? crowd.ola + person : person * steps + act.step;
+              hop = act.hop;
+              x += act.dx;
+              if (act.flip !== undefined) flip = act.flip;
+            }
+          }
           // "Olha a cobra!": quem está perto da cobra de pano pula com os braços para cima.
           const scared = dancing && fx.cobraX != null && Math.abs(x + 6 - fx.cobraX) < 14;
           const startled = fx.startle && now < fx.startle.until && Math.abs(x + 6 - fx.startle.x) < 12;
@@ -1512,6 +1526,11 @@
           sprite(sheet, shown, x - (crowd.pad || 0), top, flip);
           rim(sheet, shown, x - (crowd.pad || 0), top, flip, x + 6);
           guestUmbrella(seed + dx, x - (crowd.pad || 0), top, joke);
+          if (row >= 0) {
+            if (act) plateia.over(row, guest, seed, x - (crowd.pad || 0), top, flip, now);
+            // Clicar em alguém da plateia puxa um número (nasce nessa pessoa e se espalha).
+            regions.push({ id: `bicho:plateia:${Math.round(guest.x)}`, x: Math.round(x - (crowd.pad || 0)), y: top, w: sheet.w, h: sheet.h });
+          }
         }
       }
     }
@@ -1885,7 +1904,7 @@
         const r = fx.rockets[i];
         const t = (now - r.born) / r.dur;
         if (t < 0) continue;
-        if (t >= 1) { burst(r, now); fx.rockets.splice(i, 1); continue; }
+        if (t >= 1) { burst(r, now); if (plateia) plateia.react('fogos', now); fx.rockets.splice(i, 1); continue; }
         const e = 1 - (1 - t) ** 2;
         for (let k = 0; k < 6; k++) {
           const tt = Math.max(0, e - k * 0.035);
@@ -2695,7 +2714,25 @@
       }
     }
 
-    // Mandioquinhas penduradas nas raízes, embaixo do terreiro flutuante.
+    // Uma mandioquinha pendurada (as 36 do terreiro, números 0 a 35, e as 4 das ilhas, 36 a 39): o sprite do cenário com o jeito dela
+    // por cima (src/festa-mandioquinhas.js: acessório, rosto e mania) e a região clicável (`bicho:mandioquinha:<n>`, n de 1 a 40).
+    function drawBaby(i, left, y, frame, now) {
+      const baby = bundle.scenery.mandioquinha;
+      if (!mandioquinhas) { sprite(baby, frame, left, y); return; }
+      const hop = critter(`mandioquinha:${i + 1}`, left, y, baby.w, baby.h, now);
+      const pose = mandioquinhas.pose(i, now);
+      const x = left + pose.dx;
+      const top = y + pose.dy + hop;
+      if (!pose.hide) {
+        mandioquinhas.back(i, x, top, now);
+        sprite(baby, frame, x, top);
+        mandioquinhas.front(i, x, top, now);
+      }
+      mandioquinhas.idle(i, x, top, now, pose.hide);
+    }
+
+    // Mandioquinhas penduradas nas raízes, embaixo do terreiro flutuante. Cada uma tem o seu jeito; um clique mostra o nome e a
+    // fala dela.
     function drawRoots(now) {
       const count = Math.min(36, layout.scenery.counts.mandioquinha || 0);
       const baby = bundle.scenery.mandioquinha;
@@ -2708,9 +2745,10 @@
         g.fillRect(layout.L + col, under, 1, Math.max(0, y - under + 1));
         // Penduradas na raiz, balançam devagar (cada uma no seu tempo).
         const swing = Math.round(Math.sin(now / 900 + i * 1.7) * 0.8);
-        sprite(baby, frameAt(baby, now, i * 0.5), layout.L + col - Math.floor(baby.w / 2) + swing, y);
+        drawBaby(i, layout.L + col - Math.floor(baby.w / 2) + swing, y, frameAt(baby, now, i * 0.5), now);
         spots.set(`mandioquinha:${i + 1}`, { x: layout.L + col, y: y + 4 });
       }
+      if (mandioquinhas) mandioquinhas.murmur(count, now, k => spots.get(`mandioquinha:${k + 1}`));
     }
 
     // Bichos que andam pelo terreiro: andam um pouco, param (bicar, pastar) e dão meia-volta nas bordas.
@@ -3427,6 +3465,8 @@
       fx.react[key] = now;
       const area = regions.find(entry => entry.id === id);
       if (!area) return;
+      if (kind === 'plateia' && plateia) { plateia.pull(Number(key.split(':')[1]), now); return; }
+      if (kind === 'mandioquinha' && mandioquinhas) { mandioquinhas.click(Number(key.split(':')[1]) - 1, area.x, area.y, now); return; }
       const words = CRITTER_SAYS[kind] || ['!'];
       const x = area.x + area.w / 2;
       say(words[Math.floor(rng() * words.length)], x, area.y - 4, now, kind === 'gato' ? '#cfe3ff' : '#fff8e8', 900, 8);
@@ -3448,6 +3488,11 @@
           const a = i / 14 * Math.PI * 2;
           fx.particles.push({ x: spot.x, y: spot.y, vx: Math.cos(a) * 0.02, vy: Math.sin(a) * 0.02, gravity: 0.00001,
             born: now, ttl: 700 + rng() * 300, colors: ['#fffff0', '#fff07a', '#9ef05a'] });
+        }
+        if (piece.id === 'mandioquinha' && mandioquinhas) {
+          const x = Math.min(layout.R - 30, Math.max(layout.L + 30, spot.x));
+          mandioquinhas.intro(Math.min(35, Math.max(0, (piece.index || 1) - 1)), x, spot.y, now);
+          continue;
         }
         const label = `+ ${piece.name}`;
         const half = label.length * 2 + 2;
@@ -3537,6 +3582,17 @@
       bundle, g, sprite, shadow, halo, say, float, confetti, sound, rng, fx: () => fx, layout: () => layout, ground: () => GROUND, roam,
       poleTop: () => GROUND - POLE_H[layout.tier], lift: () => (ridge ? 9 : 0), tr,
       region: (id, x, y, w, h) => regions.push({ id, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) })
+    }) : null;
+
+    // Os números da plateia (src/festa-plateia.js): além da ola, palmas, pula-pula, bandeirinhas, trenzinho, bis... de tempos em tempos
+    // (e quando alguém da plateia é clicado).
+    const plateia = root.ArraiaFestaPlateia ? root.ArraiaFestaPlateia.create({
+      g, say, sayBig, float, confetti, dust, sound, fx: () => fx, layout: () => layout, ground: () => GROUND, tr, calm: () => calm, seed: hooks.seed
+    }) : null;
+
+    // As mandioquinhas das raízes (src/festa-mandioquinhas.js): 36 jeitos, um por mandioquinha.
+    const mandioquinhas = root.ArraiaFestaMandioquinhas ? root.ArraiaFestaMandioquinhas.create({
+      g, say, float, fx: () => fx, tr, calm: () => calm, seed: hooks.seed
     }) : null;
 
     // Os eventos do mundo (src/festa-mundo.js): o céu e o tempo mudam o mapa inteiro por alguns segundos, com alvos para clicar.
@@ -4146,7 +4202,8 @@
       // A plateia puxa uma "ola" de tempos em tempos quando já tem bastante gente.
       const crowdSize = layout.audience.length + layout.audience2.length + layout.audience3.length;
       if (fx.wave && now - fx.wave.at > 1800) fx.wave = null;
-      if (crowdSize >= 16) {
+      if (plateia) plateia.update(engine, now, fx.wx.rain > 0.3 || weddingOn(engine) || !!fx.compadre?.at);
+      if (crowdSize >= 16 && !(plateia && plateia.busy())) {
         if (!fx.nextWave) fx.nextWave = now + 5000;
         else if (now >= fx.nextWave) {
           fx.wave = { at: now, dir: rng() < 0.5 ? 1 : -1 };
@@ -4351,6 +4408,11 @@
       const hostX = layout.host.x + 12;
       const up = n => GROUND - Math.round(n * fx.scale);
       for (const event of events) {
+        // A plateia reage ao que acontece: gente nova chega, a festa sobe de porte, um bingo termina, uma meta se cumpre.
+        if (plateia) {
+          const cue = { 'size-up': 'chegada', 'tier-up': 'porte', legendary: 'porte', 'bingo-win': 'bingo', 'goal-done': 'meta' }[event.type];
+          if (cue) plateia.react(cue, now);
+        }
         if (premios && event.type === 'premio') premios.onUnlock(event, now);
         if (premios) premios.onPlay(event, now);
         if (mundo && event.type === 'mundo-pego') mundo.onCatch(event, now);
@@ -4914,7 +4976,8 @@
           g.fillStyle = '#4a2418';
           g.fillRect(cx, under, 1, 2);
           const swing = Math.round(Math.sin(now / 900 + k + i) * 0.8);
-          sprite(baby, frameAt(baby, now, k + i), cx - Math.floor(baby.w / 2) + swing, under + 2);
+          // As quatro mandioquinhas das ilhas têm as vagas 37 a 40 do elenco (duas por ilha).
+          drawBaby(36 + (id === 'ilha-quadrilha' ? 0 : 2) + k, cx - Math.floor(baby.w / 2) + swing, under + 2, frameAt(baby, now, k + i), now);
         }
         if (left) {
           const fire = bundle.fires['0'];
@@ -5072,6 +5135,7 @@
 
     // Outra partida substitui os efeitos e os alvos, mantendo escala, ritmo e opções visuais.
     function reset() {
+      if (plateia) plateia.reset();
       if (folclore) folclore.reset();
       if (premios) premios.reset();
       if (mundo) mundo.reset();
@@ -5292,7 +5356,7 @@
     function setSleepy(on) { sleepy = on === true; }
 
     // Estado dos enfeites que vêm e vão sozinhos (para os testes e as fotos): vento (-1 a 1) e ciranda das crianças.
-    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rafael: fx.rafael.x === undefined ? null : { x: fx.rafael.x, mode: fx.rafael.mode, yeahAt: fx.rafael.yeahAt ?? null, shout: fx.rafael.shout ?? null }, folclore: folclore ? folclore.probe() : null, premios: premios ? premios.probe() : null, mundo: mundo ? mundo.probe() : null, mundoTrace: mundo ? mundo.traceId() : null, shake: [fx.shakeX || 0, fx.shakeY || 0], push: [view.shakeX || 0, view.shakeY || 0], rings: fx.rings.length, impact: fx.impact ? { power: fx.impact.power } : null, bigTexts: fx.texts.filter(item => item.scale > 1).length, rain: fx.wx ? Math.round(fx.wx.rain * 100) / 100 : 0, rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
+    function probe() { return { stove: fx.stovePos ? { ...fx.stovePos } : null, dishFly: !!fx.dishFly, compadres: fx.compadreDraw ? fx.compadreDraw.stage.kind : null, looseFlag: !!fx.looseFlag, phones: !!(fx.phones && fx.phones.at), hatFly: !!fx.hatFly, carroBoi: !!(fx.carroBoi && fx.carroBoi.at), flock: !!(fx.flock && fx.flock.at), drones: !!(fx.drones && fx.drones.at), fitas: !!(fx.fitas && fx.fitas.at), burro: fx.burroPos ? { ...fx.burroPos } : null, fotografo: fx.fotoPos ? { x: fx.fotoPos.x } : null, cobra: fx.cobra ? { x: fx.cobraX, caught: fx.cobra.caught != null, scared: fx.scared } : null, visitor: !!fx.visitorPos, bichos: fx.bichosUntil || 0, kombi: !!(fx.kombi && fx.kombi.on), sticker: fx.sticker && fx.sticker.key, cold: fx.cold, announce: fx.announce && fx.announce.text, look: fx.look && fx.look.kind, leilao: fx.leilaoPos && { ...fx.leilaoPos, sold: !!fx.leilao.sold }, saco: fx.sacoPos && { ...fx.sacoPos, exit: !!fx.saco.exit }, chase: fx.dog.plan === 'chase', rafael: fx.rafael.x === undefined ? null : { x: fx.rafael.x, mode: fx.rafael.mode, yeahAt: fx.rafael.yeahAt ?? null, shout: fx.rafael.shout ?? null }, folclore: folclore ? folclore.probe() : null, premios: premios ? premios.probe() : null, mandioquinhas: mandioquinhas ? mandioquinhas.probe() : null, plateia: plateia ? plateia.probe() : null, wave: !!fx.wave, mundo: mundo ? mundo.probe() : null, mundoTrace: mundo ? mundo.traceId() : null, shake: [fx.shakeX || 0, fx.shakeY || 0], push: [view.shakeX || 0, view.shakeY || 0], rings: fx.rings.length, impact: fx.impact ? { power: fx.impact.power } : null, bigTexts: fx.texts.filter(item => item.scale > 1).length, rain: fx.wx ? Math.round(fx.wx.rain * 100) / 100 : 0, rest: fx.restKind, wind: fx.windNow, ring: !!fx.ring, particles: fx.particles.length, texts: fx.texts.length, stepTexts: fx.texts.filter(item => item.step).length, arrivals: fx.arrivals.size, moodSaid: fx.moodSaid || null, hen: fx.hen.x === undefined ? null : { x: fx.hen.x, dir: fx.hen.dir }, chicks: fx.chicks.map(({ x, dir, walking }) => ({ x, dir, walking })) }; }
 
     // A pessoa voltou para a festa depois de um tempo fora: a Mandioca dá um pulinho, faz o olhar felizinho e cumprimenta.
     const GREETINGS = 4;
@@ -5320,6 +5384,8 @@
       else if (kind === 'fome' || kind === 'carente') { fx.moodAt = 1; fx.moodForce = kind; fx.moodLine = ordem; }
       // Qual descanso ela faz agora (ofega, abana, alonga...): o sorteio do jogo pode cair num que não combina com a cena.
       else if (kind === 'descanso') fx.restKind = ordem || 'ofega';
+      // Um número da plateia agora (`ordem` é o id: palmas, pulapula, bandeiras...); sem ordem, o sorteio escolhe. `lado` é o x de onde ele nasce, se vier.
+      else if (kind === 'plateia') return !!plateia && plateia.start(ordem || 'palmas', fx.lastDraw || 0, { origin: lado === 1 ? null : lado, by: 'teste' });
       else return false;
       return true;
     }

@@ -315,5 +315,51 @@ Object.assign(module.exports, {
     ] }
 });
 
+// --- TikTok "caos" (videos/caos): gravação de tela crua, vertical, com os eventos do mundo ---------------------------------------------
+// 4K vertical (2160x3840, página de 540x960): a festa inteira cabe na largura (4 px de vídeo por pixel de arte) e a montagem dá zoom ×2
+// (8 px por pixel de arte) ou recua ×0,5, sempre em escala exata. Cada cena começa o evento antes da gravação e avança o relógio
+// (`aquecer`) até o momento bom; `seed` fixa onde o evento cai (o tornado, por exemplo).
+const CAOS = { largura: 2160, altura: 3840, zoom: 4, segundos: 8, aquecer: 8, ajustes: { zoom: 2, x: 0.5, lift: 300, calm: true } };
+const evento = (id, extra = '') => `{ const e = __jogo.engine(); e.state.mundo.nextAt = 1e18; e.state.weather.nextAt = 1e18;
+  e.state.weather.rain = e.state.weather.rainbow = null; e.state.mundo.active = null; e.mundo.start('${id}'); ${extra} }`;
+const bater = (n, de, passo) => Array.from({ length: n }, (_, i) => [de + i * passo, `__jogo.engine().mundo.catchTarget(0)`]);
+Object.assign(module.exports, {
+  // 1. O tornado de tubarões em cima da roda-gigante: o primeiro quadro do vídeo (o funil quase parado à esquerda, seed 3).
+  'caos-tornado': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 9.5,
+    preparar: evento('tubaroes', `e.state.mundo.active.seed = 3; e.state.mundo.active.dir = 1;`) },
+  // 2. Surto zumbi: sirene vermelha e mãos saindo das covas.
+  'caos-surto': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 9, segundos: 5,
+    preparar: evento('surto', `e.state.mundo.active.seed = 77;`),
+    acoes: [0, 1, 2, 3].flatMap(k => [0, 1, 2].map(i => [0.9 + k * 0.85 + i * 0.22, `__jogo.engine().mundo.catchTarget(${k})`])) },
+  // 3. Meteoro da extinção: oito cliques e ele estoura.
+  'caos-meteoro': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 24, segundos: 5,
+    preparar: evento('meteoro', `e.state.mundo.active.dir = 1;`), acoes: bater(8, 1.0, 0.3) },
+  // 4. Canhão do circo: o segundo tiro (um palhaço cruzando a festa até a rede).
+  'caos-circo': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 11.4, segundos: 5,
+    preparar: evento('circo', `e.state.mundo.active.dir = 1; e.state.mundo.active.seed = 5;`) },
+  // 5. Balão gigante da Mandioca: sete cutucadas e estoura.
+  'caos-balao': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 14, segundos: 5.5,
+    preparar: evento('baloagigante', `e.state.mundo.active.dir = 1;`), acoes: bater(7, 0.9, 0.35) },
+  // 0. A área de trabalho (um monitor na vertical): a festa dançando em cima da planilha, com a placa e a Mandioca.
+  'caos-mesa': { ...CAOS, save: save('estagio-5'), html: MESA.html, css: MESA.css + '#casa { display: none !important; }', aquecer: 2, segundos: 5,
+    ajustes: { zoom: 2, x: 0.5, lift: 46, hud: 'sempre', calm: true },
+    // Um pedido chega e, no meio, o carinho do mouse na Mandioca (o cursor da montagem chega ali no mesmo instante).
+    acoes: [[0.4, `__acao.acao('debug', { op: 'pedido', value: '0' })`], [2.4, `{ __jogo.engine().state.runtime.pokeAt = 0; __jogo.festaClick('host'); }`],
+      [2.9, `{ __jogo.engine().state.runtime.pokeAt = 0; __jogo.festaClick('host'); }`]] },
+  // 7. A debandada dos dinossauros (o quadro todo treme a cada pisada).
+  'caos-manada': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 14, segundos: 4,
+    preparar: evento('manada', `e.state.mundo.active.dir = 1; e.state.mundo.active.seed = 9;`) },
+  // 6. Noite de balada: a bola de espelhos e os raios.
+  'caos-balada': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 6, segundos: 4,
+    preparar: evento('balada') }
+});
+
+Object.assign(module.exports, {
+  // 8. O fim: a festa inteira de noite, com os drones desenhando a Mandioca no céu.
+  'caos-final': { ...CAOS, save: save('estagio-5'), html: NOITE.html, css: NOITE.css + SEM_PLACA, aquecer: 1.5, segundos: 4,
+    ajustes: { zoom: 2, x: 0.5, lift: 300, calm: true },
+    acoes: [[0, `__jogo.ui.festa.provocar('drones', { idade: 9000, ordem: [4, 4, 4, 4, 4] })`]] }
+});
+
 // Peças para outros roteiros (fotos da loja da Steam em fotos.js). Não enumerável: gravar.js grava só as cenas.
 Object.defineProperty(module.exports, 'pecas', { enumerable: false, value: { save, NOITE, SEM_PLACA, MESA, MIRA, TEXTO } });

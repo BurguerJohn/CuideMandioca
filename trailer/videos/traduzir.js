@@ -7,7 +7,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const TRADUCOES = require('./traducoes.js');
-const { GRAVACOES, copiarAssets } = require('./copiar-assets.js');
+const { GRAVACOES, SO_PT, copiarAssets } = require('./copiar-assets.js');
 
 const GERADOS = path.join(__dirname, 'gerados');
 const IDIOMAS = { en: 1, es: 2 };
@@ -64,7 +64,7 @@ function gerar(video, idioma, nome, traduzidas) {
 }
 
 const pedidos = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
-const videos = pedidos.length ? pedidos : Object.keys(GRAVACOES);
+const videos = (pedidos.length ? pedidos : Object.keys(GRAVACOES)).filter(video => !SO_PT.includes(video));
 for (const video of videos) {
   // Só os projetos deste vídeo são refeitos: não sobra variante antiga, e os outros vídeos ficam como estão.
   for (const idioma of Object.keys(IDIOMAS)) fs.rmSync(path.join(GERADOS, `${video}-${idioma}`), { recursive: true, force: true });

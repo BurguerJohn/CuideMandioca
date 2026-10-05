@@ -798,10 +798,10 @@
         const lay = layout();
         // A sirene: o mapa pisca em vermelho e uma luz giratória acende em cada canto de cima, uma de cada vez.
         const pulse = 0.5 + 0.5 * Math.sin(now / 260);
-        tint('#3a0008', 0.14 * c.k);
-        tint('#ff1010', (0.03 + 0.07 * pulse) * c.k);
-        halo(lay.L + 8, 6, 30, '#ff2a2a', (pulse > 0.5 ? 0.5 : 0.12) * c.k);
-        halo(lay.R - 8, 6, 30, '#ff2a2a', (pulse > 0.5 ? 0.12 : 0.5) * c.k);
+        tint('#3a0008', 0.22 * c.k);
+        tint('#ff1010', (0.05 + 0.14 * pulse) * c.k);
+        halo(lay.L + 8, 6, 44, '#ff2a2a', (pulse > 0.5 ? 0.7 : 0.15) * c.k);
+        halo(lay.R - 8, 6, 44, '#ff2a2a', (pulse > 0.5 ? 0.15 : 0.7) * c.k);
         rect(lay.L + 5, 2, 6, 4, pulse > 0.5 ? '#ff4a4a' : '#7a1818');
         rect(lay.R - 11, 2, 6, 4, pulse > 0.5 ? '#7a1818' : '#ff4a4a');
         const grow = clamp(c.t / 6000, 0.25, 1);

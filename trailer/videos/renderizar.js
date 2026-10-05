@@ -5,7 +5,7 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
-const { GRAVACOES } = require('./copiar-assets.js');
+const { GRAVACOES, SO_PT } = require('./copiar-assets.js');
 
 const RENDERS = path.resolve(__dirname, '..', 'renders');
 const pedidos = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
@@ -17,7 +17,7 @@ for (const video of videos) {
     [path.join(__dirname, video), 'pt-BR'],
     [path.join(__dirname, 'gerados', `${video}-en`), 'en'],
     [path.join(__dirname, 'gerados', `${video}-es`), 'es']
-  ];
+  ].filter(([, idioma]) => idioma === 'pt-BR' || !SO_PT.includes(video));
   for (const [projeto, idioma] of variantes) {
     const saida = path.join(RENDERS, idioma, `${video}.mp4`);
     if (!forcar && fs.existsSync(saida)) { console.log(`${idioma}/${video}.mp4 (já existe)`); continue; }

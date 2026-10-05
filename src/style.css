@@ -36,6 +36,13 @@ body {
   user-select: none;
 }
 body.web { background: linear-gradient(180deg, #1c1a3a 0%, #34306a 45%, #7a4a8a 78%, #e28a6e 100%); }
+/* Janela comum do desktop: a noite de São João (o mesmo céu da festa), com um brilho roxo no meio e umas estrelas. */
+body.janela { background:
+  radial-gradient(ellipse 85% 48% at 50% 44%, rgba(98, 72, 176, .55), rgba(28, 26, 58, 0) 72%),
+  radial-gradient(ellipse 100% 30% at 50% 100%, rgba(238, 47, 60, .16), rgba(28, 26, 58, 0) 70%), #1c1a3a; }
+body.janela::before { content: ''; position: fixed; left: 0; top: 0; width: 2px; height: 2px; pointer-events: none; color: #fff4e4;
+  box-shadow: 6vw 8vh, 14vw 22vh, 21vw 6vh, 28vw 31vh, 35vw 12vh, 42vw 4vh, 49vw 26vh, 56vw 9vh, 63vw 34vh, 70vw 15vh, 77vw 5vh, 84vw 28vh,
+    91vw 11vh, 96vw 24vh, 10vw 38vh, 25vw 18vh, 47vw 17vh, 66vw 20vh, 80vw 38vh, 3vw 28vh, 38vw 36vh, 59vw 3vh, 88vw 19vh; opacity: .8; }
 img.pix { image-rendering: pixelated; vertical-align: middle; flex: none; }
 img { -webkit-user-drag: none; }
 button, input, select, textarea { font-family: inherit; }

@@ -4611,3 +4611,81 @@ test('eventos avulsos (segunda leva): cada um chega com a fanfarra certa (o raro
     assert.ok(Som.SONS.includes(sound), `${sound} existe`);
   }
 });
+
+test('mandioquinha das raízes: o clique toca o som do pintinho no tom só dela e abre o nome e a fala na festa', async () => {
+  const Mq = require('../src/festa-mandioquinhas.js');
+  const plays = [];
+  const pokes = [];
+  const som = { set() {}, setMusic() {}, unlock() {}, play: (name, options) => { plays.push([name, options]); return true; } };
+  let current = 'bicho:mandioquinha:7';
+  const festa = fakeFesta({ hit: () => current, poke: id => pokes.push(id), celebrate() {}, photo: () => '' });
+  const { document } = boot({ ArraiaFesta: { create: () => festa }, ArraiaSom: { create: () => som }, ArraiaFestaMandioquinhas: Mq, FESTA_SPRITES: {} });
+  await Promise.resolve();
+  const canvas = document.querySelector('#festa-canvas');
+  canvas.closest = selector => selector === '#festa-canvas' ? canvas : null;
+  document.elementFromPoint = () => canvas;
+  const tap = () => {
+    document.listeners.pointerdown({ target: canvas, button: 0, clientX: 80, clientY: 80, preventDefault() {} });
+    document.listeners.pointerup({ target: canvas, button: 0, clientX: 80, clientY: 80 });
+  };
+  tap();
+  assert.deepEqual(pokes, ['bicho:mandioquinha:7']);
+  assert.equal(JSON.stringify(plays.at(-1)), JSON.stringify(['pintinho', { pitch: Mq.ROSTER[6].voice }]), 'o som do pintinho, no tom da sétima (o Chico Valentão)');
+  // Cada uma tem o seu tom; os outros bichos tocam o som deles do jeito de sempre.
+  current = 'bicho:mandioquinha:2';
+  tap();
+  assert.equal(JSON.stringify(plays.at(-1)), JSON.stringify(['pintinho', { pitch: Mq.ROSTER[1].voice }]));
+  assert.notEqual(Mq.ROSTER[1].voice, Mq.ROSTER[6].voice);
+  assert.equal(Mq.CAST[37].id, 'noiva');
+  current = 'bicho:mandioquinha:38';
+  tap();
+  assert.equal(JSON.stringify(plays.at(-1)), JSON.stringify(['pintinho', { pitch: Mq.CAST[37].voice }]), 'as das ilhas (37 a 40) também têm voz');
+  current = 'bicho:sapo';
+  tap();
+  assert.equal(JSON.stringify(plays.at(-1)), JSON.stringify(['sapo', null]));
+  current = 'bicho:mandioquinha:99';
+  tap();
+  assert.equal(JSON.stringify(plays.at(-1)), JSON.stringify(['pintinho', null]), 'vaga sem mandioquinha: o som padrão, sem tom');
+});
+
+test('modo de teste: a aba Plateia troca na tela e o botão de cada número chama a festa (provocar) com o id dele', async () => {
+  const calls = [];
+  const festa = fakeFesta({ provocar: (kind, options) => { calls.push([kind, options.ordem]); return true; } });
+  const { document } = boot({ ArraiaFesta: { create: () => festa }, FESTA_SPRITES: {} });
+  await Promise.resolve();
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  const digitar = texto => { for (const key of texto) document.listeners.keydown({ key, target: { closest: () => null }, preventDefault() {} }); };
+  click({ action: 'tab', tab: 'historico' });
+  digitar('banana');
+  click({ action: 'tela', tela: 'teste' });
+  click({ action: 'teste-aba', value: 'plateia' });
+  assert.match(node('#tela-corpo').innerHTML, /data-action="plateia" data-value="bandeiras"/);
+  assert.doesNotMatch(node('#tela-corpo').innerHTML, /data-op="animacao"/);
+  click({ action: 'plateia', value: 'bandeiras' });
+  click({ action: 'plateia', value: 'serpente' });
+  assert.deepEqual(calls, [['plateia', 'bandeiras'], ['plateia', 'serpente']]);
+  // A aba continua aberta depois do clique, e voltar para a Geral funciona.
+  assert.match(node('#tela-corpo').innerHTML, /data-action="plateia" data-value="serpente"/);
+  click({ action: 'teste-aba', value: 'geral' });
+  assert.match(node('#tela-corpo').innerHTML, /data-op="animacao"/);
+});
+
+test('janela comum (Linux sem sobreposição): o corpo da página ganha a classe "janela" (o fundo do céu), e os Ajustes falam em "abrir ao iniciar a sessão"', async () => {
+  const sobreposicao = boot({}, { mode: 'sobreposicao', platform: 'win32' });
+  await Promise.resolve();
+  assert.equal(sobreposicao.document.body.classList.contains('desktop'), true);
+  assert.equal(sobreposicao.document.body.classList.contains('janela'), false, 'a sobreposição segue transparente');
+  const { document } = boot({}, { mode: 'janela', platform: 'linux' });
+  await Promise.resolve();
+  assert.equal(document.body.classList.contains('desktop'), true, 'continua sendo o jogo de desktop (save, Steam)');
+  assert.equal(document.body.classList.contains('janela'), true);
+  const node = id => document.nodes.get(id);
+  const click = dataset => document.listeners.click({ target: { closest: () => ({ tagName: 'BUTTON', dataset, disabled: false }) } });
+  click({ action: 'abrir' });
+  click({ action: 'tab', tab: 'ajustes' });
+  const html = node('#painel-corpo').innerHTML;
+  assert.match(html, /Abrir ao iniciar a sessão/);
+  assert.match(html, /A festa abre sozinha quando você inicia a sessão no Linux\./);
+  assert.doesNotMatch(html, /Abrir com o Windows|entra no Windows/);
+});

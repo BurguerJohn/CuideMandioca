@@ -233,6 +233,12 @@
         v.ruido(0, 0.8, { type: 'highpass', freq: 3000, gain: 0.012 });
       }
     },
+    // Os números da plateia: palmas no compasso (sete palmas, cada uma um estalo de ruído), o "ooh" de quem vê um fogo (vozes que sobem
+    // e descem), os vivas (um coro que cresce) e a pisada (quatro batidas surdas no chão).
+    palmas: { gap: 500, play: v => { for (let i = 0; i < 7; i++) { const at = i * 0.14 + Math.random() * 0.02; v.ruido(at, 0.035, { freq: 1900 + Math.random() * 900, q: 0.9, gain: 0.06 + Math.random() * 0.05 }); v.ruido(at, 0.05, { type: 'lowpass', freq: 500, gain: 0.045 }); } } },
+    ooh: { gap: 1200, play: v => { for (const [k, f] of [[0, 330], [1, 392], [2, 247]]) v.tom(k * 0.03, 0.8, f, { to: f * 1.18, type: 'triangle', gain: 0.04, attack: 0.15, filter: 900 }); v.ruido(0, 0.7, { freq: 900, q: 0.5, gain: 0.03, attack: 0.2 }); } },
+    vivas: { gap: 1000, play: v => { v.ruido(0, 0.9, { freq: 1100, to: 1700, q: 0.6, gain: 0.07, attack: 0.1 }); for (const f of [420, 520, 640]) v.tom(0.02, 0.8, f, { to: f * 1.5, type: 'sawtooth', gain: 0.022, attack: 0.12, filter: 1400 }); } },
+    pisada: { gap: 600, play: v => { for (let i = 0; i < 4; i++) { v.tom(i * 0.17, 0.09, 110, { to: 55, type: 'sine', gain: 0.15 }); v.ruido(i * 0.17, 0.05, { type: 'lowpass', freq: 600, gain: 0.1 }); } } },
     // O grito da marcação da quadrilha ("Anarriê!"): um gritinho que sobe e desce, baixinho.
     grito: { gap: 3500, play: v => { v.tom(0, 0.09, 700, { to: 1100, type: 'triangle', gain: 0.05 }); v.tom(0.08, 0.1, 1100, { to: 800, type: 'triangle', gain: 0.045 }); } },
     // A bolinha do bingo saindo do globo: dois tiquinhos de madeira.

@@ -209,3 +209,63 @@ test('nuvem da Steam: só com o App ID de verdade e a nuvem ligada na conta e no
   assert.equal(old.cloudRead('save.json'), null);
   assert.equal(old.cloudWrite('save.json', 'z'), false);
 });
+
+test('SteamPipe com Linux: o script tem um depot por sistema (pasta de cada build), e sem o terceiro número continua só com o Windows', () => {
+  const { buildScript } = require('../desktop/prepare-steam');
+  const win = buildScript('5343830', '5343831');
+  const barra = String.fromCharCode(92);
+  assert.ok(win.includes(`"ContentRoot" "${['..', 'dist', 'CuideBemDaSuaMandioca-win32-x64'].join(barra)}"`), 'o de sempre não muda');
+  assert.doesNotMatch(win, /linux/i);
+  assert.equal((win.match(/"FileMapping"/g) || []).length, 1);
+  const both = buildScript('5343830', '5343831', '5343832');
+  assert.match(both, /"AppID" "5343830"/);
+  assert.match(both, /"ContentRoot" "\.\.\/dist"/, 'a raiz passa a ser dist/, com uma pasta por depot');
+  assert.match(both, /"5343831"\s*\{\s*"FileMapping"\s*\{\s*"LocalPath" "CuideBemDaSuaMandioca-win32-x64\/\*"/);
+  assert.match(both, /"5343832"\s*\{\s*"FileMapping"\s*\{\s*"LocalPath" "CuideBemDaSuaMandioca-linux-x64\/\*"/);
+  assert.equal((both.match(/"DepotPath" "\."/g) || []).length, 2);
+  assert.equal((both.match(/"Recursive" "1"/g) || []).length, 2);
+  // As chaves abrem e fecham (o arquivo é lido por quem não perdoa chave faltando).
+  assert.equal((both.match(/\{/g) || []).length, (both.match(/\}/g) || []).length);
+  assert.ok(both.indexOf('"5343831"') < both.indexOf('"5343832"'));
+});
+
+test('envio pelo SteamPipe com Linux: só confere o build de Linux se o script tem o depot dele, acha o steamcmd.sh no Linux e avisa do bit de executável no Windows', () => {
+  const { findSteamcmd, problems, hasLinuxDepot, linuxPermissionNote, LINUX_REQUIRED } = require('../desktop/upload-steam');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mandioca-linux-'));
+  try {
+    const touch = (base, file) => { fs.mkdirSync(path.dirname(path.join(base, file)), { recursive: true }); fs.writeFileSync(path.join(base, file), ''); };
+    const win = path.join(dir, 'win'), linux = path.join(dir, 'linux');
+    for (const file of ['CuideBemDaSuaMandioca.exe', 'resources/app.asar', 'resources/app.asar.unpacked/node_modules/steamworks.js/dist/win64/steam_api64.dll',
+      'resources/app.asar.unpacked/node_modules/steamworks.js/dist/win64/steamworksjs.win32-x64-msvc.node']) touch(win, file);
+    const so = path.join(dir, 'so.vdf'), ambos = path.join(dir, 'ambos.vdf');
+    fs.writeFileSync(so, '"AppBuild" { "ContentRoot" "..\dist\CuideBemDaSuaMandioca-win32-x64" }');
+    fs.writeFileSync(ambos, '"AppBuild" { "LocalPath" "CuideBemDaSuaMandioca-linux-x64/*" }');
+    assert.equal(hasLinuxDepot(so), false);
+    assert.equal(hasLinuxDepot(ambos), true);
+    assert.equal(hasLinuxDepot(path.join(dir, 'nao-existe.vdf')), false);
+    const config = { appId: 5343830 };
+    assert.deepEqual(problems({ config, build: win, script: so, linuxBuild: linux }), [], 'sem o depot de Linux o build de Linux nem é olhado');
+    const faltando = problems({ config, build: win, script: ambos, linuxBuild: linux });
+    assert.equal(faltando.length, LINUX_REQUIRED.length);
+    assert.match(faltando.join('\n'), /build de Linux não tem iniciar-linux\.sh/);
+    assert.match(faltando.join('\n'), /libsteam_api\.so/);
+    assert.match(faltando.join('\n'), /npm run build:linux/);
+    for (const file of LINUX_REQUIRED) touch(linux, file);
+    assert.deepEqual(problems({ config, build: win, script: ambos, linuxBuild: linux }), []);
+    // O steamcmd: .exe no Windows; .sh (nas pastas do SDK para Linux e macOS) nos outros.
+    const builder = path.join(dir, 'sdk', 'tools', 'ContentBuilder');
+    touch(builder, 'builder/steamcmd.exe');
+    touch(builder, 'builder_linux/steamcmd.sh');
+    assert.equal(findSteamcmd(path.join(dir, 'sdk'), 'win32'), path.join(builder, 'builder', 'steamcmd.exe'));
+    assert.equal(findSteamcmd(path.join(dir, 'sdk'), 'linux'), path.join(builder, 'builder_linux', 'steamcmd.sh'));
+    assert.equal(findSteamcmd(path.join(dir, 'sdk'), 'darwin'), path.join(builder, 'builder_linux', 'steamcmd.sh'), 'a ordem acha o que existir');
+    fs.rmSync(path.join(builder, 'builder_linux'), { recursive: true });
+    assert.equal(findSteamcmd(path.join(dir, 'sdk'), 'linux'), null, 'steamcmd.exe não serve no Linux');
+    // O aviso do bit de executável só aparece enviando de um Windows.
+    assert.match(linuxPermissionNote('win32'), /Windows.*bit de executável.*permission denied.*tar\.gz.*--sem-build/s);
+    assert.equal(linuxPermissionNote('linux'), null);
+    assert.equal(linuxPermissionNote('darwin'), null);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
